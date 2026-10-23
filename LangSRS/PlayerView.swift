@@ -17,6 +17,11 @@ struct PlayerView: View {
     @State private var pinnedToken: Token?
     @State private var hint: WordHint?
     @FocusState private var focusedLine: Int?
+    /// The last word the pointer was on, kept for a moment (and while the pointer is on the hint bar) so the buttons
+    /// in the bar can be reached.
+    @State private var lingerToken: Token?
+    @State private var barHovered = false
+    @State private var lingerTask: Task<Void, Never>?
     /// Status of every word in this video, so learning and known words can be tinted in the subtitles.
     @State private var statuses: [WordKey: WordStatus] = [:]
     @AppStorage("highlightWords") private var highlightWords = true
@@ -24,7 +29,7 @@ struct PlayerView: View {
 
     private var profile: (any LanguageProfile)? { LanguageProfiles.profile(for: video.language) }
     /// The word the hint bar describes: the pinned one, else the one under the pointer or the keyboard.
-    private var shownToken: Token? { pinnedToken ?? hoveredToken }
+    private var shownToken: Token? { pinnedToken ?? hoveredToken ?? lingerToken }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -46,6 +51,15 @@ struct PlayerView: View {
         .task(id: app.dataVersion) {
             guard let id = video.id else { return }
             statuses = (try? await env.database.wordStatuses(videoID: id)) ?? [:]
+        }
+        .onChange(of: hoveredToken) { _, new in
+            lingerTask?.cancel()
+            if let new { lingerToken = new; return }
+            lingerTask = Task {
+                try? await Task.sleep(for: .seconds(1.2))
+                guard !Task.isCancelled, !barHovered else { return }
+                lingerToken = nil
+            }
         }
         .onDisappear { controller?.stop() }
     }
@@ -245,6 +259,16 @@ struct PlayerView: View {
         .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
         .background(Theme.soft.opacity(0.55))
         .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 1) }
+        .onHover { inside in
+            barHovered = inside
+            guard !inside, hoveredToken == nil else { return }
+            lingerTask?.cancel()
+            lingerTask = Task {
+                try? await Task.sleep(for: .seconds(0.4))
+                guard !Task.isCancelled, !barHovered else { return }
+                lingerToken = nil
+            }
+        }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Word meaning")
     }
