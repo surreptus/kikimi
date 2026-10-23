@@ -82,7 +82,7 @@ struct ReviewView: View {
                             Divider().padding(.horizontal, 60).padding(.vertical, 4)
                             Text(highlighted(example)).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
                                 .multilineTextAlignment(.center)
-                            Text(example.videoTitle).font(.caption2).foregroundStyle(Theme.faint)
+                            Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint)
                         }
                     }
                     .padding(.top, 6)

@@ -86,7 +86,7 @@ struct ImportView: View {
                 if let progress = downloadProgress {
                     VStack(alignment: .trailing, spacing: 4) {
                         ProgressView(value: progress).progressViewStyle(.thin).frame(width: 160)
-                        Text("\(Int(progress * 100))%").font(.caption.weight(.bold)).foregroundStyle(Theme.muted)
+                        Text("\(Int(progress * 100))%").font(Theme.small.weight(.medium)).foregroundStyle(Theme.muted)
                     }
                 } else if modelInstalled == false {
                     Button("Download model") { Task { await download() } }.buttonStyle(.pill(compact: true))
@@ -95,10 +95,10 @@ struct ImportView: View {
                 }
             }
             if let note = ModelCatalog.info(for: model)?.note {
-                Text(note).font(.caption).foregroundStyle(Theme.muted)
+                Text(note).font(Theme.small).foregroundStyle(Theme.muted)
             }
             if let downloadError {
-                Text(downloadError).font(.caption).foregroundStyle(Theme.red)
+                Text(downloadError).font(Theme.small).foregroundStyle(Theme.red)
             }
         }
         .panel()
@@ -198,7 +198,7 @@ struct ImportView: View {
                         ProgressView(value: fraction).progressViewStyle(.thin)
                     }
                     if case .failed(let message) = job.status {
-                        Text(message).font(.caption).foregroundStyle(Theme.red)
+                        Text(message).font(Theme.small).foregroundStyle(Theme.red)
                     }
                     if case .languageMismatch(let detected) = job.status, let other = LanguageProfiles.profile(for: detected) {
                         languagePrompt(job: job, detected: other)

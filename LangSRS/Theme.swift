@@ -61,6 +61,9 @@ enum Theme {
         reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.38, dampingFraction: 0.86)
     }
 
+    /// The smallest text in the app. Furigana over subtitle words is the one exception (see `SubtitleRow`).
+    static let small = Font.system(size: 12, design: .rounded)
+
     /// Large headings are light; small ones need a little weight to stay readable.
     static func title(_ size: CGFloat = 24) -> Font { .system(size: size, weight: size >= 30 ? .regular : .semibold, design: .rounded) }
 }

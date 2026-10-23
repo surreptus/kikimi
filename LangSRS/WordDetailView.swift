@@ -16,7 +16,7 @@ struct WordDetail: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 header
-                if let exportMessage { Text(exportMessage).font(.caption).foregroundStyle(Theme.muted) }
+                if let exportMessage { Text(exportMessage).font(Theme.small).foregroundStyle(Theme.muted) }
 
                 Text("Dictionary").font(Theme.title(17))
                 if entries.isEmpty {
@@ -61,7 +61,7 @@ struct WordDetail: View {
                 }
             }
             if let stage = row.word.stage {
-                Text("Stage \(stage.rawValue) of 9").font(.caption).foregroundStyle(Theme.muted)
+                Text("Stage \(stage.rawValue) of 9").font(Theme.small).foregroundStyle(Theme.muted)
             }
         }
     }
@@ -71,7 +71,7 @@ struct WordDetail: View {
         return HStack(alignment: .top, spacing: 10) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(line.text).font(.system(.body, design: .rounded)).textSelection(.enabled)
-                Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(.caption).foregroundStyle(Theme.muted)
+                Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(Theme.small).foregroundStyle(Theme.muted)
             }
             Spacer(minLength: 6)
             Button(isPlaying ? "Stop" : "Hear this line", systemImage: isPlaying ? "stop.fill" : "speaker.wave.2.fill") {

@@ -32,7 +32,7 @@ struct StorageView: View {
                 ForEach(models) { model in modelRow(model) }
                 if importRunning {
                     Text("An import is running, so models can't be removed right now.")
-                        .font(.caption).foregroundStyle(Theme.muted)
+                        .font(Theme.small).foregroundStyle(Theme.muted)
                 }
             }
 
@@ -41,7 +41,7 @@ struct StorageView: View {
                     .foregroundStyle(Theme.muted)
             }
 
-            if let error { Text(error).font(.caption).foregroundStyle(Theme.red) }
+            if let error { Text(error).font(Theme.small).foregroundStyle(Theme.red) }
         }
         .padding(24)
         .frame(width: 540)
@@ -76,7 +76,7 @@ struct StorageView: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(ModelCatalog.name(for: model.variant)).font(.system(.headline, design: .rounded))
-                Text(detail(for: model)).font(.caption).foregroundStyle(Theme.muted)
+                Text(detail(for: model)).font(Theme.small).foregroundStyle(Theme.muted)
             }
             Spacer()
             Text(format(model.bytes)).foregroundStyle(Theme.muted)

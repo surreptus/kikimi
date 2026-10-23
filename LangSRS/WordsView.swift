@@ -143,7 +143,7 @@ struct WordsView: View {
         HStack(spacing: 10) {
             Text(selection.isEmpty ? "\(rows.count) words" : "\(selection.count) of \(rows.count) selected")
                 .foregroundStyle(Theme.muted)
-            if let message { Text(message).font(.caption).foregroundStyle(Theme.muted).lineLimit(1) }
+            if let message { Text(message).font(Theme.small).foregroundStyle(Theme.muted).lineLimit(1) }
             Spacer()
             Button("Reset") {
                 if selectedRows.contains(where: { $0.word.status == .learning || $0.word.status == .burned }) {

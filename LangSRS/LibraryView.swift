@@ -73,7 +73,7 @@ struct LibraryView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.video.title).font(.system(.headline, design: .rounded)).lineLimit(2)
                 Text("\(duration(item.video.duration)) · \(item.subtitleCount) lines · \(sizes[item.id].map(formatBytes) ?? "…") · added \(item.video.importedAt.formatted(date: .abbreviated, time: .omitted))")
-                    .font(.caption).foregroundStyle(Theme.muted)
+                    .font(Theme.small).foregroundStyle(Theme.muted)
             }
             Spacer()
             Button("Info", systemImage: "info.circle") { info = item.video }
@@ -195,12 +195,12 @@ private struct VideoInfoSheet: View {
                 }
                 .panel()
                 Text("This is the app's own copy. Your original file, wherever you imported it from, is not touched by the app.")
-                    .font(.caption).foregroundStyle(Theme.muted)
+                    .font(Theme.small).foregroundStyle(Theme.muted)
             } else {
                 ProgressView()
             }
 
-            if let error { Text(error).font(.caption).foregroundStyle(Theme.red) }
+            if let error { Text(error).font(Theme.small).foregroundStyle(Theme.red) }
 
             HStack(spacing: 12) {
                 Button("Delete") { confirmDelete = true }.buttonStyle(.pill(.danger, compact: true))

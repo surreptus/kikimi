@@ -16,7 +16,7 @@ struct AcknowledgementsView: View {
             List(items) { item in
                 DisclosureGroup(item.title) {
                     Text(item.text)
-                        .font(.system(.caption, design: .monospaced))
+                        .font(.system(size: 12, design: .monospaced))
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
