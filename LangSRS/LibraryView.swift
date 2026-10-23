@@ -69,19 +69,20 @@ struct LibraryView: View {
 
     private func row(_ item: LibraryEntry) -> some View {
         HStack(spacing: 14) {
-            Image(systemName: "play.rectangle.fill")
-                .font(.system(size: 26, weight: .bold)).foregroundStyle(Theme.pink)
-                .frame(width: 44, height: 44)
-                .background(RoundedRectangle(cornerRadius: 13).fill(Theme.pinkSoft))
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.video.title).font(.system(.headline, design: .rounded)).lineLimit(2)
                 Text("\(duration(item.video.duration)) · \(item.subtitleCount) lines · \(sizes[item.id].map(formatBytes) ?? "…") · added \(item.video.importedAt.formatted(date: .abbreviated, time: .omitted))")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
-            Button("Info") { info = item.video }.buttonStyle(.chunky(.secondary, compact: true))
-                .help("Size, location and delete")
-            Button("Play") { open(item.video, at: nil) }.buttonStyle(.chunky(compact: true))
+            Button("Info", systemImage: "info.circle") { info = item.video }
+                .labelStyle(.iconOnly).buttonStyle(.plain)
+                .font(.system(size: 20)).foregroundStyle(.secondary)
+                .help("Size, location, rename and delete")
+            Button("Play", systemImage: "play.circle.fill") { open(item.video, at: nil) }
+                .labelStyle(.iconOnly).buttonStyle(.plain)
+                .font(.system(size: 28)).foregroundStyle(Theme.pink)
+                .help("Play")
         }
         .duoCard()
         .contentShape(Rectangle())
