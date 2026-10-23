@@ -128,7 +128,7 @@ struct WordsView: View {
         .overlay {
             if rows.isEmpty {
                 if trimmedSearch.isEmpty && filter == nil {
-                    EmptyState(title: "No words yet", message: "Add a video on the Videos page to collect words.")
+                    EmptyState(title: "No words yet", message: "Add a video on the Videos page to collect words.", illustration: .bubble)
                 } else {
                     EmptyState(title: "No matches", message: "Try a different search or status.")
                 }

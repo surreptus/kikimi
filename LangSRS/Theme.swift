@@ -230,14 +230,94 @@ struct Blob: View {
     }
 }
 
-/// Nothing here yet: the flower, a title and one line saying what to do. Not for errors, which keep the warning icon.
+/// What the illustrations share: a light body and a near-black face in both modes, so neither follows the ink.
+private enum Mascot {
+    static let face = Color(hex: 0x121212)
+    static let paper = Color(light: .white, dark: Color(hex: 0xF4F1EA))
+}
+
+/// Two eyes and a small smile, centred `y` points from the middle.
+private struct MascotFace: View {
+    var y: CGFloat
+    var body: some View {
+        ZStack {
+            Circle().fill(Mascot.face).frame(width: 6, height: 6).offset(x: -9, y: y)
+            Circle().fill(Mascot.face).frame(width: 6, height: 6).offset(x: 9, y: y)
+            Circle().trim(from: 0.12, to: 0.38).stroke(Mascot.face, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .frame(width: 14, height: 14).rotationEffect(.degrees(30)).offset(y: y + 7)
+        }
+    }
+}
+
+/// A clapperboard with a face: for an empty Videos page.
+struct Clapperboard: View {
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 7).fill(Mascot.paper).frame(width: 66, height: 44).offset(y: 12)
+            // The hinged top, with its stripes.
+            ZStack {
+                RoundedRectangle(cornerRadius: 5).fill(Mascot.paper).frame(width: 70, height: 16)
+                HStack(spacing: 7) {
+                    ForEach(0..<4) { _ in Rectangle().fill(Mascot.face).frame(width: 7, height: 24).rotationEffect(.degrees(28)) }
+                }
+                .frame(width: 70, height: 16).clipShape(RoundedRectangle(cornerRadius: 5)).offset(x: -3)
+            }
+            .rotationEffect(.degrees(-9), anchor: .bottomLeading).offset(y: -18)
+            MascotFace(y: 6)
+        }
+        .compositingGroup()   // one flat layer, so a fade doesn't show the overlaps
+        .frame(width: 100, height: 100)
+        .accessibilityHidden(true)
+    }
+}
+
+private struct BubbleTail: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+/// A speech bubble with a face: for an empty Words page.
+struct SpeechBubble: View {
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 28).fill(Mascot.paper).frame(width: 80, height: 58).offset(y: -4)
+            BubbleTail().fill(Mascot.paper).frame(width: 18, height: 16).offset(x: -20, y: 30)
+            MascotFace(y: -8)
+        }
+        .compositingGroup()
+        .frame(width: 100, height: 100)
+        .accessibilityHidden(true)
+    }
+}
+
+/// Which character an empty state shows.
+enum Illustration {
+    case flower, clapperboard, bubble
+
+    @ViewBuilder var view: some View {
+        switch self {
+        case .flower: Blob()
+        case .clapperboard: Clapperboard()
+        case .bubble: SpeechBubble()
+        }
+    }
+}
+
+/// Nothing here yet: a character, a title and one line saying what to do. Not for errors, which keep the warning icon.
 struct EmptyState: View {
     let title: String
     let message: String
+    var illustration: Illustration = .flower
 
     var body: some View {
         VStack(spacing: 10) {
-            Blob()
+            illustration.view
             Text(title).font(Theme.title(22)).foregroundStyle(Theme.ink)
             Text(message).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
                 .multilineTextAlignment(.center)

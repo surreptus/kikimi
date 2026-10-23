@@ -57,7 +57,8 @@ struct VideosView: View {
                 ImportSection(env: env)
                 if items.isEmpty {
                     VStack(spacing: 8) {
-                        EmptyState(title: "No videos yet", message: "Drop one above and its words will appear on the Words page.")
+                        EmptyState(title: "No videos yet", message: "Drop one above and its words will appear on the Words page.",
+                                   illustration: .clapperboard)
                         Button("How Reprise works") { app.showAbout = true }.buttonStyle(.pill(.secondary, compact: true))
                     }
                     .frame(maxWidth: .infinity, minHeight: 200)
