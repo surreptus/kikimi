@@ -118,6 +118,16 @@ struct PlayerView: View {
             .keyboardShortcut(.space, modifiers: [])
             Button("Next line", systemImage: "forward.fill") { Task { await controller.nextLine() } }
                 .buttonStyle(.chunky(.secondary, compact: true))
+            Menu {
+                Picker("Speed", selection: Binding(get: { controller.speed }, set: { controller.speed = $0 })) {
+                    ForEach([Float(0.5), 0.75, 1, 1.25, 1.5, 2], id: \.self) { Text(speedLabel($0)).tag($0) }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Text(speedLabel(controller.speed)).frame(minWidth: 30)
+            }
+            .menuStyle(.button).buttonStyle(.chunky(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+            .help("Playback speed")
         }
         .labelStyle(.iconOnly)
     }
@@ -158,16 +168,6 @@ struct PlayerView: View {
                         StatusPill(text: status.rawValue, color: color(for: status))
                     }
                     Spacer()
-                }
-                Text(hint?.gloss ?? "No dictionary entry").font(.system(.callout, design: .rounded)).lineLimit(2)
-                    .foregroundStyle(hint?.gloss == nil ? .secondary : .primary)
-            } else {
-                Text("Hover a word in the subtitles to see what it means.")
-                    .font(.system(.callout, design: .rounded)).foregroundStyle(.tertiary)
-            }
-        }
-        .padding(.horizontal, 16).padding(.vertical, 10)
-        .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
                     if hint?.wordID != nil {
                         if hint?.status != .learning && hint?.status != .burned {
                             Button("Learn") { setStatus(.learning) }.buttonStyle(.chunky(compact: true))
@@ -178,8 +178,22 @@ struct PlayerView: View {
                                 .help("Mark this word as known")
                         }
                     }
+                }
+                Text(hint?.gloss ?? "No dictionary entry").font(.system(.callout, design: .rounded)).lineLimit(2)
+                    .foregroundStyle(hint?.gloss == nil ? .secondary : .primary)
+            } else {
+                Text("Hover a word in the subtitles to see what it means.")
+                    .font(.system(.callout, design: .rounded)).foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.horizontal, 16).padding(.vertical, 10)
+        .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
         .background(Theme.pinkSoft.opacity(0.55))
         .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 2) }
+    }
+
+    private func speedLabel(_ speed: Float) -> String {
+        (speed == speed.rounded() ? String(Int(speed)) : String(format: "%g", speed)) + "×"
     }
 
     private func color(for status: WordStatus) -> Color {
