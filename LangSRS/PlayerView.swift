@@ -143,7 +143,7 @@ struct PlayerView: View {
     /// What the tints mean, and one switch for them. Two states only: a burned word is simply a known one.
     private var legendBar: some View {
         HStack(spacing: 14) {
-            legendDot(Theme.orange, "Learning")
+            legendDot(Theme.orange, "Learning", underlined: true)
             legendDot(Theme.green, "Known")
             Spacer()
             Toggle("Highlight", isOn: $highlightWords)
@@ -154,10 +154,12 @@ struct PlayerView: View {
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.line).frame(height: 2) }
     }
 
-    private func legendDot(_ color: Color, _ label: String) -> some View {
+    private func legendDot(_ color: Color, _ label: String, underlined: Bool = false) -> some View {
         HStack(spacing: 5) {
             Circle().fill(color.opacity(0.85)).frame(width: 8, height: 8)
-            Text(label).font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(.secondary)
+            // The same marks the subtitles use, so the legend is a true sample, not a description.
+            Text(label).underline(underlined, pattern: .dot, color: color)
+                .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(.secondary)
         }
     }
 
@@ -248,16 +250,6 @@ struct PlayerView: View {
             } catch {
                 message = "Export failed: \(error.localizedDescription)"
             }
-        }
-    }
-
-    /// Learning words are orange, known (and burned) words green; untouched words get no tint, so they stay quiet.
-    private func tint(for token: Token?) -> Color {
-        guard let token, let status = statuses[WordKey(lemma: token.lemma, pos: token.pos)] else { return .clear }
-        switch status {
-        case .learning: return Theme.orange.opacity(0.30)
-        case .known, .burned: return Theme.green.opacity(0.22)
-        case .new: return .clear
         }
     }
 
@@ -357,6 +349,7 @@ private struct SubtitleRow: View {
             }
             HStack(spacing: 0) {
                 Text(chunk.text)
+                    .underline(status(of: chunk.token) == .learning, pattern: .dot, color: Theme.orange)
                     .font(.system(.body, design: .rounded, weight: active ? .semibold : .regular))
                     // The highlight is slightly wider than the word, but takes no layout space (no gaps in Japanese).
                     .background(RoundedRectangle(cornerRadius: 5).fill(isHovered ? Theme.pink.opacity(0.22) : tint(for: chunk.token)).padding(.horizontal, -1))
@@ -377,10 +370,15 @@ private struct SubtitleRow: View {
         }
     }
 
-    /// Learning words are orange, known (and burned) words green; untouched words get no tint, so they stay quiet.
+    private func status(of token: Token?) -> WordStatus? {
+        token.flatMap { statuses[WordKey(lemma: $0.lemma, pos: $0.pos)] }
+    }
+
+    /// Colour is never the only signal: learning words also get a dotted underline. Learning is orange, known (and
+    /// burned) green; untouched words get nothing, so they stay quiet.
     private func tint(for token: Token?) -> Color {
-        guard let token, let status = statuses[WordKey(lemma: token.lemma, pos: token.pos)] else { return .clear }
-        switch status {
+        guard let current = status(of: token) else { return .clear }
+        switch current {
         case .learning: return Theme.orange.opacity(0.30)
         case .known, .burned: return Theme.green.opacity(0.22)
         case .new: return .clear
