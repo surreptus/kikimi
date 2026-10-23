@@ -26,6 +26,7 @@ struct SideNav: View {
     var languages: [(code: String, name: String)]
     @Binding var language: String
     var showAbout: () -> Void
+    var showPrivacy: () -> Void
     var showStorage: () -> Void
     var showAcknowledgements: () -> Void
     @Namespace private var pill
@@ -64,7 +65,10 @@ struct SideNav: View {
             .menuIndicator(.hidden)
 
             VStack(alignment: .leading, spacing: 8) {
-                Button("How it works", action: showAbout)
+                HStack(spacing: 12) {
+                    Button("How it works", action: showAbout)
+                    Button("Privacy", action: showPrivacy)
+                }
                 HStack(spacing: 12) {
                     Button("Storage", action: showStorage)
                     Button("Acknowledgements", action: showAcknowledgements)

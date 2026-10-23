@@ -31,7 +31,8 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 
 ## Mac App Store extras
 - [ ] App record in App Store Connect with the same bundle ID.
-- [ ] Privacy policy URL; privacy "nutrition label": data not collected.
+- [ ] Privacy policy URL: publish `LangSRS/Privacy.md` (the app shows the same file) and add a contact line to it first.
+      Privacy "nutrition label": data not collected.
 - [ ] Export compliance: only standard HTTPS (model downloads) is used.
 - [ ] Screenshots, description, age rating, category (Education).
 - [ ] Review notes: the app downloads Whisper speech models (about 1.5 GB, data not code) from Hugging Face on

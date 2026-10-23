@@ -112,6 +112,9 @@ not committed; only the scripts that build them are. Japanese tokenizing uses a 
 The licence texts are in `LangCore/Sources/LangCore/Resources/Licenses/` and are shown in the app under
 **Acknowledgements**. The app's own code is under the [MIT licence](LICENSE); the dictionary data and the other components keep the licences above.
 
+The privacy policy is [`LangSRS/Privacy.md`](LangSRS/Privacy.md); the app shows the same file (Privacy, in the nav footer), and
+it is the text to publish where the App Store asks for a policy URL.
+
 ## Release
 
 `Release/CHECKLIST.md` lists what to do before shipping, and `Scripts/release.sh` builds, exports and (optionally)

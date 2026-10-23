@@ -5,6 +5,7 @@ struct RootView: View {
     @Environment(AppState.self) private var app
     @State private var showAcknowledgements = false
     @State private var showStorage = false
+    @State private var showPrivacy = false
     /// +1 when moving down the nav list, -1 when moving up; decides which way the new screen slides in.
     @State private var direction: CGFloat = 1
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -46,7 +47,7 @@ struct RootView: View {
             SideNav(
                 selection: selection, dueCount: app.dueCount,
                 languages: LanguageProfiles.all.map { ($0.code, $0.displayName) },
-                language: $app.languageCode, showAbout: { app.showAbout = true }, showStorage: { showStorage = true },
+                language: $app.languageCode, showAbout: { app.showAbout = true }, showPrivacy: { showPrivacy = true }, showStorage: { showStorage = true },
                 showAcknowledgements: { showAcknowledgements = true })
             ZStack {
                 detail(env: env)
@@ -62,6 +63,7 @@ struct RootView: View {
         }
         .modal(isPresented: $showStorage) { StorageView(env: env) }
         .modal(isPresented: $app.showAbout) { AboutView() }
+        .modal(isPresented: $showPrivacy) { PrivacyView() }
     }
 
     @ViewBuilder
