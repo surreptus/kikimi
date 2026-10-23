@@ -1,0 +1,7 @@
+Spanish dictionary data
+
+Definitions come from English Wiktionary (https://en.wiktionary.org), extracted into machine-readable form by
+Tatu Ylonen's wiktextract and published by kaikki.org. Wiktionary content is available under the Creative
+Commons Attribution-ShareAlike 4.0 International licence (CC BY-SA 4.0) and the GNU Free Documentation Licence:
+https://creativecommons.org/licenses/by-sa/4.0/
+Authors: the Wiktionary contributors, see the page history of each entry on en.wiktionary.org.

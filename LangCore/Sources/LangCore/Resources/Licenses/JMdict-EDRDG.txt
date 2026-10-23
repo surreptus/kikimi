@@ -1,0 +1,8 @@
+JMdict (Japanese-English dictionary data)
+
+This application uses the JMdict dictionary files. These files are the property of the Electronic Dictionary
+Research and Development Group, and are used in conformance with the Group's licence:
+https://www.edrdg.org/edrdg/licence.html
+
+JMdict is licensed under the Creative Commons Attribution-ShareAlike 4.0 International licence (CC BY-SA 4.0):
+https://creativecommons.org/licenses/by-sa/4.0/
