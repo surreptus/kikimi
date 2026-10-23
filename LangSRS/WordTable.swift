@@ -154,22 +154,18 @@ private struct WordTableRow: View {
             }
             .frame(width: 120, alignment: .leading)
         }
-        .foregroundStyle(selected ? Theme.onAccent : Theme.ink)
+        .foregroundStyle(Theme.ink)
         .padding(.horizontal, Theme.screenPadding).padding(.vertical, 9)
-        .background(selected ? Theme.accent : (striped ? Theme.stripe : .clear))
+        .background(selected ? Theme.selection : (striped ? Theme.stripe : .clear))
+        // A bar as well as the tint, so the selection doesn't rest on a small change in colour.
+        .overlay(alignment: .leading) { if selected { Rectangle().fill(Theme.ink).frame(width: 3) } }
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
 
-    private var secondary: Color { selected ? Theme.onAccent.opacity(0.85) : Theme.muted }
+    /// Full ink on a selected row: the tint takes a little contrast from the muted grey.
+    private var secondary: Color { selected ? Theme.ink : Theme.muted }
 
-    /// On the accent colour a tinted pill would be unreadable, so the word stands alone.
-    @ViewBuilder private var status: some View {
-        if selected {
-            Text(row.word.status.rawValue.capitalized).font(.system(size: 12, weight: .medium, design: .rounded))
-        } else {
-            StatusBadge(status: row.word.status)
-        }
-    }
+    private var status: some View { StatusBadge(status: row.word.status) }
 }

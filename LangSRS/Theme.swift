@@ -41,6 +41,8 @@ enum Theme {
 
     /// The side nav: a slightly darker strip of whatever colour the section is.
     static let rail = Color(light: .black.opacity(0.07), dark: .black.opacity(0.28))
+    /// A selected table row: a soft lighter tint, with ink text still on it.
+    static let selection = Color(light: .white.opacity(0.4), dark: .white.opacity(0.18))
     /// Alternate table rows: barely there.
     static let stripe = Color(light: .black.opacity(0.04), dark: .white.opacity(0.04))
 
