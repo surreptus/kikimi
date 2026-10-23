@@ -88,18 +88,22 @@ struct ReviewView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))
                 }
 
-                HStack(spacing: 10) {
-                    SpeakButton(
-                        text: (app.profile.display.showsReadings ? card.entries.first?.reading : nil) ?? card.word.lemma,
-                        languageCode: app.profile.whisperCode, showsTitle: true, shortcut: "w")
-                    if card.example != nil {
-                        Button("Play sentence", systemImage: "speaker.wave.2.fill") { playSentence() }
-                            .buttonStyle(.pill(.secondary, compact: true))
-                            .keyboardShortcut("r", modifiers: [])
-                            .help("Play this sentence from your video (R)")
+                // Hearing the word or its sentence would give the answer away, so these wait for the reveal.
+                if revealed {
+                    HStack(spacing: 10) {
+                        SpeakButton(
+                            text: (app.profile.display.showsReadings ? card.entries.first?.reading : nil) ?? card.word.lemma,
+                            languageCode: app.profile.whisperCode, showsTitle: true, shortcut: "w")
+                        if card.example != nil {
+                            Button("Play sentence", systemImage: "speaker.wave.2.fill") { playSentence() }
+                                .buttonStyle(.pill(.secondary, compact: true))
+                                .keyboardShortcut("r", modifiers: [])
+                                .help("Play this sentence from your video (R)")
+                        }
                     }
+                    .padding(.top, 6)
+                    .transition(.opacity)
                 }
-                .padding(.top, 6)
             }
             .frame(maxWidth: 560)
             .padding(.vertical, 30).padding(.horizontal, 28)
@@ -133,10 +137,8 @@ struct ReviewView: View {
 
     /// The keys that work right now: they change once the answer is showing.
     private var shortcutHints: [(key: String, action: String)] {
-        var hints: [(key: String, action: String)] = revealed
-            ? [("←", "Missed it"), ("→", "Got it")]
-            : [("Space", "Show answer")]
-        hints.append(("W", "Say word"))
+        guard revealed else { return [("Space", "Show answer")] }
+        var hints: [(key: String, action: String)] = [("←", "Missed it"), ("→", "Got it"), ("W", "Say word")]
         if card?.example != nil { hints.append(("R", "Play sentence")) }
         return hints
     }
