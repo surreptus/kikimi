@@ -4,9 +4,8 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 
 ## One-time setup
 - [ ] Apple Developer Program membership (paid). Note your **team ID** (developer.apple.com > Membership).
-- [x] **Bundle ID** is `com.surreptus.Reprise` (set in the Reprise target). It changed the app's data container; if you
-      have data from an older build, run `Scripts/migrate_container.sh` (see its header) with the app closed. It copies
-      and never deletes.
+- [x] **Bundle ID** is `com.surreptus.Reprise` (set in the Reprise target). Changing it later moves the app's data
+      container, so do that before anyone has data.
 - [ ] Choose your team in the target (Signing & Capabilities). Keep "Automatically manage signing" on.
 - [x] **App icon**: a repeat sign (𝄆) in lime and ink, drawn for Reprise (PNGs in `Reprise/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
 - [ ] Set `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` (raise the build number for every upload).

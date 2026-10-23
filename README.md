@@ -119,8 +119,7 @@ it is the text to publish where the App Store asks for a policy URL.
 
 `Release/CHECKLIST.md` lists what to do before shipping, and `Scripts/release.sh` builds, exports and (optionally)
 notarizes a release; use `--dry-run` to see the commands. Nothing in the repository is signed. The bundle identifier
-is `com.surreptus.Reprise`; builds made before that used `dev.langsrs.LangSRS`, and `Scripts/migrate_container.sh`
-copies their data across.
+is `com.surreptus.Reprise`.
 
 ## Status and known limits
 

@@ -30,52 +30,12 @@ public final class LangEnvironment: Sendable {
 
     static let folderName = "Reprise"
     static let databaseName = "reprise.sqlite"
-    /// The app was first called LangSRS, and its folder and database carried that name.
-    static let legacyFolderName = "LangSRS"
-    static let legacyDatabaseName = "langsrs.sqlite"
 
     /// The app's own folder inside its sandbox container.
     public static func standard() throws -> LangEnvironment {
         let support = try FileManager.default.url(
             for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        try migrateLegacyLayout(in: support)
         return try LangEnvironment(root: support.appending(path: folderName, directoryHint: .isDirectory))
-    }
-
-    /// Moves data kept under the old name to the current one, before the database opens. It only ever moves:
-    /// nothing is copied over or deleted. If the current folder already holds a database it is left alone, and
-    /// if it holds none (a first launch that found nothing) it is set aside, not removed, to make way.
-    static func migrateLegacyLayout(in support: URL) throws {
-        let fm = FileManager.default
-        let legacy = support.appending(path: legacyFolderName, directoryHint: .isDirectory)
-        let current = support.appending(path: folderName, directoryHint: .isDirectory)
-        guard fm.fileExists(atPath: legacy.path) else { return }
-
-        if fm.fileExists(atPath: current.path) {
-            if fm.fileExists(atPath: current.appending(path: databaseName).path) {
-                log.notice("both the old and new data folders exist; using the new one and leaving the old alone")
-                return
-            }
-            let aside = support.appending(path: "\(folderName).before-migration", directoryHint: .isDirectory)
-            try fm.moveItem(at: current, to: uniqueURL(for: aside))
-        }
-        try fm.moveItem(at: legacy, to: current)
-        for suffix in ["", "-wal", "-shm"] {
-            let old = current.appending(path: legacyDatabaseName + suffix)
-            let new = current.appending(path: databaseName + suffix)
-            if fm.fileExists(atPath: old.path), !fm.fileExists(atPath: new.path) { try fm.moveItem(at: old, to: new) }
-        }
-        log.notice("moved the data folder from \(legacyFolderName, privacy: .public) to \(folderName, privacy: .public)")
-    }
-
-    /// `url`, or `url` with a number added if something is already there.
-    private static func uniqueURL(for url: URL) -> URL {
-        var candidate = url, n = 2
-        while FileManager.default.fileExists(atPath: candidate.path) {
-            candidate = url.deletingLastPathComponent().appending(path: url.lastPathComponent + "-\(n)", directoryHint: .isDirectory)
-            n += 1
-        }
-        return candidate
     }
 
     /// Launch-time work: drop crash leftovers, and prove every dictionary opens and has entries, so a broken
