@@ -57,6 +57,8 @@ the Words screen's search, filter and selection, so they survive switching scree
 | `VideosView`, `ImportSection` | Add videos (drop zone, model choice and download, import progress), then your videos: details, delete |
 | `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
 | `StorageView` | Downloaded models and videos, with removal |
+| `SettingsView` | ⌘, window: appearance, and the speech model and sentence audio for each language |
+| `AppCommands` | The menu bar: Add Videos, Storage, the Go menu (pages and Find Words), Help pages |
 
 `Theme.swift` is the design system: one colour field for the whole window, a monotone ink accent, pill buttons and flat panels. `SideNav` is the left strip, and `Modal.swift` shows panels that close on an outside click. Use these rather than styling views ad hoc.
 

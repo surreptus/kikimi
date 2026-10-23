@@ -138,6 +138,7 @@ struct AboutView: View {
     private var shortcuts: some View {
         section("Keyboard") {
             VStack(alignment: .leading, spacing: 8) {
+                shortcut("Anywhere", "⌘O adds videos. ⌘1, ⌘2 and ⌘3 go to Videos, Words and Review. ⌘F finds words. ⌘, opens Settings.")
                 shortcut("Review", "Space shows the answer. → is Got it, ← is Missed it. W says the word, R plays the sentence.")
                 shortcut("Video", "Space plays and pauses. Click a word to keep its meaning; arrow keys move between words and Return keeps one. S says it, L starts learning it, K marks it known, Esc lets go.")
                 shortcut("Words", "↑ ↓ move, Shift extends, ⌘A selects all, Esc clears.")

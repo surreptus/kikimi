@@ -27,6 +27,8 @@ struct ImportSection: View {
         }
         .task(id: app.languageCode) { await loadModel() }
         .onChange(of: app.dataVersion) { Task { await refreshInstalled() } }   // e.g. a model removed in Storage
+        .onChange(of: app.addVideosPending) { _, pending in if pending { openChooserIfReady() } }
+        .task { if app.addVideosPending { openChooserIfReady() } }
         .onChange(of: queue.jobs.map(\.status)) { _, statuses in
             if statuses.contains(.imported) { app.dataChanged() }
         }
@@ -119,7 +121,14 @@ struct ImportSection: View {
         await refreshInstalled()
     }
 
+    /// File > Add Videos…. Without a speech model there is nothing to import into, so the page just shows the model card.
+    private func openChooserIfReady() {
+        app.addVideosPending = false
+        if canImport { showImporter = true }
+    }
+
     private func refreshInstalled() async {
+        model = env.preferences.model(for: app.profile)   // it may have been changed in Settings
         modelInstalled = nil
         let variant = env.preferences.model(for: app.profile)
         modelInstalled = await env.models.isInstalled(variant)

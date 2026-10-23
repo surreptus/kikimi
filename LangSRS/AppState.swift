@@ -18,8 +18,16 @@ final class AppState {
 
     private(set) var phase: Phase = .loading
     var section: SidebarItem = .videos
-    /// The "How Reprise works" panel, opened from the nav and from empty screens.
+    /// The panels over the window. They live here, not in the views, so the menu bar can open them too.
     var showAbout = false
+    var showPrivacy = false
+    var showStorage = false
+    var showAcknowledgements = false
+    /// +1 when moving down the nav list, -1 when moving up; decides which way the new screen slides in.
+    private(set) var navDirection: CGFloat = 1
+    /// Asked for by the menu bar; the Videos page and the Words page act on them when they show.
+    var addVideosPending = false
+    var findWordsPending = false
     /// Set by "Play" buttons elsewhere; the Videos screen consumes it.
     var pendingPlayback: PlaybackRequest?
     /// Where the player's back button goes: the screen that sent you to the video, or Videos if none.
@@ -61,6 +69,30 @@ final class AppState {
         } catch {
             phase = .failed(error.localizedDescription)
         }
+    }
+
+    var isReady: Bool {
+        if case .ready = phase { return true }
+        return false
+    }
+
+    /// Go to a page, sliding the new one in the way you moved.
+    func select(_ item: SidebarItem, reduceMotion: Bool = false) {
+        guard item != section else { return }
+        navDirection = item.order >= section.order ? 1 : -1
+        withAnimation(Theme.screenChange(reduceMotion)) { section = item }
+    }
+
+    /// File > Add Videos…: shows the Videos page and opens the file chooser there.
+    func requestAddVideos() {
+        select(.videos)
+        addVideosPending = true
+    }
+
+    /// Go > Find Words: shows the Words page with the search field focused.
+    func requestFindWords() {
+        select(.words)
+        findWordsPending = true
     }
 
     func refreshDue() async {

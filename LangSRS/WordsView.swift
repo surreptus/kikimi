@@ -22,6 +22,7 @@ struct WordsView: View {
     @State private var dictionaryHits: [DictionaryEntry] = []
     @State private var sort = WordSort(column: .seen, ascending: false)
     @State private var confirmReset = false
+    @FocusState private var searchFocused: Bool
     @State private var message: String?
 
     private struct LoadKey: Equatable {
@@ -60,11 +61,18 @@ struct WordsView: View {
             await load()
         }
         .onChange(of: app.languageCode) { selection = [] }
+        .onChange(of: app.findWordsPending) { _, pending in if pending { focusSearch() } }
+        .task { if app.findWordsPending { focusSearch() } }
         .confirmationDialog("Reset \(selection.count) words?", isPresented: $confirmReset) {
             Button("Reset", role: .destructive) { apply(.reset) }
         } message: {
             Text("Words being learned or finished lose their review progress and go back to new.")
         }
+    }
+
+    private func focusSearch() {
+        app.findWordsPending = false
+        searchFocused = true
     }
 
     // MARK: Header
@@ -76,6 +84,7 @@ struct WordsView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass").foregroundStyle(Theme.ink).font(.system(size: 14, weight: .bold))
                     TextField("Search words", text: searchBinding)
+                        .focused($searchFocused)
                         .textFieldStyle(.plain)
                         .font(.system(.body, design: .rounded))
                     if !search.isEmpty {

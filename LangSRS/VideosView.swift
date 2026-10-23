@@ -33,6 +33,10 @@ struct VideosView: View {
             }
         }
         .task(id: app.pendingPlayback) { await consumePendingPlayback() }
+        .onChange(of: app.addVideosPending) { _, pending in
+            // Add Videos while a video is open: close it so the drop area is showing.
+            if pending, playing != nil { playing = nil; app.returnSection = nil }
+        }
         .modal(isPresented: Binding(get: { info != nil }, set: { if !$0 { info = nil } })) {
             if let video = info {
                 VideoInfoSheet(env: env, video: video, play: { open(video, at: nil) }, rename: { startRename(video) })
