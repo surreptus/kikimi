@@ -15,6 +15,9 @@ struct LibraryView: View {
     @State private var playing: Video?
     @State private var startAt: Double?
     @State private var info: Video?
+    @State private var renaming: Video?
+    @State private var newTitle = ""
+    @State private var renameError: String?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -31,7 +34,14 @@ struct LibraryView: View {
         }
         .task(id: app.pendingPlayback) { await consumePendingPlayback() }
         .sheet(item: $info) { video in
-            VideoInfoSheet(env: env, video: video) { open(video, at: nil) }
+            VideoInfoSheet(env: env, video: video, play: { open(video, at: nil) }, rename: { startRename(video) })
+        }
+        .alert("Rename video", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+            TextField("Title", text: $newTitle)
+            Button("Save") { saveRename() }
+            Button("Cancel", role: .cancel) { renaming = nil }
+        } message: {
+            Text(renameError ?? "The files on disk keep their names; this changes the title shown here.")
         }
     }
 
@@ -78,9 +88,33 @@ struct LibraryView: View {
         .onTapGesture(count: 2) { open(item.video, at: nil) }
         .contextMenu {
             Button("Play") { open(item.video, at: nil) }
+            Button("Rename…") { startRename(item.video) }
             Button("Get Info…") { info = item.video }
             Button("Show in Finder") {
                 NSWorkspace.shared.activateFileViewerSelecting([env.fileURL(for: item.video)])
+            }
+        }
+    }
+
+    private func startRename(_ video: Video) {
+        newTitle = video.title
+        renameError = nil
+        renaming = video
+    }
+
+    private func saveRename() {
+        guard let video = renaming, let id = video.id else { return }
+        Task {
+            do {
+                try await env.database.renameVideo(id: id, to: newTitle)
+                renaming = nil
+                app.dataChanged()
+            } catch LangError.emptyTitle {
+                renameError = "A title can't be empty."
+                renaming = video   // keep the alert open
+            } catch {
+                renameError = error.localizedDescription
+                renaming = video
             }
         }
     }
@@ -128,6 +162,7 @@ private struct VideoInfoSheet: View {
     let env: LangEnvironment
     let video: Video
     let play: () -> Void
+    let rename: () -> Void
     @Environment(AppState.self) private var app
     @Environment(\.dismiss) private var dismiss
 
@@ -167,6 +202,7 @@ private struct VideoInfoSheet: View {
 
             HStack(spacing: 12) {
                 Button("Delete") { confirmDelete = true }.buttonStyle(.chunky(.danger, compact: true))
+                Button("Rename") { dismiss(); rename() }.buttonStyle(.chunky(.secondary, compact: true))
                 Spacer()
                 Button("Show in Finder") {
                     if let folder = details?.folder { NSWorkspace.shared.activateFileViewerSelecting([folder]) }

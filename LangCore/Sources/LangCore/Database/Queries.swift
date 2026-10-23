@@ -171,3 +171,16 @@ extension LangDatabase {
         }
     }
 }
+
+extension LangDatabase {
+    /// Changes the title shown in the library. The files on disk keep their names; only the label changes.
+    public func renameVideo(id: Int64, to title: String) async throws {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { throw LangError.emptyTitle }
+        try await writer.write { db in
+            guard var video = try Video.fetchOne(db, key: id) else { throw LangError.notFound }
+            video.title = trimmed
+            try video.update(db)
+        }
+    }
+}

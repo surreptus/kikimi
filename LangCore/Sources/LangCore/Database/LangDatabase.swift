@@ -4,6 +4,7 @@ import GRDB
 public enum LangError: Error, Equatable {
     case notFound
     case notLearning
+    case emptyTitle
 }
 
 public final class LangDatabase: Sendable {
