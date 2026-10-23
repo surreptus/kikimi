@@ -157,6 +157,8 @@ private struct WordTableRow: View {
         .foregroundStyle(selected ? Theme.onAccent : Theme.ink)
         .padding(.horizontal, Theme.screenPadding).padding(.vertical, 9)
         .background(selected ? Theme.accent : (striped ? Theme.stripe : .clear))
+        // A bar as well as the colour, so the selection doesn't depend on telling gold from the field.
+        .overlay(alignment: .leading) { if selected { Rectangle().fill(Theme.ink).frame(width: 4) } }
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)

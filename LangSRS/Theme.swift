@@ -20,7 +20,7 @@ extension Color {
 enum Theme {
     static let ink = Color(light: Color(hex: 0x121212), dark: Color(hex: 0xF4F1EA))
     static let muted = Color(light: Color(hex: 0x3F3F3F), dark: Color(hex: 0xD6D4CE))
-    static let faint = Color(light: Color(hex: 0x4A4A4A), dark: Color(hex: 0xD3D1CB))
+    static let faint = Color(light: Color(hex: 0x3F3F3F), dark: Color(hex: 0xD3D1CB))
     /// The one accent, a gold: the main button, selected rows and the due badge. It is a fill, never a text or icon
     /// colour, because gold on the green field is too faint to read.
     static let accent = Color(light: Color(hex: 0xFFC21A), dark: Color(hex: 0xFFCB3D))
@@ -36,8 +36,8 @@ enum Theme {
     static let softStrong = Color(light: .white.opacity(0.85), dark: .white.opacity(0.16))
     static let line = Color(light: .black.opacity(0.12), dark: .white.opacity(0.16))
 
-    /// The colour of the whole window: a fresh mint, and a deep green in dark mode.
-    static let field = Color(light: Color(hex: 0x8FE5BE), dark: Color(hex: 0x124632))
+    /// The colour of the whole window: a bright yellow-green, and a deep green in dark mode.
+    static let field = Color(light: Color(hex: 0x66CC0A), dark: Color(hex: 0x124632))
 
     /// The side nav: a slightly darker strip of whatever colour the section is.
     static let rail = Color(light: .black.opacity(0.07), dark: .black.opacity(0.28))
@@ -45,7 +45,7 @@ enum Theme {
     static let stripe = Color(light: .black.opacity(0.04), dark: .white.opacity(0.04))
 
     // Status and feedback. Always shown with a word as well, never as colour alone.
-    static let red = Color(light: Color(hex: 0x8F1414), dark: Color(hex: 0xFFBDB5))
+    static let red = Color(light: Color(hex: 0x801010), dark: Color(hex: 0xFFBDB5))
     static let green = Color(light: Color(hex: 0x1E8A55), dark: Color(hex: 0x6FD6A0))
     static let orange = Color(light: Color(hex: 0xB86E00), dark: Color(hex: 0xFFB84D))
     static let purple = Color(light: Color(hex: 0x7C4DDB), dark: Color(hex: 0xC3A6FF))
