@@ -88,7 +88,7 @@ struct SideNav: View {
             HStack(spacing: 12) {
                 Image(systemName: item.symbol).font(.system(size: 15, weight: .medium)).frame(width: 22)
                 Text(item.rawValue)
-                    .font(.system(size: 15, weight: selected ? .semibold : .regular, design: .rounded))
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
                 Spacer()
                 if item == .review, dueCount > 0 {
                     Text("\(dueCount)")

@@ -167,7 +167,7 @@ private struct WordTableRow: View {
     /// On the accent colour a tinted pill would be unreadable, so the word stands alone.
     @ViewBuilder private var status: some View {
         if selected {
-            Text(row.word.status.rawValue.capitalized).font(.system(size: 12, weight: .semibold, design: .rounded))
+            Text(row.word.status.rawValue.capitalized).font(.system(size: 12, weight: .medium, design: .rounded))
         } else {
             StatusBadge(status: row.word.status)
         }

@@ -51,7 +51,7 @@ struct SubtitleRow: View {
                 .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(active ? Theme.ink : .secondary)
             if segments.isEmpty {
-                Text(line.text).font(.system(.body, design: .rounded, weight: active ? .semibold : .regular))
+                Text(line.text).font(.system(.body, design: .rounded, weight: .regular))
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 FlowLayout {
@@ -92,11 +92,11 @@ struct SubtitleRow: View {
             HStack(spacing: 0) {
                 Text(chunk.text)
                     .underline(status(of: chunk.token) == .learning, pattern: .dot, color: Theme.orange)
-                    .font(.system(.body, design: .rounded, weight: active ? .semibold : .regular))
+                    .font(.system(.body, design: .rounded, weight: .regular))
                     // The highlight is slightly wider than the word, but takes no layout space (no gaps in Japanese).
                     .background(RoundedRectangle(cornerRadius: 5).fill(isHovered ? Theme.accent.opacity(0.22) : tint(for: chunk.token)).padding(.horizontal, -1))
                 if !chunk.trailing.isEmpty {
-                    Text(chunk.trailing).font(.system(.body, design: .rounded, weight: active ? .semibold : .regular))
+                    Text(chunk.trailing).font(.system(.body, design: .rounded, weight: .regular))
                 }
             }
         }
