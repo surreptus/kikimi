@@ -1,0 +1,125 @@
+import Foundation
+import Observation
+
+extension ImportError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .duplicate: "Already imported."
+        case .languageMismatch(let detected, let chosen, _):
+            "This sounds like \(LanguageProfiles.profile(for: detected)?.displayName ?? detected), not \(LanguageProfiles.profile(for: chosen)?.displayName ?? chosen)."
+        case .copyFailed(let e): "Couldn't copy the file: \(e.localizedDescription)"
+        case .transcriptionFailed(let e): Self.describe(transcription: e)
+        case .transcodeFailed(let e): "Couldn't re-encode the video: \(e.localizedDescription)"
+        case .verificationFailed(let why): "The re-encoded video failed verification (\(why)). Your original is untouched."
+        case .audioExportFailed(let e): "Couldn't export the audio: \(e.localizedDescription)"
+        case .libraryMoveFailed(let e): "Couldn't save to the library: \(e.localizedDescription)"
+        case .databaseFailed(let e): "Couldn't save to the database: \(e.localizedDescription)"
+        }
+    }
+
+    private static func describe(transcription error: Error) -> String {
+        switch error {
+        case ModelError.notInstalled: "The speech model isn't downloaded yet."
+        case AudioExtractionError.noAudioTrack: "This file has no audio track."
+        default: "Transcription failed: \(error.localizedDescription)"
+        }
+    }
+}
+
+/// Runs dropped files through the import pipeline one at a time and publishes per-file status.
+@MainActor @Observable
+public final class ImportQueue {
+    public enum Status: Equatable, Sendable {
+        case queued
+        case running(ImportStage, Double)
+        case imported
+        case duplicate
+        /// Stopped before transcribing: the audio sounds like another supported language (that profile's code).
+        case languageMismatch(detected: String)
+        case failed(String)
+    }
+
+    public struct Job: Identifiable, Sendable {
+        public let id = UUID()
+        public let url: URL
+        public fileprivate(set) var status: Status = .queued
+        public fileprivate(set) var profile: any LanguageProfile
+        fileprivate(set) var model: String
+        fileprivate var skipsLanguageCheck = false
+        public var fileName: String { url.lastPathComponent }
+    }
+
+    public private(set) var jobs: [Job] = []
+    public var isBusy: Bool { jobs.contains { $0.status == .queued || isRunning($0.status) } }
+
+    private let pipeline: ImportPipeline
+    private var worker: Task<Void, Never>?
+
+    public init(pipeline: ImportPipeline) { self.pipeline = pipeline }
+
+    public func enqueue(_ urls: [URL], profile: any LanguageProfile, model: String) {
+        jobs += urls.map { Job(url: $0, profile: profile, model: model) }
+        kick()
+    }
+
+    /// After a language warning: import it as the language you picked originally.
+    public func importAnyway(_ id: UUID) {
+        guard let index = jobs.firstIndex(where: { $0.id == id }) else { return }
+        jobs[index].skipsLanguageCheck = true
+        jobs[index].status = .queued
+        kick()
+    }
+
+    /// After a language warning: import it as the language it sounds like.
+    public func retry(_ id: UUID, as profile: any LanguageProfile, model: String) {
+        guard let index = jobs.firstIndex(where: { $0.id == id }) else { return }
+        jobs[index].profile = profile
+        jobs[index].model = model
+        jobs[index].status = .queued
+        kick()
+    }
+
+    private func kick() {
+        if worker == nil { worker = Task { await drain() } }
+    }
+
+    public func clearFinished() {
+        jobs.removeAll { $0.status != .queued && !isRunning($0.status) }
+    }
+
+    /// Returns once every queued job has finished.
+    public func waitUntilIdle() async { await worker?.value }
+
+    private func isRunning(_ status: Status) -> Bool {
+        if case .running = status { return true }
+        return false
+    }
+
+    private func drain() async {
+        while let index = jobs.firstIndex(where: { $0.status == .queued }) {
+            let job = jobs[index]
+            set(job.id, .running(.hashing, 0))
+            do {
+                _ = try await pipeline.importVideo(
+                    from: job.url, profile: job.profile, model: job.model, checkLanguage: !job.skipsLanguageCheck) { [weak self] p in
+                    Task { @MainActor in self?.set(job.id, .running(p.stage, p.fraction)) }
+                }
+                set(job.id, .imported)
+            } catch ImportError.duplicate {
+                set(job.id, .duplicate)
+            } catch ImportError.languageMismatch(let detected, _, _) {
+                set(job.id, .languageMismatch(detected: detected))
+            } catch {
+                set(job.id, .failed(error.localizedDescription))
+            }
+        }
+        worker = nil
+    }
+
+    /// Late progress updates from a finished job must not overwrite its final status.
+    private func set(_ id: UUID, _ status: Status) {
+        guard let index = jobs.firstIndex(where: { $0.id == id }) else { return }
+        if case .running = status, !isRunning(jobs[index].status) && jobs[index].status != .queued { return }
+        jobs[index].status = status
+    }
+}

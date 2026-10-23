@@ -1,0 +1,5 @@
+Speech recognition
+
+Transcription uses OpenAI Whisper models (MIT licence, Copyright (c) 2022 OpenAI), converted to Core ML and
+distributed by Argmax in the argmaxinc/whisperkit-coreml repository on Hugging Face. See WhisperKit-MIT.txt for
+the MIT licence text of the runtime.
