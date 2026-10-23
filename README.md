@@ -108,13 +108,14 @@ not committed; only the scripts that build them are. Japanese tokenizing uses a 
 [MeCab](https://taku910.github.io/mecab/) (BSD licence) with the IPADIC dictionary.
 
 The licence texts are in `LangCore/Sources/LangCore/Resources/Licenses/` and are shown in the app under
-**Acknowledgements**. This repository does not yet declare a licence of its own; add one before publishing.
+**Acknowledgements**. The app's own code is under the [MIT licence](LICENSE); the dictionary data and the other components keep the licences above.
 
 ## Release
 
 `Release/CHECKLIST.md` lists what to do before shipping, and `Scripts/release.sh` builds, exports and (optionally)
-notarizes a release; use `--dry-run` to see the commands. Nothing in the repository is signed, and the bundle
-identifier `dev.langsrs.LangSRS` is a placeholder to replace first.
+notarizes a release; use `--dry-run` to see the commands. Nothing in the repository is signed. The bundle identifier
+is `com.surreptus.Reprise`; builds made before that used `dev.langsrs.LangSRS`, and `Scripts/migrate_container.sh`
+copies their data across.
 
 ## Status and known limits
 
