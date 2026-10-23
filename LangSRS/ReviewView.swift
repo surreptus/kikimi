@@ -126,8 +126,19 @@ struct ReviewView: View {
                 .buttonStyle(.pill(.primary))
                 .keyboardShortcut(.space, modifiers: [])
             }
+            ShortcutHints(items: shortcutHints)
         }
         .padding(28)
+    }
+
+    /// The keys that work right now: they change once the answer is showing.
+    private var shortcutHints: [(key: String, action: String)] {
+        var hints: [(key: String, action: String)] = revealed
+            ? [("←", "Missed it"), ("→", "Got it")]
+            : [("Space", "Show answer")]
+        hints.append(("W", "Say word"))
+        if card?.example != nil { hints.append(("R", "Play sentence")) }
+        return hints
     }
 
     private func playSentence() {

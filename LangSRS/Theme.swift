@@ -326,3 +326,26 @@ struct EmptyState: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+/// A quiet line of keys and what they do, such as "Space  Show answer". Wraps on a narrow window.
+struct ShortcutHints: View {
+    let items: [(key: String, action: String)]
+
+    var body: some View {
+        FlowLayout {
+            ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                HStack(spacing: 6) {
+                    Text(item.key)
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .padding(.horizontal, 7).padding(.vertical, 2)
+                        .background(RoundedRectangle(cornerRadius: 6).fill(Theme.softStrong))
+                    Text(item.action).font(Theme.small).foregroundStyle(Theme.muted)
+                }
+                .padding(.trailing, 14)
+            }
+        }
+        .foregroundStyle(Theme.ink)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Keyboard shortcuts: " + items.map { "\($0.key) \($0.action)" }.joined(separator: ", "))
+    }
+}
