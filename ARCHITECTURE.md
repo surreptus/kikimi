@@ -52,10 +52,9 @@ the Words screen's search, filter and selection, so they survive switching scree
 
 | View | Screen |
 |---|---|
-| `ImportView` | Drop zone, model choice and download, import progress |
 | `WordsView`, `WordTable`, `WordDetailView` | Search and bulk actions; the hand-built word table (square rows, keyboard selection); the inspector |
 | `ReviewView` | Spaced-repetition cards |
-| `LibraryView` | Videos, details, delete |
+| `VideosView`, `ImportSection` | Add videos (drop zone, model choice and download, import progress), then your videos: details, delete |
 | `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
 | `StorageView` | Downloaded models and videos, with removal |
 

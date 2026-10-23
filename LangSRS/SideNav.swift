@@ -1,10 +1,9 @@
 import SwiftUI
 
 enum SidebarItem: String, CaseIterable, Identifiable {
-    case importVideos = "Import"
-    case review = "Review"
+    case videos = "Videos"
     case words = "Words"
-    case library = "Library"
+    case review = "Review"
 
     var id: String { rawValue }
 
@@ -13,10 +12,9 @@ enum SidebarItem: String, CaseIterable, Identifiable {
 
     var symbol: String {
         switch self {
-        case .importVideos: "square.and.arrow.down.fill"
-        case .review: "rectangle.stack.fill"
+        case .videos: "film.stack.fill"
         case .words: "text.book.closed.fill"
-        case .library: "film.stack.fill"
+        case .review: "rectangle.stack.fill"
         }
     }
 }

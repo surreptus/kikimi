@@ -17,10 +17,10 @@ final class AppState {
     }
 
     private(set) var phase: Phase = .loading
-    var section: SidebarItem = .importVideos
-    /// Set by "Play" buttons elsewhere; the Library screen consumes it.
+    var section: SidebarItem = .videos
+    /// Set by "Play" buttons elsewhere; the Videos screen consumes it.
     var pendingPlayback: PlaybackRequest?
-    /// Where the player's back button goes: the screen that sent you to the video, or the Library if none.
+    /// Where the player's back button goes: the screen that sent you to the video, or Videos if none.
     var returnSection: SidebarItem?
 
     // The Words page keeps its search, filter and selection while you watch a video and come back.
@@ -68,8 +68,8 @@ final class AppState {
 
     func openVideo(id: Int64, at time: Double) {
         pendingPlayback = PlaybackRequest(videoID: id, time: time)
-        returnSection = section == .library ? nil : section
-        withAnimation(Theme.screenChange(false)) { section = .library }
+        returnSection = section == .videos ? nil : section
+        withAnimation(Theme.screenChange(false)) { section = .videos }
     }
 
     func dataChanged() {

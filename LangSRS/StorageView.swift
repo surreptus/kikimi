@@ -2,7 +2,7 @@ import LangCore
 import SwiftUI
 
 /// What the app keeps on this Mac that is large: downloaded speech models (removable here) and your videos
-/// (removed from the Library).
+/// (removed from the Videos page).
 struct StorageView: View {
     let env: LangEnvironment
     @Environment(AppState.self) private var app
@@ -37,7 +37,7 @@ struct StorageView: View {
             }
 
             section("Videos", bytes: videoBytes) {
-                Text("\(videoCount) video\(videoCount == 1 ? "" : "s"). Delete them from the Library.")
+                Text("\(videoCount) video\(videoCount == 1 ? "" : "s"). Delete them from the Videos page.")
                     .foregroundStyle(Theme.muted)
             }
 

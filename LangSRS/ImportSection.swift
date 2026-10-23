@@ -2,7 +2,8 @@ import LangCore
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct ImportView: View {
+/// Adding videos: the speech model, the drop area and the progress of each import. It sits at the top of the Videos page.
+struct ImportSection: View {
     let env: LangEnvironment
     @Environment(AppState.self) private var app
 
@@ -19,14 +20,10 @@ struct ImportView: View {
     private var canImport: Bool { modelInstalled == true }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                ScreenTitle(text: "Import", subtitle: "Drop videos you own. They never leave this Mac.")
-                modelSection
-                dropZone
-                if !queue.jobs.isEmpty { jobList }
-            }
-            .padding(Theme.screenPadding)
+        VStack(alignment: .leading, spacing: 20) {
+            modelSection
+            dropZone
+            if !queue.jobs.isEmpty { jobList }
         }
         .task(id: app.languageCode) { await loadModel() }
         .onChange(of: app.dataVersion) { Task { await refreshInstalled() } }   // e.g. a model removed in Storage

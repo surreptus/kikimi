@@ -24,7 +24,7 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 
 ## Test the result (on a Mac or user account that has never run a dev build)
 - [ ] The app opens without a Gatekeeper warning (direct download).
-- [ ] First launch is quick (the dictionaries are read in place); the Import tab can download a speech model.
+- [ ] First launch is quick (the dictionaries are read in place); the Videos page can download a speech model.
 - [ ] Import a short video end to end; play it; review a word; export a clip.
 - [ ] Quit and relaunch: data is still there.
 - [ ] The Acknowledgements screen lists all licences.

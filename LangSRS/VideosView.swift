@@ -6,7 +6,7 @@ private func formatBytes(_ bytes: Int64) -> String {
     ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
 }
 
-struct LibraryView: View {
+struct VideosView: View {
     let env: LangEnvironment
     @Environment(AppState.self) private var app
     @State private var items: [LibraryEntry] = []
@@ -23,7 +23,7 @@ struct LibraryView: View {
     var body: some View {
         ZStack {
             if let playing {
-                PlayerView(env: env, video: playing, startAt: startAt, backTitle: app.returnSection?.rawValue ?? "Library") {
+                PlayerView(env: env, video: playing, startAt: startAt, backTitle: app.returnSection?.rawValue ?? "Videos") {
                     closePlayer()
                 }
                 .id(playing.id)
@@ -51,12 +51,15 @@ struct LibraryView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 ScreenTitle(
-                    text: "Library",
-                    subtitle: items.isEmpty ? "Videos you import appear here."
+                    text: "Videos",
+                    subtitle: items.isEmpty ? "Drop videos you own. They never leave this Mac."
                         : "\(items.count) video\(items.count == 1 ? "" : "s") · \(formatBytes(totalBytes)) on this Mac")
+                ImportSection(env: env)
                 if items.isEmpty {
-                    EmptyState(title: "No videos yet", message: "Videos you import appear here.")
-                        .frame(maxWidth: .infinity, minHeight: 280)
+                    EmptyState(title: "No videos yet", message: "Drop one above and its words will appear on the Words page.")
+                        .frame(maxWidth: .infinity, minHeight: 200)
+                } else {
+                    Text("Your videos").font(Theme.title(17)).padding(.top, 8)
                 }
                 ForEach(items) { item in
                     row(item)
@@ -126,7 +129,7 @@ struct LibraryView: View {
         totalBytes = env.libraryBytes()
     }
 
-    /// Back to the Library, or to the screen that sent you here (e.g. Words, with its search and selection intact).
+    /// Back to Videos, or to the screen that sent you here (e.g. Words, with its search and selection intact).
     private func closePlayer() {
         withAnimation(Theme.screenChange(reduceMotion)) {
             playing = nil

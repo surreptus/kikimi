@@ -66,10 +66,9 @@ struct RootView: View {
     @ViewBuilder
     private func detail(env: LangEnvironment) -> some View {
         switch app.section {
-        case .importVideos: ImportView(env: env)
-        case .review: ReviewView(env: env)
+        case .videos: VideosView(env: env)
         case .words: WordsView(env: env)
-        case .library: LibraryView(env: env)
+        case .review: ReviewView(env: env)
         }
     }
 }
