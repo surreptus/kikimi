@@ -1,4 +1,4 @@
-# Release checklist
+# Release checklist (Reprise)
 
 Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 
@@ -9,7 +9,7 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       `~/Library/Containers/dev.langsrs.LangSRS/Data/Library/Application Support/LangSRS` into the new container
       (`~/Library/Containers/<new id>/Data/Library/Application Support/LangSRS`) while the app is closed.
 - [ ] Choose your team in the target (Signing & Capabilities). Keep "Automatically manage signing" on.
-- [ ] Add the **app icon** (PNGs in `LangSRS/Assets.xcassets/AppIcon.appiconset`, 1024 px source).
+- [x] **App icon**: a repeat sign (𝄆) in lime and ink, drawn for Reprise (PNGs in `LangSRS/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
 - [ ] Set `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` (raise the build number for every upload).
 - [ ] Direct download only: create a notarization profile once:
       `xcrun notarytool store-credentials langsrs --apple-id <you> --team-id <TEAM_ID>`
