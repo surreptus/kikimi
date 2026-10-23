@@ -1,3 +1,22 @@
+// How this file works, in the order you need it:
+//
+// 1. `VideoPlan.plan(for:)` is pure arithmetic: given the source's codec, size and bitrate, it decides
+//    "keep as is" or "re-encode to HEVC at this size and bitrate". It is the only part with tuning knobs.
+// 2. `AVFoundationTranscoder.compact` carries out that plan. Pass-through, and the audio export, use
+//    `AVAssetExportSession` (`export`). A re-encode needs a chosen size and bitrate, which the export
+//    session can't do, so it uses `AVAssetReader` and `AVAssetWriter` (`reencode`).
+// 3. If the re-encoded file isn't smaller than the source, `compact` swaps in a copy of the original streams.
+// 4. `MediaVerifier` checks the result before the import pipeline keeps it.
+//
+// The reader/writer path is the hard part. `pump` copies samples from a reader output into a writer input on
+// AVFoundation's own queue, and the two pumps (video, audio) run concurrently. Cancelling is where it bites:
+// AVAssetWriterInput raises an uncaught exception if it is touched after `cancelWriting()`, and after that call
+// AVFoundation never invokes the "ready for more data" block again, so anything waiting on it would hang.
+// `Gate` solves both: every writer call goes through it under a lock, and cancelling wakes the waiters.
+// `Once` makes sure each pump's continuation is resumed exactly one time, whichever of "finished" or
+// "cancelled" happens first. The `nonisolated(unsafe)` lets are safe for the same reason: the gate, not the
+// compiler, guarantees one thread touches an AVFoundation object at a time.
+
 import AVFoundation
 import Foundation
 
