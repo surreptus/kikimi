@@ -4,10 +4,9 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 
 ## One-time setup
 - [ ] Apple Developer Program membership (paid). Note your **team ID** (developer.apple.com > Membership).
-- [ ] Pick the real **bundle ID** and set it in the LangSRS target (Signing & Capabilities).
-      **This changes the app's data container.** Before switching, copy
-      `~/Library/Containers/dev.langsrs.LangSRS/Data/Library/Application Support/LangSRS` into the new container
-      (`~/Library/Containers/<new id>/Data/Library/Application Support/LangSRS`) while the app is closed.
+- [x] **Bundle ID** is `com.surreptus.Reprise` (set in the LangSRS target). It changed the app's data container; if you
+      have data from an older build, run `Scripts/migrate_container.sh` (see its header) with the app closed. It copies
+      and never deletes.
 - [ ] Choose your team in the target (Signing & Capabilities). Keep "Automatically manage signing" on.
 - [x] **App icon**: a repeat sign (𝄆) in lime and ink, drawn for Reprise (PNGs in `LangSRS/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
 - [ ] Set `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` (raise the build number for every upload).

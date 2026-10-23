@@ -43,7 +43,7 @@ if [ "$DRY" -eq 1 ] && [ -z "$TEAM_ID" ]; then TEAM_ID="TEAMID0000"; warn "TEAM_
 [[ "$TEAM_ID" =~ ^[A-Z0-9]{10}$ ]] || fail "set TEAM_ID to your 10-character Apple team ID (developer.apple.com > Membership)"
 
 BUNDLE_ID="$(sed -n 's/.*PRODUCT_BUNDLE_IDENTIFIER = \(.*\);/\1/p' LangSRS.xcodeproj/project.pbxproj | head -1)"
-if [ "$BUNDLE_ID" = "dev.langsrs.LangSRS" ] && [ "${ALLOW_PLACEHOLDER_BUNDLE_ID:-0}" != "1" ]; then
+if [ "$BUNDLE_ID" = "dev.langsrs.LangSRS" ] && [ "${ALLOW_PLACEHOLDER_BUNDLE_ID:-0}" != "1" ]; then   # the old placeholder
   if [ "$DRY" -eq 1 ]; then warn "bundle ID is still the placeholder dev.langsrs.LangSRS"
   else fail "bundle ID is still the placeholder dev.langsrs.LangSRS. Set your own (it also moves the app's data container; see Release/CHECKLIST.md)"; fi
 fi
