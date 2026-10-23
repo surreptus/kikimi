@@ -12,6 +12,8 @@ struct ImportView: View {
     @State private var downloadError: String?
     @State private var isTargeted = false
     @State private var showImporter = false
+    /// The model choice is set once and then stays out of the way; this opens it again.
+    @State private var changingModel = false
 
     private var queue: ImportQueue { app.importQueue! }
     private var canImport: Bool { modelInstalled == true }
@@ -19,7 +21,7 @@ struct ImportView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                ScreenTitle(text: "Import", subtitle: "Drop videos you own. Everything stays on this Mac.")
+                ScreenTitle(text: "Import", subtitle: "Drop videos you own. They never leave this Mac.")
                 modelSection
                 dropZone
                 if !queue.jobs.isEmpty { jobList }
@@ -39,7 +41,30 @@ struct ImportView: View {
 
     // MARK: Model
 
+    /// Quiet once it's ready: a single line, with the choice one click away. The full card appears only when a
+    /// model has to be downloaded or you ask to change it.
+    @ViewBuilder
     private var modelSection: some View {
+        if modelInstalled == true, downloadProgress == nil, !changingModel {
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.green)
+                Text("Speech model ready: \(modelShortName)").font(.callout).foregroundStyle(.secondary)
+                Button("Change") { changingModel = true }
+                    .buttonStyle(.plain)
+                    .font(.system(.callout, design: .rounded, weight: .semibold))
+                    .foregroundStyle(Theme.pinkText)
+                Spacer()
+            }
+        } else {
+            modelCard
+        }
+    }
+
+    private var modelShortName: String {
+        env.preferences.model(for: app.profile).replacingOccurrences(of: "openai_whisper-", with: "")
+    }
+
+    private var modelCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 14) {
                 Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.pink)
@@ -66,9 +91,7 @@ struct ImportView: View {
                 } else if modelInstalled == false {
                     Button("Download model") { Task { await download() } }.buttonStyle(.chunky(compact: true))
                 } else if modelInstalled == true {
-                    Label("Ready", systemImage: "checkmark.circle.fill")
-                        .font(.system(size: 13, weight: .heavy, design: .rounded))
-                        .foregroundStyle(Theme.green)
+                    Button("Done") { changingModel = false }.buttonStyle(.chunky(.secondary, compact: true))
                 }
             }
             if let downloadError {
@@ -89,6 +112,7 @@ struct ImportView: View {
     }
 
     private func loadModel() async {
+        changingModel = false
         model = env.preferences.model(for: app.profile)
         await refreshInstalled()
     }
@@ -110,6 +134,7 @@ struct ImportView: View {
         }
         downloadProgress = nil
         await refreshInstalled()
+        if modelInstalled == true { changingModel = false }   // done: fold the card away again
     }
 
     // MARK: Drop zone
