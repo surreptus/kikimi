@@ -11,7 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1A0000000000000000000003 /* LangSRS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LangSRS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A0000000000000000000003 /* Reprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reprise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -58,7 +58,7 @@
 		1A0000000000000000000005 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1A0000000000000000000003 /* LangSRS.app */,
+				1A0000000000000000000003 /* Reprise.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -86,7 +86,7 @@
 				1A000000000000000000000C /* LangCore */,
 			);
 			productName = LangSRS;
-			productReference = 1A0000000000000000000003 /* LangSRS.app */;
+			productReference = 1A0000000000000000000003 /* Reprise.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
