@@ -243,7 +243,7 @@ final class AppSupportTests: XCTestCase {
             XCTAssertGreaterThan(count, 1_000, profile.code)
         }
         try await env.prepare()   // a second launch has nothing to redo
-        let size = try FileManager.default.attributesOfItem(atPath: root.appending(path: "langsrs.sqlite").path)[.size] as! Int
+        let size = try FileManager.default.attributesOfItem(atPath: root.appending(path: LangEnvironment.databaseName).path)[.size] as! Int
         XCTAssertLessThan(size, 2_000_000, "the dictionaries are not copied into the database")
     }
 }
