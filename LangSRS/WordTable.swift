@@ -34,6 +34,8 @@ struct WordTable: View {
     @Binding var sort: WordSort
 
     @State private var anchor: Int64?
+    /// Measured, so the table can drop columns it has no room for (Next review first, then Type).
+    @State private var width: CGFloat = 900
     @FocusState private var focused: Bool
 
     private static let word: CGFloat = 0     // flexible
@@ -46,7 +48,8 @@ struct WordTable: View {
                 ScrollView {
                     LazyVStack(spacing: 0) {
                         ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
-                            WordTableRow(row: row, selected: selection.contains(row.id), striped: index % 2 == 1)
+                            WordTableRow(row: row, selected: selection.contains(row.id), striped: index % 2 == 1,
+                                         showsType: showsType, showsNext: showsNext)
                                 .onTapGesture { click(row) }
                                 .id(row.id)
                         }
@@ -64,19 +67,23 @@ struct WordTable: View {
                 }
             }
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Words")
     }
+
+    private var showsType: Bool { width >= 520 }
+    private var showsNext: Bool { width >= 660 }
 
     // MARK: Header
 
     private var headerRow: some View {
         HStack(spacing: 0) {
             headerCell("Word", .word).frame(maxWidth: .infinity, alignment: .leading)
-            headerCell("Type", .type).frame(width: Self.typeWidth, alignment: .leading)
+            if showsType { headerCell("Type", .type).frame(width: Self.typeWidth, alignment: .leading) }
             headerCell("Seen", .seen).frame(width: Self.seenWidth, alignment: .leading)
             headerCell("Status", .status).frame(width: Self.statusWidth, alignment: .leading)
-            Text("Next review").frame(width: Self.nextWidth, alignment: .leading)
+            if showsNext { Text("Next review").frame(width: Self.nextWidth, alignment: .leading) }
         }
         .font(.system(size: 12, weight: .medium, design: .rounded))
         .foregroundStyle(Theme.muted)
@@ -138,21 +145,25 @@ private struct WordTableRow: View {
     let row: WordRow
     let selected: Bool
     let striped: Bool
+    let showsType: Bool
+    let showsNext: Bool
 
     var body: some View {
         HStack(spacing: 0) {
             Text(row.word.lemma).font(.system(.body, design: .rounded, weight: .medium)).lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Text(row.word.pos.rawValue).foregroundStyle(secondary).frame(width: 80, alignment: .leading)
+            if showsType { Text(row.word.pos.rawValue).foregroundStyle(secondary).frame(width: 80, alignment: .leading) }
             Text("\(row.occurrenceCount)×").foregroundStyle(secondary).monospacedDigit().frame(width: 60, alignment: .leading)
             status.frame(width: 96, alignment: .leading)
-            // A container, so the column keeps its width on rows with no date.
-            ZStack(alignment: .leading) {
-                if let due = row.word.nextReview {
-                    Text(due, format: .relative(presentation: .named)).foregroundStyle(secondary)
+            if showsNext {
+                // A container, so the column keeps its width on rows with no date.
+                ZStack(alignment: .leading) {
+                    if let due = row.word.nextReview {
+                        Text(due, format: .relative(presentation: .named)).foregroundStyle(secondary)
+                    }
                 }
+                .frame(width: 120, alignment: .leading)
             }
-            .frame(width: 120, alignment: .leading)
         }
         .foregroundStyle(Theme.ink)
         .padding(.horizontal, Theme.screenPadding).padding(.vertical, 9)

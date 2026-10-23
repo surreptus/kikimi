@@ -40,16 +40,20 @@ struct WordDetail: View {
         .onDisappear { audio?.stop() }
     }
 
-    /// The word and its status, with a ⋯ menu to export its example clips.
+    /// The word gets a line to itself, so even a long one isn't squeezed; its status and actions share the line below.
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.6)
+        VStack(alignment: .leading, spacing: 10) {
+            Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.7)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 10) {
+                StatusBadge(status: row.word.status)
+                if let stage = row.word.stage {
+                    Text("Stage \(stage.rawValue) of 9").font(Theme.small).foregroundStyle(Theme.muted)
+                }
+                Spacer(minLength: 8)
                 SpeakButton(
                     text: (app.profile.display.showsReadings ? entries.first?.reading : nil) ?? row.word.lemma,
                     languageCode: LanguageProfiles.profile(for: row.word.language)?.whisperCode ?? row.word.language)
-                StatusBadge(status: row.word.status)
-                Spacer(minLength: 8)
                 if !examples.isEmpty {
                     Menu {
                         Button("Export audio clips…") { exportExamples(.audio) }
@@ -57,41 +61,40 @@ struct WordDetail: View {
                     } label: {
                         Image(systemName: "ellipsis")
                             .font(.system(size: 15, weight: .medium))
-                            .frame(width: 32, height: 28)
+                            .frame(width: 22, height: 18)
                     }
                     .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
                     .help("Export this word's example sentences as clips")
                 }
-            }
-            if let stage = row.word.stage {
-                Text("Stage \(stage.rawValue) of 9").font(Theme.small).foregroundStyle(Theme.muted)
             }
         }
     }
 
     private func exampleRow(_ line: ExampleLine) -> some View {
         let isPlaying = playingLine == line.id
-        return HStack(alignment: .top, spacing: 10) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(line.text).font(.system(.body, design: .rounded)).textSelection(.enabled)
-                Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(Theme.small).foregroundStyle(Theme.muted)
+        return VStack(alignment: .leading, spacing: 8) {
+            Text(line.text).font(.system(.body, design: .rounded)).textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(Theme.small).foregroundStyle(Theme.muted)
+            HStack(spacing: 8) {
+                Button(isPlaying ? "Stop" : "Hear", systemImage: isPlaying ? "stop.fill" : "speaker.wave.2.fill") {
+                    togglePlayback(line)
+                }
+                .labelStyle(.titleAndIcon)
+                .buttonStyle(.pill(isPlaying ? .primary : .secondary, compact: true))
+                .fixedSize()
+                .help("Play this sentence's audio from your video, right here")
+                Button("Open video", systemImage: "play.rectangle.fill") {
+                    audio?.stop()
+                    app.openVideo(id: line.videoID, at: line.startTime)
+                }
+                .labelStyle(.titleAndIcon)
+                .buttonStyle(.pill(.secondary, compact: true))
+                .fixedSize()
+                .help("Open the video at this moment")
             }
-            Spacer(minLength: 6)
-            Button(isPlaying ? "Stop" : "Hear this line", systemImage: isPlaying ? "stop.fill" : "speaker.wave.2.fill") {
-                togglePlayback(line)
-            }
-            .buttonStyle(.pill(isPlaying ? .primary : .secondary, compact: true))
-            .labelStyle(.iconOnly)
-            .help("Play this sentence's audio from your video, right here")
-            Button("Open in video", systemImage: "play.rectangle.fill") {
-                audio?.stop()
-                app.openVideo(id: line.videoID, at: line.startTime)
-            }
-            .buttonStyle(.pill(.secondary, compact: true))
-            .labelStyle(.iconOnly)
-            .help("Open the video at this moment")
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 6)
     }
 
     private func togglePlayback(_ line: ExampleLine) {

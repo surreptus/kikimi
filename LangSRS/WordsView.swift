@@ -50,7 +50,7 @@ struct WordsView: View {
             if inspectorShown.wrappedValue {
                 Rectangle().fill(Theme.line).frame(width: 1)
                 inspector
-                    .frame(width: 350)
+                    .frame(width: 380)
                     .frame(maxHeight: .infinity)
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             }
