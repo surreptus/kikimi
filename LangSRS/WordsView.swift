@@ -20,7 +20,7 @@ struct WordsView: View {
 
     @State private var rows: [WordRow] = []
     @State private var dictionaryHits: [DictionaryEntry] = []
-    @State private var sortOrder = [KeyPathComparator(\WordRow.occurrenceCount, order: .reverse)]
+    @State private var sort = WordSort(column: .seen, ascending: false)
     @State private var confirmReset = false
     @State private var message: String?
 
@@ -36,7 +36,7 @@ struct WordsView: View {
     private var filterBinding: Binding<WordStatus?> { Binding(get: { app.wordsFilter }, set: { app.wordsFilter = $0 }) }
     private var selectionBinding: Binding<Set<Int64>> { Binding(get: { app.wordsSelection }, set: { app.wordsSelection = $0 }) }
 
-    private var sortedRows: [WordRow] { rows.sorted(using: sortOrder) }
+    private var sortedRows: [WordRow] { rows.sorted(using: sort.comparators) }
     private var selectedRows: [WordRow] { rows.filter { selection.contains($0.id) } }
     private var trimmedSearch: String { search.trimmingCharacters(in: .whitespaces) }
 
@@ -124,31 +124,7 @@ struct WordsView: View {
     // MARK: Table
 
     private var table: some View {
-        Table(sortedRows, selection: selectionBinding, sortOrder: $sortOrder) {
-            TableColumn("Word", value: \.word.lemma) { row in
-                Text(row.word.lemma).font(.headline)
-            }
-            TableColumn("Type", value: \.word.pos.rawValue) { row in
-                Text(row.word.pos.rawValue).foregroundStyle(Theme.muted)
-            }
-            .width(min: 70, ideal: 90)
-            TableColumn("Seen", value: \.occurrenceCount) { row in
-                Text("\(row.occurrenceCount)×").foregroundStyle(Theme.muted).monospacedDigit()
-            }
-            .width(min: 50, ideal: 60)
-            TableColumn("Status", value: \.statusOrder) { row in
-                StatusBadge(status: row.word.status)
-            }
-            .width(min: 80, ideal: 100)
-            TableColumn("Next review") { row in
-                if let due = row.word.nextReview {
-                    Text(due, format: .relative(presentation: .named)).foregroundStyle(Theme.muted)
-                }
-            }
-            .width(min: 90, ideal: 130)
-        }
-        .tableStyle(.inset(alternatesRowBackgrounds: true))
-        .scrollContentBackground(.hidden)
+        WordTable(rows: sortedRows, selection: selectionBinding, sort: $sort)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
             if rows.isEmpty {

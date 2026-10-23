@@ -19,12 +19,12 @@ extension Color {
 /// and the one action that matters on a screen is a solid pill. Colour marks where you are; nothing is decorative.
 enum Theme {
     static let ink = Color(light: Color(hex: 0x121212), dark: Color(hex: 0xF4F1EA))
-    /// Text on an `ink` face (the primary button).
-    static let onInk = Color(light: .white, dark: Color(hex: 0x121212))
     static let muted = Color(light: Color(hex: 0x3F3F3F), dark: Color(hex: 0xD6D4CE))
     static let faint = Color(light: Color(hex: 0x4A4A4A), dark: Color(hex: 0xD3D1CB))
-    /// Interactive tint for system controls.
-    static let accent = ink
+    /// The one vivid colour: the main button, the selected row, progress, and the tint of system controls.
+    static let accent = Color(light: Color(hex: 0x4A32E6), dark: Color(hex: 0xB0A4FF))
+    /// Text and icons on an `accent` face.
+    static let onAccent = Color(light: .white, dark: Color(hex: 0x14102B))
 
     /// Behind the floating nav, and behind sheets.
     static let page = Color(light: Color(hex: 0xF6F4EF), dark: Color(hex: 0x121212))
@@ -36,13 +36,18 @@ enum Theme {
     static let line = Color(light: .black.opacity(0.12), dark: .white.opacity(0.16))
 
     // The four section colours, light and dark.
-    static let lilac = Color(light: Color(hex: 0xDCC8FA), dark: Color(hex: 0x3B2F5C))
-    static let mint = Color(light: Color(hex: 0xBFEBD3), dark: Color(hex: 0x1F4A38))
-    static let yellow = Color(light: Color(hex: 0xFFE14D), dark: Color(hex: 0x54460F))
-    static let peach = Color(light: Color(hex: 0xFFB48A), dark: Color(hex: 0x5C3523))
+    static let lilac = Color(light: Color(hex: 0xCDB5FF), dark: Color(hex: 0x372866))
+    static let mint = Color(light: Color(hex: 0x8FE5BE), dark: Color(hex: 0x124632))
+    static let yellow = Color(light: Color(hex: 0xFFD83A), dark: Color(hex: 0x574700))
+    static let peach = Color(light: Color(hex: 0xFFA67A), dark: Color(hex: 0x66341A))
+
+    /// The side nav: a slightly darker strip of whatever colour the section is.
+    static let rail = Color(light: .black.opacity(0.07), dark: .black.opacity(0.28))
+    /// Alternate table rows: barely there.
+    static let stripe = Color(light: .black.opacity(0.04), dark: .white.opacity(0.04))
 
     // Status and feedback. Always shown with a word as well, never as colour alone.
-    static let red = Color(light: Color(hex: 0x9C1717), dark: Color(hex: 0xFFA8A0))
+    static let red = Color(light: Color(hex: 0x8F1414), dark: Color(hex: 0xFFBDB5))
     static let green = Color(light: Color(hex: 0x1E8A55), dark: Color(hex: 0x6FD6A0))
     static let orange = Color(light: Color(hex: 0xB86E00), dark: Color(hex: 0xFFB84D))
     static let purple = Color(light: Color(hex: 0x7C4DDB), dark: Color(hex: 0xC3A6FF))
@@ -99,7 +104,7 @@ struct PillButtonStyle: ButtonStyle {
 
     private var face: Color {
         switch kind {
-        case .primary: Theme.ink
+        case .primary: Theme.accent
         case .secondary: Theme.softStrong
         case .danger: Color(hex: 0xC62828)
         }
@@ -107,7 +112,7 @@ struct PillButtonStyle: ButtonStyle {
 
     private var text: Color {
         switch kind {
-        case .primary: Theme.onInk
+        case .primary: Theme.onAccent
         case .secondary: Theme.ink
         case .danger: .white
         }
@@ -153,7 +158,7 @@ struct ThinProgressStyle: ProgressViewStyle {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule().fill(Theme.ink.opacity(0.15))
-                Capsule().fill(Theme.ink)
+                Capsule().fill(Theme.accent)
                     .frame(width: max(height, proxy.size.width * fraction))
                     .opacity(fraction > 0 ? 1 : 0)
                     .animation(.easeOut(duration: 0.25), value: fraction)
@@ -169,17 +174,21 @@ extension ProgressViewStyle where Self == ThinProgressStyle {
 
 // MARK: Small pieces
 
-/// A word-sized label. The colour tints the pill; the text stays ink so it reads on every section colour.
+/// A word-sized label. The pill is neutral so it reads on every section colour; a small dot carries the status
+/// colour, and the word always says it too.
 struct StatusPill: View {
     let text: String
     var color: Color?
 
     var body: some View {
-        Text(text.prefix(1).uppercased() + text.dropFirst())
-            .font(.system(size: 12, weight: .medium, design: .rounded))
-            .padding(.horizontal, 10).padding(.vertical, 3)
-            .background(Capsule().fill(color.map { $0.opacity(0.35) } ?? Theme.softStrong))
-            .foregroundStyle(Theme.ink)
+        HStack(spacing: 6) {
+            if let color { Circle().fill(color).frame(width: 7, height: 7) }
+            Text(text.prefix(1).uppercased() + text.dropFirst())
+        }
+        .font(.system(size: 12, weight: .medium, design: .rounded))
+        .padding(.horizontal, 10).padding(.vertical, 3)
+        .background(Capsule().fill(Theme.softStrong))
+        .foregroundStyle(Theme.ink)
     }
 }
 

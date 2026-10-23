@@ -21,8 +21,8 @@ enum SidebarItem: String, CaseIterable, Identifiable {
     }
 }
 
-/// The navigation, as a rounded card floating over the window.
-struct FloatingNav: View {
+/// The navigation: a strip fixed to the left edge, a shade darker than the section colour beside it.
+struct SideNav: View {
     @Binding var selection: SidebarItem
     var dueCount: Int
     var languages: [(code: String, name: String)]
@@ -36,6 +36,7 @@ struct FloatingNav: View {
             Text("LangSRS").font(Theme.title(20)).foregroundStyle(Theme.ink)
                 .padding(.bottom, 14)
                 .padding(.horizontal, 12)
+                .padding(.top, 30)   // clears the window's traffic-light buttons
 
             ForEach(SidebarItem.allCases) { item in
                 navRow(item)
@@ -75,7 +76,8 @@ struct FloatingNav: View {
         .padding(14)
         .frame(width: 214)
         .frame(maxHeight: .infinity)
-        .background(RoundedRectangle(cornerRadius: 28).fill(Theme.card))
+        .ignoresSafeArea()
+        .background(Theme.rail)
     }
 
     private func navRow(_ item: SidebarItem) -> some View {
@@ -92,9 +94,9 @@ struct FloatingNav: View {
                 if item == .review, dueCount > 0 {
                     Text("\(dueCount)")
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Theme.onInk)
+                        .foregroundStyle(Theme.onAccent)
                         .padding(.horizontal, 8).padding(.vertical, 2)
-                        .background(Capsule().fill(Theme.ink))
+                        .background(Capsule().fill(Theme.accent))
                 }
             }
             .foregroundStyle(Theme.ink)

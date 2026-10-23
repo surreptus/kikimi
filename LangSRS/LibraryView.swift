@@ -33,8 +33,10 @@ struct LibraryView: View {
             }
         }
         .task(id: app.pendingPlayback) { await consumePendingPlayback() }
-        .sheet(item: $info) { video in
-            VideoInfoSheet(env: env, video: video, play: { open(video, at: nil) }, rename: { startRename(video) })
+        .modal(isPresented: Binding(get: { info != nil }, set: { if !$0 { info = nil } })) {
+            if let video = info {
+                VideoInfoSheet(env: env, video: video, play: { open(video, at: nil) }, rename: { startRename(video) })
+            }
         }
         .alert("Rename video", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Title", text: $newTitle)
@@ -165,7 +167,7 @@ private struct VideoInfoSheet: View {
     let play: () -> Void
     let rename: () -> Void
     @Environment(AppState.self) private var app
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismissModal) private var dismiss
 
     @State private var details: VideoDetails?
     @State private var confirmDelete = false

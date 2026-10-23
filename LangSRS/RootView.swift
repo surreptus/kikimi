@@ -30,7 +30,7 @@ struct RootView: View {
         .toolbarBackground(.hidden, for: .windowToolbar)
         .tint(Theme.accent)
         .fontDesign(.rounded)
-        .sheet(isPresented: $showAcknowledgements) { AcknowledgementsView() }
+        .modal(isPresented: $showAcknowledgements) { AcknowledgementsView() }
     }
 
     /// The colour of the whole window: the current section's, or plain while loading.
@@ -39,7 +39,7 @@ struct RootView: View {
         return Theme.page
     }
 
-    /// A floating nav card on the left; the current screen fills the rest of the window.
+    /// A nav strip fixed to the left edge; the current screen fills the rest of the window.
     private func layout(_ env: LangEnvironment) -> some View {
         @Bindable var app = app
         let selection = Binding<SidebarItem>(
@@ -48,8 +48,8 @@ struct RootView: View {
                 direction = new.order >= app.section.order ? 1 : -1
                 withAnimation(Theme.screenChange(reduceMotion)) { app.section = new }
             })
-        return HStack(spacing: 14) {
-            FloatingNav(
+        return HStack(spacing: 0) {
+            SideNav(
                 selection: selection, dueCount: app.dueCount,
                 languages: LanguageProfiles.all.map { ($0.code, $0.displayName) },
                 language: $app.languageCode, showStorage: { showStorage = true },
@@ -64,9 +64,9 @@ struct RootView: View {
             }
             .animation(Theme.screenChange(reduceMotion), value: app.section)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.top, 14)   // the same distance from the top as before, now measured from the window edge
         }
-        .padding(14)
-        .sheet(isPresented: $showStorage) { StorageView(env: env) }
+        .modal(isPresented: $showStorage) { StorageView(env: env) }
     }
 
     @ViewBuilder

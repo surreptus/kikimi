@@ -2,7 +2,7 @@ import LangCore
 import SwiftUI
 
 struct AcknowledgementsView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismissModal) private var dismiss
     private let items = Acknowledgements.all()
 
     var body: some View {

@@ -6,7 +6,7 @@ import SwiftUI
 struct StorageView: View {
     let env: LangEnvironment
     @Environment(AppState.self) private var app
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismissModal) private var dismiss
 
     @State private var models: [InstalledModel] = []
     @State private var modelBytes: Int64 = 0

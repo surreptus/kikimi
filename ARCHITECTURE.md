@@ -53,13 +53,13 @@ the Words screen's search, filter and selection, so they survive switching scree
 | View | Screen |
 |---|---|
 | `ImportView` | Drop zone, model choice and download, import progress |
-| `WordsView`, `WordDetailView` | Word table and bulk actions; the inspector with entry and examples |
+| `WordsView`, `WordTable`, `WordDetailView` | Search and bulk actions; the hand-built word table (square rows, keyboard selection); the inspector |
 | `ReviewView` | Spaced-repetition cards |
 | `LibraryView` | Videos, details, delete |
 | `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
 | `StorageView` | Downloaded models and videos, with removal |
 
-`Theme.swift` is the design system (colours, button and card styles). Use it rather than styling views ad hoc.
+`Theme.swift` is the design system: the four section colours (the whole window takes the current one), one accent, pill buttons and flat panels. `SideNav` is the left strip, and `Modal.swift` shows panels that close on an outside click. Use these rather than styling views ad hoc.
 
 ## Data on disk
 
