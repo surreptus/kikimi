@@ -1,0 +1,77 @@
+# Architecture
+
+A map for finding your way around. The [README](README.md) says what the app does and how to build it.
+
+## The one rule
+
+All logic lives in `LangCore/` (a Swift package with no UI). `LangSRS/` holds SwiftUI views only and calls into
+`LangCore` through one object, `LangEnvironment`. If you are adding behaviour, it almost certainly belongs in
+`LangCore`, with a test.
+
+Shared code never checks a language code such as `"ja"`. It asks the `LanguageProfile`.
+
+## Where to start reading
+
+1. `LangCore/Sources/LangCore/Environment/LangEnvironment.swift`: the front door. It owns the database, the
+   dictionaries, the model manager and the import queue, and is what the views hold.
+2. `Profiles/LanguageProfile.swift`: everything that differs between languages.
+3. `Import/ImportPipeline.swift`: the most important flow. `importVideo` reads as a list of steps.
+4. `LangSRS/RootView.swift`, then the view for the screen you care about.
+
+## LangCore, by folder
+
+| Folder | What it holds |
+|---|---|
+| `Profiles/` | `LanguageProfile` and the Spanish and Japanese profiles; `LanguageProfiles.all` is the registry. |
+| `Tokenizing/` | Turns a line of text into content words (lemma and part of speech). Spanish uses Apple's `NaturalLanguage`; Japanese uses the vendored MeCab (`Sources/CMeCab`). |
+| `Dictionary/` | `DictionaryStore` reads the bundled dictionary files in place, read-only. They are never copied into the database. |
+| `Database/` | GRDB records, migrations (`LangMigrations`) and queries. Schema changes are new migrations only. |
+| `Import/` | The import pipeline, queue, transcription, video compaction and the language check. |
+| `Models/` | Speech-model download, listing and removal (`ModelManager`), plus `ModelCatalog` (sizes and notes). |
+| `SRS/`, `Review/` | The nine review stages and their intervals; review sessions and sentence audio. |
+| `Playback/` | The player controller, subtitle timeline and word hints. |
+| `Export/` | Audio and video clip export. |
+| `Environment/` | `LangEnvironment` and where videos live on disk. |
+
+## The import pipeline
+
+`ImportPipeline.importVideo` calls one small method per step, in this order:
+
+`stage` (copy the original) → `confirmLanguage` → `transcribe` → `makeLibraryFiles` (compact video, verify,
+AAC audio) → `moveIntoLibrary` → `save` (one database transaction) → delete the staged copy.
+
+The original is only read. Any failure removes only what this import created. Tests inject a failure at each step
+and check the original is unchanged. `ImportQueue` runs imports one at a time for the UI and reports status.
+
+The two hardest files are `AVFoundationTranscoder.swift` (it starts with a reading guide) and `ImportPipeline.swift`.
+
+## The app
+
+`LangSRSApp` → `RootView` (floating nav plus the current section). `AppState` holds which section is showing and
+the Words screen's search, filter and selection, so they survive switching screens.
+
+| View | Screen |
+|---|---|
+| `ImportView` | Drop zone, model choice and download, import progress |
+| `WordsView`, `WordDetailView` | Word table and bulk actions; the inspector with entry and examples |
+| `ReviewView` | Spaced-repetition cards |
+| `LibraryView` | Videos, details, delete |
+| `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
+| `StorageView` | Downloaded models and videos, with removal |
+
+`Theme.swift` is the design system (colours, button and card styles). Use it rather than styling views ad hoc.
+
+## Data on disk
+
+Everything is in the app container, never the repo: `Application Support/LangSRS/` holds `Library/` (videos and
+audio, one folder per content hash), `Staging/` (temporary), `models/` (speech models) and the SQLite database.
+
+## Tests
+
+`cd LangCore && swift test`. The tests are the best examples of how each part is used. Anything needing a real
+model or file is opt-in through environment variables listed in the README. There are no UI tests; the views are
+checked by building and by rendered previews.
+
+## Adding a language
+
+Write a profile, add it to `LanguageProfiles.all`, add a dictionary build script. See the README.
