@@ -88,13 +88,18 @@ struct ReviewView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))
                 }
 
-                if card.example != nil {
-                    Button("Play sentence", systemImage: "speaker.wave.2.fill") { playSentence() }
-                        .buttonStyle(.pill(.secondary, compact: true))
-                        .keyboardShortcut("r", modifiers: [])
-                        .help("Play this sentence from your video (R)")
-                        .padding(.top, 6)
+                HStack(spacing: 10) {
+                    SpeakButton(
+                        text: (app.profile.display.showsReadings ? card.entries.first?.reading : nil) ?? card.word.lemma,
+                        languageCode: app.profile.whisperCode, showsTitle: true, shortcut: "w")
+                    if card.example != nil {
+                        Button("Play sentence", systemImage: "speaker.wave.2.fill") { playSentence() }
+                            .buttonStyle(.pill(.secondary, compact: true))
+                            .keyboardShortcut("r", modifiers: [])
+                            .help("Play this sentence from your video (R)")
+                    }
                 }
+                .padding(.top, 6)
             }
             .frame(maxWidth: 560)
             .padding(.vertical, 30).padding(.horizontal, 28)

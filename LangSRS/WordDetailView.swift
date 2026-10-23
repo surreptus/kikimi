@@ -45,6 +45,9 @@ struct WordDetail: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.6)
+                SpeakButton(
+                    text: (app.profile.display.showsReadings ? entries.first?.reading : nil) ?? row.word.lemma,
+                    languageCode: LanguageProfiles.profile(for: row.word.language)?.whisperCode ?? row.word.language)
                 StatusBadge(status: row.word.status)
                 Spacer(minLength: 8)
                 if !examples.isEmpty {

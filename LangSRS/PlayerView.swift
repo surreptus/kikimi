@@ -210,6 +210,8 @@ struct PlayerView: View {
                         Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
                     }
                     StatusPill(text: token.pos.rawValue)
+                    SpeakButton(text: hint?.reading ?? token.reading ?? hint?.lemma ?? token.lemma,
+                                languageCode: profile?.whisperCode ?? video.language, shortcut: "s")
                     if let status = hint?.status {
                         StatusPill(text: status.rawValue, color: color(for: status))
                     }
