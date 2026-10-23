@@ -94,7 +94,7 @@ struct SubtitleRow: View {
                     .underline(status(of: chunk.token) == .learning, pattern: .dot, color: Theme.orange)
                     .font(.system(.body, design: .rounded, weight: .regular))
                     // The highlight is slightly wider than the word, but takes no layout space (no gaps in Japanese).
-                    .background(RoundedRectangle(cornerRadius: 5).fill(isHovered ? Theme.accent.opacity(0.22) : tint(for: chunk.token)).padding(.horizontal, -1))
+                    .background(RoundedRectangle(cornerRadius: 5).fill(isHovered ? Theme.ink.opacity(0.12) : tint(for: chunk.token)).padding(.horizontal, -1))
                 if !chunk.trailing.isEmpty {
                     Text(chunk.trailing).font(.system(.body, design: .rounded, weight: .regular))
                 }

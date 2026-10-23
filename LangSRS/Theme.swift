@@ -16,16 +16,16 @@ extension Color {
 }
 
 /// The look of the app: one flat field of colour (mint), text is near-black (or near-white in dark mode),
-/// and the one action that matters on a screen is a solid pill. The accent is gold; nothing is decorative.
+/// and the one action that matters on a screen is a solid pill. The accent is the ink; nothing is decorative.
 enum Theme {
     static let ink = Color(light: Color(hex: 0x121212), dark: Color(hex: 0xF4F1EA))
     static let muted = Color(light: Color(hex: 0x3F3F3F), dark: Color(hex: 0xD6D4CE))
     static let faint = Color(light: Color(hex: 0x3F3F3F), dark: Color(hex: 0xD3D1CB))
-    /// The one accent, a gold: the main button, selected rows and the due badge. It is a fill, never a text or icon
-    /// colour, because gold on the green field is too faint to read.
-    static let accent = Color(light: Color(hex: 0xFFC21A), dark: Color(hex: 0xFFCB3D))
-    /// Text and icons on an `accent` face: the same near-black in both modes.
-    static let onAccent = Color(hex: 0x121212)
+    /// The accent is the ink itself: the main button, selected rows and the due badge are solid ink, so the only
+    /// colour in the app is the field.
+    static let accent = ink
+    /// Text and icons on an `accent` face.
+    static let onAccent = Color(light: .white, dark: Color(hex: 0x121212))
 
     /// Behind the floating nav, and behind sheets.
     static let page = Color(light: Color(hex: 0xF6F4EF), dark: Color(hex: 0x121212))
@@ -202,7 +202,7 @@ struct ScreenShift: ViewModifier {
 
 /// The one character in the app: a flat flower with a small smile. Used only where something is finished or empty.
 struct Blob: View {
-    var color: Color = Theme.accent
+    var color: Color = Theme.softStrong
 
     var body: some View {
         ZStack {
