@@ -27,6 +27,7 @@ struct FloatingNav: View {
     var dueCount: Int
     var languages: [(code: String, name: String)]
     @Binding var language: String
+    var showStorage: () -> Void
     var showAcknowledgements: () -> Void
     @Namespace private var pill
 
@@ -70,11 +71,14 @@ struct FloatingNav: View {
             .buttonStyle(.plain)
             .menuIndicator(.hidden)
 
-            Button("Acknowledgements", action: showAcknowledgements)
-                .buttonStyle(.plain)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 6).padding(.top, 4)
+            HStack(spacing: 12) {
+                Button("Storage", action: showStorage)
+                Button("Acknowledgements", action: showAcknowledgements)
+            }
+            .buttonStyle(.plain)
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 6).padding(.top, 4)
         }
         .padding(14)
         .frame(width: 214)

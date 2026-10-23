@@ -30,6 +30,7 @@ struct ImportView: View {
         }
         .navigationTitle("Import")
         .task(id: app.languageCode) { await loadModel() }
+        .onChange(of: app.dataVersion) { Task { await refreshInstalled() } }   // e.g. a model removed in Storage
         .onChange(of: queue.jobs.map(\.status)) { _, statuses in
             if statuses.contains(.imported) { app.dataChanged() }
         }
@@ -61,7 +62,7 @@ struct ImportView: View {
     }
 
     private var modelShortName: String {
-        env.preferences.model(for: app.profile).replacingOccurrences(of: "openai_whisper-", with: "")
+        ModelCatalog.name(for: env.preferences.model(for: app.profile))
     }
 
     private var modelCard: some View {
@@ -94,6 +95,9 @@ struct ImportView: View {
                     Button("Done") { changingModel = false }.buttonStyle(.chunky(.secondary, compact: true))
                 }
             }
+            if let note = ModelCatalog.info(for: model)?.note {
+                Text(note).font(.caption).foregroundStyle(.secondary)
+            }
             if let downloadError {
                 Text(downloadError).font(.caption).foregroundStyle(Theme.red)
             }
@@ -106,9 +110,11 @@ struct ImportView: View {
         return all.contains(app.profile.defaultModel) ? all : [app.profile.defaultModel] + all
     }
 
+    /// "medium · 1.5 GB (recommended)": the size, and a flag on the model suggested for this language.
     private func label(for variant: String) -> String {
-        let name = variant.replacingOccurrences(of: "openai_whisper-", with: "")
-        return variant == app.profile.defaultModel ? "\(name) (default)" : name
+        let size = ModelCatalog.info(for: variant)
+            .map { " · " + ByteCountFormatter.string(fromByteCount: $0.downloadBytes, countStyle: .file) } ?? ""
+        return ModelCatalog.name(for: variant) + size + (variant == app.profile.defaultModel ? " (recommended)" : "")
     }
 
     private func loadModel() async {

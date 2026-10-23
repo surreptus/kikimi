@@ -50,8 +50,11 @@ public actor WhisperKitTranscriber: Transcriber {
     }
 
     private func kit(for model: String) async throws -> WhisperKit {
+        guard let folder = await models.installedFolder(for: model) else {
+            if loaded?.model == model { loaded = nil }   // it was removed: release the memory it was holding
+            throw ModelError.notInstalled(model)
+        }
         if let loaded, loaded.model == model { return loaded.kit }
-        guard let folder = await models.installedFolder(for: model) else { throw ModelError.notInstalled(model) }
         let config = WhisperKitConfig(modelFolder: folder.path, verbose: false, load: true, download: false)
         let kit = try await WhisperKit(config)
         loaded = (model, kit)

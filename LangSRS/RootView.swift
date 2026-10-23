@@ -4,6 +4,7 @@ import SwiftUI
 struct RootView: View {
     @Environment(AppState.self) private var app
     @State private var showAcknowledgements = false
+    @State private var showStorage = false
     /// +1 when moving down the nav list, -1 when moving up; decides which way the new screen slides in.
     @State private var direction: CGFloat = 1
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -44,7 +45,8 @@ struct RootView: View {
             FloatingNav(
                 selection: selection, dueCount: app.dueCount,
                 languages: LanguageProfiles.all.map { ($0.code, $0.displayName) },
-                language: $app.languageCode, showAcknowledgements: { showAcknowledgements = true })
+                language: $app.languageCode, showStorage: { showStorage = true },
+                showAcknowledgements: { showAcknowledgements = true })
             ZStack {
                 detail(env: env)
                     .id(app.section)
@@ -60,6 +62,7 @@ struct RootView: View {
                 .overlay(RoundedRectangle(cornerRadius: 28).strokeBorder(Theme.line, lineWidth: 2))
         }
         .padding(14)
+        .sheet(isPresented: $showStorage) { StorageView(env: env) }
     }
 
     @ViewBuilder
