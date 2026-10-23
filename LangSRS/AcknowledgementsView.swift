@@ -1,0 +1,30 @@
+import LangCore
+import SwiftUI
+
+struct AcknowledgementsView: View {
+    @Environment(\.dismiss) private var dismiss
+    private let items = Acknowledgements.all()
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("Acknowledgements").font(Theme.title(22))
+                Spacer()
+                Button("Done") { dismiss() }.buttonStyle(.chunky(compact: true)).keyboardShortcut(.defaultAction)
+            }
+            .padding()
+            List(items) { item in
+                DisclosureGroup(item.title) {
+                    Text(item.text)
+                        .font(.system(.caption, design: .monospaced))
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+        .frame(width: 640, height: 520)
+        .background(Theme.background)
+        .fontDesign(.rounded)
+        .tint(Theme.pink)
+    }
+}
