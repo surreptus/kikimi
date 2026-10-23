@@ -5,7 +5,7 @@ struct LangSRSApp: App {
     @State private var app = AppState()
 
     var body: some Scene {
-        WindowGroup("LangSRS") {
+        WindowGroup("Reprise") {
             RootView()
                 .environment(app)
                 .task { await app.start() }

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds a release archive of LangSRS and exports it. Nothing runs until you choose a mode.
+# Builds a release archive of Reprise and exports it. Nothing runs until you choose a mode.
 #
 #   TEAM_ID=ABCDE12345 Scripts/release.sh developer-id            archive + export for direct download
 #   TEAM_ID=ABCDE12345 NOTARY_PROFILE=langsrs Scripts/release.sh developer-id --notarize
@@ -98,16 +98,16 @@ if [ "$MODE" = "app-store" ]; then
   exit 0
 fi
 
-APP="$EXPORT/LangSRS.app"
+APP="$EXPORT/Reprise.app"
 if [ "$NOTARIZE" -eq 1 ]; then
   echo "== Notarize"
-  run ditto -c -k --keepParent "$APP" "$BUILD/LangSRS-notarize.zip"
-  run xcrun notarytool submit "$BUILD/LangSRS-notarize.zip" --keychain-profile "${NOTARY_PROFILE:-PROFILE}" --wait
+  run ditto -c -k --keepParent "$APP" "$BUILD/Reprise-notarize.zip"
+  run xcrun notarytool submit "$BUILD/Reprise-notarize.zip" --keychain-profile "${NOTARY_PROFILE:-PROFILE}" --wait
   run xcrun stapler staple "$APP"
   run spctl --assess --type execute --verbose "$APP"
   echo "== DMG"
-  run hdiutil create -volname LangSRS -srcfolder "$APP" -ov -format UDZO "$BUILD/LangSRS.dmg"
-  echo "== Done: $BUILD/LangSRS.dmg"
+  run hdiutil create -volname Reprise -srcfolder "$APP" -ov -format UDZO "$BUILD/Reprise.dmg"
+  echo "== Done: $BUILD/Reprise.dmg"
 else
   echo "== Done: $APP (signed, NOT notarized: add --notarize before sharing it)"
 fi
