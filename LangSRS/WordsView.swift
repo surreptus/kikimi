@@ -278,7 +278,6 @@ private struct WordDetail: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 header
-                actions
                 if let exportMessage { Text(exportMessage).font(.caption).foregroundStyle(.secondary) }
 
                 Text("Dictionary").font(Theme.title(17))
@@ -303,45 +302,28 @@ private struct WordDetail: View {
         .onDisappear { audio?.stop() }
     }
 
-    /// The word, its status, and a ⋯ menu for the less common things.
+    /// The word and its status, with a ⋯ menu to export its example clips.
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.6)
                 StatusBadge(status: row.word.status)
                 Spacer(minLength: 8)
-                Menu {
-                    if !examples.isEmpty {
+                if !examples.isEmpty {
+                    Menu {
                         Button("Export audio clips…") { exportExamples(.audio) }
                         Button("Export video clips…") { exportExamples(.video) }
-                        Divider()
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 15, weight: .heavy))
+                            .frame(width: 32, height: 28)
                     }
-                    Button("Reset to new", role: .destructive) { Task { await change { try await env.database.markNew(wordID: row.id) } } }
-                        .disabled(row.word.status == .new)
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.system(size: 15, weight: .heavy))
-                        .frame(width: 32, height: 28)
+                    .menuStyle(.button).buttonStyle(.chunky(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+                    .help("Export this word's example sentences as clips")
                 }
-                .menuStyle(.button).buttonStyle(.chunky(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
-                .help("More: export example clips, reset")
             }
             if let stage = row.word.stage {
                 Text("Stage \(stage.rawValue) of 9").font(.caption).foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    /// Two equal, roomy buttons; whichever doesn't apply is simply left out.
-    private var actions: some View {
-        HStack(spacing: 10) {
-            if row.word.status != .learning {
-                Button("Start learning") { Task { await change { try await env.database.startLearning(wordID: row.id) } } }
-                    .buttonStyle(.chunky(.primary, compact: true, fullWidth: true))
-            }
-            if row.word.status != .known {
-                Button("Mark known") { Task { await change { try await env.database.markKnown(wordID: row.id) } } }
-                    .buttonStyle(.chunky(.secondary, compact: true, fullWidth: true))
             }
         }
     }
@@ -399,11 +381,6 @@ private struct WordDetail: View {
                 exportMessage = "Export failed: \(error.localizedDescription)"
             }
         }
-    }
-
-    private func change(_ work: () async throws -> Void) async {
-        try? await work()
-        app.dataChanged()
     }
 
     private func timestamp(_ seconds: Double) -> String {
