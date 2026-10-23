@@ -35,13 +35,13 @@ Scripts/build_ipadic.sh         # Japanese tokenizer dictionary (clones MeCab at
 Scripts/build_dictionaries.sh   # JMdict (~10 MB download) and the Spanish extract (~1 GB download)
 ```
 
-Then open `LangSRS.xcodeproj` in Xcode, pick the **LangSRS** scheme (the project, folder and scheme keep the working name `LangSRS`) and **My Mac**, and press ⌘R. The app reads the
+Then open `Reprise.xcodeproj` in Xcode, pick the **Reprise** scheme and **My Mac**, and press ⌘R. The app reads the
 bundled dictionaries in place (they are never copied into its database); on the **Import** tab, download a speech
 model, then drop in a video.
 Defaults are `medium` for Spanish and `large-v3` for Japanese (about 3 GB), and you can pick another per language.
 
 The app is sandboxed. Its database, models and library live in its container,
-`~/Library/Containers/<bundle id>/Data/Library/Application Support/LangSRS/`.
+`~/Library/Containers/<bundle id>/Data/Library/Application Support/Reprise/`.
 
 ## Tests
 
@@ -71,7 +71,7 @@ Two parts in one repository:
 
 - **`LangCore/`**, a Swift package with no UI, and all the logic: language profiles, SRS, database (GRDB with
   migrations), tokenizing, the import pipeline, playback, clip export, and review sessions.
-- **`LangSRS.xcodeproj`** with **`LangSRS/`**: the SwiftUI interface, app lifecycle, assets, entitlements and
+- **`Reprise.xcodeproj`** with **`Reprise/`**: the SwiftUI interface, app lifecycle, assets, entitlements and
   `Info.plist`. It contains no logic of its own; views call into `LangCore`.
 
 ### Language profiles
@@ -112,7 +112,7 @@ not committed; only the scripts that build them are. Japanese tokenizing uses a 
 The licence texts are in `LangCore/Sources/LangCore/Resources/Licenses/` and are shown in the app under
 **Acknowledgements**. The app's own code is under the [MIT licence](LICENSE); the dictionary data and the other components keep the licences above.
 
-The privacy policy is [`LangSRS/Privacy.md`](LangSRS/Privacy.md); the app shows the same file (Privacy, in the nav footer), and
+The privacy policy is [`Reprise/Privacy.md`](Reprise/Privacy.md); the app shows the same file (Privacy, in the nav footer), and
 it is the text to publish where the App Store asks for a policy URL.
 
 ## Release

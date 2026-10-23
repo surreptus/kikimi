@@ -2,7 +2,7 @@
 # Builds a release archive of Reprise and exports it. Nothing runs until you choose a mode.
 #
 #   TEAM_ID=ABCDE12345 Scripts/release.sh developer-id            archive + export for direct download
-#   TEAM_ID=ABCDE12345 NOTARY_PROFILE=langsrs Scripts/release.sh developer-id --notarize
+#   TEAM_ID=ABCDE12345 NOTARY_PROFILE=reprise Scripts/release.sh developer-id --notarize
 #                                                                 ... then notarize, staple, make a DMG
 #   TEAM_ID=ABCDE12345 Scripts/release.sh app-store               archive + export a .pkg for App Store Connect
 #   Scripts/release.sh developer-id --dry-run                     print every command, change nothing
@@ -42,7 +42,7 @@ TEAM_ID="${TEAM_ID:-}"
 if [ "$DRY" -eq 1 ] && [ -z "$TEAM_ID" ]; then TEAM_ID="TEAMID0000"; warn "TEAM_ID not set; using a placeholder for this dry run"; fi
 [[ "$TEAM_ID" =~ ^[A-Z0-9]{10}$ ]] || fail "set TEAM_ID to your 10-character Apple team ID (developer.apple.com > Membership)"
 
-BUNDLE_ID="$(sed -n 's/.*PRODUCT_BUNDLE_IDENTIFIER = \(.*\);/\1/p' LangSRS.xcodeproj/project.pbxproj | head -1)"
+BUNDLE_ID="$(sed -n 's/.*PRODUCT_BUNDLE_IDENTIFIER = \(.*\);/\1/p' Reprise.xcodeproj/project.pbxproj | head -1)"
 if [ "$BUNDLE_ID" = "dev.langsrs.LangSRS" ] && [ "${ALLOW_PLACEHOLDER_BUNDLE_ID:-0}" != "1" ]; then   # the old placeholder
   if [ "$DRY" -eq 1 ]; then warn "bundle ID is still the placeholder dev.langsrs.LangSRS"
   else fail "bundle ID is still the placeholder dev.langsrs.LangSRS. Set your own (it also moves the app's data container; see Release/CHECKLIST.md)"; fi
@@ -52,7 +52,7 @@ missing=0
 for f in LangCore/Sources/LangCore/Resources/ipadic/sys.dic \
          LangCore/Sources/LangCore/Resources/dictionaries/dictionary-ja.sqlite \
          LangCore/Sources/LangCore/Resources/dictionaries/dictionary-es.sqlite \
-         LangSRS/PrivacyInfo.xcprivacy; do
+         Reprise/PrivacyInfo.xcprivacy; do
   [ -e "$f" ] || { echo "missing: $f" >&2; missing=1; }
 done
 if [ "$missing" -eq 1 ]; then
@@ -60,7 +60,7 @@ if [ "$missing" -eq 1 ]; then
   else fail "run Scripts/build_ipadic.sh and Scripts/build_dictionaries.sh first"; fi
 fi
 
-if ! ls LangSRS/Assets.xcassets/AppIcon.appiconset/*.png >/dev/null 2>&1; then
+if ! ls Reprise/Assets.xcassets/AppIcon.appiconset/*.png >/dev/null 2>&1; then
   if [ "$MODE" = "app-store" ] && [ "$DRY" -eq 0 ]; then fail "the App Store requires an app icon: add PNGs to Assets.xcassets/AppIcon"; fi
   warn "no app icon images in Assets.xcassets/AppIcon"
 fi
@@ -71,7 +71,7 @@ fi
 
 # ---------- Build ----------
 BUILD="$ROOT/build/release"
-ARCHIVE="$BUILD/LangSRS.xcarchive"
+ARCHIVE="$BUILD/Reprise.xcarchive"
 EXPORT="$BUILD/export-$MODE"
 OPTIONS_SRC="$ROOT/Release/ExportOptions-$([ "$MODE" = developer-id ] && echo DeveloperID || echo AppStore).plist"
 OPTIONS="$BUILD/ExportOptions-$MODE.plist"
@@ -84,7 +84,7 @@ fi
 echo "== Archive ($MODE, team $TEAM_ID)"
 run mkdir -p "$BUILD"
 run rm -rf "$ARCHIVE" "$EXPORT"
-run xcodebuild -project LangSRS.xcodeproj -scheme LangSRS -configuration Release \
+run xcodebuild -project Reprise.xcodeproj -scheme Reprise -configuration Release \
   -destination 'generic/platform=macOS' -archivePath "$ARCHIVE" \
   -allowProvisioningUpdates DEVELOPMENT_TEAM="$TEAM_ID" archive
 

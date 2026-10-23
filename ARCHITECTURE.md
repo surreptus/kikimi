@@ -4,7 +4,7 @@ A map for finding your way around. The [README](README.md) says what the app doe
 
 ## The one rule
 
-All logic lives in `LangCore/` (a Swift package with no UI). `LangSRS/` holds SwiftUI views only and calls into
+All logic lives in `LangCore/` (a Swift package with no UI). `Reprise/` holds SwiftUI views only and calls into
 `LangCore` through one object, `LangEnvironment`. If you are adding behaviour, it almost certainly belongs in
 `LangCore`, with a test.
 
@@ -16,7 +16,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
    dictionaries, the model manager and the import queue, and is what the views hold.
 2. `Profiles/LanguageProfile.swift`: everything that differs between languages.
 3. `Import/ImportPipeline.swift`: the most important flow. `importVideo` reads as a list of steps.
-4. `LangSRS/RootView.swift`, then the view for the screen you care about.
+4. `Reprise/RootView.swift`, then the view for the screen you care about.
 
 ## LangCore, by folder
 
@@ -47,7 +47,7 @@ The two hardest files are `AVFoundationTranscoder.swift` (it starts with a readi
 
 ## The app
 
-`LangSRSApp` → `RootView` (floating nav plus the current section). `AppState` holds which section is showing and
+`RepriseApp` → `RootView` (floating nav plus the current section). `AppState` holds which section is showing and
 the Words screen's search, filter and selection, so they survive switching screens.
 
 | View | Screen |
@@ -64,7 +64,7 @@ the Words screen's search, filter and selection, so they survive switching scree
 
 ## Data on disk
 
-Everything is in the app container, never the repo: `Application Support/LangSRS/` holds `Library/` (videos and
+Everything is in the app container, never the repo: `Application Support/Reprise/` holds `Library/` (videos and
 audio, one folder per content hash), `Staging/` (temporary), `models/` (speech models) and the SQLite database.
 
 ## Tests

@@ -15,22 +15,22 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		1A0000000000000000000007 /* Exceptions for "LangSRS" folder in "LangSRS" target */ = {
+		1A0000000000000000000007 /* Exceptions for "Reprise" folder in "Reprise" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 1A0000000000000000000002 /* LangSRS */;
+			target = 1A0000000000000000000002 /* Reprise */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		1A0000000000000000000006 /* LangSRS */ = {
+		1A0000000000000000000006 /* Reprise */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				1A0000000000000000000007 /* Exceptions for "LangSRS" folder in "LangSRS" target */,
+				1A0000000000000000000007 /* Exceptions for "Reprise" folder in "Reprise" target */,
 			);
-			path = LangSRS;
+			path = Reprise;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -50,7 +50,7 @@
 		1A0000000000000000000004 = {
 			isa = PBXGroup;
 			children = (
-				1A0000000000000000000006 /* LangSRS */,
+				1A0000000000000000000006 /* Reprise */,
 				1A0000000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -66,9 +66,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1A0000000000000000000002 /* LangSRS */ = {
+		1A0000000000000000000002 /* Reprise */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1A000000000000000000000F /* Build configuration list for PBXNativeTarget "LangSRS" */;
+			buildConfigurationList = 1A000000000000000000000F /* Build configuration list for PBXNativeTarget "Reprise" */;
 			buildPhases = (
 				1A0000000000000000000008 /* Sources */,
 				1A0000000000000000000009 /* Frameworks */,
@@ -79,13 +79,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				1A0000000000000000000006 /* LangSRS */,
+				1A0000000000000000000006 /* Reprise */,
 			);
-			name = LangSRS;
+			name = Reprise;
 			packageProductDependencies = (
 				1A000000000000000000000C /* LangCore */,
 			);
-			productName = LangSRS;
+			productName = Reprise;
 			productReference = 1A0000000000000000000003 /* Reprise.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -104,7 +104,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 1A000000000000000000000E /* Build configuration list for PBXProject "LangSRS" */;
+			buildConfigurationList = 1A000000000000000000000E /* Build configuration list for PBXProject "Reprise" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -121,7 +121,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1A0000000000000000000002 /* LangSRS */,
+				1A0000000000000000000002 /* Reprise */,
 			);
 		};
 /* End PBXProject section */
@@ -194,14 +194,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LangSRS/LangSRS.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Reprise/Reprise.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = LangSRS/Info.plist;
+				INFOPLIST_FILE = Reprise/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -219,14 +219,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LangSRS/LangSRS.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Reprise/Reprise.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = LangSRS/Info.plist;
+				INFOPLIST_FILE = Reprise/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -242,7 +242,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1A000000000000000000000E /* Build configuration list for PBXProject "LangSRS" */ = {
+		1A000000000000000000000E /* Build configuration list for PBXProject "Reprise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1A0000000000000000000010 /* Debug */,
@@ -251,7 +251,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1A000000000000000000000F /* Build configuration list for PBXNativeTarget "LangSRS" */ = {
+		1A000000000000000000000F /* Build configuration list for PBXNativeTarget "Reprise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1A0000000000000000000012 /* Debug */,

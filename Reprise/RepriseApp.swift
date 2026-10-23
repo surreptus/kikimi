@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct LangSRSApp: App {
+struct RepriseApp: App {
     @State private var app = AppState()
     @AppStorage(Appearance.key) private var appearance = Appearance.system
 

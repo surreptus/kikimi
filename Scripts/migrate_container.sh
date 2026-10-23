@@ -31,7 +31,9 @@ if pgrep -x Reprise >/dev/null || pgrep -x LangSRS >/dev/null; then fail "quit R
 SIZE=$(du -sh "$OLD/Application Support/LangSRS" | cut -f1)
 say "Copying $SIZE of data from $OLD_ID to $NEW_ID"
 
-DEST="$NEW/Application Support/LangSRS"
+# The old app kept its data in a folder called LangSRS, with a database called langsrs.sqlite; Reprise uses its own
+# name for both, so the copy is renamed on the way in.
+DEST="$NEW/Application Support/Reprise"
 if [ -e "$DEST" ]; then
   ASIDE="$DEST.before-migration-$(date +%Y%m%d-%H%M%S)"
   say "The new app already has data; moving it aside to $(basename "$ASIDE")"
@@ -39,6 +41,11 @@ if [ -e "$DEST" ]; then
 fi
 run mkdir -p "$NEW/Application Support"
 run cp -cR "$OLD/Application Support/LangSRS" "$DEST"
+for suffix in "" "-wal" "-shm"; do
+  if [ "$DRY" -eq 1 ] || [ -e "$DEST/langsrs.sqlite$suffix" ]; then
+    run mv "$DEST/langsrs.sqlite$suffix" "$DEST/reprise.sqlite$suffix"
+  fi
+done
 
 OLD_PREFS="$OLD/Preferences/$OLD_ID.plist"
 if [ -f "$OLD_PREFS" ]; then
