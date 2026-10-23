@@ -151,6 +151,7 @@ struct ReviewView: View {
             let new = try await ReviewSession(database: env.database, language: app.languageCode)
             session = new
             total = await new.remaining
+            remaining = total   // set together with the total, or the bar shows full for a moment
             await advance(new)
         } catch { self.error = error.localizedDescription }
     }
@@ -168,9 +169,11 @@ struct ReviewView: View {
     private func advance(_ session: ReviewSession) async {
         revealed = false
         do {
-            card = try await session.currentCard()
+            let next = try await session.currentCard()
+            // Update the counts before the card, so the bar never shows a card with a stale count.
             remaining = await session.remaining
             total = max(total, remaining)   // a missed word re-enters the queue, so the total can grow
+            card = next
             if mode == .onCardShown { playSentence() }
             if card == nil, await session.answered > 0 {
                 summary = (await session.answered, await session.correctFirstTry)
