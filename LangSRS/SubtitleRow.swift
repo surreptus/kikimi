@@ -1,14 +1,22 @@
 import LangCore
 import SwiftUI
 
-/// One subtitle line. Words are hoverable; hovering the line shows furigana above Japanese words.
+/// One subtitle line. Hover (or focus) a word to see its meaning in the hint bar; click it, or press Return on it,
+/// to pin that meaning. Hovering or focusing the line shows furigana above Japanese words.
+///
+/// Keyboard: click a line (or Tab to it with Full Keyboard Access) to focus it; ← → move between its words,
+/// Return pins the word, Esc unpins, ↑ ↓ move to the previous or next line.
 struct SubtitleRow: View {
     let line: Subtitle
+    let index: Int
     let active: Bool
     let profile: (any LanguageProfile)?
     /// Empty when highlighting is off.
     let statuses: [WordKey: WordStatus]
     @Binding var hovered: Token?
+    @Binding var pinned: Token?
+    var focusedLine: FocusState<Int?>.Binding
+    let moveFocus: (Int) -> Void
     let seek: () -> Void
     let exportAudio: () -> Void
     let exportVideo: () -> Void
@@ -16,6 +24,8 @@ struct SubtitleRow: View {
     @State private var segments: [LineSegment] = []
     @State private var rowHovered = false
     @State private var hoveredChunk: Int?
+    /// Which word of this line the keyboard is on (an index into `contentChunks`).
+    @State private var caret = 0
 
     struct Chunk: Identifiable {
         let id: Int
@@ -41,15 +51,29 @@ struct SubtitleRow: View {
         return result
     }
 
+    private func isContent(_ chunk: Chunk) -> Bool {
+        guard let token = chunk.token else { return false }
+        return profile?.contentPOS.contains(token.pos) == true
+    }
+
+    /// The words that have a meaning to show; the ones the keyboard can land on.
+    private var contentChunks: [Chunk] { chunks.filter(isContent) }
+
+    private var isFocused: Bool { focusedLine.wrappedValue == index }
+
     private var reservesRuby: Bool {
         (profile?.display.showsReadings ?? false) && segments.contains { $0.token?.reading != nil }
     }
+
+    /// Furigana is a reading aid set above the text, conventionally about half its size, so it is exempt from the
+    /// 12 pt minimum used elsewhere. The full-size reading is always in the hint bar.
+    private static let rubySize: CGFloat = 10
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
             Text(stamp(line.startTime))
                 .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
-                .foregroundStyle(active ? Theme.ink : .secondary)
+                .foregroundStyle(active ? Theme.ink : Theme.muted)
             if segments.isEmpty {
                 Text(line.text).font(.system(.body, design: .rounded, weight: .regular))
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -58,6 +82,8 @@ struct SubtitleRow: View {
                     ForEach(chunks) { chunk in chunkView(chunk) }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("Line at \(stamp(line.startTime))")
             }
         }
         .padding(.horizontal, 12).padding(.vertical, 9)
@@ -65,12 +91,34 @@ struct SubtitleRow: View {
         .background(RoundedRectangle(cornerRadius: 14).fill(active ? Theme.soft : .clear))
         .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(active ? Theme.ink.opacity(0.6) : Theme.line.opacity(0.7), lineWidth: 1))
         .contentShape(RoundedRectangle(cornerRadius: 14))
-        .onTapGesture(perform: seek)
+        .onTapGesture { focusedLine.wrappedValue = index; seek() }
         .onHover { rowHovered = $0 }
         .animation(.easeOut(duration: 0.12), value: rowHovered)
         .contextMenu {
             Button("Save audio clip…", action: exportAudio)
             Button("Save video clip…", action: exportVideo)
+        }
+        .accessibilityAction(named: "Jump to this line", seek)
+        .focusable()
+        .focused(focusedLine, equals: index)
+        .focusEffectDisabled()
+        .onKeyPress(.leftArrow) { moveCaret(-1) }
+        .onKeyPress(.rightArrow) { moveCaret(1) }
+        .onKeyPress(.upArrow) { moveFocus(-1); return .handled }
+        .onKeyPress(.downArrow) { moveFocus(1); return .handled }
+        .onKeyPress(.return) { pinCaret() }
+        .onKeyPress(.escape) {
+            guard pinned != nil else { return .ignored }
+            pinned = nil
+            return .handled
+        }
+        .onChange(of: isFocused) { _, focused in
+            if focused {
+                caret = min(caret, max(0, contentChunks.count - 1))
+                hovered = contentChunks[safe: caret]?.token
+            } else if let token = contentChunks[safe: caret]?.token, hovered == token {
+                hovered = nil
+            }
         }
         .task {
             guard let profile else { return }
@@ -79,29 +127,61 @@ struct SubtitleRow: View {
         }
     }
 
+    // MARK: Keyboard
+
+    private func moveCaret(_ step: Int) -> KeyPress.Result {
+        guard !contentChunks.isEmpty else { return .ignored }
+        caret = min(contentChunks.count - 1, max(0, caret + step))
+        hovered = contentChunks[caret].token
+        return .handled
+    }
+
+    private func pinCaret() -> KeyPress.Result {
+        guard let token = contentChunks[safe: caret]?.token else { return .ignored }
+        togglePin(token)
+        return .handled
+    }
+
+    private func togglePin(_ token: Token) {
+        pinned = pinned == token ? nil : token
+    }
+
+    // MARK: Words
+
     private func chunkView(_ chunk: Chunk) -> some View {
+        let content = isContent(chunk)
         let isHovered = hoveredChunk == chunk.id
-        return VStack(spacing: 0) {
+        let hasCaret = isFocused && content && contentChunks[safe: caret]?.id == chunk.id
+        let isPinned = content && chunk.token != nil && pinned == chunk.token
+        let showRuby = rowHovered || isFocused
+        let view = VStack(spacing: 0) {
             if reservesRuby {
-                // Always reserved, so showing furigana on hover never moves the text.
+                // Always reserved, so showing furigana never moves the text.
                 Text(chunk.token?.reading ?? " ")
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .font(.system(size: Self.rubySize, weight: .medium, design: .rounded))
                     .foregroundStyle(Theme.ink)
-                    .opacity(rowHovered && chunk.token?.reading != nil ? 1 : 0)
+                    .opacity(showRuby && chunk.token?.reading != nil ? 1 : 0)
+                    .accessibilityHidden(true)   // VoiceOver gets the reading in the word's label
             }
             HStack(spacing: 0) {
                 Text(chunk.text)
                     .underline(status(of: chunk.token) == .learning, pattern: .dot, color: Theme.orange)
                     .font(.system(.body, design: .rounded, weight: .regular))
                     // The highlight is slightly wider than the word, but takes no layout space (no gaps in Japanese).
-                    .background(RoundedRectangle(cornerRadius: 5).fill(isHovered ? Theme.ink.opacity(0.12) : tint(for: chunk.token)).padding(.horizontal, -1))
+                    .background(RoundedRectangle(cornerRadius: 5)
+                        .fill(isPinned ? Theme.ink.opacity(0.2) : isHovered ? Theme.ink.opacity(0.12) : tint(for: chunk.token))
+                        .padding(.horizontal, -1))
+                    .overlay {
+                        // The keyboard's place, drawn as an outline so it doesn't rest on colour.
+                        if hasCaret { RoundedRectangle(cornerRadius: 5).strokeBorder(Theme.ink, lineWidth: 2).padding(-2) }
+                    }
                 if !chunk.trailing.isEmpty {
                     Text(chunk.trailing).font(.system(.body, design: .rounded, weight: .regular))
                 }
             }
         }
         .onHover { inside in
-            guard let token = chunk.token, profile?.contentPOS.contains(token.pos) == true else { return }
+            guard let token = chunk.token, content else { return }
             if inside {
                 hoveredChunk = chunk.id
                 hovered = token
@@ -109,6 +189,29 @@ struct SubtitleRow: View {
                 hoveredChunk = nil
                 if hovered == token { hovered = nil }
             }
+        }
+        return accessible(view, chunk)
+    }
+
+    /// A word with a meaning is a button for VoiceOver: its label carries the reading and its status (which
+    /// sighted users get from colour), and activating it pins the meaning, which is then announced.
+    @ViewBuilder
+    private func accessible<V: View>(_ view: V, _ chunk: Chunk) -> some View {
+        if isContent(chunk), let token = chunk.token {
+            view
+                .onTapGesture {
+                    focusedLine.wrappedValue = index
+                    togglePin(token)
+                    seek()
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(chunk.text + (token.reading.map { ", read \($0)" } ?? ""))
+                .accessibilityValue(status(of: token).map { $0 == .new ? "" : ($0 == .learning ? "Learning" : "Known") } ?? "")
+                .accessibilityHint("Shows what it means")
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction { togglePin(token) }
+        } else {
+            view
         }
     }
 
@@ -131,4 +234,8 @@ struct SubtitleRow: View {
         let s = Int(seconds)
         return String(format: "%d:%02d", s / 60, s % 60)
     }
+}
+
+private extension Array {
+    subscript(safe index: Int) -> Element? { indices.contains(index) ? self[index] : nil }
 }

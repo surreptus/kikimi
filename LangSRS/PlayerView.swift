@@ -13,13 +13,18 @@ struct PlayerView: View {
     @State private var message: String?
     @State private var failure: String?
     @State private var hoveredToken: Token?
+    /// A word whose meaning is kept in the hint bar until you unpin it, so its buttons can be reached.
+    @State private var pinnedToken: Token?
     @State private var hint: WordHint?
+    @FocusState private var focusedLine: Int?
     /// Status of every word in this video, so learning and known words can be tinted in the subtitles.
     @State private var statuses: [WordKey: WordStatus] = [:]
     @AppStorage("highlightWords") private var highlightWords = true
     @Environment(AppState.self) private var app
 
     private var profile: (any LanguageProfile)? { LanguageProfiles.profile(for: video.language) }
+    /// The word the hint bar describes: the pinned one, else the one under the pointer or the keyboard.
+    private var shownToken: Token? { pinnedToken ?? hoveredToken }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -37,7 +42,7 @@ struct PlayerView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .task { await load() }
-        .task(id: hoveredToken?.lemma) { await refreshHint() }
+        .task(id: shownToken?.lemma) { await refreshHint(announce: pinnedToken != nil) }
         .task(id: app.dataVersion) {
             guard let id = video.id else { return }
             statuses = (try? await env.database.wordStatuses(videoID: id)) ?? [:]
@@ -45,9 +50,13 @@ struct PlayerView: View {
         .onDisappear { controller?.stop() }
     }
 
-    private func refreshHint() async {
-        guard let token = hoveredToken else { hint = nil; return }
+    private func refreshHint(announce: Bool = false) async {
+        guard let token = shownToken else { hint = nil; return }
         hint = await env.hint(for: token, language: video.language)
+        // VoiceOver can't hover, so pinning a word reads its meaning aloud.
+        if announce, let hint {
+            AccessibilityNotification.Announcement("\(hint.lemma). \(hint.gloss ?? "No dictionary entry")").post()
+        }
     }
 
     /// Start learning or mark known without leaving the video.
@@ -147,7 +156,7 @@ struct PlayerView: View {
             Spacer()
             Toggle("Highlight", isOn: $highlightWords)
                 .toggleStyle(.switch).controlSize(.mini)
-                .font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
         }
         .padding(.horizontal, 16).padding(.vertical, 8)
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.line).frame(height: 1) }
@@ -168,9 +177,15 @@ struct PlayerView: View {
                 LazyVStack(spacing: 8) {
                     ForEach(Array(controller.lines.enumerated()), id: \.offset) { index, line in
                         SubtitleRow(
-                            line: line, active: controller.activeIndex == index, profile: profile,
+                            line: line, index: index, active: controller.activeIndex == index, profile: profile,
                             statuses: highlightWords ? statuses : [:],
-                            hovered: $hoveredToken,
+                            hovered: $hoveredToken, pinned: $pinnedToken, focusedLine: $focusedLine,
+                            moveFocus: { delta in
+                                let target = index + delta
+                                guard controller.lines.indices.contains(target) else { return }
+                                withAnimation { proxy.scrollTo(target, anchor: .center) }
+                                Task { @MainActor in focusedLine = target }   // after the row exists, if it was off screen
+                            },
                             seek: { Task { await controller.seek(toLine: index) } },
                             exportAudio: { export(line, kind: .audio) },
                             exportVideo: { export(line, kind: .video) })
@@ -185,10 +200,10 @@ struct PlayerView: View {
         }
     }
 
-    /// Fixed-height strip under the subtitles: the meaning of the word under the pointer.
+    /// Fixed-height strip under the subtitles: the meaning of the word that is pinned, or under the pointer or keyboard.
     private var hintBar: some View {
         VStack(alignment: .leading, spacing: 3) {
-            if let token = hoveredToken {
+            if let token = shownToken {
                 HStack(spacing: 8) {
                     Text(hint?.lemma ?? token.lemma).font(Theme.title(17))
                     if let reading = hint?.reading ?? token.reading {
@@ -202,18 +217,25 @@ struct PlayerView: View {
                     if hint?.wordID != nil {
                         if hint?.status != .learning && hint?.status != .burned {
                             Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
-                                .help("Start learning this word")
+                                .keyboardShortcut("l", modifiers: [])
+                                .help("Start learning this word (L)")
                         }
                         if hint?.status != .known {
                             Button("Known") { setStatus(.known) }.buttonStyle(.pill(.secondary, compact: true))
-                                .help("Mark this word as known")
+                                .keyboardShortcut("k", modifiers: [])
+                                .help("Mark this word as known (K)")
                         }
+                    }
+                    if pinnedToken != nil {
+                        Button("Unpin", systemImage: "pin.slash") { pinnedToken = nil }
+                            .labelStyle(.iconOnly).buttonStyle(.pill(.secondary, compact: true))
+                            .help("Stop keeping this word here (Esc)")
                     }
                 }
                 Text(hint?.gloss ?? "No dictionary entry").font(.system(.callout, design: .rounded)).lineLimit(2)
-                    .foregroundStyle(hint?.gloss == nil ? .secondary : .primary)
+                    .foregroundStyle(hint?.gloss == nil ? Theme.muted : Theme.ink)
             } else {
-                Text("Hover a word in the subtitles to see what it means.")
+                Text("Hover a word to see what it means. Click it to keep it here, or use the arrow keys and Return.")
                     .font(.system(.callout, design: .rounded)).foregroundStyle(Theme.faint)
             }
         }
@@ -221,6 +243,8 @@ struct PlayerView: View {
         .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
         .background(Theme.soft.opacity(0.55))
         .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 1) }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Word meaning")
     }
 
     private func speedLabel(_ speed: Float) -> String {
