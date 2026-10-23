@@ -14,6 +14,7 @@ struct PlayerView: View {
     @State private var failure: String?
     @State private var hoveredToken: Token?
     @State private var hint: WordHint?
+    @Environment(AppState.self) private var app
 
     private var profile: (any LanguageProfile)? { LanguageProfiles.profile(for: video.language) }
 
@@ -34,11 +35,26 @@ struct PlayerView: View {
         }
         .navigationTitle(video.title)
         .task { await load() }
-        .task(id: hoveredToken?.lemma) {
-            guard let token = hoveredToken else { hint = nil; return }
-            hint = await env.hint(for: token, language: video.language)
-        }
+        .task(id: hoveredToken?.lemma) { await refreshHint() }
         .onDisappear { controller?.stop() }
+    }
+
+    private func refreshHint() async {
+        guard let token = hoveredToken else { hint = nil; return }
+        hint = await env.hint(for: token, language: video.language)
+    }
+
+    /// Start learning or mark known without leaving the video.
+    private func setStatus(_ status: WordStatus) {
+        guard let id = hint?.wordID else { return }
+        Task {
+            switch status {
+            case .learning: try? await env.database.startLearning(wordID: id)
+            default: try? await env.database.markKnown(wordID: id)
+            }
+            app.dataChanged()
+            await refreshHint()
+        }
     }
 
     /// A visible way back, inside the card.
@@ -152,6 +168,16 @@ struct PlayerView: View {
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
         .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
+                    if hint?.wordID != nil {
+                        if hint?.status != .learning && hint?.status != .burned {
+                            Button("Learn") { setStatus(.learning) }.buttonStyle(.chunky(compact: true))
+                                .help("Start learning this word")
+                        }
+                        if hint?.status != .known {
+                            Button("Known") { setStatus(.known) }.buttonStyle(.chunky(.secondary, compact: true))
+                                .help("Mark this word as known")
+                        }
+                    }
         .background(Theme.pinkSoft.opacity(0.55))
         .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 2) }
     }

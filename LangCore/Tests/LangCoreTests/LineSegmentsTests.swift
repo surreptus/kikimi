@@ -67,19 +67,22 @@ final class WordHintTests: XCTestCase {
         let root = FileManager.default.temporaryDirectory.appending(path: "hint-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }
         let env = try LangEnvironment(root: root, defaults: UserDefaults(suiteName: "hint-\(UUID().uuidString)")!)
+        var knownID: Int64 = 0
         try await env.database.writer.write { db in
             var entry = DictionaryEntry(language: "ja", headword: "友達", reading: "ともだち", gloss: "1. (n) friend; companion")
             try entry.insert(db)
             var word = Word(language: "ja", lemma: "友達", pos: .noun, status: .known)
             try word.insert(db)
+            knownID = word.id!
         }
         let known = await env.hint(for: Token(surface: "友達", lemma: "友達", pos: .noun, reading: "ともだち"), language: "ja")
-        XCTAssertEqual(known, WordHint(lemma: "友達", pos: .noun, reading: "ともだち", gloss: "friend; companion", status: .known))
+        XCTAssertEqual(known, WordHint(wordID: knownID, lemma: "友達", pos: .noun, reading: "ともだち", gloss: "friend; companion", status: .known))
 
         // A word that isn't in the dictionary or your list still gets a hint, with whatever the tokenizer knew.
         let unknown = await env.hint(for: Token(surface: "走り", lemma: "走る", pos: .verb, reading: "はしり"), language: "ja")
         XCTAssertEqual(unknown?.reading, "はしり")
         XCTAssertNil(unknown?.gloss)
         XCTAssertNil(unknown?.status)
+        XCTAssertNil(unknown?.wordID)
     }
 }

@@ -31,6 +31,8 @@ extension LanguageProfile {
 
 /// What to show when hovering a word.
 public struct WordHint: Sendable, Equatable {
+    /// The word in your list, if it has one (every content word found in an import does).
+    public let wordID: Int64?
     public let lemma: String
     public let pos: PartOfSpeech
     public let reading: String?
@@ -50,11 +52,11 @@ extension DictionaryEntry {
 extension LangEnvironment {
     public func hint(for token: Token, language: String) async -> WordHint? {
         let entry = try? await database.lookup(language: language, term: token.lemma, limit: 1).first
-        let status = try? await database.writer.read { db in
+        let word = try? await database.writer.read { db in
             try Word.filter(Column("language") == language && Column("lemma") == token.lemma && Column("pos") == token.pos.rawValue)
-                .fetchOne(db)?.status
+                .fetchOne(db)
         }
-        return WordHint(lemma: token.lemma, pos: token.pos, reading: entry?.reading ?? token.reading,
-                        gloss: entry?.shortGloss, status: status)
+        return WordHint(wordID: word?.id, lemma: token.lemma, pos: token.pos, reading: entry?.reading ?? token.reading,
+                        gloss: entry?.shortGloss, status: word?.status)
     }
 }
