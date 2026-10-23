@@ -36,6 +36,8 @@ public actor ImportPipeline {
         }
     }
 
+    /// Runs the steps in order; each is a method below. A cancel is honoured between steps, up to the point where
+    /// the video is moved into the library, after which the move and the database write finish as one unit.
     public func importVideo(
         from original: URL, profile: any LanguageProfile, model: String? = nil, checkLanguage: Bool = true,
         progress: @escaping ProgressHandler = { _ in }
@@ -43,6 +45,7 @@ public actor ImportPipeline {
         let scoped = original.startAccessingSecurityScopedResource()
         defer { if scoped { original.stopAccessingSecurityScopedResource() } }
         let fm = FileManager.default
+        let model = model ?? profile.defaultModel
 
         progress(ImportProgress(stage: .hashing, fraction: 0))
         let hash = try await FileHasher.sha256(of: original)
@@ -55,91 +58,30 @@ public actor ImportPipeline {
         let work = stagingRoot.appending(path: UUID().uuidString, directoryHint: .isDirectory)
         var libraryDir: URL?
         do {
-            // 1. Stage a copy. The original is read, never modified.
-            progress(ImportProgress(stage: .staging, fraction: 0))
-            let staged = work.appending(path: "source." + original.pathExtension)
-            do {
-                try fm.createDirectory(at: work, withIntermediateDirectories: true)
-                try fm.copyItem(at: original, to: staged)
-                let sizes = try [original, staged].map { try fm.attributesOfItem(atPath: $0.path)[.size] as? UInt64 }
-                guard sizes[0] == sizes[1] else { throw CocoaError(.fileReadCorruptFile) }
-            } catch { throw Self.wrapped(error, ImportError.copyFailed) }
-
+            let staged = try stage(original, in: work, progress: progress)
             try Task.checkCancellation()
 
-            // Importing a Japanese video as Spanish would produce nonsense words, so check the spoken language first.
-            // Detection is only advice: if it fails or is unsure, the import carries on as chosen.
-            if checkLanguage {
-                progress(ImportProgress(stage: .detectingLanguage, fraction: 0))
-                if let guess = try? await transcriber.detectLanguage(mediaURL: staged, model: model ?? profile.defaultModel),
-                   guess.confidence >= Self.languageConfidence, guess.code != profile.whisperCode,
-                   let other = LanguageProfiles.all.first(where: { $0.whisperCode == guess.code }) {
-                    throw ImportError.languageMismatch(detected: other.code, chosen: profile.code, confidence: guess.confidence)
-                }
-            }
-
+            if checkLanguage { try await confirmLanguage(of: staged, profile: profile, model: model, progress: progress) }
             try Task.checkCancellation()
 
-            // 2. Transcribe. Failing here has changed nothing.
-            let segments: [TranscriptSegment]
-            progress(ImportProgress(stage: .transcribing, fraction: 0))
-            do {
-                segments = try await transcriber.transcribe(
-                    mediaURL: staged, whisperCode: profile.whisperCode, model: model ?? profile.defaultModel,
-                    progress: { progress(ImportProgress(stage: .transcribing, fraction: $0)) })
-            } catch { throw Self.wrapped(error, ImportError.transcriptionFailed) }
-
+            let segments = try await transcribe(staged, profile: profile, model: model, progress: progress)
             try Task.checkCancellation()
 
-            // 3. Re-encode to a temp file.
-            let out = work.appending(path: "out", directoryHint: .isDirectory)
-            let videoOut = out.appending(path: "video.mov")
-            let audioOut = out.appending(path: "audio.m4a")
-            do {
-                try fm.createDirectory(at: out, withIntermediateDirectories: true)
-                try await transcoder.compactVideo(
-                    source: staged, destination: videoOut,
-                    progress: { progress(ImportProgress(stage: .transcoding, fraction: $0)) })
-            } catch { throw Self.wrapped(error, ImportError.transcodeFailed) }
-
+            let files = try await makeLibraryFiles(from: staged, in: work, progress: progress)
+            // The last point where a cancel is honoured.
             try Task.checkCancellation()
 
-            // 4. Verify the output against the staged source.
-            progress(ImportProgress(stage: .verifying, fraction: 0))
-            let duration: Double
-            do { duration = try await MediaVerifier.duration(of: staged) }
-            catch { throw ImportError.verificationFailed("source unreadable: \(error)") }
-            try await MediaVerifier.verify(output: videoOut, expectedDuration: duration)
-
-            try Task.checkCancellation()
-
-            // 5. Compact audio track.
-            progress(ImportProgress(stage: .extractingAudio, fraction: 0))
-            do { try await transcoder.extractAAC(source: staged, destination: audioOut) }
-            catch { throw Self.wrapped(error, ImportError.audioExportFailed) }
-
-            // The last point where a cancel is honoured: after this the video is moved in and saved as one unit.
-            try Task.checkCancellation()
-
-            // 6. Atomic move into the library (one directory rename), then one DB transaction.
             progress(ImportProgress(stage: .saving, fraction: 0))
             let destination = libraryRoot.appending(path: hash, directoryHint: .isDirectory)
-            do {
-                try fm.createDirectory(at: libraryRoot, withIntermediateDirectories: true)
-                try fm.moveItem(at: out, to: destination)
-            } catch { throw ImportError.libraryMoveFailed(error) }
-            libraryDir = destination
-
-            let analysed = segments.map { (segment: $0, tokens: profile.contentWords(in: $0.text)) }
+            try moveIntoLibrary(files, to: destination)
+            libraryDir = destination   // set only after the move, so a failed move never deletes an existing folder
             let video = Video(
                 language: profile.code, title: original.deletingPathExtension().lastPathComponent,
                 contentHash: hash, videoPath: "\(hash)/video.mov", audioPath: "\(hash)/audio.m4a",
-                duration: duration)
-            let saved: Video
-            do { saved = try await database.saveImport(video: video, subtitles: analysed) }
-            catch { throw Self.wrapped(error, ImportError.databaseFailed) }
+                duration: files.duration)
+            let saved = try await save(video, segments: segments, profile: profile)
 
-            // 7. Only now drop the staged copy. Failure to delete it must not fail a committed import.
+            // Only now drop the staged copy. Failure to delete it must not fail a committed import.
             try? fm.removeItem(at: work)
             progress(ImportProgress(stage: .saving, fraction: 1))
             return saved
@@ -149,5 +91,99 @@ public actor ImportPipeline {
             if let libraryDir { try? fm.removeItem(at: libraryDir) }
             throw error
         }
+    }
+
+    // MARK: Steps
+
+    /// 1. Copy the original into staging and check the copy's size. The original is read, never modified.
+    private func stage(_ original: URL, in work: URL, progress: ProgressHandler) throws -> URL {
+        progress(ImportProgress(stage: .staging, fraction: 0))
+        let fm = FileManager.default
+        let staged = work.appending(path: "source." + original.pathExtension)
+        do {
+            try fm.createDirectory(at: work, withIntermediateDirectories: true)
+            try fm.copyItem(at: original, to: staged)
+            let sizes = try [original, staged].map { try fm.attributesOfItem(atPath: $0.path)[.size] as? UInt64 }
+            guard sizes[0] == sizes[1] else { throw CocoaError(.fileReadCorruptFile) }
+        } catch { throw Self.wrapped(error, ImportError.copyFailed) }
+        return staged
+    }
+
+    /// Importing a Japanese video as Spanish would produce nonsense words, so check the spoken language first.
+    /// Detection is only advice: if it fails or is unsure, the import carries on as chosen.
+    private func confirmLanguage(
+        of staged: URL, profile: any LanguageProfile, model: String, progress: ProgressHandler
+    ) async throws {
+        progress(ImportProgress(stage: .detectingLanguage, fraction: 0))
+        if let guess = try? await transcriber.detectLanguage(mediaURL: staged, model: model),
+           guess.confidence >= Self.languageConfidence, guess.code != profile.whisperCode,
+           let other = LanguageProfiles.all.first(where: { $0.whisperCode == guess.code }) {
+            throw ImportError.languageMismatch(detected: other.code, chosen: profile.code, confidence: guess.confidence)
+        }
+    }
+
+    /// 2. Transcribe. Failing here has changed nothing.
+    private func transcribe(
+        _ staged: URL, profile: any LanguageProfile, model: String, progress: @escaping ProgressHandler
+    ) async throws -> [TranscriptSegment] {
+        progress(ImportProgress(stage: .transcribing, fraction: 0))
+        do {
+            return try await transcriber.transcribe(
+                mediaURL: staged, whisperCode: profile.whisperCode, model: model,
+                progress: { progress(ImportProgress(stage: .transcribing, fraction: $0)) })
+        } catch { throw Self.wrapped(error, ImportError.transcriptionFailed) }
+    }
+
+    /// The library files built in staging, before they are moved in.
+    private struct LibraryFiles {
+        var folder: URL
+        var duration: Double
+    }
+
+    /// 3-5. Make the compact video, verify it against the staged source, then export the AAC audio.
+    private func makeLibraryFiles(
+        from staged: URL, in work: URL, progress: @escaping ProgressHandler
+    ) async throws -> LibraryFiles {
+        let fm = FileManager.default
+        let out = work.appending(path: "out", directoryHint: .isDirectory)
+        let videoOut = out.appending(path: "video.mov")
+        let audioOut = out.appending(path: "audio.m4a")
+        do {
+            try fm.createDirectory(at: out, withIntermediateDirectories: true)
+            try await transcoder.compactVideo(
+                source: staged, destination: videoOut,
+                progress: { progress(ImportProgress(stage: .transcoding, fraction: $0)) })
+        } catch { throw Self.wrapped(error, ImportError.transcodeFailed) }
+        try Task.checkCancellation()
+
+        progress(ImportProgress(stage: .verifying, fraction: 0))
+        let duration: Double
+        do { duration = try await MediaVerifier.duration(of: staged) }
+        catch { throw ImportError.verificationFailed("source unreadable: \(error)") }
+        try await MediaVerifier.verify(output: videoOut, expectedDuration: duration)
+        try Task.checkCancellation()
+
+        progress(ImportProgress(stage: .extractingAudio, fraction: 0))
+        do { try await transcoder.extractAAC(source: staged, destination: audioOut) }
+        catch { throw Self.wrapped(error, ImportError.audioExportFailed) }
+        return LibraryFiles(folder: out, duration: duration)
+    }
+
+    /// 6. Move the files into the library with one directory rename.
+    private func moveIntoLibrary(_ files: LibraryFiles, to destination: URL) throws {
+        let fm = FileManager.default
+        do {
+            try fm.createDirectory(at: libraryRoot, withIntermediateDirectories: true)
+            try fm.moveItem(at: files.folder, to: destination)
+        } catch { throw ImportError.libraryMoveFailed(error) }
+    }
+
+    /// Write every row in one transaction. If this fails the caller removes the moved folder.
+    private func save(
+        _ video: Video, segments: [TranscriptSegment], profile: any LanguageProfile
+    ) async throws -> Video {
+        let analysed = segments.map { (segment: $0, tokens: profile.contentWords(in: $0.text)) }
+        do { return try await database.saveImport(video: video, subtitles: analysed) }
+        catch { throw Self.wrapped(error, ImportError.databaseFailed) }
     }
 }
