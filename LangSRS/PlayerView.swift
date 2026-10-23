@@ -14,6 +14,9 @@ struct PlayerView: View {
     @State private var failure: String?
     @State private var hoveredToken: Token?
     @State private var hint: WordHint?
+    /// Status of every word in this video, so learning and known words can be tinted in the subtitles.
+    @State private var statuses: [WordKey: WordStatus] = [:]
+    @AppStorage("highlightWords") private var highlightWords = true
     @Environment(AppState.self) private var app
 
     private var profile: (any LanguageProfile)? { LanguageProfiles.profile(for: video.language) }
@@ -36,6 +39,10 @@ struct PlayerView: View {
         .navigationTitle(video.title)
         .task { await load() }
         .task(id: hoveredToken?.lemma) { await refreshHint() }
+        .task(id: app.dataVersion) {
+            guard let id = video.id else { return }
+            statuses = (try? await env.database.wordStatuses(videoID: id)) ?? [:]
+        }
         .onDisappear { controller?.stop() }
     }
 
@@ -96,6 +103,7 @@ struct PlayerView: View {
             Rectangle().fill(Theme.line).frame(width: 2)
 
             VStack(spacing: 0) {
+                legendBar
                 subtitleList(controller)
                 hintBar
                 if let message {
@@ -132,6 +140,27 @@ struct PlayerView: View {
         .labelStyle(.iconOnly)
     }
 
+    /// What the tints mean, and one switch for them. Two states only: a burned word is simply a known one.
+    private var legendBar: some View {
+        HStack(spacing: 14) {
+            legendDot(Theme.orange, "Learning")
+            legendDot(Theme.green, "Known")
+            Spacer()
+            Toggle("Highlight", isOn: $highlightWords)
+                .toggleStyle(.switch).controlSize(.mini)
+                .font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 16).padding(.vertical, 8)
+        .overlay(alignment: .bottom) { Rectangle().fill(Theme.line).frame(height: 2) }
+    }
+
+    private func legendDot(_ color: Color, _ label: String) -> some View {
+        HStack(spacing: 5) {
+            Circle().fill(color.opacity(0.85)).frame(width: 8, height: 8)
+            Text(label).font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(.secondary)
+        }
+    }
+
     private func subtitleList(_ controller: PlaybackController) -> some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -139,6 +168,7 @@ struct PlayerView: View {
                     ForEach(Array(controller.lines.enumerated()), id: \.offset) { index, line in
                         SubtitleRow(
                             line: line, active: controller.activeIndex == index, profile: profile,
+                            statuses: highlightWords ? statuses : [:],
                             hovered: $hoveredToken,
                             seek: { Task { await controller.seek(toLine: index) } },
                             exportAudio: { export(line, kind: .audio) },
@@ -221,6 +251,16 @@ struct PlayerView: View {
         }
     }
 
+    /// Learning words are orange, known (and burned) words green; untouched words get no tint, so they stay quiet.
+    private func tint(for token: Token?) -> Color {
+        guard let token, let status = statuses[WordKey(lemma: token.lemma, pos: token.pos)] else { return .clear }
+        switch status {
+        case .learning: return Theme.orange.opacity(0.30)
+        case .known, .burned: return Theme.green.opacity(0.22)
+        case .new: return .clear
+        }
+    }
+
     private func stamp(_ seconds: Double) -> String {
         let s = Int(seconds)
         return String(format: "%d:%02d", s / 60, s % 60)
@@ -232,6 +272,8 @@ private struct SubtitleRow: View {
     let line: Subtitle
     let active: Bool
     let profile: (any LanguageProfile)?
+    /// Empty when highlighting is off.
+    let statuses: [WordKey: WordStatus]
     @Binding var hovered: Token?
     let seek: () -> Void
     let exportAudio: () -> Void
@@ -317,7 +359,7 @@ private struct SubtitleRow: View {
                 Text(chunk.text)
                     .font(.system(.body, design: .rounded, weight: active ? .semibold : .regular))
                     // The highlight is slightly wider than the word, but takes no layout space (no gaps in Japanese).
-                    .background(RoundedRectangle(cornerRadius: 5).fill(isHovered ? Theme.pink.opacity(0.22) : .clear).padding(.horizontal, -1))
+                    .background(RoundedRectangle(cornerRadius: 5).fill(isHovered ? Theme.pink.opacity(0.22) : tint(for: chunk.token)).padding(.horizontal, -1))
                 if !chunk.trailing.isEmpty {
                     Text(chunk.trailing).font(.system(.body, design: .rounded, weight: active ? .semibold : .regular))
                 }
@@ -332,6 +374,16 @@ private struct SubtitleRow: View {
                 hoveredChunk = nil
                 if hovered == token { hovered = nil }
             }
+        }
+    }
+
+    /// Learning words are orange, known (and burned) words green; untouched words get no tint, so they stay quiet.
+    private func tint(for token: Token?) -> Color {
+        guard let token, let status = statuses[WordKey(lemma: token.lemma, pos: token.pos)] else { return .clear }
+        switch status {
+        case .learning: return Theme.orange.opacity(0.30)
+        case .known, .burned: return Theme.green.opacity(0.22)
+        case .new: return .clear
         }
     }
 

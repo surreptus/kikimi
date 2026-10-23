@@ -184,3 +184,32 @@ extension LangDatabase {
         }
     }
 }
+
+/// A word as the tokenizer and the word list both identify it.
+public struct WordKey: Hashable, Sendable {
+    public let lemma: String
+    public let pos: PartOfSpeech
+
+    public init(lemma: String, pos: PartOfSpeech) { self.lemma = lemma; self.pos = pos }
+}
+
+extension LangDatabase {
+    /// The status of every word that appears in one video, for highlighting its subtitles.
+    public func wordStatuses(videoID: Int64) async throws -> [WordKey: WordStatus] {
+        try await writer.read { db in
+            let rows = try Row.fetchAll(db, sql: """
+                SELECT DISTINCT words.lemma, words.pos, words.status
+                FROM occurrences
+                JOIN subtitles ON subtitles.id = occurrences.subtitle_id
+                JOIN words ON words.id = occurrences.word_id
+                WHERE subtitles.video_id = ?
+                """, arguments: [videoID])
+            var result: [WordKey: WordStatus] = [:]
+            for row in rows {
+                guard let pos = PartOfSpeech(rawValue: row["pos"]), let status = WordStatus(rawValue: row["status"]) else { continue }
+                result[WordKey(lemma: row["lemma"], pos: pos)] = status
+            }
+            return result
+        }
+    }
+}
