@@ -53,6 +53,9 @@ If `xcode-select` points at the Command Line Tools, prefix with
 `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` (XCTest needs Xcode's toolchain). The dictionary builders have
 their own tests: `cd Scripts/dictionaries && python3 test_builders.py`.
 
+`Scripts/check_leaks.sh` runs the same tests under macOS's `leaks` tool and fails if anything leaked. It covers `LangCore`, not the
+SwiftUI app.
+
 Some tests need real models or files, so they are opt-in and skipped by default:
 
 | Variable | Runs |
