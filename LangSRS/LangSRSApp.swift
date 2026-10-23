@@ -9,7 +9,8 @@ struct LangSRSApp: App {
             RootView()
                 .environment(app)
                 .task { await app.start() }
-                .frame(minWidth: 820, minHeight: 540)
+                .frame(minWidth: 980, minHeight: 620)
         }
+        .defaultSize(width: 1240, height: 800)
     }
 }
