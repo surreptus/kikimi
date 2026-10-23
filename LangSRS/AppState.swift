@@ -18,6 +18,8 @@ final class AppState {
 
     private(set) var phase: Phase = .loading
     var section: SidebarItem = .videos
+    /// The "How Reprise works" panel, opened from the nav and from empty screens.
+    var showAbout = false
     /// Set by "Play" buttons elsewhere; the Videos screen consumes it.
     var pendingPlayback: PlaybackRequest?
     /// Where the player's back button goes: the screen that sent you to the video, or Videos if none.

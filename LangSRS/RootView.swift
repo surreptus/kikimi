@@ -46,7 +46,7 @@ struct RootView: View {
             SideNav(
                 selection: selection, dueCount: app.dueCount,
                 languages: LanguageProfiles.all.map { ($0.code, $0.displayName) },
-                language: $app.languageCode, showStorage: { showStorage = true },
+                language: $app.languageCode, showAbout: { app.showAbout = true }, showStorage: { showStorage = true },
                 showAcknowledgements: { showAcknowledgements = true })
             ZStack {
                 detail(env: env)
@@ -61,6 +61,7 @@ struct RootView: View {
             .ignoresSafeArea(.container, edges: .top)   // no gap above the content; the title bar has nothing in it
         }
         .modal(isPresented: $showStorage) { StorageView(env: env) }
+        .modal(isPresented: $app.showAbout) { AboutView() }
     }
 
     @ViewBuilder

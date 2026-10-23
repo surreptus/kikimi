@@ -56,8 +56,11 @@ struct VideosView: View {
                         : "\(items.count) video\(items.count == 1 ? "" : "s") · \(formatBytes(totalBytes)) on this Mac")
                 ImportSection(env: env)
                 if items.isEmpty {
-                    EmptyState(title: "No videos yet", message: "Drop one above and its words will appear on the Words page.")
-                        .frame(maxWidth: .infinity, minHeight: 200)
+                    VStack(spacing: 8) {
+                        EmptyState(title: "No videos yet", message: "Drop one above and its words will appear on the Words page.")
+                        Button("How Reprise works") { app.showAbout = true }.buttonStyle(.pill(.secondary, compact: true))
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 200)
                 } else {
                     Text("Your videos").font(Theme.title(17)).padding(.top, 8)
                 }
