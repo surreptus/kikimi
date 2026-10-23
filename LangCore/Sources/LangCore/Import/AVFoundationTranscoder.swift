@@ -215,6 +215,15 @@ public struct AVFoundationTranscoder: MediaTranscoder {
 
         var isCancelled: Bool { lock.lock(); defer { lock.unlock() }; return cancelled }
 
+        /// Drops the stored callbacks. They can refer back to the gate, so a gate that was never cancelled would
+        /// otherwise keep itself alive through them.
+        func tearDown() {
+            lock.lock()
+            wakeups = []
+            idleWaiters = []
+            lock.unlock()
+        }
+
         /// A pump block calls this before it touches the reader or writer. False means cancelled: do nothing.
         func enterBlock() -> Bool {
             lock.lock(); defer { lock.unlock() }
@@ -301,6 +310,7 @@ public struct AVFoundationTranscoder: MediaTranscoder {
         nonisolated(unsafe) let videoOutput = videoOut, videoInput = videoIn
         nonisolated(unsafe) let audioPairU = audioPair
         let gate = Gate()
+        defer { gate.tearDown() }
         await withTaskCancellationHandler {
             async let v: Void = Self.pump(videoOutput, into: videoInput, label: "video", gate: gate) { sample in
                 if duration > 0 {
@@ -362,7 +372,7 @@ public struct AVFoundationTranscoder: MediaTranscoder {
                         }
                     }
                 }
-            }, wakeup: { gate.whenIdle { once.run { done.resume() } } })
+            }, wakeup: { [unowned gate] in gate.whenIdle { once.run { done.resume() } } })
             if !registered { once.run { done.resume() } }
         }
     }
