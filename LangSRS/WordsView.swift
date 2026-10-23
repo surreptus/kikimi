@@ -105,6 +105,10 @@ struct WordsView: View {
                     Button("All \(rows.count) shown") { selection = Set(rows.map(\.id)) }
                     Button("None") { selection = [] }
                     Divider()
+                    ForEach([25, 50, 100, 250], id: \.self) { n in
+                        Button("\(n) most-seen new words") { selectMostSeenNew(n) }
+                    }
+                    Divider()
                     ForEach([WordStatus.new, .learning, .known], id: \.self) { status in
                         Button("\(status.rawValue.capitalized) words shown") {
                             selection = Set(rows.filter { $0.word.status == status }.map(\.id))
@@ -181,6 +185,12 @@ struct WordsView: View {
         .padding(.horizontal, Theme.screenPadding).padding(.vertical, 12)
         .background(Theme.pinkSoft.opacity(0.5))
         .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 2) }
+    }
+
+    /// The words you meet most that you haven't touched yet: the best ones to start learning.
+    private func selectMostSeenNew(_ count: Int) {
+        selection = Set(rows.filter { $0.word.status == .new }
+            .sorted { $0.occurrenceCount > $1.occurrenceCount }.prefix(count).map(\.id))
     }
 
     private func apply(_ action: Bulk) {
