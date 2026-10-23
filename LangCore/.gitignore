@@ -1,0 +1,6 @@
+.build/
+.swiftpm/
+*.xcodeproj/xcuserdata/
+.DS_Store
+Sources/LangCore/Resources/ipadic/
+Sources/LangCore/Resources/dictionaries/*.sqlite
