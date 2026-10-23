@@ -6,10 +6,30 @@ enum FixtureVideo {
     /// `speech` replaces the 440 Hz tone with real samples (padded with silence to the video's length).
     /// Other knobs build realistic sources: `codec`, `size`, `fps`, a target `bitrate`, `noise` frames (which can't be
     /// compressed, so the encoder really spends its bitrate), and uncompressed `pcmAudio`.
+    ///
+    /// The encoder can be refused for a moment when the machine is busy (other apps using the video hardware), so a
+    /// failed attempt is retried a couple of times before the test is failed.
     static func make(
         at url: URL, seconds: Int = 2, withAudio: Bool = true, speech: (samples: [Float], rate: Int)? = nil,
         codec: AVVideoCodecType = .h264, size: (width: Int, height: Int) = (320, 240), fps: Int = 10,
         bitrate: Int? = nil, noise: Bool = false, pcmAudio: Bool = false
+    ) async throws {
+        var lastError: Error?
+        for attempt in 0..<3 {
+            if attempt > 0 { try await Task.sleep(for: .milliseconds(500)) }
+            do {
+                try await makeOnce(at: url, seconds: seconds, withAudio: withAudio, speech: speech, codec: codec,
+                                   size: size, fps: fps, bitrate: bitrate, noise: noise, pcmAudio: pcmAudio)
+                return
+            } catch { lastError = error }
+        }
+        throw lastError ?? CocoaError(.fileWriteUnknown)
+    }
+
+    private static func makeOnce(
+        at url: URL, seconds: Int, withAudio: Bool, speech: (samples: [Float], rate: Int)?,
+        codec: AVVideoCodecType, size: (width: Int, height: Int), fps: Int,
+        bitrate: Int?, noise: Bool, pcmAudio: Bool
     ) async throws {
         let width = size.width, height = size.height, rate = speech?.rate ?? 44_100
         try? FileManager.default.removeItem(at: url)
@@ -40,9 +60,11 @@ enum FixtureVideo {
         // Pull model: the writer calls back whenever an input can take more, which avoids interleaving deadlocks.
         let frames = seconds * fps
         async let videoDone: Void = feed(videoInput, count: frames, queue: "fixture.video") { frame in
+            // Not the adaptor's pool: it can be torn down under us when the encoder fails, and crashes inside CoreVideo.
+            // If a buffer can't be made, skip the frame and let the run end with the writer's own error.
             var buffer: CVPixelBuffer?
-            CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &buffer)
-            let pixels = buffer!
+            CVPixelBufferCreate(nil, width, height, kCVPixelFormatType_32BGRA, nil, &buffer)
+            guard let pixels = buffer else { return }
             CVPixelBufferLockBaseAddress(pixels, [])
             if noise {
                 arc4random_buf(CVPixelBufferGetBaseAddress(pixels), CVPixelBufferGetDataSize(pixels))

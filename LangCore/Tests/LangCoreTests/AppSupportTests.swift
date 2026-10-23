@@ -373,7 +373,11 @@ final class SentenceAudioTests: XCTestCase {
         }
         let elapsed = Date().timeIntervalSince(started)
         XCTAssertTrue(stopped, "should stop on its own after the sentence")
-        XCTAssertEqual(elapsed, 1.3, accuracy: 0.6, "1 s sentence + 0.3 s padding, not the whole 6 s file")
+        // The sentence plus padding is about 1.6 s of audio; the whole file from there would be about 5.3 s. The wall
+        // clock also includes the audio pipeline starting, which varies by a second with the machine's state, so
+        // the window is wide: it only has to tell "the sentence" from "the whole file".
+        XCTAssertGreaterThan(elapsed, 1.0, "it should actually play")
+        XCTAssertLessThan(elapsed, 3.5, "the sentence plus padding, not the whole 6 s file")
     }
 
     func testStopAndReplaceAndMissingFile() async throws {
