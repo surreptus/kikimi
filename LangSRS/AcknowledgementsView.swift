@@ -25,6 +25,6 @@ struct AcknowledgementsView: View {
         .frame(width: 640, height: 520)
         .background(Theme.page)
         .fontDesign(.rounded)
-        .tint(Theme.accent)
+        .tint(Theme.ink)
     }
 }

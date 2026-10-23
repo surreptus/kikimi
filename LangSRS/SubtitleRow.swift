@@ -63,7 +63,7 @@ struct SubtitleRow: View {
         .padding(.horizontal, 12).padding(.vertical, 9)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 14).fill(active ? Theme.soft : .clear))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(active ? Theme.accent : Theme.line.opacity(0.7), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(active ? Theme.ink.opacity(0.6) : Theme.line.opacity(0.7), lineWidth: 1))
         .contentShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture(perform: seek)
         .onHover { rowHovered = $0 }

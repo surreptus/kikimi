@@ -47,7 +47,7 @@ struct StorageView: View {
         .frame(width: 540)
         .background(Theme.page)
         .fontDesign(.rounded)
-        .tint(Theme.accent)
+        .tint(Theme.ink)
         .task { await reload() }
         .confirmationDialog(
             "Remove the \(removing.map { ModelCatalog.name(for: $0.variant) } ?? "") model?",

@@ -15,16 +15,17 @@ extension Color {
     }
 }
 
-/// The look of the app: each section is a flat field of colour, text is near-black (or near-white in dark mode),
-/// and the one action that matters on a screen is a solid pill. Colour marks where you are; nothing is decorative.
+/// The look of the app: one flat field of colour (mint), text is near-black (or near-white in dark mode),
+/// and the one action that matters on a screen is a solid pill. The accent is gold; nothing is decorative.
 enum Theme {
     static let ink = Color(light: Color(hex: 0x121212), dark: Color(hex: 0xF4F1EA))
     static let muted = Color(light: Color(hex: 0x3F3F3F), dark: Color(hex: 0xD6D4CE))
     static let faint = Color(light: Color(hex: 0x4A4A4A), dark: Color(hex: 0xD3D1CB))
-    /// The one vivid colour: the main button, the selected row, progress, and the tint of system controls.
-    static let accent = Color(light: Color(hex: 0x4A32E6), dark: Color(hex: 0xB0A4FF))
-    /// Text and icons on an `accent` face.
-    static let onAccent = Color(light: .white, dark: Color(hex: 0x14102B))
+    /// The one accent, a gold: the main button, selected rows and the due badge. It is a fill, never a text or icon
+    /// colour, because gold on the green field is too faint to read.
+    static let accent = Color(light: Color(hex: 0xFFC21A), dark: Color(hex: 0xFFCB3D))
+    /// Text and icons on an `accent` face: the same near-black in both modes.
+    static let onAccent = Color(hex: 0x121212)
 
     /// Behind the floating nav, and behind sheets.
     static let page = Color(light: Color(hex: 0xF6F4EF), dark: Color(hex: 0x121212))
@@ -35,11 +36,8 @@ enum Theme {
     static let softStrong = Color(light: .white.opacity(0.85), dark: .white.opacity(0.16))
     static let line = Color(light: .black.opacity(0.12), dark: .white.opacity(0.16))
 
-    // The four section colours, light and dark.
-    static let lilac = Color(light: Color(hex: 0xCDB5FF), dark: Color(hex: 0x372866))
-    static let mint = Color(light: Color(hex: 0x8FE5BE), dark: Color(hex: 0x124632))
-    static let yellow = Color(light: Color(hex: 0xFFD83A), dark: Color(hex: 0x574700))
-    static let peach = Color(light: Color(hex: 0xFFA67A), dark: Color(hex: 0x66341A))
+    /// The colour of the whole window: a fresh mint, and a deep green in dark mode.
+    static let field = Color(light: Color(hex: 0x8FE5BE), dark: Color(hex: 0x124632))
 
     /// The side nav: a slightly darker strip of whatever colour the section is.
     static let rail = Color(light: .black.opacity(0.07), dark: .black.opacity(0.28))
@@ -63,18 +61,6 @@ enum Theme {
 
     /// Large headings are light; small ones need a little weight to stay readable.
     static func title(_ size: CGFloat = 24) -> Font { .system(size: size, weight: size >= 30 ? .regular : .semibold, design: .rounded) }
-}
-
-extension SidebarItem {
-    /// The colour of this section's screen, and of its dot in the nav.
-    var color: Color {
-        switch self {
-        case .importVideos: Theme.lilac
-        case .words: Theme.mint
-        case .review: Theme.yellow
-        case .library: Theme.peach
-        }
-    }
 }
 
 // MARK: Buttons
@@ -158,7 +144,7 @@ struct ThinProgressStyle: ProgressViewStyle {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule().fill(Theme.ink.opacity(0.15))
-                Capsule().fill(Theme.accent)
+                Capsule().fill(Theme.ink)
                     .frame(width: max(height, proxy.size.width * fraction))
                     .opacity(fraction > 0 ? 1 : 0)
                     .animation(.easeOut(duration: 0.25), value: fraction)
@@ -216,7 +202,7 @@ struct ScreenShift: ViewModifier {
 
 /// The one character in the app: a flat flower with a small smile. Used only where something is finished or empty.
 struct Blob: View {
-    var color: Color = Theme.peach
+    var color: Color = Theme.accent
 
     var body: some View {
         ZStack {

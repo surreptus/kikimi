@@ -31,7 +31,6 @@ struct ReviewView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .navigationTitle("Review")
         .onChange(of: mode) { _, new in env.reviewAudio.setMode(new, for: app.profile) }
         .task(id: app.languageCode) { await begin() }
         .onDisappear { audio?.stop() }

@@ -65,7 +65,6 @@ struct LibraryView: View {
             }
             .padding(Theme.screenPadding)
         }
-        .navigationTitle("Library")
         .task(id: "\(app.languageCode)-\(app.dataVersion)") { await reload() }
     }
 
@@ -83,7 +82,7 @@ struct LibraryView: View {
                 .help("Size, location, rename and delete")
             Button("Play", systemImage: "play.circle.fill") { open(item.video, at: nil) }
                 .labelStyle(.iconOnly).buttonStyle(.plain)
-                .font(.system(size: 28)).foregroundStyle(Theme.accent)
+                .font(.system(size: 28)).foregroundStyle(Theme.ink)
                 .help("Play")
         }
         .panel()
@@ -221,7 +220,7 @@ private struct VideoInfoSheet: View {
         .frame(width: 540)
         .background(Theme.page)
         .fontDesign(.rounded)
-        .tint(Theme.accent)
+        .tint(Theme.ink)
         .task { details = try? await env.details(for: video) }
         .confirmationDialog("Delete \"\(video.title)\"?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete from this Mac", role: .destructive) { delete() }

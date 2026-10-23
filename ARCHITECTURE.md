@@ -59,7 +59,7 @@ the Words screen's search, filter and selection, so they survive switching scree
 | `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
 | `StorageView` | Downloaded models and videos, with removal |
 
-`Theme.swift` is the design system: the four section colours (the whole window takes the current one), one accent, pill buttons and flat panels. `SideNav` is the left strip, and `Modal.swift` shows panels that close on an outside click. Use these rather than styling views ad hoc.
+`Theme.swift` is the design system: one mint colour field for the whole window, one gold accent, pill buttons and flat panels. `SideNav` is the left strip, and `Modal.swift` shows panels that close on an outside click. Use these rather than styling views ad hoc.
 
 ## Data on disk
 

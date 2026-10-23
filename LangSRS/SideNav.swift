@@ -86,8 +86,7 @@ struct SideNav: View {
             selection = item
         } label: {
             HStack(spacing: 12) {
-                Circle().fill(item.color).frame(width: 12, height: 12)
-                    .overlay(Circle().strokeBorder(Theme.ink.opacity(0.25), lineWidth: 1))
+                Image(systemName: item.symbol).font(.system(size: 15, weight: .medium)).frame(width: 22)
                 Text(item.rawValue)
                     .font(.system(size: 15, weight: selected ? .semibold : .regular, design: .rounded))
                 Spacer()
@@ -104,7 +103,7 @@ struct SideNav: View {
             .background {
                 // One shared shape: it glides between rows when the selection changes.
                 if selected {
-                    RoundedRectangle(cornerRadius: 14).fill(item.color.opacity(0.6))
+                    RoundedRectangle(cornerRadius: 14).fill(Theme.softStrong)
                         .matchedGeometryEffect(id: "selectionPill", in: pill)
                 }
             }

@@ -36,7 +36,6 @@ struct PlayerView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .navigationTitle(video.title)
         .task { await load() }
         .task(id: hoveredToken?.lemma) { await refreshHint() }
         .task(id: app.dataVersion) {

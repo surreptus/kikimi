@@ -28,7 +28,6 @@ struct ImportView: View {
             }
             .padding(Theme.screenPadding)
         }
-        .navigationTitle("Import")
         .task(id: app.languageCode) { await loadModel() }
         .onChange(of: app.dataVersion) { Task { await refreshInstalled() } }   // e.g. a model removed in Storage
         .onChange(of: queue.jobs.map(\.status)) { _, statuses in
@@ -68,7 +67,7 @@ struct ImportView: View {
     private var modelCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 14) {
-                Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.accent)
+                Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.ink)
                 Text("Speech model").font(.system(.headline, design: .rounded))
                 if model.isEmpty {
                     ProgressView().controlSize(.small)   // selection not loaded yet; a Picker would warn about ""
@@ -147,7 +146,7 @@ struct ImportView: View {
 
     private var dropZone: some View {
         VStack(spacing: 12) {
-            Image(systemName: "film.fill").font(.system(size: 44, weight: .bold)).foregroundStyle(Theme.accent)
+            Image(systemName: "film.fill").font(.system(size: 44, weight: .bold)).foregroundStyle(Theme.ink)
             Text(canImport ? "Drop \(app.profile.displayName) videos here" : "Download the speech model to start importing")
                 .font(Theme.title(20))
             Text("Importing as \(app.profile.displayName). Change the language in the sidebar.")

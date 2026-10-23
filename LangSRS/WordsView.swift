@@ -56,7 +56,6 @@ struct WordsView: View {
             }
         }
         .animation(.easeOut(duration: 0.18), value: inspectorShown.wrappedValue)
-        .navigationTitle("Words")
         .task(id: LoadKey(language: app.languageCode, search: search, filter: filter, version: app.dataVersion)) {
             await load()
         }
@@ -75,7 +74,7 @@ struct WordsView: View {
             ScreenTitle(text: "Words", subtitle: "Pick words to learn, or mark the ones you already know.")
             HStack(spacing: 10) {
                 HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass").foregroundStyle(Theme.accent).font(.system(size: 14, weight: .bold))
+                    Image(systemName: "magnifyingglass").foregroundStyle(Theme.ink).font(.system(size: 14, weight: .bold))
                     TextField("Search words", text: searchBinding)
                         .textFieldStyle(.plain)
                         .font(.system(.body, design: .rounded))

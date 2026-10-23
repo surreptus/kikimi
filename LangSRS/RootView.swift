@@ -24,19 +24,13 @@ struct RootView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(fieldColor)
-        .containerBackground(fieldColor, for: .window)
-        .animation(.easeOut(duration: 0.25), value: app.section)
+        .background(Theme.field)
+        .containerBackground(Theme.field, for: .window)
+        .toolbar(removing: .title)
         .toolbarBackground(.hidden, for: .windowToolbar)
         .tint(Theme.accent)
         .fontDesign(.rounded)
         .modal(isPresented: $showAcknowledgements) { AcknowledgementsView() }
-    }
-
-    /// The colour of the whole window: the current section's, or plain while loading.
-    private var fieldColor: Color {
-        if case .ready = app.phase { return app.section.color }
-        return Theme.page
     }
 
     /// A nav strip fixed to the left edge; the current screen fills the rest of the window.
@@ -64,7 +58,7 @@ struct RootView: View {
             }
             .animation(Theme.screenChange(reduceMotion), value: app.section)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.top, 14)   // the same distance from the top as before, now measured from the window edge
+            .ignoresSafeArea(.container, edges: .top)   // no gap above the content; the title bar has nothing in it
         }
         .modal(isPresented: $showStorage) { StorageView(env: env) }
     }
