@@ -247,16 +247,10 @@ struct WordsView: View {
     // MARK: Loading
 
     private func load() async {
-        let language = app.languageCode
-        do {
-            rows = try await env.database.words(language: language, search: search, status: filter)
-            selection.formIntersection(rows.map(\.id))
-            dictionaryHits = trimmedSearch.isEmpty
-                ? [] : try await env.database.lookup(language: language, term: trimmedSearch, limit: 5)
-        } catch {
-            rows = []
-            dictionaryHits = []
-        }
+        rows = await env.searchWords(search, profile: app.profile, status: filter)
+        selection.formIntersection(rows.map(\.id))
+        dictionaryHits = trimmedSearch.isEmpty
+            ? [] : await env.lookupWord(trimmedSearch, profile: app.profile, limit: 5)
     }
 }
 
