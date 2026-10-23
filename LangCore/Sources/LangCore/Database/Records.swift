@@ -84,22 +84,4 @@ public struct Occurrence: LangRecord {
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 }
 
-public struct DictionaryEntry: LangRecord {
-    public static let databaseTableName = "dictionary"
-    public var id: Int64?
-    public var language: String
-    public var headword: String
-    public var reading: String?
-    public var gloss: String
-
-    public init(id: Int64? = nil, language: String, headword: String, reading: String? = nil, gloss: String) {
-        self.id = id; self.language = language; self.headword = headword
-        self.reading = reading; self.gloss = gloss
-    }
-
-    public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
-}
-
-extension DictionaryEntry: Identifiable {}
-
 extension Video: Identifiable {}

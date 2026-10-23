@@ -36,8 +36,9 @@ Scripts/build_ipadic.sh         # Japanese tokenizer dictionary (clones MeCab at
 Scripts/build_dictionaries.sh   # JMdict (~10 MB download) and the Spanish extract (~1 GB download)
 ```
 
-Then open `LangSRS.xcodeproj` in Xcode, pick the **LangSRS** scheme and **My Mac**, and press ⌘R. On first launch
-the app imports the bundled dictionaries; on the **Import** tab, download a speech model, then drop in a video.
+Then open `LangSRS.xcodeproj` in Xcode, pick the **LangSRS** scheme and **My Mac**, and press ⌘R. The app reads the
+bundled dictionaries in place (they are never copied into its database); on the **Import** tab, download a speech
+model, then drop in a video.
 Defaults are `medium` for Spanish and `large-v3` for Japanese (about 3 GB), and you can pick another per language.
 
 The app is sandboxed. Its database, models and library live in its container,

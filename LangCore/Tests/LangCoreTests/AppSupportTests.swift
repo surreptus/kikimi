@@ -6,8 +6,8 @@ final class AppSupportTests: XCTestCase {
     let now = Date(timeIntervalSince1970: 2_000_000)
 
     /// One imported Spanish video with two lines, via the real save path.
-    private func seededDatabase() async throws -> (LangDatabase, Video) {
-        let db = try LangDatabase()
+    private func seededDatabase(dictionaries: DictionaryStore = .empty) async throws -> (LangDatabase, Video) {
+        let db = try LangDatabase(dictionaries: dictionaries)
         let es = SpanishProfile()
         let segments = [
             TranscriptSegment(start: 0, end: 1, text: "La casa es grande."),
@@ -120,11 +120,8 @@ final class AppSupportTests: XCTestCase {
     }
 
     func testReviewCardIncludesDictionaryEntryAndExample() async throws {
-        let (db, _) = try await seededDatabase()
-        let es = try await db.writer.write { d in
-            var e = DictionaryEntry(language: "es", headword: "casa", gloss: "1. (noun) house"); try e.insert(d)
-        }
-        _ = es
+        let (db, _) = try await seededDatabase(
+            dictionaries: TestDictionaries.store(["es": [("casa", nil, "1. (noun) house")]]))
         let id = try await wordID(db, "casa")
         try await db.startLearning(wordID: id, now: now)
         let session = try await ReviewSession(database: db, language: "es", now: now)
@@ -234,17 +231,20 @@ final class AppSupportTests: XCTestCase {
         XCTAssertTrue(items.contains { $0.title.contains("JMdict") && $0.text.contains("CC BY-SA") })
     }
 
-    func testEnvironmentSetsUpFoldersAndLoadsDictionaries() async throws {
+    func testEnvironmentOpensTheBundledDictionariesInPlace() async throws {
         let root = FileManager.default.temporaryDirectory.appending(path: "env-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }
         let defaults = UserDefaults(suiteName: "env-\(UUID().uuidString)")!
         let env = try LangEnvironment(root: root, defaults: defaults)
-        try await env.prepare()
+        try await env.prepare()   // throws if a dictionary can't be opened or is empty
+        XCTAssertEqual(env.database.dictionaries.languages, LanguageProfiles.all.map(\.code).sorted())
         for profile in LanguageProfiles.all {
-            let has = try await env.database.hasDictionary(language: profile.code)
-            XCTAssertTrue(has, profile.code)
+            let count = try await env.database.dictionaries.entryCount(language: profile.code)
+            XCTAssertGreaterThan(count, 1_000, profile.code)
         }
-        try await env.prepare()   // second launch: nothing to redo
+        try await env.prepare()   // a second launch has nothing to redo
+        let size = try FileManager.default.attributesOfItem(atPath: root.appending(path: "langsrs.sqlite").path)[.size] as! Int
+        XCTAssertLessThan(size, 2_000_000, "the dictionaries are not copied into the database")
     }
 }
 

@@ -14,18 +14,18 @@ final class LemmaSearchTests: XCTestCase {
         XCTAssertEqual(ja.lemmas(of: "行きました"), ["行く"])
     }
 
-    private func environment() throws -> (LangEnvironment, URL) {
+    private func environment(dictionaries: DictionaryStore = .empty) throws -> (LangEnvironment, URL) {
         let root = FileManager.default.temporaryDirectory.appending(path: "lemma-\(UUID().uuidString)")
         addTeardownBlock { try? FileManager.default.removeItem(at: root) }
-        return (try LangEnvironment(root: root, defaults: UserDefaults(suiteName: "lemma-\(UUID().uuidString)")!), root)
+        let defaults = UserDefaults(suiteName: "lemma-\(UUID().uuidString)")!
+        return (try LangEnvironment(root: root, defaults: defaults, dictionaries: dictionaries), root)
     }
 
     func testDictionaryLookupFallsBackToTheDictionaryForm() async throws {
-        let (env, _) = try environment()
-        try await env.database.writer.write { db in
-            var run = DictionaryEntry(language: "es", headword: "correr", gloss: "1. (verb) to run"); try run.insert(db)
-            var eat = DictionaryEntry(language: "ja", headword: "食べる", reading: "たべる", gloss: "1. (v1) to eat"); try eat.insert(db)
-        }
+        let (env, _) = try environment(dictionaries: TestDictionaries.store([
+            "es": [("correr", nil, "1. (verb) to run")],
+            "ja": [("食べる", "たべる", "1. (v1) to eat")],
+        ]))
         let es = SpanishProfile(), ja = JapaneseProfile()
         let inflected = await env.lookupWord("corremos", profile: es)
         XCTAssertEqual(inflected.map(\.headword), ["correr"])
@@ -38,11 +38,9 @@ final class LemmaSearchTests: XCTestCase {
     }
 
     func testAnExactEntryBeatsTheFallback() async throws {
-        let (env, _) = try environment()
-        try await env.database.writer.write { db in
-            var a = DictionaryEntry(language: "es", headword: "corremos", gloss: "form entry"); try a.insert(db)
-            var b = DictionaryEntry(language: "es", headword: "correr", gloss: "base entry"); try b.insert(db)
-        }
+        let (env, _) = try environment(dictionaries: TestDictionaries.store([
+            "es": [("corremos", nil, "form entry"), ("correr", nil, "base entry")],
+        ]))
         let hits = await env.lookupWord("corremos", profile: SpanishProfile())
         XCTAssertEqual(hits.map(\.headword), ["corremos"])
     }

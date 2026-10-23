@@ -61,6 +61,16 @@ public enum LangMigrations {
         migrator.registerMigration("v2-dictionary-reading-index") { db in
             try db.create(index: "dictionary_reading", on: "dictionary", columns: ["language", "reading"])
         }
+
+        dropCopiedDictionary(in: &migrator)
+    }
+
+    // The dictionaries are now read straight from their built files, so the copy in this database is dropped
+    // (it was derived data and can be rebuilt from the files, so nothing of yours is lost).
+    private static func dropCopiedDictionary(in migrator: inout DatabaseMigrator) {
+        migrator.registerMigration("v3-dictionaries-live-in-the-bundle") { db in
+            try db.drop(table: "dictionary")
+        }
     }
 
     public static func migrator() -> DatabaseMigrator {

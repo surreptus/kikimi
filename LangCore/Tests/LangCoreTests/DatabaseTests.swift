@@ -8,9 +8,10 @@ final class DatabaseTests: XCTestCase {
     func testMigrationCreatesSchema() throws {
         let db = try LangDatabase()
         let tables = try db.writer.read { try String.fetchSet($0, sql: "SELECT name FROM sqlite_master WHERE type='table'") }
-        for t in ["videos", "subtitles", "words", "occurrences", "dictionary"] {
+        for t in ["videos", "subtitles", "words", "occurrences"] {
             XCTAssertTrue(tables.contains(t), t)
         }
+        XCTAssertFalse(tables.contains("dictionary"), "dictionaries are read from their files, not stored here (migration v3)")
     }
 
     func testMigrationsAreIdempotentAndKeepData() throws {

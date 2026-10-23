@@ -94,6 +94,18 @@ class JMdictTests(unittest.TestCase):
     def test_kana_only_entry(self):
         self.assertIn(("ゆっくり", "ゆっくり"), [(h, r) for h, r, _ in self.rows])
 
+    def test_lookups_are_indexed_because_the_app_reads_the_file_in_place(self):
+        db = sqlite3.connect(self.out)
+        try:
+            indexes = {row[1] for row in db.execute("SELECT * FROM sqlite_master WHERE type = 'index'")}
+            plan = " ".join(str(r) for r in db.execute(
+                "EXPLAIN QUERY PLAN SELECT id FROM entries WHERE headword = ? OR reading = ?", ("x", "y")))
+        finally:
+            db.close()
+        self.assertTrue({"entries_headword", "entries_reading"} <= indexes)
+        self.assertIn("USING INDEX", plan)
+        self.assertNotIn("SCAN entries", plan)
+
     def test_meta(self):
         meta = dict(sqlite3.connect(self.out).execute("SELECT key, value FROM meta").fetchall())
         self.assertEqual(meta["source_created"], "2026-01-02")

@@ -14,7 +14,7 @@ struct RootView: View {
             case .loading:
                 VStack(spacing: 14) {
                     ProgressView().controlSize(.large)
-                    Text("Preparing dictionaries…").font(Theme.title(18)).foregroundStyle(Theme.pinkText)
+                    Text("Opening your library…").font(Theme.title(18)).foregroundStyle(Theme.pinkText)
                 }
             case .failed(let message):
                 ContentUnavailableView("Couldn't start", systemImage: "exclamationmark.triangle", description: Text(message))

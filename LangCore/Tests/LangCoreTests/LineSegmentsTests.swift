@@ -66,11 +66,11 @@ final class WordHintTests: XCTestCase {
     func testHintCombinesDictionaryEntryAndYourWordStatus() async throws {
         let root = FileManager.default.temporaryDirectory.appending(path: "hint-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }
-        let env = try LangEnvironment(root: root, defaults: UserDefaults(suiteName: "hint-\(UUID().uuidString)")!)
+        let env = try LangEnvironment(
+            root: root, defaults: UserDefaults(suiteName: "hint-\(UUID().uuidString)")!,
+            dictionaries: TestDictionaries.store(["ja": [("友達", "ともだち", "1. (n) friend; companion")]]))
         var knownID: Int64 = 0
         try await env.database.writer.write { db in
-            var entry = DictionaryEntry(language: "ja", headword: "友達", reading: "ともだち", gloss: "1. (n) friend; companion")
-            try entry.insert(db)
             var word = Word(language: "ja", lemma: "友達", pos: .noun, status: .known)
             try word.insert(db)
             knownID = word.id!

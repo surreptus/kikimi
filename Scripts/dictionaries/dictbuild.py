@@ -5,7 +5,7 @@ Each built file is a SQLite database with:
   meta(key TEXT PRIMARY KEY, value TEXT)
 
 Rows are inserted most-useful-first, so `ORDER BY id` is the display order. There is no language column: the
-app assigns the language of the profile that owns the file when it imports it.
+app opens each file read-only, in place, as the dictionary of the profile that names it.
 """
 import os
 import sqlite3
@@ -34,6 +34,9 @@ def write_database(path, rows, meta):
     db.execute("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
     db.executemany("INSERT INTO entries (headword, reading, gloss) VALUES (?, ?, ?)", rows)
     db.executemany("INSERT INTO meta VALUES (?, ?)", sorted(meta.items()))
+    # The app reads this file in place, so lookups by headword and by reading need indexes.
+    db.execute("CREATE INDEX entries_headword ON entries(headword)")
+    db.execute("CREATE INDEX entries_reading ON entries(reading)")
     db.commit()
     count = db.execute("SELECT COUNT(*) FROM entries").fetchone()[0]
     db.execute("VACUUM")

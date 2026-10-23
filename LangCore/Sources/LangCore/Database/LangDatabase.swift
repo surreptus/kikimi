@@ -9,16 +9,29 @@ public enum LangError: Error, Equatable {
 
 public final class LangDatabase: Sendable {
     public let writer: any DatabaseWriter
+    /// Dictionary lookups; read directly from the built dictionary files, never copied into this database.
+    public let dictionaries: DictionaryStore
 
-    public init(path: String) throws {
+    public init(path: String, dictionaries: DictionaryStore = .empty) throws {
         writer = try DatabasePool(path: path)
+        self.dictionaries = dictionaries
         try LangMigrations.migrator().migrate(writer)
+        try Self.reclaimFreeSpace(writer)
     }
 
     /// In-memory database for tests.
-    public init() throws {
+    public init(dictionaries: DictionaryStore = .empty) throws {
         writer = try DatabaseQueue()
+        self.dictionaries = dictionaries
         try LangMigrations.migrator().migrate(writer)
+    }
+
+    /// Dropping the old dictionary copy leaves the file full of free pages; give them back once.
+    private static func reclaimFreeSpace(_ writer: any DatabaseWriter) throws {
+        try writer.writeWithoutTransaction { db in
+            let free = try Int.fetchOne(db, sql: "PRAGMA freelist_count") ?? 0
+            if free > 2_000 { try db.execute(sql: "VACUUM") }   // over about 8 MB of free pages
+        }
     }
 
     // MARK: Words
