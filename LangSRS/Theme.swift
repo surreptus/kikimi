@@ -207,7 +207,9 @@ struct ScreenShift: ViewModifier {
 
 /// The one character in the app: a flat flower with a small smile. Used only where something is finished or empty.
 struct Blob: View {
-    var color: Color = Theme.softStrong
+    /// Near-black in both modes: the flower is light in both, so the face must not follow the ink.
+    private static let face = Color(hex: 0x121212)
+    var color: Color = Color(light: .white, dark: Color(hex: 0xF4F1EA))
 
     var body: some View {
         ZStack {
@@ -215,9 +217,9 @@ struct Blob: View {
                 Circle().fill(color).frame(width: 30, height: 30).offset(y: -22).rotationEffect(.degrees(Double(i) * 72))
             }
             Circle().fill(color).frame(width: 52, height: 52)
-            Circle().fill(Theme.ink).frame(width: 6, height: 6).offset(x: -9, y: -1)
-            Circle().fill(Theme.ink).frame(width: 6, height: 6).offset(x: 9, y: -1)
-            Circle().trim(from: 0.12, to: 0.38).stroke(Theme.ink, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+            Circle().fill(Self.face).frame(width: 6, height: 6).offset(x: -9, y: -1)
+            Circle().fill(Self.face).frame(width: 6, height: 6).offset(x: 9, y: -1)
+            Circle().trim(from: 0.12, to: 0.38).stroke(Self.face, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .frame(width: 14, height: 14).rotationEffect(.degrees(30)).offset(y: 4)
         }
         .frame(width: 100, height: 100)
