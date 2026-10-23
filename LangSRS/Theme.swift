@@ -226,3 +226,20 @@ struct Blob: View {
         .accessibilityHidden(true)
     }
 }
+
+/// Nothing here yet: the flower, a title and one line saying what to do. Not for errors, which keep the warning icon.
+struct EmptyState: View {
+    let title: String
+    let message: String
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Blob()
+            Text(title).font(Theme.title(22)).foregroundStyle(Theme.ink)
+            Text(message).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                .multilineTextAlignment(.center)
+        }
+        .padding(24)
+        .accessibilityElement(children: .combine)
+    }
+}

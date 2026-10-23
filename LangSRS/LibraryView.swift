@@ -55,8 +55,7 @@ struct LibraryView: View {
                     subtitle: items.isEmpty ? "Videos you import appear here."
                         : "\(items.count) video\(items.count == 1 ? "" : "s") · \(formatBytes(totalBytes)) on this Mac")
                 if items.isEmpty {
-                    ContentUnavailableView("No videos yet", systemImage: "film.stack",
-                                           description: Text("Videos you import appear here."))
+                    EmptyState(title: "No videos yet", message: "Videos you import appear here.")
                         .frame(maxWidth: .infinity, minHeight: 280)
                 }
                 ForEach(items) { item in

@@ -127,10 +127,11 @@ struct WordsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
             if rows.isEmpty {
-                ContentUnavailableView(
-                    trimmedSearch.isEmpty && filter == nil ? "No words yet" : "No matches",
-                    systemImage: "text.book.closed",
-                    description: Text(trimmedSearch.isEmpty && filter == nil ? "Import a video to collect words." : ""))
+                if trimmedSearch.isEmpty && filter == nil {
+                    EmptyState(title: "No words yet", message: "Import a video to collect words.")
+                } else {
+                    EmptyState(title: "No matches", message: "Try a different search or status.")
+                }
             }
         }
     }

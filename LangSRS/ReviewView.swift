@@ -24,8 +24,7 @@ struct ReviewView: View {
             } else if let summary {
                 finished(summary)
             } else if session != nil {
-                ContentUnavailableView("Nothing due", systemImage: "tray",
-                    description: Text("Start learning words from the Words tab, or come back later."))
+                EmptyState(title: "Nothing due", message: "Start learning words from the Words tab, or come back later.")
             } else {
                 ProgressView()
             }
