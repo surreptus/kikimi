@@ -13,6 +13,8 @@
 // AVAssetWriterInput raises an uncaught exception if it is touched after `cancelWriting()`, and after that call
 // AVFoundation never invokes the "ready for more data" block again, so anything waiting on it would hang.
 // `Gate` solves both: every writer call goes through it under a lock, and cancelling wakes the waiters.
+// A cancel only resumes the caller once no pump is mid-call (`Gate.whenIdle`), so the reader and writer are never
+// freed under a running pump; that ordering is what a rare crash under load came from.
 // `Once` makes sure each pump's continuation is resumed exactly one time, whichever of "finished" or
 // "cancelled" happens first. The `nonisolated(unsafe)` lets are safe for the same reason: the gate, not the
 // compiler, guarantees one thread touches an AVFoundation object at a time.
@@ -177,6 +179,9 @@ public struct AVFoundationTranscoder: MediaTranscoder {
         private let lock = NSLock()
         private var cancelled = false
         private var wakeups: [() -> Void] = []
+        /// How many pump blocks are currently inside the reader or writer, and what is waiting for them to leave.
+        private var running = 0
+        private var idleWaiters: [() -> Void] = []
 
         /// Cancels once: runs `body` (the AVFoundation cancel calls), then wakes everything waiting on the writer,
         /// because after `cancelWriting()` AVFoundation never calls the "ready for more data" blocks again.
@@ -209,6 +214,30 @@ public struct AVFoundationTranscoder: MediaTranscoder {
         }
 
         var isCancelled: Bool { lock.lock(); defer { lock.unlock() }; return cancelled }
+
+        /// A pump block calls this before it touches the reader or writer. False means cancelled: do nothing.
+        func enterBlock() -> Bool {
+            lock.lock(); defer { lock.unlock() }
+            guard !cancelled else { return false }
+            running += 1
+            return true
+        }
+
+        func exitBlock() {
+            lock.lock()
+            running -= 1
+            let ready = running == 0 ? idleWaiters : []
+            if running == 0 { idleWaiters = [] }
+            lock.unlock()
+            ready.forEach { $0() }
+        }
+
+        /// Runs `body` once no pump block is inside the reader or writer. Resuming the transcode earlier would let
+        /// it return and free them while a block is still in `copyNextSampleBuffer`, which crashes.
+        func whenIdle(_ body: @escaping () -> Void) {
+            lock.lock()
+            if running == 0 { lock.unlock(); body() } else { idleWaiters.append(body); lock.unlock() }
+        }
     }
 
     private final class Once: @unchecked Sendable {
@@ -311,6 +340,8 @@ public struct AVFoundationTranscoder: MediaTranscoder {
         await withCheckedContinuation { (done: CheckedContinuation<Void, Never>) in
             let registered = gate.registerIfOpen({
                 input.requestMediaDataWhenReady(on: DispatchQueue(label: "transcode.\(label)")) {
+                    guard gate.enterBlock() else { return }   // cancelled; the wakeup below resumes the caller
+                    defer { gate.exitBlock() }
                     while input.isReadyForMoreMediaData {
                         var finished = gate.isCancelled
                         if !finished {
@@ -331,7 +362,7 @@ public struct AVFoundationTranscoder: MediaTranscoder {
                         }
                     }
                 }
-            }, wakeup: { once.run { done.resume() } })
+            }, wakeup: { gate.whenIdle { once.run { done.resume() } } })
             if !registered { once.run { done.resume() } }
         }
     }
