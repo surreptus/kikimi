@@ -10,14 +10,15 @@ struct SpeakButton: View {
     var showsTitle = false
     var shortcut: KeyEquivalent?
 
-    @State private var speaker = WordSpeaker()
+    private var speaker: WordSpeaker { .shared }
+    /// Looked up once per language, not on every redraw (it lists every installed voice).
+    @State private var available = true
 
     var body: some View {
-        let available = speaker.isAvailable(languageCode: languageCode)
         Group {
             if let shortcut { button(available).keyboardShortcut(shortcut, modifiers: []) } else { button(available) }
         }
-        .onDisappear { speaker.stop() }
+        .task(id: languageCode) { available = speaker.isAvailable(languageCode: languageCode) }
     }
 
     @ViewBuilder

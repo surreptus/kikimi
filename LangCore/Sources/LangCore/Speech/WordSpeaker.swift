@@ -40,6 +40,10 @@ private func isEloquence(_ voice: VoiceChoice) -> Bool { voice.identifier.lowerc
 /// Spoken Content) makes it sound better. The language comes from the profile's `whisperCode`.
 @MainActor
 public final class WordSpeaker {
+    /// The one speaker the app uses. A synthesizer per button gets created and thrown away every time SwiftUI
+    /// rebuilds a view, and a discarded one can cut off speech that is still going.
+    public static let shared = WordSpeaker()
+
     private let synthesizer = AVSpeechSynthesizer()
 
     public init() {}
@@ -58,15 +62,18 @@ public final class WordSpeaker {
 
     /// Speaks `text`, replacing anything still being said. Does nothing if no voice for the language is installed,
     /// because the default voice would read it in the wrong language.
-    public func speak(_ text: String, languageCode: String) {
+    public func speak(_ text: String, languageCode: String, volume: Float = 1) {
         guard let choice = VoiceSelection.best(in: Self.installedChoices(), forLanguage: languageCode),
               let voice = AVSpeechSynthesisVoice(identifier: choice.identifier) else { return }
         synthesizer.stopSpeaking(at: .immediate)
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = voice
+        utterance.volume = volume
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9   // a little slower: this is for learning
         synthesizer.speak(utterance)
     }
+
+    public var isSpeaking: Bool { synthesizer.isSpeaking }
 
     public func stop() { synthesizer.stopSpeaking(at: .immediate) }
 }
