@@ -22,32 +22,32 @@ struct StorageView: View {
             HStack {
                 Text("Storage").font(Theme.title(22))
                 Spacer()
-                Button("Done") { dismiss() }.buttonStyle(.chunky(compact: true)).keyboardShortcut(.defaultAction)
+                Button("Done") { dismiss() }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
             }
 
             section("Speech models", bytes: modelBytes) {
                 if models.isEmpty {
-                    Text("No speech models are downloaded.").foregroundStyle(.secondary)
+                    Text("No speech models are downloaded.").foregroundStyle(Theme.muted)
                 }
                 ForEach(models) { model in modelRow(model) }
                 if importRunning {
                     Text("An import is running, so models can't be removed right now.")
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(.caption).foregroundStyle(Theme.muted)
                 }
             }
 
             section("Videos", bytes: videoBytes) {
                 Text("\(videoCount) video\(videoCount == 1 ? "" : "s"). Delete them from the Library.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.muted)
             }
 
             if let error { Text(error).font(.caption).foregroundStyle(Theme.red) }
         }
         .padding(24)
         .frame(width: 540)
-        .background(Theme.background)
+        .background(Theme.page)
         .fontDesign(.rounded)
-        .tint(Theme.pink)
+        .tint(Theme.accent)
         .task { await reload() }
         .confirmationDialog(
             "Remove the \(removing.map { ModelCatalog.name(for: $0.variant) } ?? "") model?",
@@ -65,23 +65,23 @@ struct StorageView: View {
             HStack {
                 Text(title).font(Theme.title(16))
                 Spacer()
-                Text(format(bytes)).font(.system(.callout, design: .rounded, weight: .semibold)).foregroundStyle(.secondary)
+                Text(format(bytes)).font(.system(.callout, design: .rounded, weight: .semibold)).foregroundStyle(Theme.muted)
             }
             content()
         }
-        .duoCard()
+        .panel()
     }
 
     private func modelRow(_ model: InstalledModel) -> some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(ModelCatalog.name(for: model.variant)).font(.system(.headline, design: .rounded))
-                Text(detail(for: model)).font(.caption).foregroundStyle(.secondary)
+                Text(detail(for: model)).font(.caption).foregroundStyle(Theme.muted)
             }
             Spacer()
-            Text(format(model.bytes)).foregroundStyle(.secondary)
+            Text(format(model.bytes)).foregroundStyle(Theme.muted)
             Button("Remove") { removing = model }
-                .buttonStyle(.chunky(.secondary, compact: true))
+                .buttonStyle(.pill(.secondary, compact: true))
                 .disabled(importRunning)
         }
     }

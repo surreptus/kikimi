@@ -68,11 +68,11 @@ struct PlayerView: View {
     private var topBar: some View {
         HStack(spacing: 14) {
             Button("Back", systemImage: "chevron.left") { close() }
-                .buttonStyle(.chunky(.secondary, compact: true))
+                .buttonStyle(.pill(.secondary, compact: true))
                 .help("Back to \(backTitle)")
-            Text("Back to \(backTitle)").font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
+            Text("Back to \(backTitle)").font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(Theme.muted)
             Spacer()
-            Text(video.title).font(.system(.callout, design: .rounded, weight: .semibold)).lineLimit(1).foregroundStyle(.secondary)
+            Text(video.title).font(.system(.callout, design: .rounded, weight: .semibold)).lineLimit(1).foregroundStyle(Theme.muted)
         }
         .padding(.horizontal, 20).padding(.top, 16)
     }
@@ -94,13 +94,13 @@ struct PlayerView: View {
             VStack(spacing: 14) {
                 VideoPlayer(player: controller.player)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(Theme.line, lineWidth: 2))
+                    .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(Theme.line, lineWidth: 1))
                 controls(controller)
             }
             .padding(20)
             .frame(minWidth: 380)
 
-            Rectangle().fill(Theme.line).frame(width: 2)
+            Rectangle().fill(Theme.line).frame(width: 1)
 
             VStack(spacing: 0) {
                 legendBar
@@ -108,7 +108,7 @@ struct PlayerView: View {
                 hintBar
                 if let message {
                     Text(message).font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .padding(8).frame(maxWidth: .infinity).background(Theme.pinkSoft)
+                        .padding(8).frame(maxWidth: .infinity).background(Theme.soft)
                 }
             }
             .frame(minWidth: 320, idealWidth: 400, maxWidth: 480)
@@ -118,14 +118,14 @@ struct PlayerView: View {
     private func controls(_ controller: PlaybackController) -> some View {
         HStack(spacing: 12) {
             Button("Previous line", systemImage: "backward.fill") { Task { await controller.previousLine() } }
-                .buttonStyle(.chunky(.secondary, compact: true))
+                .buttonStyle(.pill(.secondary, compact: true))
             Button(controller.isPlaying ? "Pause" : "Play", systemImage: controller.isPlaying ? "pause.fill" : "play.fill") {
                 controller.togglePlayback()
             }
-            .buttonStyle(.chunky(compact: true))
+            .buttonStyle(.pill(compact: true))
             .keyboardShortcut(.space, modifiers: [])
             Button("Next line", systemImage: "forward.fill") { Task { await controller.nextLine() } }
-                .buttonStyle(.chunky(.secondary, compact: true))
+                .buttonStyle(.pill(.secondary, compact: true))
             Menu {
                 Picker("Speed", selection: Binding(get: { controller.speed }, set: { controller.speed = $0 })) {
                     ForEach([Float(0.5), 0.75, 1, 1.25, 1.5, 2], id: \.self) { Text(speedLabel($0)).tag($0) }
@@ -134,7 +134,7 @@ struct PlayerView: View {
             } label: {
                 Text(speedLabel(controller.speed)).frame(minWidth: 30)
             }
-            .menuStyle(.button).buttonStyle(.chunky(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+            .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
             .help("Playback speed")
         }
         .labelStyle(.iconOnly)
@@ -148,10 +148,10 @@ struct PlayerView: View {
             Spacer()
             Toggle("Highlight", isOn: $highlightWords)
                 .toggleStyle(.switch).controlSize(.mini)
-                .font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(.secondary)
+                .font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
         }
         .padding(.horizontal, 16).padding(.vertical, 8)
-        .overlay(alignment: .bottom) { Rectangle().fill(Theme.line).frame(height: 2) }
+        .overlay(alignment: .bottom) { Rectangle().fill(Theme.line).frame(height: 1) }
     }
 
     private func legendDot(_ color: Color, _ label: String, underlined: Bool = false) -> some View {
@@ -159,7 +159,7 @@ struct PlayerView: View {
             Circle().fill(color.opacity(0.85)).frame(width: 8, height: 8)
             // The same marks the subtitles use, so the legend is a true sample, not a description.
             Text(label).underline(underlined, pattern: .dot, color: color)
-                .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(.secondary)
+                .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
         }
     }
 
@@ -193,20 +193,20 @@ struct PlayerView: View {
                 HStack(spacing: 8) {
                     Text(hint?.lemma ?? token.lemma).font(Theme.title(17))
                     if let reading = hint?.reading ?? token.reading {
-                        Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.pinkText)
+                        Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
                     }
-                    StatusPill(text: token.pos.rawValue, color: .secondary)
+                    StatusPill(text: token.pos.rawValue)
                     if let status = hint?.status {
                         StatusPill(text: status.rawValue, color: color(for: status))
                     }
                     Spacer()
                     if hint?.wordID != nil {
                         if hint?.status != .learning && hint?.status != .burned {
-                            Button("Learn") { setStatus(.learning) }.buttonStyle(.chunky(compact: true))
+                            Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
                                 .help("Start learning this word")
                         }
                         if hint?.status != .known {
-                            Button("Known") { setStatus(.known) }.buttonStyle(.chunky(.secondary, compact: true))
+                            Button("Known") { setStatus(.known) }.buttonStyle(.pill(.secondary, compact: true))
                                 .help("Mark this word as known")
                         }
                     }
@@ -215,13 +215,13 @@ struct PlayerView: View {
                     .foregroundStyle(hint?.gloss == nil ? .secondary : .primary)
             } else {
                 Text("Hover a word in the subtitles to see what it means.")
-                    .font(.system(.callout, design: .rounded)).foregroundStyle(.tertiary)
+                    .font(.system(.callout, design: .rounded)).foregroundStyle(Theme.faint)
             }
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
         .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
-        .background(Theme.pinkSoft.opacity(0.55))
-        .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 2) }
+        .background(Theme.soft.opacity(0.55))
+        .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 1) }
     }
 
     private func speedLabel(_ speed: Float) -> String {

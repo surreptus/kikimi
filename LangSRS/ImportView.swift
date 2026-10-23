@@ -49,11 +49,11 @@ struct ImportView: View {
         if modelInstalled == true, downloadProgress == nil, !changingModel {
             HStack(spacing: 8) {
                 Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.green)
-                Text("Speech model ready: \(modelShortName)").font(.callout).foregroundStyle(.secondary)
+                Text("Speech model ready: \(modelShortName)").font(.callout).foregroundStyle(Theme.muted)
                 Button("Change") { changingModel = true }
                     .buttonStyle(.plain)
                     .font(.system(.callout, design: .rounded, weight: .semibold))
-                    .foregroundStyle(Theme.pinkText)
+                    .foregroundStyle(Theme.ink)
                 Spacer()
             }
         } else {
@@ -68,7 +68,7 @@ struct ImportView: View {
     private var modelCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 14) {
-                Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.pink)
+                Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.accent)
                 Text("Speech model").font(.system(.headline, design: .rounded))
                 if model.isEmpty {
                     ProgressView().controlSize(.small)   // selection not loaded yet; a Picker would warn about ""
@@ -86,23 +86,23 @@ struct ImportView: View {
                 Spacer()
                 if let progress = downloadProgress {
                     VStack(alignment: .trailing, spacing: 4) {
-                        ProgressView(value: progress).progressViewStyle(.duo).frame(width: 160)
-                        Text("\(Int(progress * 100))%").font(.caption.weight(.bold)).foregroundStyle(.secondary)
+                        ProgressView(value: progress).progressViewStyle(.thin).frame(width: 160)
+                        Text("\(Int(progress * 100))%").font(.caption.weight(.bold)).foregroundStyle(Theme.muted)
                     }
                 } else if modelInstalled == false {
-                    Button("Download model") { Task { await download() } }.buttonStyle(.chunky(compact: true))
+                    Button("Download model") { Task { await download() } }.buttonStyle(.pill(compact: true))
                 } else if modelInstalled == true {
-                    Button("Done") { changingModel = false }.buttonStyle(.chunky(.secondary, compact: true))
+                    Button("Done") { changingModel = false }.buttonStyle(.pill(.secondary, compact: true))
                 }
             }
             if let note = ModelCatalog.info(for: model)?.note {
-                Text(note).font(.caption).foregroundStyle(.secondary)
+                Text(note).font(.caption).foregroundStyle(Theme.muted)
             }
             if let downloadError {
                 Text(downloadError).font(.caption).foregroundStyle(Theme.red)
             }
         }
-        .duoCard()
+        .panel()
     }
 
     private var modelChoices: [String] {
@@ -147,22 +147,22 @@ struct ImportView: View {
 
     private var dropZone: some View {
         VStack(spacing: 12) {
-            Image(systemName: "film.fill").font(.system(size: 44, weight: .bold)).foregroundStyle(Theme.pink)
+            Image(systemName: "film.fill").font(.system(size: 44, weight: .bold)).foregroundStyle(Theme.accent)
             Text(canImport ? "Drop \(app.profile.displayName) videos here" : "Download the speech model to start importing")
                 .font(Theme.title(20))
             Text("Importing as \(app.profile.displayName). Change the language in the sidebar.")
-                .font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.pinkText)
+                .font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.ink)
             Text("Your original files are never changed or deleted.")
-                .font(.callout).foregroundStyle(.secondary)
+                .font(.callout).foregroundStyle(Theme.muted)
             Button("Choose files") { showImporter = true }
-                .buttonStyle(.chunky)
+                .buttonStyle(.pill)
                 .disabled(!canImport)
                 .padding(.top, 4)
         }
         .frame(maxWidth: .infinity, minHeight: 230)
-        .background(RoundedRectangle(cornerRadius: 26).fill(isTargeted ? Theme.pinkSoft : Theme.pinkSoft.opacity(0.45)))
+        .background(RoundedRectangle(cornerRadius: 26).fill(isTargeted ? Theme.soft : Theme.soft.opacity(0.45)))
         .overlay(RoundedRectangle(cornerRadius: 26)
-            .strokeBorder(Theme.pink.opacity(isTargeted ? 1 : 0.7), style: StrokeStyle(lineWidth: 3, dash: [11, 9])))
+            .strokeBorder(Theme.ink.opacity(isTargeted ? 0.7 : 0.35), style: StrokeStyle(lineWidth: 1.5, dash: [8, 7])))
         .scaleEffect(isTargeted ? 1.01 : 1)
         .animation(.easeOut(duration: 0.12), value: isTargeted)
         .dropDestination(for: URL.self) { urls, _ in
@@ -191,12 +191,12 @@ struct ImportView: View {
                         Spacer()
                         StatusPill(text: statusText(job), color: statusColor(job.status))
                         if canCancel(job.status) {
-                            Button("Cancel") { queue.cancel(job.id) }.buttonStyle(.chunky(.secondary, compact: true))
+                            Button("Cancel") { queue.cancel(job.id) }.buttonStyle(.pill(.secondary, compact: true))
                                 .help("Stop this import. Your original file is untouched.")
                         }
                     }
                     if case .running(_, let fraction) = job.status {
-                        ProgressView(value: fraction).progressViewStyle(.duo)
+                        ProgressView(value: fraction).progressViewStyle(.thin)
                     }
                     if case .failed(let message) = job.status {
                         Text(message).font(.caption).foregroundStyle(Theme.red)
@@ -209,11 +209,11 @@ struct ImportView: View {
             HStack {
                 Spacer()
                 Button("Clear finished") { queue.clearFinished() }
-                    .buttonStyle(.chunky(.secondary, compact: true))
+                    .buttonStyle(.pill(.secondary, compact: true))
                     .disabled(queue.isBusy && queue.jobs.count == 1)
             }
         }
-        .duoCard()
+        .panel()
     }
 
     /// Asked when the audio sounds like a different supported language than the one selected.
@@ -225,14 +225,14 @@ struct ImportView: View {
                 Button("Import as \(other.displayName)") {
                     queue.retry(job.id, as: other, model: env.preferences.model(for: other))
                 }
-                .buttonStyle(.chunky(compact: true))
+                .buttonStyle(.pill(compact: true))
                 Button("Import as \(job.profile.displayName) anyway") { queue.importAnyway(job.id) }
-                    .buttonStyle(.chunky(.secondary, compact: true))
-                Button("Cancel") { queue.cancel(job.id) }.buttonStyle(.chunky(.secondary, compact: true))
+                    .buttonStyle(.pill(.secondary, compact: true))
+                Button("Cancel") { queue.cancel(job.id) }.buttonStyle(.pill(.secondary, compact: true))
             }
         }
         .padding(12)
-        .background(RoundedRectangle(cornerRadius: 14).fill(Theme.pinkSoft))
+        .background(RoundedRectangle(cornerRadius: 14).fill(Theme.soft))
     }
 
     private func statusText(_ job: ImportQueue.Job) -> String {
@@ -261,7 +261,7 @@ struct ImportView: View {
         case .imported: Theme.green
         case .failed: Theme.red
         case .languageMismatch, .cancelling: Theme.orange
-        case .running: Theme.pinkText
+        case .running: Theme.ink
         default: .secondary
         }
     }

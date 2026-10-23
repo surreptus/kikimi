@@ -15,7 +15,7 @@ struct RootView: View {
             case .loading:
                 VStack(spacing: 14) {
                     ProgressView().controlSize(.large)
-                    Text("Opening your library…").font(Theme.title(18)).foregroundStyle(Theme.pinkText)
+                    Text("Opening your library…").font(Theme.title(18)).foregroundStyle(Theme.ink)
                 }
             case .failed(let message):
                 ContentUnavailableView("Couldn't start", systemImage: "exclamationmark.triangle", description: Text(message))
@@ -24,15 +24,22 @@ struct RootView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Theme.background)
-        .containerBackground(Theme.background, for: .window)
+        .background(fieldColor)
+        .containerBackground(fieldColor, for: .window)
+        .animation(.easeOut(duration: 0.25), value: app.section)
         .toolbarBackground(.hidden, for: .windowToolbar)
-        .tint(Theme.pink)
+        .tint(Theme.accent)
         .fontDesign(.rounded)
         .sheet(isPresented: $showAcknowledgements) { AcknowledgementsView() }
     }
 
-    /// A floating nav card on the left, and the current screen in its own rounded card.
+    /// The colour of the whole window: the current section's, or plain while loading.
+    private var fieldColor: Color {
+        if case .ready = app.phase { return app.section.color }
+        return Theme.page
+    }
+
+    /// A floating nav card on the left; the current screen fills the rest of the window.
     private func layout(_ env: LangEnvironment) -> some View {
         @Bindable var app = app
         let selection = Binding<SidebarItem>(
@@ -57,9 +64,6 @@ struct RootView: View {
             }
             .animation(Theme.screenChange(reduceMotion), value: app.section)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(RoundedRectangle(cornerRadius: 28).fill(Theme.card))
-                .clipShape(RoundedRectangle(cornerRadius: 28))
-                .overlay(RoundedRectangle(cornerRadius: 28).strokeBorder(Theme.line, lineWidth: 2))
         }
         .padding(14)
         .sheet(isPresented: $showStorage) { StorageView(env: env) }

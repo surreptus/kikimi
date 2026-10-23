@@ -72,19 +72,19 @@ struct LibraryView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.video.title).font(.system(.headline, design: .rounded)).lineLimit(2)
                 Text("\(duration(item.video.duration)) · \(item.subtitleCount) lines · \(sizes[item.id].map(formatBytes) ?? "…") · added \(item.video.importedAt.formatted(date: .abbreviated, time: .omitted))")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(Theme.muted)
             }
             Spacer()
             Button("Info", systemImage: "info.circle") { info = item.video }
                 .labelStyle(.iconOnly).buttonStyle(.plain)
-                .font(.system(size: 20)).foregroundStyle(.secondary)
+                .font(.system(size: 20)).foregroundStyle(Theme.muted)
                 .help("Size, location, rename and delete")
             Button("Play", systemImage: "play.circle.fill") { open(item.video, at: nil) }
                 .labelStyle(.iconOnly).buttonStyle(.plain)
-                .font(.system(size: 28)).foregroundStyle(Theme.pink)
+                .font(.system(size: 28)).foregroundStyle(Theme.accent)
                 .help("Play")
         }
-        .duoCard()
+        .panel()
         .contentShape(Rectangle())
         .onTapGesture(count: 2) { open(item.video, at: nil) }
         .contextMenu {
@@ -188,13 +188,13 @@ private struct VideoInfoSheet: View {
                         row("   Audio", formatBytes(details.audioBytes))
                     }
                     GridRow(alignment: .top) {
-                        Text("Location").foregroundStyle(.secondary).gridColumnAlignment(.trailing)
+                        Text("Location").foregroundStyle(Theme.muted).gridColumnAlignment(.trailing)
                         Text(details.folder.path).textSelection(.enabled).font(.callout)
                     }
                 }
-                .duoCard()
+                .panel()
                 Text("This is the app's own copy. Your original file, wherever you imported it from, is not touched by the app.")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(Theme.muted)
             } else {
                 ProgressView()
             }
@@ -202,24 +202,24 @@ private struct VideoInfoSheet: View {
             if let error { Text(error).font(.caption).foregroundStyle(Theme.red) }
 
             HStack(spacing: 12) {
-                Button("Delete") { confirmDelete = true }.buttonStyle(.chunky(.danger, compact: true))
-                Button("Rename") { dismiss(); rename() }.buttonStyle(.chunky(.secondary, compact: true))
+                Button("Delete") { confirmDelete = true }.buttonStyle(.pill(.danger, compact: true))
+                Button("Rename") { dismiss(); rename() }.buttonStyle(.pill(.secondary, compact: true))
                 Spacer()
                 Button("Show in Finder") {
                     if let folder = details?.folder { NSWorkspace.shared.activateFileViewerSelecting([folder]) }
                 }
-                .buttonStyle(.chunky(.secondary, compact: true))
+                .buttonStyle(.pill(.secondary, compact: true))
                 Button("Play") { dismiss(); play() }
-                    .buttonStyle(.chunky(.secondary, compact: true))
+                    .buttonStyle(.pill(.secondary, compact: true))
                     .disabled(details?.filesMissing ?? true)
-                Button("Done") { dismiss() }.buttonStyle(.chunky(compact: true)).keyboardShortcut(.defaultAction)
+                Button("Done") { dismiss() }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
             }
         }
         .padding(24)
         .frame(width: 540)
-        .background(Theme.background)
+        .background(Theme.page)
         .fontDesign(.rounded)
-        .tint(Theme.pink)
+        .tint(Theme.accent)
         .task { details = try? await env.details(for: video) }
         .confirmationDialog("Delete \"\(video.title)\"?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete from this Mac", role: .destructive) { delete() }
@@ -234,7 +234,7 @@ private struct VideoInfoSheet: View {
 
     private func row(_ label: String, _ value: String) -> some View {
         GridRow {
-            Text(label).foregroundStyle(.secondary).gridColumnAlignment(.trailing)
+            Text(label).foregroundStyle(Theme.muted).gridColumnAlignment(.trailing)
             Text(value).font(.system(.body, design: .rounded, weight: .semibold))
         }
     }

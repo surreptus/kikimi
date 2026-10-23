@@ -33,17 +33,9 @@ struct FloatingNav: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 10) {
-                Image(systemName: "bubble.left.and.text.bubble.right.fill")
-                    .font(.system(size: 16, weight: .heavy))
-                    .foregroundStyle(.white)
-                    .frame(width: 34, height: 34)
-                    .background(RoundedRectangle(cornerRadius: 11).fill(Theme.pink))
-                    .background(RoundedRectangle(cornerRadius: 11).fill(Theme.pinkEdge).offset(y: 3))
-                Text("LangSRS").font(Theme.title(20)).foregroundStyle(Theme.pinkText)
-            }
-            .padding(.bottom, 14)
-            .padding(.horizontal, 4)
+            Text("LangSRS").font(Theme.title(20)).foregroundStyle(Theme.ink)
+                .padding(.bottom, 14)
+                .padding(.horizontal, 12)
 
             ForEach(SidebarItem.allCases) { item in
                 navRow(item)
@@ -62,10 +54,10 @@ struct FloatingNav: View {
                     Spacer()
                     Image(systemName: "chevron.up.chevron.down").font(.caption2)
                 }
-                .font(.system(size: 13, weight: .bold, design: .rounded))
-                .foregroundStyle(Theme.pinkText)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .foregroundStyle(Theme.ink)
                 .padding(.horizontal, 12).padding(.vertical, 10)
-                .background(RoundedRectangle(cornerRadius: 14).strokeBorder(Theme.line, lineWidth: 2))
+                .background(Capsule().fill(Theme.ink.opacity(0.07)))
             }
             .menuStyle(.button)
             .buttonStyle(.plain)
@@ -76,17 +68,14 @@ struct FloatingNav: View {
                 Button("Acknowledgements", action: showAcknowledgements)
             }
             .buttonStyle(.plain)
-            .font(.system(size: 11, weight: .semibold, design: .rounded))
-            .foregroundStyle(.secondary)
+            .font(.system(size: 12, design: .rounded))
+            .foregroundStyle(Theme.muted)
             .padding(.horizontal, 6).padding(.top, 4)
         }
         .padding(14)
         .frame(width: 214)
         .frame(maxHeight: .infinity)
-        // The shadow belongs to the card's shape only; on the whole view it would smear the icons and text.
-        .background(RoundedRectangle(cornerRadius: 28).fill(Theme.card)
-            .shadow(color: Theme.pinkEdge.opacity(0.16), radius: 20, y: 8))
-        .overlay(RoundedRectangle(cornerRadius: 28).strokeBorder(Theme.line, lineWidth: 2))
+        .background(RoundedRectangle(cornerRadius: 28).fill(Theme.card))
     }
 
     private func navRow(_ item: SidebarItem) -> some View {
@@ -95,32 +84,29 @@ struct FloatingNav: View {
             selection = item
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: item.symbol)
-                    .font(.system(size: 16, weight: .bold))
-                    .frame(width: 24)
-                Text(item.rawValue.uppercased())
-                    .font(.system(size: 13, weight: .heavy, design: .rounded))
-                    .tracking(0.5)
+                Circle().fill(item.color).frame(width: 12, height: 12)
+                    .overlay(Circle().strokeBorder(Theme.ink.opacity(0.25), lineWidth: 1))
+                Text(item.rawValue)
+                    .font(.system(size: 15, weight: selected ? .semibold : .regular, design: .rounded))
                 Spacer()
                 if item == .review, dueCount > 0 {
                     Text("\(dueCount)")
-                        .font(.system(size: 11, weight: .heavy, design: .rounded))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 7).padding(.vertical, 2)
-                        .background(Capsule().fill(Theme.red))
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Theme.onInk)
+                        .padding(.horizontal, 8).padding(.vertical, 2)
+                        .background(Capsule().fill(Theme.ink))
                 }
             }
-            .foregroundStyle(selected ? Theme.pinkText : Color.secondary)
+            .foregroundStyle(Theme.ink)
             .padding(.horizontal, 12).padding(.vertical, 11)
             .background {
                 // One shared shape: it glides between rows when the selection changes.
                 if selected {
-                    RoundedRectangle(cornerRadius: 15).fill(Theme.pinkSoft)
-                        .overlay(RoundedRectangle(cornerRadius: 15).strokeBorder(Theme.pink, lineWidth: 2))
+                    RoundedRectangle(cornerRadius: 14).fill(item.color.opacity(0.6))
                         .matchedGeometryEffect(id: "selectionPill", in: pill)
                 }
             }
-            .contentShape(RoundedRectangle(cornerRadius: 15))
+            .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
     }

@@ -15,25 +15,40 @@ extension Color {
     }
 }
 
-/// The look of the app: bright, rounded, chunky, in pink.
+/// The look of the app: each section is a flat field of colour, text is near-black (or near-white in dark mode),
+/// and the one action that matters on a screen is a solid pill. Colour marks where you are; nothing is decorative.
 enum Theme {
-    static let pink = Color(light: Color(hex: 0xFF4FA1), dark: Color(hex: 0xFF5FAA))
-    static let pinkEdge = Color(light: Color(hex: 0xD93A85), dark: Color(hex: 0xBF2F78))
-    static let pinkSoft = Color(light: Color(hex: 0xFFE3F0), dark: Color(hex: 0x3D2030))
-    static let pinkText = Color(light: Color(hex: 0xE0368A), dark: Color(hex: 0xFF7FBC))
+    static let ink = Color(light: Color(hex: 0x121212), dark: Color(hex: 0xF4F1EA))
+    /// Text on an `ink` face (the primary button).
+    static let onInk = Color(light: .white, dark: Color(hex: 0x121212))
+    static let muted = Color(light: Color(hex: 0x3F3F3F), dark: Color(hex: 0xD6D4CE))
+    static let faint = Color(light: Color(hex: 0x4A4A4A), dark: Color(hex: 0xD3D1CB))
+    /// Interactive tint for system controls.
+    static let accent = ink
 
-    static let background = Color(light: Color(hex: 0xFFF1F8), dark: Color(hex: 0x170F15))
-    static let card = Color(light: .white, dark: Color(hex: 0x241A21))
-    static let line = Color(light: Color(hex: 0xF3D5E5), dark: Color(hex: 0x3B2B36))
+    /// Behind the floating nav, and behind sheets.
+    static let page = Color(light: Color(hex: 0xF6F4EF), dark: Color(hex: 0x121212))
+    /// The nav card.
+    static let card = Color(light: .white, dark: Color(hex: 0x1F1F1F))
+    /// A panel on a coloured field: translucent, so it works on every section colour.
+    static let soft = Color(light: .white.opacity(0.62), dark: .white.opacity(0.09))
+    static let softStrong = Color(light: .white.opacity(0.85), dark: .white.opacity(0.16))
+    static let line = Color(light: .black.opacity(0.12), dark: .white.opacity(0.16))
 
-    static let red = Color(hex: 0xFF4B4B)
-    static let redEdge = Color(hex: 0xD93838)
-    static let green = Color(hex: 0x58CC02)
-    static let orange = Color(hex: 0xFF9600)
-    static let purple = Color(hex: 0xCE82FF)
+    // The four section colours, light and dark.
+    static let lilac = Color(light: Color(hex: 0xDCC8FA), dark: Color(hex: 0x3B2F5C))
+    static let mint = Color(light: Color(hex: 0xBFEBD3), dark: Color(hex: 0x1F4A38))
+    static let yellow = Color(light: Color(hex: 0xFFE14D), dark: Color(hex: 0x54460F))
+    static let peach = Color(light: Color(hex: 0xFFB48A), dark: Color(hex: 0x5C3523))
+
+    // Status and feedback. Always shown with a word as well, never as colour alone.
+    static let red = Color(light: Color(hex: 0x9C1717), dark: Color(hex: 0xFFA8A0))
+    static let green = Color(light: Color(hex: 0x1E8A55), dark: Color(hex: 0x6FD6A0))
+    static let orange = Color(light: Color(hex: 0xB86E00), dark: Color(hex: 0xFFB84D))
+    static let purple = Color(light: Color(hex: 0x7C4DDB), dark: Color(hex: 0xC3A6FF))
 
     static let cornerRadius: CGFloat = 20
-    /// Inset of every screen's content from its card edge, so headings sit in the same place everywhere.
+    /// Inset of every screen's content from the window edge, so headings sit in the same place everywhere.
     static let screenPadding: CGFloat = 26
 
     /// How screens change: a short spring, or a plain quick fade when Reduce Motion is on.
@@ -41,13 +56,26 @@ enum Theme {
         reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.38, dampingFraction: 0.86)
     }
 
-    static func title(_ size: CGFloat = 24) -> Font { .system(size: size, weight: .heavy, design: .rounded) }
+    /// Large headings are light; small ones need a little weight to stay readable.
+    static func title(_ size: CGFloat = 24) -> Font { .system(size: size, weight: size >= 30 ? .regular : .semibold, design: .rounded) }
+}
+
+extension SidebarItem {
+    /// The colour of this section's screen, and of its dot in the nav.
+    var color: Color {
+        switch self {
+        case .importVideos: Theme.lilac
+        case .words: Theme.mint
+        case .review: Theme.yellow
+        case .library: Theme.peach
+        }
+    }
 }
 
 // MARK: Buttons
 
-/// A Duolingo-style button: solid face, darker "ledge" underneath, and it sinks when pressed.
-struct ChunkyButtonStyle: ButtonStyle {
+/// A solid pill. Primary is the one action that matters (ink face); secondary is a quiet translucent pill.
+struct PillButtonStyle: ButtonStyle {
     enum Kind { case primary, secondary, danger }
 
     var kind: Kind = .primary
@@ -56,63 +84,47 @@ struct ChunkyButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 
     func makeBody(configuration: Configuration) -> some View {
-        let depth: CGFloat = compact ? 3 : 4
-        let radius: CGFloat = compact ? 11 : 15
-        let pressed = configuration.isPressed
         configuration.label
-            .font(.system(size: compact ? 12 : 14, weight: .heavy, design: .rounded))
-            .textCase(.uppercase)
-            .tracking(0.5)
+            .font(.system(size: compact ? 13 : 15, weight: .medium, design: .rounded))
             .foregroundStyle(text)
             .padding(.vertical, compact ? 7 : 12)
-            .padding(.horizontal, compact ? 12 : 22)
+            .padding(.horizontal, compact ? 14 : 26)
             .frame(maxWidth: fullWidth ? .infinity : nil)
-            .background(RoundedRectangle(cornerRadius: radius).fill(face))
-            .overlay(RoundedRectangle(cornerRadius: radius).strokeBorder(border, lineWidth: kind == .secondary ? 2 : 0))
-            .background(RoundedRectangle(cornerRadius: radius).fill(edge).offset(y: pressed ? 0 : depth))
-            .offset(y: pressed ? depth : 0)
-            .padding(.bottom, depth)
-            .opacity(isEnabled ? 1 : 0.4)
-            .contentShape(Rectangle())
-            .animation(.easeOut(duration: 0.07), value: pressed)
+            .background(Capsule().fill(face))
+            .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.4)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .contentShape(Capsule())
+            .animation(.easeOut(duration: 0.08), value: configuration.isPressed)
     }
 
     private var face: Color {
         switch kind {
-        case .primary: Theme.pink
-        case .secondary: Theme.card
-        case .danger: Theme.red
+        case .primary: Theme.ink
+        case .secondary: Theme.softStrong
+        case .danger: Color(hex: 0xC62828)
         }
     }
-
-    private var edge: Color {
-        switch kind {
-        case .primary: Theme.pinkEdge
-        case .secondary: Theme.line
-        case .danger: Theme.redEdge
-        }
-    }
-
-    private var border: Color { kind == .secondary ? Theme.line : .clear }
 
     private var text: Color {
         switch kind {
-        case .primary, .danger: .white
-        case .secondary: Theme.pinkText
+        case .primary: Theme.onInk
+        case .secondary: Theme.ink
+        case .danger: .white
         }
     }
 }
 
-extension ButtonStyle where Self == ChunkyButtonStyle {
-    static var chunky: ChunkyButtonStyle { .init() }
-    static func chunky(_ kind: ChunkyButtonStyle.Kind = .primary, compact: Bool = false, fullWidth: Bool = false) -> ChunkyButtonStyle {
+extension ButtonStyle where Self == PillButtonStyle {
+    static var pill: PillButtonStyle { .init() }
+    static func pill(_ kind: PillButtonStyle.Kind = .primary, compact: Bool = false, fullWidth: Bool = false) -> PillButtonStyle {
         .init(kind: kind, compact: compact, fullWidth: fullWidth)
     }
 }
 
-// MARK: Cards
+// MARK: Panels
 
-struct DuoCard: ViewModifier {
+/// Content that belongs together: flat, translucent, no outline. Buttons are solid; panels never are.
+struct Panel: ViewModifier {
     var padding: CGFloat = 16
     var radius: CGFloat = Theme.cornerRadius
     var highlighted = false
@@ -120,34 +132,28 @@ struct DuoCard: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(padding)
-            .background(RoundedRectangle(cornerRadius: radius).fill(highlighted ? Theme.pinkSoft : Theme.card))
-            .overlay(RoundedRectangle(cornerRadius: radius).strokeBorder(highlighted ? Theme.pink : Theme.line, lineWidth: 2))
-            .background(RoundedRectangle(cornerRadius: radius).fill(highlighted ? Theme.pinkEdge : Theme.line).offset(y: 4))
-            .padding(.bottom, 4)
+            .background(RoundedRectangle(cornerRadius: radius).fill(highlighted ? Theme.softStrong : Theme.soft))
     }
 }
 
 extension View {
-    func duoCard(padding: CGFloat = 16, radius: CGFloat = Theme.cornerRadius, highlighted: Bool = false) -> some View {
-        modifier(DuoCard(padding: padding, radius: radius, highlighted: highlighted))
+    func panel(padding: CGFloat = 16, radius: CGFloat = Theme.cornerRadius, highlighted: Bool = false) -> some View {
+        modifier(Panel(padding: padding, radius: radius, highlighted: highlighted))
     }
 }
 
 // MARK: Progress
 
-/// A thick, rounded bar with a light sheen, like a lesson progress bar.
-struct DuoProgressStyle: ProgressViewStyle {
-    var height: CGFloat = 16
+/// A thin line, like a lesson progress bar with nothing else on it.
+struct ThinProgressStyle: ProgressViewStyle {
+    var height: CGFloat = 6
 
     func makeBody(configuration: Configuration) -> some View {
         let fraction = max(0, min(1, configuration.fractionCompleted ?? 0))
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
-                Capsule().fill(Theme.line)
-                Capsule().fill(Theme.pink)
-                    .overlay(alignment: .top) {
-                        Capsule().fill(.white.opacity(0.28)).frame(height: height * 0.28).padding(.horizontal, height * 0.4).padding(.top, height * 0.2)
-                    }
+                Capsule().fill(Theme.ink.opacity(0.15))
+                Capsule().fill(Theme.ink)
                     .frame(width: max(height, proxy.size.width * fraction))
                     .opacity(fraction > 0 ? 1 : 0)
                     .animation(.easeOut(duration: 0.25), value: fraction)
@@ -157,23 +163,23 @@ struct DuoProgressStyle: ProgressViewStyle {
     }
 }
 
-extension ProgressViewStyle where Self == DuoProgressStyle {
-    static var duo: DuoProgressStyle { .init() }
+extension ProgressViewStyle where Self == ThinProgressStyle {
+    static var thin: ThinProgressStyle { .init() }
 }
 
 // MARK: Small pieces
 
+/// A word-sized label. The colour tints the pill; the text stays ink so it reads on every section colour.
 struct StatusPill: View {
     let text: String
-    let color: Color
+    var color: Color?
 
     var body: some View {
-        Text(text.uppercased())
-            .font(.system(size: 10, weight: .heavy, design: .rounded))
-            .tracking(0.4)
-            .padding(.horizontal, 8).padding(.vertical, 3)
-            .background(color.opacity(0.18), in: Capsule())
-            .foregroundStyle(color)
+        Text(text.prefix(1).uppercased() + text.dropFirst())
+            .font(.system(size: 12, weight: .medium, design: .rounded))
+            .padding(.horizontal, 10).padding(.vertical, 3)
+            .background(Capsule().fill(color.map { $0.opacity(0.35) } ?? Theme.softStrong))
+            .foregroundStyle(Theme.ink)
     }
 }
 
@@ -184,9 +190,9 @@ struct ScreenTitle: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(text).font(Theme.title(26)).foregroundStyle(.primary)
+            Text(text).font(Theme.title(34)).foregroundStyle(Theme.ink)
             // Always one subtitle line, so the heading is the same height on every screen.
-            Text(subtitle ?? " ").font(.system(.callout, design: .rounded)).foregroundStyle(.secondary).lineLimit(1)
+            Text(subtitle ?? " ").font(.system(.callout, design: .rounded)).foregroundStyle(Theme.muted).lineLimit(1)
         }
     }
 }
@@ -197,4 +203,24 @@ struct ScreenShift: ViewModifier {
     var opacity: Double
 
     func body(content: Content) -> some View { content.offset(y: y).opacity(opacity) }
+}
+
+/// The one character in the app: a flat flower with a small smile. Used only where something is finished or empty.
+struct Blob: View {
+    var color: Color = Theme.peach
+
+    var body: some View {
+        ZStack {
+            ForEach(0..<5) { i in
+                Circle().fill(color).frame(width: 30, height: 30).offset(y: -22).rotationEffect(.degrees(Double(i) * 72))
+            }
+            Circle().fill(color).frame(width: 52, height: 52)
+            Circle().fill(Theme.ink).frame(width: 6, height: 6).offset(x: -9, y: -1)
+            Circle().fill(Theme.ink).frame(width: 6, height: 6).offset(x: 9, y: -1)
+            Circle().trim(from: 0.12, to: 0.38).stroke(Theme.ink, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .frame(width: 14, height: 14).rotationEffect(.degrees(30)).offset(y: 4)
+        }
+        .frame(width: 100, height: 100)
+        .accessibilityHidden(true)
+    }
 }

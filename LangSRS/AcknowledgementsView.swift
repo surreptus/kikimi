@@ -10,7 +10,7 @@ struct AcknowledgementsView: View {
             HStack {
                 Text("Acknowledgements").font(Theme.title(22))
                 Spacer()
-                Button("Done") { dismiss() }.buttonStyle(.chunky(compact: true)).keyboardShortcut(.defaultAction)
+                Button("Done") { dismiss() }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
             }
             .padding()
             List(items) { item in
@@ -23,8 +23,8 @@ struct AcknowledgementsView: View {
             }
         }
         .frame(width: 640, height: 520)
-        .background(Theme.background)
+        .background(Theme.page)
         .fontDesign(.rounded)
-        .tint(Theme.pink)
+        .tint(Theme.accent)
     }
 }

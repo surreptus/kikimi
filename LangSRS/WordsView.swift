@@ -48,7 +48,7 @@ struct WordsView: View {
                 bulkBar
             }
             if inspectorShown.wrappedValue {
-                Rectangle().fill(Theme.line).frame(width: 2)
+                Rectangle().fill(Theme.line).frame(width: 1)
                 inspector
                     .frame(width: 350)
                     .frame(maxHeight: .infinity)
@@ -75,17 +75,17 @@ struct WordsView: View {
             ScreenTitle(text: "Words", subtitle: "Pick words to learn, or mark the ones you already know.")
             HStack(spacing: 10) {
                 HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass").foregroundStyle(Theme.pink).font(.system(size: 14, weight: .bold))
+                    Image(systemName: "magnifyingglass").foregroundStyle(Theme.accent).font(.system(size: 14, weight: .bold))
                     TextField("Search words", text: searchBinding)
                         .textFieldStyle(.plain)
                         .font(.system(.body, design: .rounded))
                     if !search.isEmpty {
                         Button("Clear search", systemImage: "xmark.circle.fill") { search = "" }
-                            .labelStyle(.iconOnly).buttonStyle(.plain).foregroundStyle(.secondary)
+                            .labelStyle(.iconOnly).buttonStyle(.plain).foregroundStyle(Theme.muted)
                     }
                 }
                 .padding(.horizontal, 12).padding(.vertical, 9)
-                .background(RoundedRectangle(cornerRadius: 14).strokeBorder(Theme.line, lineWidth: 2))
+                .background(RoundedRectangle(cornerRadius: 14).strokeBorder(Theme.line, lineWidth: 1))
                 .frame(maxWidth: .infinity)
 
                 Menu {
@@ -99,7 +99,7 @@ struct WordsView: View {
                 } label: {
                     Label(filter?.rawValue.capitalized ?? "All", systemImage: "line.3.horizontal.decrease")
                 }
-                .menuStyle(.button).buttonStyle(.chunky(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+                .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
 
                 Menu("Select") {
                     Button("All \(rows.count) shown") { selection = Set(rows.map(\.id)) }
@@ -115,7 +115,7 @@ struct WordsView: View {
                         }
                     }
                 }
-                .menuStyle(.button).buttonStyle(.chunky(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+                .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
             }
         }
         .padding(.horizontal, Theme.screenPadding).padding(.top, Theme.screenPadding).padding(.bottom, 10)
@@ -129,11 +129,11 @@ struct WordsView: View {
                 Text(row.word.lemma).font(.headline)
             }
             TableColumn("Type", value: \.word.pos.rawValue) { row in
-                Text(row.word.pos.rawValue).foregroundStyle(.secondary)
+                Text(row.word.pos.rawValue).foregroundStyle(Theme.muted)
             }
             .width(min: 70, ideal: 90)
             TableColumn("Seen", value: \.occurrenceCount) { row in
-                Text("\(row.occurrenceCount)×").foregroundStyle(.secondary).monospacedDigit()
+                Text("\(row.occurrenceCount)×").foregroundStyle(Theme.muted).monospacedDigit()
             }
             .width(min: 50, ideal: 60)
             TableColumn("Status", value: \.statusOrder) { row in
@@ -142,7 +142,7 @@ struct WordsView: View {
             .width(min: 80, ideal: 100)
             TableColumn("Next review") { row in
                 if let due = row.word.nextReview {
-                    Text(due, format: .relative(presentation: .named)).foregroundStyle(.secondary)
+                    Text(due, format: .relative(presentation: .named)).foregroundStyle(Theme.muted)
                 }
             }
             .width(min: 90, ideal: 130)
@@ -167,8 +167,8 @@ struct WordsView: View {
     private var bulkBar: some View {
         HStack(spacing: 10) {
             Text(selection.isEmpty ? "\(rows.count) words" : "\(selection.count) of \(rows.count) selected")
-                .foregroundStyle(.secondary)
-            if let message { Text(message).font(.caption).foregroundStyle(.secondary).lineLimit(1) }
+                .foregroundStyle(Theme.muted)
+            if let message { Text(message).font(.caption).foregroundStyle(Theme.muted).lineLimit(1) }
             Spacer()
             Button("Reset") {
                 if selectedRows.contains(where: { $0.word.status == .learning || $0.word.status == .burned }) {
@@ -177,14 +177,14 @@ struct WordsView: View {
                     apply(.reset)
                 }
             }
-            .buttonStyle(.chunky(.secondary, compact: true))
-            Button("Mark known") { apply(.known) }.buttonStyle(.chunky(.secondary, compact: true))
-            Button("Start learning") { apply(.learn) }.buttonStyle(.chunky(compact: true))
+            .buttonStyle(.pill(.secondary, compact: true))
+            Button("Mark known") { apply(.known) }.buttonStyle(.pill(.secondary, compact: true))
+            Button("Start learning") { apply(.learn) }.buttonStyle(.pill(compact: true))
         }
         .disabled(selection.isEmpty)
         .padding(.horizontal, Theme.screenPadding).padding(.vertical, 12)
-        .background(Theme.pinkSoft.opacity(0.5))
-        .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 2) }
+        .background(Theme.soft.opacity(0.5))
+        .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 1) }
     }
 
     /// The words you meet most that you haven't touched yet: the best ones to start learning.
@@ -237,7 +237,7 @@ struct WordsView: View {
                     if count > 0 { HStack { StatusBadge(status: status); Text("\(count)") } }
                 }
                 Text("Use the buttons below the list to start learning, mark known, or reset them all at once.")
-                    .font(.callout).foregroundStyle(.secondary)
+                    .font(.callout).foregroundStyle(Theme.muted)
                 Spacer()
             }
             .padding()

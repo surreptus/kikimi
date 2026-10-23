@@ -16,11 +16,11 @@ struct WordDetail: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 header
-                if let exportMessage { Text(exportMessage).font(.caption).foregroundStyle(.secondary) }
+                if let exportMessage { Text(exportMessage).font(.caption).foregroundStyle(Theme.muted) }
 
                 Text("Dictionary").font(Theme.title(17))
                 if entries.isEmpty {
-                    Text("No entry found.").foregroundStyle(.secondary)
+                    Text("No entry found.").foregroundStyle(Theme.muted)
                 } else {
                     ForEach(entries) { EntryView(entry: $0, showsReading: app.profile.display.showsReadings) }
                 }
@@ -53,15 +53,15 @@ struct WordDetail: View {
                         Button("Export video clips…") { exportExamples(.video) }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .font(.system(size: 15, weight: .heavy))
+                            .font(.system(size: 15, weight: .medium))
                             .frame(width: 32, height: 28)
                     }
-                    .menuStyle(.button).buttonStyle(.chunky(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+                    .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
                     .help("Export this word's example sentences as clips")
                 }
             }
             if let stage = row.word.stage {
-                Text("Stage \(stage.rawValue) of 9").font(.caption).foregroundStyle(.secondary)
+                Text("Stage \(stage.rawValue) of 9").font(.caption).foregroundStyle(Theme.muted)
             }
         }
     }
@@ -71,20 +71,20 @@ struct WordDetail: View {
         return HStack(alignment: .top, spacing: 10) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(line.text).font(.system(.body, design: .rounded)).textSelection(.enabled)
-                Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(.caption).foregroundStyle(.secondary)
+                Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(.caption).foregroundStyle(Theme.muted)
             }
             Spacer(minLength: 6)
             Button(isPlaying ? "Stop" : "Hear this line", systemImage: isPlaying ? "stop.fill" : "speaker.wave.2.fill") {
                 togglePlayback(line)
             }
-            .buttonStyle(.chunky(isPlaying ? .primary : .secondary, compact: true))
+            .buttonStyle(.pill(isPlaying ? .primary : .secondary, compact: true))
             .labelStyle(.iconOnly)
             .help("Play this sentence's audio from your video, right here")
             Button("Open in video", systemImage: "play.rectangle.fill") {
                 audio?.stop()
                 app.openVideo(id: line.videoID, at: line.startTime)
             }
-            .buttonStyle(.chunky(.secondary, compact: true))
+            .buttonStyle(.pill(.secondary, compact: true))
             .labelStyle(.iconOnly)
             .help("Open the video at this moment")
         }
@@ -136,7 +136,7 @@ struct EntryView: View {
             HStack(spacing: 6) {
                 Text(entry.headword).font(.headline)
                 if showsReading, let reading = entry.reading, reading != entry.headword {
-                    Text(reading).foregroundStyle(.secondary)
+                    Text(reading).foregroundStyle(Theme.muted)
                 }
             }
             Text(entry.gloss).font(.callout).textSelection(.enabled)

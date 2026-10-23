@@ -48,8 +48,8 @@ struct SubtitleRow: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
             Text(stamp(line.startTime))
-                .font(.system(size: 11, weight: .heavy, design: .rounded).monospacedDigit())
-                .foregroundStyle(active ? Theme.pinkText : .secondary)
+                .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
+                .foregroundStyle(active ? Theme.ink : .secondary)
             if segments.isEmpty {
                 Text(line.text).font(.system(.body, design: .rounded, weight: active ? .semibold : .regular))
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -62,8 +62,8 @@ struct SubtitleRow: View {
         }
         .padding(.horizontal, 12).padding(.vertical, 9)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 14).fill(active ? Theme.pinkSoft : .clear))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(active ? Theme.pink : Theme.line.opacity(0.7), lineWidth: 2))
+        .background(RoundedRectangle(cornerRadius: 14).fill(active ? Theme.soft : .clear))
+        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(active ? Theme.accent : Theme.line.opacity(0.7), lineWidth: 1))
         .contentShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture(perform: seek)
         .onHover { rowHovered = $0 }
@@ -85,8 +85,8 @@ struct SubtitleRow: View {
             if reservesRuby {
                 // Always reserved, so showing furigana on hover never moves the text.
                 Text(chunk.token?.reading ?? " ")
-                    .font(.system(size: 9, weight: .heavy, design: .rounded))
-                    .foregroundStyle(Theme.pinkText)
+                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .foregroundStyle(Theme.ink)
                     .opacity(rowHovered && chunk.token?.reading != nil ? 1 : 0)
             }
             HStack(spacing: 0) {
@@ -94,7 +94,7 @@ struct SubtitleRow: View {
                     .underline(status(of: chunk.token) == .learning, pattern: .dot, color: Theme.orange)
                     .font(.system(.body, design: .rounded, weight: active ? .semibold : .regular))
                     // The highlight is slightly wider than the word, but takes no layout space (no gaps in Japanese).
-                    .background(RoundedRectangle(cornerRadius: 5).fill(isHovered ? Theme.pink.opacity(0.22) : tint(for: chunk.token)).padding(.horizontal, -1))
+                    .background(RoundedRectangle(cornerRadius: 5).fill(isHovered ? Theme.accent.opacity(0.22) : tint(for: chunk.token)).padding(.horizontal, -1))
                 if !chunk.trailing.isEmpty {
                     Text(chunk.trailing).font(.system(.body, design: .rounded, weight: active ? .semibold : .regular))
                 }
