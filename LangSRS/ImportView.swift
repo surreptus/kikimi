@@ -159,6 +159,10 @@ struct ImportView: View {
                             .lineLimit(1).truncationMode(.middle)
                         Spacer()
                         StatusPill(text: statusText(job), color: statusColor(job.status))
+                        if canCancel(job.status) {
+                            Button("Cancel") { queue.cancel(job.id) }.buttonStyle(.chunky(.secondary, compact: true))
+                                .help("Stop this import. Your original file is untouched.")
+                        }
                     }
                     if case .running(_, let fraction) = job.status {
                         ProgressView(value: fraction).progressViewStyle(.duo)
@@ -193,6 +197,7 @@ struct ImportView: View {
                 .buttonStyle(.chunky(compact: true))
                 Button("Import as \(job.profile.displayName) anyway") { queue.importAnyway(job.id) }
                     .buttonStyle(.chunky(.secondary, compact: true))
+                Button("Cancel") { queue.cancel(job.id) }.buttonStyle(.chunky(.secondary, compact: true))
             }
         }
         .padding(12)
@@ -206,7 +211,17 @@ struct ImportView: View {
         case .imported: "Imported · \(job.profile.displayName)"
         case .duplicate: "Already in library"
         case .languageMismatch: "Check language"
+        case .cancelling: "Cancelling…"
+        case .cancelled: "Cancelled"
         case .failed: "Failed"
+        }
+    }
+
+    /// Waiting or running jobs can be cancelled; one already cancelling can't be asked twice.
+    private func canCancel(_ status: ImportQueue.Status) -> Bool {
+        switch status {
+        case .queued, .running: true
+        default: false
         }
     }
 
@@ -214,7 +229,7 @@ struct ImportView: View {
         switch status {
         case .imported: Theme.green
         case .failed: Theme.red
-        case .languageMismatch: Theme.orange
+        case .languageMismatch, .cancelling: Theme.orange
         case .running: Theme.pinkText
         default: .secondary
         }

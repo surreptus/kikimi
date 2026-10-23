@@ -36,6 +36,9 @@ public final class ImportQueue {
         case duplicate
         /// Stopped before transcribing: the audio sounds like another supported language (that profile's code).
         case languageMismatch(detected: String)
+        /// Cancel was pressed on a running import; it stops at the next safe point.
+        case cancelling
+        case cancelled
         case failed(String)
     }
 
@@ -50,10 +53,11 @@ public final class ImportQueue {
     }
 
     public private(set) var jobs: [Job] = []
-    public var isBusy: Bool { jobs.contains { $0.status == .queued || isRunning($0.status) } }
+    public var isBusy: Bool { jobs.contains { $0.status == .queued || $0.status == .cancelling || isRunning($0.status) } }
 
     private let pipeline: ImportPipeline
     private var worker: Task<Void, Never>?
+    private var currentImport: Task<Video, Error>?
 
     public init(pipeline: ImportPipeline) { self.pipeline = pipeline }
 
@@ -79,12 +83,27 @@ public final class ImportQueue {
         kick()
     }
 
+    /// Cancels a waiting job immediately, or a running one at its next safe point. A cancelled import leaves your
+    /// original untouched and removes everything it created.
+    public func cancel(_ id: UUID) {
+        guard let index = jobs.firstIndex(where: { $0.id == id }) else { return }
+        switch jobs[index].status {
+        case .queued, .languageMismatch:
+            jobs[index].status = .cancelled
+        case .running:
+            jobs[index].status = .cancelling
+            currentImport?.cancel()
+        default:
+            break
+        }
+    }
+
     private func kick() {
         if worker == nil { worker = Task { await drain() } }
     }
 
     public func clearFinished() {
-        jobs.removeAll { $0.status != .queued && !isRunning($0.status) }
+        jobs.removeAll { $0.status != .queued && $0.status != .cancelling && !isRunning($0.status) }
     }
 
     /// Returns once every queued job has finished.
@@ -99,18 +118,29 @@ public final class ImportQueue {
         while let index = jobs.firstIndex(where: { $0.status == .queued }) {
             let job = jobs[index]
             set(job.id, .running(.hashing, 0))
-            do {
-                _ = try await pipeline.importVideo(
-                    from: job.url, profile: job.profile, model: job.model, checkLanguage: !job.skipsLanguageCheck) { [weak self] p in
-                    Task { @MainActor in self?.set(job.id, .running(p.stage, p.fraction)) }
-                }
+            let update: @Sendable (ImportProgress) -> Void = { [weak self] p in
+                Task { @MainActor in self?.set(job.id, .running(p.stage, p.fraction)) }
+            }
+            let work = Task { [pipeline] in
+                try await pipeline.importVideo(
+                    from: job.url, profile: job.profile, model: job.model,
+                    checkLanguage: !job.skipsLanguageCheck, progress: update)
+            }
+            currentImport = work
+            // A cancel may have arrived between marking the job running and starting the task.
+            if case .cancelling = jobs.first(where: { $0.id == job.id })?.status { work.cancel() }
+            let result = await work.result
+            currentImport = nil
+            switch result {
+            case .success:
                 set(job.id, .imported)
-            } catch ImportError.duplicate {
-                set(job.id, .duplicate)
-            } catch ImportError.languageMismatch(let detected, _, _) {
-                set(job.id, .languageMismatch(detected: detected))
-            } catch {
-                set(job.id, .failed(error.localizedDescription))
+            case .failure(let error):
+                switch error {
+                case is CancellationError: set(job.id, .cancelled)
+                case ImportError.duplicate: set(job.id, .duplicate)
+                case ImportError.languageMismatch(let detected, _, _): set(job.id, .languageMismatch(detected: detected))
+                default: set(job.id, .failed(error.localizedDescription))
+                }
             }
         }
         worker = nil

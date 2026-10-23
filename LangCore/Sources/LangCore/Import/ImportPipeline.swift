@@ -12,6 +12,11 @@ public actor ImportPipeline {
     /// How sure Whisper must be before the import is stopped for a language check.
     static let languageConfidence = 0.6
 
+    /// A cancel that lands inside a step stays a cancellation instead of being reported as that step failing.
+    private static func wrapped(_ error: Error, _ make: (Error) -> ImportError) -> Error {
+        error is CancellationError || Task.isCancelled ? CancellationError() : make(error)
+    }
+
     public init(
         database: LangDatabase, root: URL, transcriber: any Transcriber,
         transcoder: any MediaTranscoder = AVFoundationTranscoder()
@@ -58,7 +63,9 @@ public actor ImportPipeline {
                 try fm.copyItem(at: original, to: staged)
                 let sizes = try [original, staged].map { try fm.attributesOfItem(atPath: $0.path)[.size] as? UInt64 }
                 guard sizes[0] == sizes[1] else { throw CocoaError(.fileReadCorruptFile) }
-            } catch { throw ImportError.copyFailed(error) }
+            } catch { throw Self.wrapped(error, ImportError.copyFailed) }
+
+            try Task.checkCancellation()
 
             // Importing a Japanese video as Spanish would produce nonsense words, so check the spoken language first.
             // Detection is only advice: if it fails or is unsure, the import carries on as chosen.
@@ -71,6 +78,8 @@ public actor ImportPipeline {
                 }
             }
 
+            try Task.checkCancellation()
+
             // 2. Transcribe. Failing here has changed nothing.
             let segments: [TranscriptSegment]
             progress(ImportProgress(stage: .transcribing, fraction: 0))
@@ -78,7 +87,9 @@ public actor ImportPipeline {
                 segments = try await transcriber.transcribe(
                     mediaURL: staged, whisperCode: profile.whisperCode, model: model ?? profile.defaultModel,
                     progress: { progress(ImportProgress(stage: .transcribing, fraction: $0)) })
-            } catch { throw ImportError.transcriptionFailed(error) }
+            } catch { throw Self.wrapped(error, ImportError.transcriptionFailed) }
+
+            try Task.checkCancellation()
 
             // 3. Re-encode to a temp file.
             let out = work.appending(path: "out", directoryHint: .isDirectory)
@@ -89,7 +100,9 @@ public actor ImportPipeline {
                 try await transcoder.compactVideo(
                     source: staged, destination: videoOut,
                     progress: { progress(ImportProgress(stage: .transcoding, fraction: $0)) })
-            } catch { throw ImportError.transcodeFailed(error) }
+            } catch { throw Self.wrapped(error, ImportError.transcodeFailed) }
+
+            try Task.checkCancellation()
 
             // 4. Verify the output against the staged source.
             progress(ImportProgress(stage: .verifying, fraction: 0))
@@ -98,10 +111,15 @@ public actor ImportPipeline {
             catch { throw ImportError.verificationFailed("source unreadable: \(error)") }
             try await MediaVerifier.verify(output: videoOut, expectedDuration: duration)
 
+            try Task.checkCancellation()
+
             // 5. Compact audio track.
             progress(ImportProgress(stage: .extractingAudio, fraction: 0))
             do { try await transcoder.extractAAC(source: staged, destination: audioOut) }
-            catch { throw ImportError.audioExportFailed(error) }
+            catch { throw Self.wrapped(error, ImportError.audioExportFailed) }
+
+            // The last point where a cancel is honoured: after this the video is moved in and saved as one unit.
+            try Task.checkCancellation()
 
             // 6. Atomic move into the library (one directory rename), then one DB transaction.
             progress(ImportProgress(stage: .saving, fraction: 0))
@@ -119,7 +137,7 @@ public actor ImportPipeline {
                 duration: duration)
             let saved: Video
             do { saved = try await database.saveImport(video: video, subtitles: analysed) }
-            catch { throw ImportError.databaseFailed(error) }
+            catch { throw Self.wrapped(error, ImportError.databaseFailed) }
 
             // 7. Only now drop the staged copy. Failure to delete it must not fail a committed import.
             try? fm.removeItem(at: work)
