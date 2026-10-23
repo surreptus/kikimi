@@ -222,6 +222,9 @@ struct Blob: View {
             Circle().trim(from: 0.12, to: 0.38).stroke(Self.face, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .frame(width: 14, height: 14).rotationEffect(.degrees(30)).offset(y: 4)
         }
+        // One flat layer, so a fade applies to the whole flower; otherwise each overlapping circle fades on its own
+        // and the seams show.
+        .compositingGroup()
         .frame(width: 100, height: 100)
         .accessibilityHidden(true)
     }
