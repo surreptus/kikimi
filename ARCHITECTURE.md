@@ -31,6 +31,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `SRS/`, `Review/` | The nine review stages and their intervals; review sessions and sentence audio. |
 | `Playback/` | The player controller, subtitle timeline and word hints. |
 | `Export/` | Audio and video clip export. |
+| `Coverage/` | How much of a video you know (`VideoCoverage`, `LevelFit`), the shortest word list that reaches a target (`wordsToReach`), and marking a list of known words. |
 | `Backup/` | `ProgressBackup`: the `.reprise` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. |
 | `Environment/` | `LangEnvironment` and where videos live on disk. |
 
