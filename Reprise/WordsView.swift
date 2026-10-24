@@ -26,7 +26,7 @@ struct WordsView: View {
     @State private var message: String?
 
     private struct LoadKey: Equatable {
-        let language: String, search: String, filter: WordStatus?, version: Int
+        let language: String, search: String, filter: WordStatus?, type: PartOfSpeech?, version: Int
     }
 
     // Search, filter and selection live in AppState so they survive a trip to the video and back.
@@ -35,6 +35,18 @@ struct WordsView: View {
     private var selection: Set<Int64> { get { app.wordsSelection } nonmutating set { app.wordsSelection = newValue } }
     private var searchBinding: Binding<String> { Binding(get: { app.wordsSearch }, set: { app.wordsSearch = $0 }) }
     private var filterBinding: Binding<WordStatus?> { Binding(get: { app.wordsFilter }, set: { app.wordsFilter = $0 }) }
+    private var typeFilter: PartOfSpeech? { app.wordsTypeFilter }
+    private var typeBinding: Binding<PartOfSpeech?> { Binding(get: { app.wordsTypeFilter }, set: { app.wordsTypeFilter = $0 }) }
+    /// The types of word this language keeps (nouns, verbs...), in a fixed order. Particles and other small words
+    /// aren't kept, so they aren't offered.
+    private var typeChoices: [PartOfSpeech] {
+        [.noun, .verb, .adjective, .adverb, .other].filter { app.profile.contentPOS.contains($0) }
+    }
+    /// What the filter button says: "All", or what is narrowing the list.
+    private var filterSummary: String {
+        let parts = [filter?.rawValue.capitalized, typeFilter?.rawValue.capitalized].compactMap { $0 }
+        return parts.isEmpty ? "All" : parts.joined(separator: " · ")
+    }
     private var selectionBinding: Binding<Set<Int64>> { Binding(get: { app.wordsSelection }, set: { app.wordsSelection = $0 }) }
 
     private var sortedRows: [WordRow] { rows.sorted(using: sort.comparators) }
@@ -57,7 +69,7 @@ struct WordsView: View {
             }
         }
         .animation(.easeOut(duration: 0.18), value: inspectorShown.wrappedValue)
-        .task(id: LoadKey(language: app.languageCode, search: search, filter: filter, version: app.dataVersion)) {
+        .task(id: LoadKey(language: app.languageCode, search: search, filter: filter, type: typeFilter, version: app.dataVersion)) {
             await load()
         }
         .onChange(of: app.languageCode) { selection = [] }
@@ -114,8 +126,13 @@ struct WordsView: View {
                         }
                     }
                     .pickerStyle(.inline)
+                    Picker("Type", selection: typeBinding) {
+                        Text("All types").tag(PartOfSpeech?.none)
+                        ForEach(typeChoices, id: \.self) { Text($0.rawValue.capitalized).tag(PartOfSpeech?.some($0)) }
+                    }
+                    .pickerStyle(.inline)
                 } label: {
-                    Label(filter?.rawValue.capitalized ?? "All", systemImage: "line.3.horizontal.decrease")
+                    Label(filterSummary, systemImage: "line.3.horizontal.decrease")
                 }
                 .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
 
@@ -146,7 +163,7 @@ struct WordsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
             if rows.isEmpty {
-                if trimmedSearch.isEmpty && filter == nil {
+                if trimmedSearch.isEmpty && filter == nil && typeFilter == nil {
                     EmptyState(title: "No words yet", message: "Add a video on the Videos page to collect words.", illustration: .bubble)
                 } else {
                     EmptyState(title: "No matches", message: "Try a different search or status.")
@@ -252,7 +269,7 @@ struct WordsView: View {
     // MARK: Loading
 
     private func load() async {
-        rows = await env.searchWords(search, profile: app.profile, status: filter)
+        rows = await env.searchWords(search, profile: app.profile, status: filter, pos: typeFilter)
         selection.formIntersection(rows.map(\.id))
         dictionaryHits = trimmedSearch.isEmpty
             ? [] : await env.lookupWord(trimmedSearch, profile: app.profile, limit: 5)

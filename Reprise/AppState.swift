@@ -42,6 +42,7 @@ final class AppState {
     // The Words page keeps its search, filter and selection while you watch a video and come back.
     var wordsSearch = ""
     var wordsFilter: WordStatus?
+    var wordsTypeFilter: PartOfSpeech?
     var wordsSelection = Set<Int64>()
     private(set) var importQueue: ImportQueue?
     /// Words due for review in the selected language.
