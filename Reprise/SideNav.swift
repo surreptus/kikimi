@@ -4,6 +4,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
     case videos = "Videos"
     case words = "Words"
     case review = "Review"
+    case settings = "Settings"
 
     var id: String { rawValue }
 
@@ -15,6 +16,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
         case .videos: "film.stack.fill"
         case .words: "text.book.closed.fill"
         case .review: "rectangle.stack.fill"
+        case .settings: "gearshape.fill"
         }
     }
 }
@@ -26,7 +28,6 @@ struct SideNav: View {
     var languages: [(code: String, name: String)]
     @Binding var language: String
     var showAbout: () -> Void
-    var showSettings: () -> Void
     @Namespace private var pill
 
     var body: some View {
@@ -36,11 +37,14 @@ struct SideNav: View {
                 .padding(.horizontal, 12)
                 .padding(.top, 30)   // clears the window's traffic-light buttons
 
-            ForEach(SidebarItem.allCases) { item in
+            // The pages you study with, then Settings by itself at the bottom.
+            ForEach(SidebarItem.allCases.filter { $0 != .settings }) { item in
                 navRow(item)
             }
 
             Spacer(minLength: 16)
+
+            navRow(.settings)
 
             Menu {
                 ForEach(languages, id: \.code) { entry in
@@ -62,10 +66,7 @@ struct SideNav: View {
             .buttonStyle(.plain)
             .menuIndicator(.hidden)
 
-            HStack(spacing: 12) {
-                Button("Settings", action: showSettings)
-                Button("How it works", action: showAbout)
-            }
+            Button("How it works", action: showAbout)
             .buttonStyle(.plain)
             .font(.system(size: 12, design: .rounded))
             .foregroundStyle(Theme.muted)

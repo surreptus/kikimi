@@ -21,15 +21,16 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     }
 }
 
-/// Settings (⌘,), a panel over the main window: a list of tabs on the left and the chosen one on the right.
-/// Everything here changes the same stored values the rest of the app uses, so the two places never disagree.
+/// Settings (⌘,): a page in the sidebar like the others, with a row of tabs across the top and the chosen tab's
+/// content below. Everything here changes the same stored values the rest of the app uses, so the two places never
+/// disagree.
 struct SettingsView: View {
     @Environment(AppState.self) private var app
-    @Environment(\.dismissModal) private var dismiss
 
     var body: some View {
-        HStack(spacing: 0) {
-            sidebar
+        VStack(alignment: .leading, spacing: 18) {
+            ScreenTitle(text: "Settings", subtitle: "How Reprise looks, works and keeps your data.")
+            tabBar
             Group {
                 if case .ready(let env) = app.phase {
                     switch app.settingsTab {
@@ -42,61 +43,36 @@ struct SettingsView: View {
                     ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(width: 760, height: 540)
-        .background(Theme.field)
-        .tint(Theme.ink)
-        .fontDesign(.rounded)
+        .padding(Theme.screenPadding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
-    private var sidebar: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Settings").font(Theme.title(20)).foregroundStyle(Theme.ink)
-                .padding(.horizontal, 12).padding(.top, 10).padding(.bottom, 14)
+    /// The sub-tabs: the chosen one is the solid pill, the others are quiet.
+    private var tabBar: some View {
+        HStack(spacing: 8) {
             ForEach(SettingsTab.allCases) { tab in
-                Button { app.settingsTab = tab } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: tab.symbol).font(.system(size: 15, weight: .medium)).frame(width: 22)
-                        Text(tab.rawValue).font(.system(size: 15, weight: .medium, design: .rounded))
-                        Spacer()
-                    }
-                    .foregroundStyle(Theme.ink)
-                    .padding(.horizontal, 12).padding(.vertical, 10)
-                    .background(RoundedRectangle(cornerRadius: 14).fill(app.settingsTab == tab ? Theme.softStrong : .clear))
-                    .contentShape(RoundedRectangle(cornerRadius: 14))
-                }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(app.settingsTab == tab ? .isSelected : [])
+                Button(tab.rawValue) { app.settingsTab = tab }
+                    .buttonStyle(.pill(app.settingsTab == tab ? .primary : .secondary, compact: true))
+                    .fixedSize()   // otherwise "Languages" is cut short
+                    .accessibilityAddTraits(app.settingsTab == tab ? .isSelected : [])
             }
-            Spacer()
-            Button("Done") { dismiss() }
-                .buttonStyle(.pill(compact: true))
-                .keyboardShortcut(.defaultAction)
-                .padding(.horizontal, 6)
         }
-        .padding(14)
-        .frame(width: 200)
-        .frame(maxHeight: .infinity)
-        .background(Theme.rail)
     }
 }
 
 // MARK: Page building blocks
 
-/// A tab's page: a title, then its groups.
+/// A tab's content: its groups, scrolling, at a width that is comfortable to read.
 private struct SettingsPage<Content: View>: View {
-    let title: String
     @ViewBuilder let content: Content
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
-                Text(title).font(Theme.title(30)).foregroundStyle(Theme.ink)
-                content
-            }
-            .padding(28)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading, spacing: 22) { content }
+                .frame(maxWidth: 680, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 20)
         }
     }
 }
@@ -124,7 +100,7 @@ private struct GeneralTab: View {
     @AppStorage(Appearance.key) private var appearance = Appearance.system
 
     var body: some View {
-        SettingsPage(title: "General") {
+        SettingsPage {
             SettingsGroup(title: "Appearance", note: "Match system follows your Mac's Light or Dark setting.") {
                 Picker("Appearance", selection: $appearance) {
                     ForEach(Appearance.allCases, id: \.self) { Text($0.title).tag($0) }
@@ -146,7 +122,7 @@ private struct LanguagesTab: View {
     @State private var refresh = 0
 
     var body: some View {
-        SettingsPage(title: "Languages") {
+        SettingsPage {
             Text("A model downloads once, from the Videos page, the first time you need it. The model applies to videos you add from now on; videos already added keep their transcripts.")
                 .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
             ForEach(LanguageProfiles.all, id: \.code) { profile in
@@ -204,7 +180,7 @@ private struct DataTab: View {
 
     var body: some View {
         @Bindable var backup = app.backup
-        SettingsPage(title: "Data") {
+        SettingsPage {
             SettingsGroup(
                 title: "Back up your progress",
                 note: "Saves the words you are learning and the ones you know, with their stages and review dates, to a file. It doesn't include videos or speech models.") {
@@ -228,7 +204,6 @@ private struct DataTab: View {
 
             SettingsGroup(title: "Storage", note: "Speech models and your saved videos are kept on this Mac.") {
                 Button("Manage storage…") {
-                    app.showSettings = false
                     app.showStorage = true
                 }
                 .buttonStyle(.pill(.secondary, compact: true))
@@ -355,7 +330,7 @@ private struct AboutTab: View {
     }
 
     var body: some View {
-        SettingsPage(title: "About") {
+        SettingsPage {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Reprise").font(Theme.title(24)).foregroundStyle(Theme.ink)
                 Text(version).font(Theme.small).foregroundStyle(Theme.muted)
@@ -377,12 +352,9 @@ private struct AboutTab: View {
         }
     }
 
-    /// Opens one of the other panels, closing Settings first so they aren't stacked.
+    /// Opens one of the other panels.
     private func link(_ title: String, _ open: @escaping () -> Void) -> some View {
-        Button(title) {
-            app.showSettings = false
-            open()
-        }
+        Button(title) { open() }
         .buttonStyle(.pill(.secondary, compact: true))
     }
 }

@@ -23,7 +23,6 @@ final class AppState {
     var showPrivacy = false
     var showStorage = false
     var showAcknowledgements = false
-    var showSettings = false
     /// Saving and restoring progress; shared so the File menu, the Settings window and a double-clicked file all use it.
     let backup = BackupModel()
     /// Which tab the Settings window shows; set before opening it to land on one.
@@ -80,10 +79,10 @@ final class AppState {
         }
     }
 
-    /// Opens the Settings panel on a tab.
+    /// Goes to the Settings page, on a tab.
     func openSettings(_ tab: SettingsTab) {
         settingsTab = tab
-        showSettings = true
+        select(.settings)
     }
 
     /// A `.reprise` file opened from Finder or dropped on the Dock icon: show what it would restore.
