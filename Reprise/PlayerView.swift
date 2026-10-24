@@ -22,6 +22,10 @@ struct PlayerView: View {
     @State private var lingerToken: Token?
     @State private var barHovered = false
     @State private var lingerTask: Task<Void, Never>?
+    /// Where the transcript and meaning bar are in the window, and the mouse watcher that uses it: a click anywhere
+    /// outside them lets go of a pinned word.
+    @State private var panelFrame: CGRect = .zero
+    @State private var clickMonitor: Any?
     /// Status of every word in this video, so learning and known words can be tinted in the subtitles.
     @State private var statuses: [WordKey: WordStatus] = [:]
     @AppStorage("highlightWords") private var highlightWords = true
@@ -61,7 +65,22 @@ struct PlayerView: View {
                 lingerToken = nil
             }
         }
-        .onDisappear { controller?.stop() }
+        .onAppear { installClickMonitor() }
+        .onDisappear {
+            controller?.stop()
+            if let clickMonitor { NSEvent.removeMonitor(clickMonitor) }
+            clickMonitor = nil
+        }
+    }
+
+    private func installClickMonitor() {
+        guard clickMonitor == nil else { return }
+        clickMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { event in
+            if pinnedToken != nil, panelFrame != .zero, !panelFrame.contains(event.locationInWindow) {
+                pinnedToken = nil
+            }
+            return event   // the click carries on to whatever was clicked
+        }
     }
 
     private func refreshHint(announce: Bool = false) async {
@@ -94,7 +113,6 @@ struct PlayerView: View {
                 .help("Back to \(backTitle)")
             Text("Back to \(backTitle)").font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(Theme.muted)
             Spacer()
-            Text(video.title).font(.system(.callout, design: .rounded, weight: .semibold)).lineLimit(1).foregroundStyle(Theme.muted)
         }
         .padding(.horizontal, 20).padding(.top, 16)
     }
@@ -125,6 +143,7 @@ struct PlayerView: View {
             Rectangle().fill(Theme.line).frame(width: 1)
 
             VStack(spacing: 0) {
+                titleBar
                 legendBar
                 subtitleList(controller)
                 hintBar
@@ -134,6 +153,7 @@ struct PlayerView: View {
                 }
             }
             .frame(minWidth: 320, idealWidth: 400, maxWidth: 480)
+            .background(WindowFrameReader { panelFrame = $0 })
         }
     }
 
@@ -160,6 +180,17 @@ struct PlayerView: View {
             .help("Playback speed")
         }
         .labelStyle(.iconOnly)
+    }
+
+    /// The video's title, at the top of the transcript panel, left-aligned.
+    private var titleBar: some View {
+        Text(video.title)
+            .font(Theme.title(17))
+            .lineLimit(2)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16).padding(.top, 16).padding(.bottom, 6)
+            .accessibilityAddTraits(.isHeader)
     }
 
     /// What the tints mean, and one switch for them. Two states only: a burned word is simply a known one.
@@ -224,9 +255,8 @@ struct PlayerView: View {
                         Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
                     }
                     StatusPill(text: token.pos.rawValue)
-                    SpeakButton(text: hint?.reading ?? token.reading ?? hint?.lemma ?? token.lemma,
-                                languageCode: profile?.whisperCode ?? video.language, shortcut: "s")
-                    if let status = hint?.status {
+                    // A new word needs no badge: Learn and Known beside it already say it is new.
+                    if let status = hint?.status, status != .new {
                         StatusBadge(status: status, stage: hint?.stage)
                     }
                     Spacer()
@@ -242,16 +272,11 @@ struct PlayerView: View {
                                 .help("Mark this word as known (K)")
                         }
                     }
-                    if pinnedToken != nil {
-                        Button("Unpin", systemImage: "pin.slash") { pinnedToken = nil }
-                            .labelStyle(.iconOnly).buttonStyle(.pill(.secondary, compact: true))
-                            .help("Stop keeping this word here (Esc)")
-                    }
                 }
                 Text(hint?.gloss ?? "No dictionary entry").font(.system(.callout, design: .rounded)).lineLimit(2)
                     .foregroundStyle(hint?.gloss == nil ? Theme.muted : Theme.ink)
             } else {
-                Text("Hover a word to see what it means. Click it to keep it here, or use the arrow keys and Return.")
+                Text("Hover a word to see what it means. Click it to keep it here, and click anywhere else to let go.")
                     .font(.system(.callout, design: .rounded)).foregroundStyle(Theme.faint)
             }
         }
