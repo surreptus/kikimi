@@ -18,9 +18,9 @@ extension Color {
 /// The look of the app: one flat field of colour (mint), text is near-black (or near-white in dark mode),
 /// and the one action that matters on a screen is a solid pill. The accent is the ink; nothing is decorative.
 enum Theme {
-    static let ink = Color(light: Color(hex: 0x121212), dark: Color(hex: 0xF4F1EA))
-    static let muted = Color(light: Color(hex: 0x3F3F3F), dark: Color(hex: 0xD6D4CE))
-    static let faint = Color(light: Color(hex: 0x3F3F3F), dark: Color(hex: 0xD3D1CB))
+    static let ink = Color(light: Color(hex: 0x153A0B), dark: Color(hex: 0xF4F1EA))
+    static let muted = Color(light: Color(hex: 0x1C4612), dark: Color(hex: 0xD6D4CE))
+    static let faint = Color(light: Color(hex: 0x1C4612), dark: Color(hex: 0xD3D1CB))
     /// The accent is the ink itself: the main button, selected rows and the due badge are solid ink, so the only
     /// colour in the app is the field.
     static let accent = ink
