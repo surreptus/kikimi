@@ -152,7 +152,6 @@ struct ImportSection: View {
 
     private var dropZone: some View {
         VStack(spacing: 12) {
-            Image(systemName: "film.fill").font(.system(size: 44, weight: .bold)).foregroundStyle(Theme.ink)
             Text(canImport ? "Drop \(app.profile.displayName) videos here" : "Download the speech model to start importing")
                 .font(Theme.title(20))
             Text("Importing as \(app.profile.displayName). Change the language in the sidebar.")

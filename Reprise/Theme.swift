@@ -207,8 +207,6 @@ struct ScreenShift: ViewModifier {
 
 /// The one character in the app: a flat flower with a small smile. Used only where something is finished or empty.
 struct Blob: View {
-    /// Near-black in both modes: the flower is light in both, so the face must not follow the ink.
-    private static let face = Color(hex: 0x121212)
     var color: Color = Color(light: .white, dark: Color(hex: 0xF4F1EA))
 
     var body: some View {
@@ -217,10 +215,7 @@ struct Blob: View {
                 Circle().fill(color).frame(width: 30, height: 30).offset(y: -22).rotationEffect(.degrees(Double(i) * 72))
             }
             Circle().fill(color).frame(width: 52, height: 52)
-            Circle().fill(Self.face).frame(width: 6, height: 6).offset(x: -9, y: -1)
-            Circle().fill(Self.face).frame(width: 6, height: 6).offset(x: 9, y: -1)
-            Circle().trim(from: 0.12, to: 0.38).stroke(Self.face, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                .frame(width: 14, height: 14).rotationEffect(.degrees(30)).offset(y: 4)
+            MascotFace(y: -2, mood: .content)
         }
         // One flat layer, so a fade applies to the whole flower; otherwise each overlapping circle fades on its own
         // and the seams show.
@@ -230,21 +225,60 @@ struct Blob: View {
     }
 }
 
-/// What the illustrations share: a light body and a near-black face in both modes, so neither follows the ink.
+/// What the illustrations share: a light body, features in a deep green (the app's own colour, not black), and a
+/// blush. None of them follows the ink, so they look the same in both modes.
 private enum Mascot {
-    static let face = Color(hex: 0x121212)
+    static let face = Color(light: Color(hex: 0x1E5A0B), dark: Color(hex: 0x124632))
     static let paper = Color(light: .white, dark: Color(hex: 0xF4F1EA))
+    static let blush = Color(hex: 0xFF8FA3).opacity(0.75)
 }
 
-/// Two eyes and a small smile, centred `y` points from the middle.
+/// How a character looks: each empty state has its own, so they aren't one face repeated.
+private enum Mood {
+    case smile      // two dots and a small smile
+    case content    // eyes closed, happy: at rest after finishing
+    case grin       // wide eyes, open smile: eager, for something about to start
+    case chatty     // a small round mouth: about to say something
+}
+
+/// A face, centred `y` points from the middle.
 private struct MascotFace: View {
     var y: CGFloat
+    var mood: Mood = .smile
+
     var body: some View {
         ZStack {
-            Circle().fill(Mascot.face).frame(width: 6, height: 6).offset(x: -9, y: y)
-            Circle().fill(Mascot.face).frame(width: 6, height: 6).offset(x: 9, y: y)
+            Circle().fill(Mascot.blush).frame(width: 8, height: 8).offset(x: -17, y: y + 6)
+            Circle().fill(Mascot.blush).frame(width: 8, height: 8).offset(x: 17, y: y + 6)
+            eyes
+            mouth
+        }
+    }
+
+    @ViewBuilder private var eyes: some View {
+        switch mood {
+        case .content:
+            // Closed, happy arches.
+            ForEach([-9.0, 9.0], id: \.self) { x in
+                Circle().trim(from: 0.5, to: 1).stroke(Mascot.face, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                    .frame(width: 8, height: 8).offset(x: x, y: y + 2)
+            }
+        default:
+            let size: CGFloat = mood == .grin ? 7.5 : 6
+            Circle().fill(Mascot.face).frame(width: size, height: size).offset(x: -9, y: y)
+            Circle().fill(Mascot.face).frame(width: size, height: size).offset(x: 9, y: y)
+        }
+    }
+
+    @ViewBuilder private var mouth: some View {
+        switch mood {
+        case .smile, .content:
             Circle().trim(from: 0.12, to: 0.38).stroke(Mascot.face, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .frame(width: 14, height: 14).rotationEffect(.degrees(30)).offset(y: y + 7)
+        case .grin:
+            Circle().trim(from: 0, to: 0.5).fill(Mascot.face).frame(width: 14, height: 14).offset(y: y + 5)
+        case .chatty:
+            Circle().strokeBorder(Mascot.face, lineWidth: 2).frame(width: 8, height: 8).offset(y: y + 9)
         }
     }
 }
@@ -263,7 +297,7 @@ struct Clapperboard: View {
                 .frame(width: 70, height: 16).clipShape(RoundedRectangle(cornerRadius: 5)).offset(x: -3)
             }
             .rotationEffect(.degrees(-9), anchor: .bottomLeading).offset(y: -18)
-            MascotFace(y: 6)
+            MascotFace(y: 6, mood: .grin)
         }
         .compositingGroup()   // one flat layer, so a fade doesn't show the overlaps
         .frame(width: 100, height: 100)
@@ -288,7 +322,7 @@ struct SpeechBubble: View {
         ZStack {
             RoundedRectangle(cornerRadius: 28).fill(Mascot.paper).frame(width: 80, height: 58).offset(y: -4)
             BubbleTail().fill(Mascot.paper).frame(width: 18, height: 16).offset(x: -20, y: 30)
-            MascotFace(y: -8)
+            MascotFace(y: -8, mood: .chatty)
         }
         .compositingGroup()
         .frame(width: 100, height: 100)
