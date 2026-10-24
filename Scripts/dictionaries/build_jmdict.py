@@ -29,12 +29,20 @@ def strip_braces(text):
     return text.strip("{}")
 
 
+def is_common_tags(tags):
+    return any(t in COMMON_PRIORITIES for t in tags)
+
+
 def entry_rows(entry):
-    kanji = [(k.findtext("keb"), [strip_braces(i.text) for i in k.findall("ke_inf")]) for k in entry.findall("k_ele")]
+    """Rows of (headword, reading, gloss, common). `common` is judged for each spelling on its own: an entry such as
+    時 (とき) lists 秋 as an alternate spelling with no priority of its own, and must not outrank the real 秋 (あき)."""
+    kanji = [(k.findtext("keb"), [strip_braces(i.text) for i in k.findall("ke_inf")],
+              is_common_tags([p.text for p in k.findall("ke_pri")])) for k in entry.findall("k_ele")]
     readings = []
     for r in entry.findall("r_ele"):
         readings.append({
             "reb": r.findtext("reb"),
+            "common": is_common_tags([p.text for p in r.findall("re_pri")]),
             "restrict": [x.text for x in r.findall("re_restr")],
             "no_kanji": r.find("re_nokanji") is not None,
         })
@@ -53,20 +61,15 @@ def entry_rows(entry):
     gloss = dictbuild.format_senses(senses)
 
     rows = []
-    for keb, _info in kanji:
+    for keb, _info, keb_common in kanji:
         for r in readings:
             if r["no_kanji"] or (r["restrict"] and keb not in r["restrict"]):
                 continue
-            rows.append((keb, r["reb"], gloss))
+            rows.append((keb, r["reb"], gloss, keb_common))
     if not kanji or usually_kana:
         for r in readings:
-            rows.append((r["reb"], r["reb"], gloss))
+            rows.append((r["reb"], r["reb"], gloss, r["common"]))
     return rows
-
-
-def is_common(entry):
-    tags = [p.text for p in entry.iter() if p.tag in ("ke_pri", "re_pri")]
-    return any(t in COMMON_PRIORITIES for t in tags)
 
 
 def build(input_path, output_path):
@@ -75,7 +78,8 @@ def build(input_path, output_path):
         root, created = parse(f.read())
     common, rest = [], []
     for entry in root.findall("entry"):
-        (common if is_common(entry) else rest).extend(entry_rows(entry))
+        for headword, reading, gloss, is_common in entry_rows(entry):
+            (common if is_common else rest).append((headword, reading, gloss))
     meta = {
         "source": "JMdict_e",
         "source_url": "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz",

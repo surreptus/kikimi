@@ -89,6 +89,12 @@ final class DictionaryTests: XCTestCase {
             let hits = try await db.lookup(language: language, term: term)
             XCTAssertTrue(hits.contains { $0.gloss.contains(expected) }, "\(term): \(hits.map(\.gloss))")
         }
+        // Spellings shared by several entries must lead with the usual word (秋 is あき, not the とき of 時).
+        for (term, reading, gloss) in [("秋", "あき", "autumn"), ("米", "こめ", "rice"), ("彼", "かれ", "he")] {
+            let first = try await db.lookup(language: "ja", term: term, limit: 5).first
+            XCTAssertEqual(first?.reading, reading, "\(term): \(String(describing: first?.gloss))")
+            XCTAssertTrue(first?.gloss.contains(gloss) == true, "\(term): \(String(describing: first?.gloss))")
+        }
         let ja = try await store.entryCount(language: "ja")
         XCTAssertGreaterThan(ja, 100_000)
 

@@ -2,6 +2,37 @@ import GRDB
 import XCTest
 @testable import LangCore
 
+final class HomographHintTests: XCTestCase {
+    /// 秋 has two entries, and the wrong one (とき) comes first in the file.
+    func testTheHintUsesTheReadingTheTokenizerSawWhenAnEntryMatches() async throws {
+        let env = try makeEnvironment(entries: [("秋", "とき", "time; hour; moment"), ("秋", "あき", "autumn; fall")])
+        defer { try? FileManager.default.removeItem(at: env.root) }
+        let aki = Token(surface: "秋", lemma: "秋", pos: .noun, reading: "あき")
+        let hint = await env.hint(for: aki, language: "ja")
+        XCTAssertEqual(hint?.reading, "あき")
+        XCTAssertEqual(hint?.gloss, "autumn; fall", "and the meaning that goes with that reading")
+    }
+
+    func testWithNoMatchingReadingItFallsBackToTheFirstEntry() async throws {
+        let env = try makeEnvironment(entries: [("秋", "とき", "time"), ("秋", "あき", "autumn")])
+        defer { try? FileManager.default.removeItem(at: env.root) }
+        let noReading = Token(surface: "秋", lemma: "秋", pos: .noun, reading: nil)
+        let none = await env.hint(for: noReading, language: "ja")
+        XCTAssertEqual(none?.reading, "とき", "nothing to go on, so the first entry")
+        let other = Token(surface: "秋", lemma: "秋", pos: .noun, reading: "しゅう")
+        let unmatched = await env.hint(for: other, language: "ja")
+        XCTAssertEqual(unmatched?.reading, "とき")
+    }
+
+    private func makeEnvironment(entries: [TestDictionaries.Entry]) throws -> LangEnvironment {
+        try LangEnvironment(
+            root: FileManager.default.temporaryDirectory.appending(path: "hh-\(UUID().uuidString)"),
+            defaults: UserDefaults(suiteName: "hh-\(UUID().uuidString)")!,
+            transcriber: StubTranscriber(result: .success([])),
+            dictionaries: TestDictionaries.store(["ja": entries, "es": [("casa", nil, "house")]]))
+    }
+}
+
 final class LineSegmentsTests: XCTestCase {
     private func rejoin(_ segments: [LineSegment]) -> String { segments.map(\.text).joined() }
 

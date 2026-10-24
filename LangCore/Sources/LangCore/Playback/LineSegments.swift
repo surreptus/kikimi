@@ -53,7 +53,10 @@ extension DictionaryEntry {
 
 extension LangEnvironment {
     public func hint(for token: Token, language: String) async -> WordHint? {
-        let entry = try? await database.lookup(language: language, term: token.lemma, limit: 1).first
+        // Several entries can share a spelling (秋 is あき, "autumn", and also とき). The tokenizer read the word in
+        // context, so when one of the entries has that reading it is the one meant; otherwise take the first.
+        let entries = (try? await database.lookup(language: language, term: token.lemma, limit: 8)) ?? []
+        let entry = entries.first { token.reading != nil && $0.reading == token.reading } ?? entries.first
         let word = try? await database.writer.read { db in
             try Word.filter(Column("language") == language && Column("lemma") == token.lemma && Column("pos") == token.pos.rawValue)
                 .fetchOne(db)

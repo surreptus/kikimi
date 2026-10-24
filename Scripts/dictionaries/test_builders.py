@@ -44,6 +44,19 @@ JMDICT = """<?xml version="1.0" encoding="UTF-8"?>
 <r_ele><reb>ゆっくり</reb></r_ele>
 <sense><gloss>slowly</gloss></sense>
 </entry>
+<entry>
+<ent_seq>5</ent_seq>
+<k_ele><keb>時</keb><ke_pri>ichi1</ke_pri></k_ele>
+<k_ele><keb>秋</keb></k_ele>
+<r_ele><reb>とき</reb><re_pri>ichi1</re_pri></r_ele>
+<sense><pos>&n;</pos><gloss>time</gloss></sense>
+</entry>
+<entry>
+<ent_seq>6</ent_seq>
+<k_ele><keb>秋</keb><ke_pri>ichi1</ke_pri></k_ele>
+<r_ele><reb>あき</reb><re_pri>ichi1</re_pri></r_ele>
+<sense><pos>&n;</pos><gloss>autumn</gloss></sense>
+</entry>
 </JMdict>
 """
 
@@ -105,6 +118,14 @@ class JMdictTests(unittest.TestCase):
         self.assertTrue({"entries_headword", "entries_reading"} <= indexes)
         self.assertIn("USING INDEX", plan)
         self.assertNotIn("SCAN entries", plan)
+
+    def test_a_spelling_with_no_priority_of_its_own_does_not_outrank_the_real_word(self):
+        # 時 (toki) lists 秋 as an alternate spelling with no priority; the autumn entry 秋 (aki) has its own.
+        # A lookup takes the first row, so the readings of 秋 must come out aki first.
+        readings = [r for h, r, _g in self.rows if h == "秋"]
+        self.assertEqual(readings, ["あき", "とき"])
+        toki = [r for h, r, _g in self.rows if h == "時"]
+        self.assertEqual(toki, ["とき"], "the main spelling of 時 is unaffected")
 
     def test_meta(self):
         meta = dict(sqlite3.connect(self.out).execute("SELECT key, value FROM meta").fetchall())
