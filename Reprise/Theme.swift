@@ -146,17 +146,46 @@ struct ThinProgressStyle: ProgressViewStyle {
     var height: CGFloat = 6
 
     func makeBody(configuration: Configuration) -> some View {
-        let fraction = max(0, min(1, configuration.fractionCompleted ?? 0))
+        if let value = configuration.fractionCompleted {
+            let fraction = max(0, min(1, value))
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Theme.ink.opacity(0.15))
+                    Capsule().fill(Theme.ink)
+                        .frame(width: max(height, proxy.size.width * fraction))
+                        .opacity(fraction > 0 ? 1 : 0)
+                        .animation(.easeOut(duration: 0.25), value: fraction)
+                }
+            }
+            .frame(height: height)
+        } else {
+            IndeterminateBar(height: height)
+        }
+    }
+}
+
+/// For work with no measurable progress: a short segment that slides back and forth along the track. With Reduce
+/// Motion on it stays still at the start, so something is shown without anything moving.
+private struct IndeterminateBar: View {
+    let height: CGFloat
+    @State private var atEnd = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
         GeometryReader { proxy in
+            let segment = proxy.size.width * 0.28
             ZStack(alignment: .leading) {
                 Capsule().fill(Theme.ink.opacity(0.15))
                 Capsule().fill(Theme.ink)
-                    .frame(width: max(height, proxy.size.width * fraction))
-                    .opacity(fraction > 0 ? 1 : 0)
-                    .animation(.easeOut(duration: 0.25), value: fraction)
+                    .frame(width: segment)
+                    .offset(x: atEnd ? proxy.size.width - segment : 0)
             }
         }
         .frame(height: height)
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) { atEnd = true }
+        }
     }
 }
 

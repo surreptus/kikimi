@@ -3,6 +3,10 @@ import Foundation
 public enum ImportStage: String, Sendable, CaseIterable {
     case hashing, staging, detectingLanguage, transcribing, transcoding, verifying, extractingAudio, saving
 
+    /// Whether the step reports how far along it is. Only transcribing and compressing do; the others have no
+    /// measurable progress, so the UI shows a bar that just moves instead of one stuck at empty.
+    public var reportsProgress: Bool { self == .transcribing || self == .transcoding }
+
     /// The steps an import goes through, in order. The language check is left out when it was skipped (an import
     /// the user chose to go ahead with anyway), so "3 of 7" is true.
     public static func steps(checkingLanguage: Bool) -> [ImportStage] {

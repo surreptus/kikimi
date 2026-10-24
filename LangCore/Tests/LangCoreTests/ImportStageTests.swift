@@ -21,6 +21,11 @@ final class ImportStageTests: XCTestCase {
         XCTAssertEqual(last.number, 7); XCTAssertEqual(last.of, 7)
     }
 
+    func testOnlyTheLongStepsReportProgress() {
+        XCTAssertEqual(ImportStage.allCases.filter(\.reportsProgress), [.transcribing, .transcoding])
+        XCTAssertFalse(ImportStage.detectingLanguage.reportsProgress, "the language check has nothing to measure")
+    }
+
     func testEveryStageHasAPositionBetweenOneAndTheTotal() {
         for checking in [true, false] {
             for stage in ImportStage.steps(checkingLanguage: checking) {

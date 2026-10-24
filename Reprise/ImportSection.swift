@@ -199,8 +199,9 @@ struct ImportSection: View {
                                 .help("Stop this import. Your original file is untouched.")
                         }
                     }
-                    if case .running(_, let fraction) = job.status {
-                        ProgressView(value: fraction).progressViewStyle(.thin)
+                    if case .running(let stage, let fraction) = job.status {
+                        // Without a real fraction (the language check, for one) the bar moves instead of sitting empty.
+                        ProgressView(value: stage.reportsProgress ? fraction : nil).progressViewStyle(.thin)
                     }
                     if case .failed(let message) = job.status {
                         Text(message).font(Theme.small).foregroundStyle(Theme.red)
