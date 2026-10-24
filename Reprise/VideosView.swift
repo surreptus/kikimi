@@ -12,6 +12,9 @@ struct VideosView: View {
     @State private var items: [LibraryEntry] = []
     @State private var sizes: [Int64: Int64] = [:]
     @State private var totalBytes: Int64 = 0
+    @State private var coverages: [Int64: VideoCoverage] = [:]
+    /// "newest" or "fit": how the list is ordered. Best fit puts the videos you can most comfortably follow first.
+    @AppStorage("videoSort") private var sort = "newest"
     @State private var playing: Video?
     @State private var startAt: Double?
     @State private var info: Video?
@@ -67,9 +70,9 @@ struct VideosView: View {
                     }
                     .frame(maxWidth: .infinity, minHeight: 200)
                 } else {
-                    Text("Your videos").font(Theme.title(17)).padding(.top, 8)
+                    sortMenu
                 }
-                ForEach(items) { item in
+                ForEach(orderedItems) { item in
                     row(item)
                 }
             }
@@ -78,12 +81,33 @@ struct VideosView: View {
         .task(id: "\(app.languageCode)-\(app.dataVersion)") { await reload() }
     }
 
+    /// "Your videos" with the order they are in, and the way to change it.
+    private var sortMenu: some View {
+        HStack {
+            Text("Your videos").font(Theme.title(17))
+            Spacer()
+            Menu {
+                Picker("Order", selection: $sort) {
+                    Text("Newest first").tag("newest")
+                    Text("Best fit first").tag("fit")
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Label(sort == "fit" ? "Best fit first" : "Newest first", systemImage: "arrow.up.arrow.down")
+            }
+            .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+            .help("Best fit puts the videos you already know most of, but not all, first")
+        }
+        .padding(.top, 8)
+    }
+
     private func row(_ item: LibraryEntry) -> some View {
         HStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.video.title).font(.system(.headline, design: .rounded)).lineLimit(2)
                 Text("\(duration(item.video.duration)) · \(item.subtitleCount) lines · \(sizes[item.id].map(formatBytes) ?? "…") · added \(item.video.importedAt.formatted(date: .abbreviated, time: .omitted))")
                     .font(Theme.small).foregroundStyle(Theme.muted)
+                CoverageBadge(coverage: coverages[item.id]).padding(.top, 2)
             }
             Spacer()
             Button("Info", systemImage: "info.circle") { info = item.video }
@@ -135,6 +159,19 @@ struct VideosView: View {
         items = (try? await env.database.libraryVideos(language: app.languageCode)) ?? []
         sizes = Dictionary(uniqueKeysWithValues: items.map { ($0.id, env.bytesOnDisk(for: $0.video)) })
         totalBytes = env.libraryBytes()
+        coverages = (try? await env.database.videoCoverage(language: app.languageCode)) ?? [:]
+    }
+
+    /// The list in the chosen order. "Best fit" uses coverage; videos with nothing to judge by go last.
+    private var orderedItems: [LibraryEntry] {
+        guard sort == "fit" else { return items }
+        return items.sorted { a, b in
+            switch (coverages[a.id], coverages[b.id]) {
+            case (let x?, let y?): VideoCoverage.bestFirst(x, y)
+            case (_?, nil): true
+            default: false
+            }
+        }
     }
 
     /// Back to Videos, or to the screen that sent you here (e.g. Words, with its search and selection intact).
@@ -179,12 +216,21 @@ private struct VideoInfoSheet: View {
     @Environment(\.dismissModal) private var dismiss
 
     @State private var details: VideoDetails?
+    @State private var goal: CoverageGoal?
+    @State private var goalMessage: String?
     @State private var confirmDelete = false
     @State private var error: String?
 
-    var body: some View {
+    /// Everything above the buttons; it scrolls only if the window is too short to show it all.
+    private var info: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(video.title).font(Theme.title(22)).lineLimit(2)
+
+            if let goal, goal.current.totalWords > 0 {
+                CoverageGoalView(goal: goal, startLearning: startLearning, message: goalMessage)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .panel()
+            }
 
             if let details {
                 Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 14, verticalSpacing: 9) {
@@ -212,6 +258,15 @@ private struct VideoInfoSheet: View {
 
             if let error { Text(error).font(Theme.small).foregroundStyle(Theme.red) }
 
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            ViewThatFits(in: .vertical) {
+                info
+                ScrollView { info }
+            }
             HStack(spacing: 12) {
                 Button("Delete") { confirmDelete = true }.buttonStyle(.pill(.danger, compact: true))
                 Button("Rename") { dismiss(); rename() }.buttonStyle(.pill(.secondary, compact: true))
@@ -228,10 +283,14 @@ private struct VideoInfoSheet: View {
         }
         .padding(24)
         .frame(width: 540)
+        .frame(maxHeight: 580)
         .background(Theme.page)
         .fontDesign(.rounded)
         .tint(Theme.ink)
-        .task { details = try? await env.details(for: video) }
+        .task {
+            details = try? await env.details(for: video)
+            await loadGoal()
+        }
         .confirmationDialog("Delete \"\(video.title)\"?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete from this Mac", role: .destructive) { delete() }
         } message: {
@@ -247,6 +306,25 @@ private struct VideoInfoSheet: View {
         GridRow {
             Text(label).foregroundStyle(Theme.muted).gridColumnAlignment(.trailing)
             Text(value).font(.system(.body, design: .rounded, weight: .semibold))
+        }
+    }
+
+    /// What it would take to know 90% of this video's content words (roughly 95% of everything said).
+    private func loadGoal() async {
+        guard let id = video.id else { return }
+        goal = try? await env.database.wordsToReach(target: 0.90, inVideo: id)
+    }
+
+    private func startLearning(_ entries: [CoverageGoal.Entry]) {
+        Task {
+            do {
+                let added = try await env.database.startLearning(wordIDs: entries.map(\.wordID))
+                app.dataChanged()
+                await loadGoal()
+                goalMessage = "Added \(added) word\(added == 1 ? "" : "s") to your reviews."
+            } catch {
+                self.error = error.localizedDescription
+            }
         }
     }
 

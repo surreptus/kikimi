@@ -21,6 +21,7 @@ struct AboutView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 26) {
                     gettingStarted
+                    level
                     importSteps
                     reviews
                     backups
@@ -137,6 +138,19 @@ struct AboutView: View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text("•").accessibilityHidden(true)
             paragraph(text)
+        }
+    }
+
+    private var level: some View {
+        section("Finding videos at your level") {
+            paragraph("On Videos, each video shows how much of it you already know, such as 91% known · Comfortable. It counts the nouns, verbs, adjectives and adverbs you know. Small words like articles and particles aren't kept; they make up about half of what is said and are nearly always known, so the share you really understand is higher than the figure. About 90% of the words that are kept is roughly 95% of everything, which is around where following along gets comfortable.")
+            VStack(alignment: .leading, spacing: 6) {
+                bullet("Hard is under 80%, A stretch is 80 to 88%, Comfortable is 88 to 98%, and Easy is 98% or more.")
+                bullet("A word counts as known if you marked it known, it is finished, or you are learning it and its reviews are a week or more apart (Guru 1 and above).")
+                bullet("Sort by Best fit to put the videos worth watching next at the top: mostly understood, with a little new.")
+                bullet("Open a video's Info to see the commonest words you don't know yet, and start learning them all at once.")
+                bullet("In Settings, under Data, you can mark a list of words you already know (one per line, or the first column of a CSV), so these numbers start out honest.")
+            }
         }
     }
 
