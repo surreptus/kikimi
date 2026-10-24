@@ -15,6 +15,7 @@ public enum Acknowledgements {
         "MeCab-BSD": "MeCab morphological analyzer",
         "OpenAI-Whisper": "Whisper speech recognition",
         "WhisperKit-MIT": "WhisperKit",
+        "swift-transformers-Apache-2.0": "swift-transformers (Hugging Face), inside WhisperKit",
         "GRDB-MIT": "GRDB.swift",
     ]
 
