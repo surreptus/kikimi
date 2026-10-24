@@ -227,7 +227,7 @@ struct PlayerView: View {
                     SpeakButton(text: hint?.reading ?? token.reading ?? hint?.lemma ?? token.lemma,
                                 languageCode: profile?.whisperCode ?? video.language, shortcut: "s")
                     if let status = hint?.status {
-                        StatusPill(text: status.rawValue, color: color(for: status))
+                        StatusBadge(status: status, stage: hint?.stage)
                     }
                     Spacer()
                     if hint?.wordID != nil {
@@ -275,15 +275,6 @@ struct PlayerView: View {
 
     private func speedLabel(_ speed: Float) -> String {
         (speed == speed.rounded() ? String(Int(speed)) : String(format: "%g", speed)) + "×"
-    }
-
-    private func color(for status: WordStatus) -> Color {
-        switch status {
-        case .new: .secondary
-        case .learning: Theme.orange
-        case .known: Theme.green
-        case .burned: Theme.purple
-        }
     }
 
     // MARK: Export

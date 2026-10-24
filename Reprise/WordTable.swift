@@ -178,5 +178,5 @@ private struct WordTableRow: View {
     /// Full ink on a selected row: the tint takes a little contrast from the muted grey.
     private var secondary: Color { selected ? Theme.ink : Theme.muted }
 
-    private var status: some View { StatusBadge(status: row.word.status) }
+    private var status: some View { StatusBadge(status: row.word.status, stage: row.word.stage) }
 }

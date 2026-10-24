@@ -75,7 +75,7 @@ struct AboutView: View {
 
     private var importSteps: some View {
         section("What happens when you add a video") {
-            paragraph("Your original file is only ever read, never changed or deleted. Reprise works on a copy and keeps a smaller one for playback.")
+            paragraph("Your original file is only ever read, never changed or deleted. Reprise works on a copy and keeps a smaller one for playback. While a video is being added, its row says which step it is on, such as 4 of 8 · Transcribing. If you chose to go ahead despite a language warning, the language check is skipped and there are 7 steps.")
             VStack(alignment: .leading, spacing: 8) {
                 row("Reading file", "Checks whether you've already added this video, by its contents rather than its name.")
                 row("Copying", "Makes a working copy. Seconds.")
@@ -103,22 +103,26 @@ struct AboutView: View {
             paragraph("Reprise uses spaced repetition: a word you get right comes back after a longer wait each time, and one you miss comes back sooner. A word you are learning moves through these stages:")
             Grid(alignment: .leading, horizontalSpacing: 24, verticalSpacing: 6) {
                 GridRow {
+                    Text("").frame(width: 18)
                     Text("Stage").foregroundStyle(Theme.muted)
                     Text("Next review comes after").foregroundStyle(Theme.muted)
                 }
                 .font(Theme.small)
                 ForEach(Array(SRS.intervals.enumerated()), id: \.offset) { index, interval in
                     GridRow {
+                        StageRing(stage: index + 1, size: 18)
                         Text("\(index + 1). \(Self.stageNames[index])")
                         Text(Self.describe(interval))
                     }
                 }
                 GridRow {
+                    StageRing(stage: 9, size: 18)
                     Text("9. Burned")
                     Text("Finished: it never comes back")
                 }
             }
             .padding(14).frame(maxWidth: .infinity, alignment: .leading).panel(padding: 0)
+            paragraph("You'll see the same circle beside a word on the Words page, in its panel and in the video. It fills as the word moves up, from red through yellow to green, and becomes a white disc once it is burned. An empty ring is a new word, and a green tick is a word you marked known.")
             VStack(alignment: .leading, spacing: 6) {
                 bullet("Got it moves a word up one stage. Missed it moves it down one, never below Apprentice 1.")
                 bullet("A word's stage changes only on its first answer in a sitting. A missed word returns later in the same sitting for another try, without moving again.")

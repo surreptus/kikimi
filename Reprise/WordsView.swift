@@ -70,6 +70,16 @@ struct WordsView: View {
         }
     }
 
+    /// The selection summary counts words by status, not stage, so it uses a plain dot rather than the stage ring.
+    private func summaryColor(_ status: WordStatus) -> Color {
+        switch status {
+        case .new: Theme.muted
+        case .learning: Theme.orange
+        case .known: Theme.green
+        case .burned: Theme.ink
+        }
+    }
+
     private func focusSearch() {
         app.findWordsPending = false
         searchFocused = true
@@ -219,7 +229,7 @@ struct WordsView: View {
                 Text("\(selection.count) words selected").font(.title2.bold())
                 ForEach([WordStatus.new, .learning, .known, .burned], id: \.self) { status in
                     let count = selectedRows.filter { $0.word.status == status }.count
-                    if count > 0 { HStack { StatusBadge(status: status); Text("\(count)") } }
+                    if count > 0 { HStack { StatusPill(text: status.rawValue, color: summaryColor(status)); Text("\(count)") } }
                 }
                 Text("Use the buttons below the list to start learning, mark known, or reset them all at once.")
                     .font(.callout).foregroundStyle(Theme.muted)

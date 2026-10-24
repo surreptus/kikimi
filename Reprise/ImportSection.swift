@@ -243,7 +243,7 @@ struct ImportSection: View {
     private func statusText(_ job: ImportQueue.Job) -> String {
         switch job.status {
         case .queued: "Waiting"
-        case .running(let stage, _): stageName(stage)
+        case .running(let stage, _): runningText(stage, job)
         case .imported: "Imported · \(job.profile.displayName)"
         case .duplicate: "Already in library"
         case .languageMismatch: "Check language"
@@ -269,6 +269,12 @@ struct ImportSection: View {
         case .running: Theme.ink
         default: .secondary
         }
+    }
+
+    /// "3 of 8 · Transcribing": the step's place in the import (out of 7 if the language check was skipped).
+    private func runningText(_ stage: ImportStage, _ job: ImportQueue.Job) -> String {
+        let place = stage.position(checkingLanguage: job.checksLanguage)
+        return "\(place.number) of \(place.of) · \(stageName(stage))"
     }
 
     private func stageName(_ stage: ImportStage) -> String {

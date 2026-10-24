@@ -46,10 +46,7 @@ struct WordDetail: View {
             Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.7)
                 .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 10) {
-                StatusBadge(status: row.word.status)
-                if let stage = row.word.stage {
-                    Text("Stage \(stage.rawValue) of 9").font(Theme.small).foregroundStyle(Theme.muted)
-                }
+                StatusBadge(status: row.word.status, stage: row.word.stage)
                 Spacer(minLength: 8)
                 SpeakButton(
                     text: (app.profile.display.showsReadings ? entries.first?.reading : nil) ?? row.word.lemma,
@@ -60,7 +57,7 @@ struct WordDetail: View {
                         Button("Export video clips…") { exportExamples(.video) }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .font(.system(size: 15, weight: .medium))
+                            .font(.system(size: 14, weight: .medium))
                             .frame(width: 22, height: 18)
                     }
                     .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
@@ -146,21 +143,6 @@ struct EntryView: View {
                 }
             }
             Text(entry.gloss).font(.callout).textSelection(.enabled)
-        }
-    }
-}
-
-struct StatusBadge: View {
-    let status: WordStatus
-
-    var body: some View { StatusPill(text: status.rawValue, color: color) }
-
-    private var color: Color {
-        switch status {
-        case .new: .secondary
-        case .learning: Theme.orange
-        case .known: Theme.green
-        case .burned: Theme.purple
         }
     }
 }
