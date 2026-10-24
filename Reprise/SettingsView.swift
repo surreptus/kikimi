@@ -48,16 +48,14 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
-    /// The sub-tabs: the chosen one is the solid pill, the others are quiet.
+    /// The sub-tabs, as the Mac's own segmented control: arrow keys, VoiceOver and the system look come with it.
     private var tabBar: some View {
-        HStack(spacing: 8) {
-            ForEach(SettingsTab.allCases) { tab in
-                Button(tab.rawValue) { app.settingsTab = tab }
-                    .buttonStyle(.pill(app.settingsTab == tab ? .primary : .secondary, compact: true))
-                    .fixedSize()   // otherwise "Languages" is cut short
-                    .accessibilityAddTraits(app.settingsTab == tab ? .isSelected : [])
-            }
+        Picker("Settings section", selection: Bindable(app).settingsTab) {
+            ForEach(SettingsTab.allCases) { Text($0.rawValue).tag($0) }
         }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .fixedSize()
     }
 }
 
