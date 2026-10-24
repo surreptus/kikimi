@@ -32,9 +32,13 @@ struct SpeakButton: View {
                 .labelStyle(.titleAndIcon).buttonStyle(.pill(.secondary, compact: true))
                 .disabled(!available).help(help)
         } else {
-            Button("Say word", systemImage: "speaker.wave.2.fill", action: action)
-                .labelStyle(.iconOnly).buttonStyle(.pill(.secondary, compact: true))
-                .disabled(!available).help(help)
+            // The same icon size and frame as the ⋯ menu beside it in the word panel, so the two match.
+            Button(action: action) {
+                Image(systemName: "speaker.wave.2.fill").font(.system(size: 14, weight: .medium)).frame(width: 22, height: 18)
+            }
+            .buttonStyle(.pill(.secondary, compact: true))
+            .accessibilityLabel("Say word")
+            .disabled(!available).help(help)
         }
     }
 }
