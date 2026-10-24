@@ -50,6 +50,8 @@ public final class ImportQueue {
         fileprivate(set) var model: String
         fileprivate var skipsLanguageCheck = false
         public var fileName: String { url.lastPathComponent }
+        /// False for an import the user chose to go ahead with after a language warning.
+        public var checksLanguage: Bool { !skipsLanguageCheck }
     }
 
     public private(set) var jobs: [Job] = []

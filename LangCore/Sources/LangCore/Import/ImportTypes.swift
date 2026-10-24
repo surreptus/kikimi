@@ -1,7 +1,19 @@
 import Foundation
 
-public enum ImportStage: String, Sendable {
+public enum ImportStage: String, Sendable, CaseIterable {
     case hashing, staging, detectingLanguage, transcribing, transcoding, verifying, extractingAudio, saving
+
+    /// The steps an import goes through, in order. The language check is left out when it was skipped (an import
+    /// the user chose to go ahead with anyway), so "3 of 7" is true.
+    public static func steps(checkingLanguage: Bool) -> [ImportStage] {
+        allCases.filter { checkingLanguage || $0 != .detectingLanguage }
+    }
+
+    /// "3 of 8": this step's place in the import.
+    public func position(checkingLanguage: Bool) -> (number: Int, of: Int) {
+        let steps = Self.steps(checkingLanguage: checkingLanguage)
+        return ((steps.firstIndex(of: self) ?? 0) + 1, steps.count)
+    }
 }
 
 public struct ImportProgress: Sendable {

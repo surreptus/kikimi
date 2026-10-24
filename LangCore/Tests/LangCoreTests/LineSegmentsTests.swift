@@ -76,7 +76,7 @@ final class WordHintTests: XCTestCase {
             knownID = word.id!
         }
         let known = await env.hint(for: Token(surface: "友達", lemma: "友達", pos: .noun, reading: "ともだち"), language: "ja")
-        XCTAssertEqual(known, WordHint(wordID: knownID, lemma: "友達", pos: .noun, reading: "ともだち", gloss: "friend; companion", status: .known))
+        XCTAssertEqual(known, WordHint(wordID: knownID, lemma: "友達", pos: .noun, reading: "ともだち", gloss: "friend; companion", status: .known, stage: nil))
 
         // A word that isn't in the dictionary or your list still gets a hint, with whatever the tokenizer knew.
         let unknown = await env.hint(for: Token(surface: "走り", lemma: "走る", pos: .verb, reading: "はしり"), language: "ja")

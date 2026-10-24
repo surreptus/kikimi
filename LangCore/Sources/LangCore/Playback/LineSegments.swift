@@ -39,6 +39,8 @@ public struct WordHint: Sendable, Equatable {
     /// First meaning, short.
     public let gloss: String?
     public let status: WordStatus?
+    /// Where it is in the review stages, for a word being learned.
+    public let stage: SRSStage?
 }
 
 extension DictionaryEntry {
@@ -57,7 +59,7 @@ extension LangEnvironment {
                 .fetchOne(db)
         }
         return WordHint(wordID: word?.id, lemma: token.lemma, pos: token.pos, reading: entry?.reading ?? token.reading,
-                        gloss: entry?.shortGloss, status: word?.status)
+                        gloss: entry?.shortGloss, status: word?.status, stage: word?.stage)
     }
 }
 
