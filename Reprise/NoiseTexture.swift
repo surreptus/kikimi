@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// A very faint grain laid over the colour fields, like paper. The tile is drawn once in code (a fixed pattern, so it
+/// A very faint grain laid over the window colour behind the sidebar and around the card, like paper. The tile is drawn once in code (a fixed pattern, so it
 /// never changes between launches), then repeated. It only nudges the colour a little, so text keeps its contrast,
 /// and it goes away when the Mac's Increase Contrast setting is on.
 struct NoiseOverlay: View {
