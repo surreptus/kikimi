@@ -7,7 +7,7 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 - [x] **Bundle ID** is `com.surreptus.Reprise` (set in the Reprise target). Changing it later moves the app's data
       container, so do that before anyone has data.
 - [ ] Choose your team in the target (Signing & Capabilities). Keep "Automatically manage signing" on.
-- [x] **App icon**: a repeat sign (𝄆) in lime and ink, drawn for Reprise (PNGs in `Reprise/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
+- [x] **App icon**: a repeat sign (𝄆) melted sideways across the full width, in dark green on lime, drawn for Reprise (`Scripts/icon/make_icon.swift` regenerates it) (PNGs in `Reprise/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
 - [ ] Set `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` (raise the build number for every upload).
 - [ ] Direct download only: create a notarization profile once:
       `xcrun notarytool store-credentials reprise --apple-id <you> --team-id <TEAM_ID>`
