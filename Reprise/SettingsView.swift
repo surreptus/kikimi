@@ -140,6 +140,7 @@ private struct DataTab: View {
     let env: LangEnvironment
     @Environment(AppState.self) private var app
     @Environment(\.openWindow) private var openWindow
+    @State private var known: KnownListState = .idle
 
     var body: some View {
         @Bindable var backup = app.backup
@@ -168,6 +169,14 @@ private struct DataTab: View {
             }
 
             Section {
+                knownListContent
+            } header: {
+                Text("Words you already know")
+            } footer: {
+                Text("Choose a text file of \(app.profile.displayName) words you know, one per line (or the first column of a CSV, such as an Anki export). They're marked known, so each video's coverage reflects what you can really follow. Only words already in your library change; to do another language, switch it in the sidebar first.")
+            }
+
+            Section {
                 Button("Manage storage…") {
                     openWindow(id: "main")
                     NSApp.activate(ignoringOtherApps: true)
@@ -180,7 +189,7 @@ private struct DataTab: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 560, height: 520)
+        .frame(width: 560, height: 640)
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = urls.first(where: { $0.pathExtension == ProgressBackup.fileExtension }) else { return false }
             Task { await app.backup.open(url, env: env) }
@@ -259,6 +268,82 @@ private struct DataTab: View {
                     Button("Done") { backup.reset() }
                 }
             }
+        }
+    }
+
+    // MARK: Words you already know
+
+    private enum KnownListState {
+        case idle
+        case previewing(words: [String], report: KnownListReport)
+        case done(KnownListReport)
+        case failed(String)
+    }
+
+    @ViewBuilder
+    private var knownListContent: some View {
+        switch known {
+        case .idle:
+            Button("Choose word list…") { Task { await chooseKnownList() } }
+        case .previewing(let words, let report):
+            VStack(alignment: .leading, spacing: 8) {
+                Text("\(plural(report.listed, "word")) in the list").font(.headline)
+                VStack(alignment: .leading, spacing: 4) {
+                    if report.marked > 0 {
+                        Text("• \(plural(report.marked, "word")) in your \(app.profile.displayName) library will be marked known."
+                             + (report.fromLearning > 0 ? " \(report.fromLearning) of them are being learned, and leave your reviews." : ""))
+                    }
+                    if report.alreadyKnown > 0 { Text("• \(report.alreadyKnown) are already known.") }
+                    if report.notInLibrary > 0 {
+                        Text("• \(report.notInLibrary) aren't in your library yet, so there's nothing to change; they'll be new when they appear in a video.")
+                    }
+                    if report.marked == 0 { Text("Nothing in this list would change.") }
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                HStack {
+                    if report.marked > 0 {
+                        Button("Mark as known") { Task { await applyKnownList(words) } }.keyboardShortcut(.defaultAction)
+                        Button("Cancel") { known = .idle }
+                    } else {
+                        Button("Done") { known = .idle }
+                    }
+                }
+            }
+        case .done(let report):
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Marked \(plural(report.marked, "word")) as known.").font(.headline)
+                Button("Done") { known = .idle }
+            }
+        case .failed(let message):
+            VStack(alignment: .leading, spacing: 8) {
+                Text(message).foregroundStyle(.red)
+                Button("Try again") { known = .idle }
+            }
+        }
+    }
+
+    private func chooseKnownList() async {
+        guard let url = ExportPanels.openTextFile() else { return }
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        do {
+            let text = try String(contentsOf: url, encoding: .utf8)
+            let words = KnownWordList.parse(text)
+            guard !words.isEmpty else { known = .failed("That file has no words in it."); return }
+            let report = try await env.database.markKnown(lemmas: words, language: app.languageCode, dryRun: true)
+            known = .previewing(words: words, report: report)
+        } catch {
+            known = .failed("Couldn't read that file as text: \(error.localizedDescription)")
+        }
+    }
+
+    private func applyKnownList(_ words: [String]) async {
+        do {
+            let report = try await env.database.markKnown(lemmas: words, language: app.languageCode)
+            app.dataChanged()
+            known = .done(report)
+        } catch {
+            known = .failed("Couldn't mark those words: \(error.localizedDescription)")
         }
     }
 

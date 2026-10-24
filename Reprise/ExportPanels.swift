@@ -21,6 +21,15 @@ enum ExportPanels {
         return panel.runModal() == .OK ? panel.url : nil
     }
 
+    /// Choose a plain-text or CSV/TSV file (a list of words).
+    static func openTextFile() -> URL? {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.allowedContentTypes = [.plainText, .commaSeparatedText, .tabSeparatedText]
+        return panel.runModal() == .OK ? panel.url : nil
+    }
+
     static func chooseFolder(message: String) -> URL? {
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
