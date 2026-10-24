@@ -39,8 +39,9 @@ enum Theme {
     /// The colour of the whole window: a bright yellow-green, and a deep green in dark mode.
     static let field = Color(light: Color(hex: 0x66CC0A), dark: Color(hex: 0x124632))
 
-    /// The side nav: a slightly darker strip of whatever colour the section is.
-    static let rail = Color(light: .black.opacity(0.07), dark: .black.opacity(0.28))
+    /// The window itself, behind the sidebar and around the content card: the field, a shade darker, so the card
+    /// reads as a lighter shape on it.
+    static let chrome = Color(light: Color(hex: 0x5DBA09), dark: Color(hex: 0x0C2D20))
     /// A selected table row: a soft lighter tint, with ink text still on it.
     static let selection = Color(light: .white.opacity(0.4), dark: .white.opacity(0.18))
     /// Alternate table rows: barely there.

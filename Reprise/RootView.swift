@@ -20,8 +20,8 @@ struct RootView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Theme.field)
-        .containerBackground(Theme.field, for: .window)
+        .background(windowColor)
+        .containerBackground(windowColor, for: .window)
         .toolbar(removing: .title)
         .toolbarBackground(.hidden, for: .windowToolbar)
         .tint(Theme.accent)
@@ -29,7 +29,11 @@ struct RootView: View {
         .modal(isPresented: Binding(get: { app.showAcknowledgements }, set: { app.showAcknowledgements = $0 })) { AcknowledgementsView() }
     }
 
-    /// A nav strip fixed to the left edge; the current screen fills the rest of the window.
+    /// The window is the sidebar's colour once the library is open, with the page in a card on it; while it opens,
+    /// or if it can't, there is no card, so the page colour fills the window.
+    private var windowColor: Color { app.isReady ? Theme.chrome : Theme.field }
+
+    /// The sidebar sits directly on the window; the current page is a rounded card beside it.
     private func layout(_ env: LangEnvironment) -> some View {
         @Bindable var app = app
         let selection = Binding<SidebarItem>(
@@ -50,7 +54,10 @@ struct RootView: View {
             }
             .animation(Theme.screenChange(reduceMotion), value: app.section)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .ignoresSafeArea(.container, edges: .top)   // no gap above the content; the title bar has nothing in it
+            .background(Theme.field)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))   // a page sliding in stays inside the card
+            .padding(.top, 10).padding(.trailing, 10).padding(.bottom, 10)
+            .ignoresSafeArea(.container, edges: .top)   // the card starts 10 points from the window's top edge
         }
         .modal(isPresented: $app.showStorage) { StorageView(env: env) }
         .modal(isPresented: $app.showAbout) { AboutView() }

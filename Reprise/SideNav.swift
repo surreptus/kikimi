@@ -69,14 +69,13 @@ struct SideNav: View {
             Button("How it works", action: showAbout)
             .buttonStyle(.plain)
             .font(.system(size: 12, design: .rounded))
-            .foregroundStyle(Theme.muted)
+            .foregroundStyle(Theme.ink)
             .padding(.horizontal, 6).padding(.top, 4)
         }
         .padding(14)
         .frame(width: 214)
         .frame(maxHeight: .infinity)
         .ignoresSafeArea()
-        .background(Theme.rail)
     }
 
     private func navRow(_ item: SidebarItem) -> some View {
