@@ -71,18 +71,22 @@ struct StatusIndicator: View {
     }
 }
 
-/// The word's status: its mark, then the word for it.
+/// The word's status: its mark, then the word for it (except for a word being learned, which is just its ring).
 struct StatusBadge: View {
     let status: WordStatus
     var stage: SRSStage?
 
+    /// A word being learned shows only its ring: the filled segments and colour are the stage, and hovering or
+    /// VoiceOver says it in words. Every other status keeps its word beside the mark.
+    private var ringOnly: Bool { status == .learning }
+
     var body: some View {
         HStack(spacing: 6) {
             StatusIndicator(status: status, stage: stage?.rawValue, size: 18)
-            Text(status.rawValue.capitalized)
+            if !ringOnly { Text(status.rawValue.capitalized) }
         }
         .font(.system(size: 12, weight: .medium, design: .rounded))
-        .padding(.leading, 6).padding(.trailing, 10).padding(.vertical, 3)
+        .padding(.leading, 6).padding(.trailing, ringOnly ? 6 : 10).padding(.vertical, 3)
         .background(Capsule().fill(Theme.softStrong))
         .foregroundStyle(Theme.ink)
         .help(stage.map { "Stage \($0.rawValue) of 9" } ?? status.rawValue.capitalized)

@@ -122,7 +122,7 @@ struct AboutView: View {
                 }
             }
             .padding(14).frame(maxWidth: .infinity, alignment: .leading).panel(padding: 0)
-            paragraph("You'll see the same circle beside a word on the Words page, in its panel and in the video. It fills as the word moves up, from red through yellow to green, and becomes a white disc once it is burned. An empty ring is a new word, and a green tick is a word you marked known.")
+            paragraph("You'll see the same circle beside a word on the Words page, in its panel and in the video. It fills as the word moves up, from red through yellow to green, and becomes a white disc once it is burned. A ring with no word beside it is a word you are learning (hover over it for its stage), an empty ring is a new word, and a green tick is a word you marked known.")
             VStack(alignment: .leading, spacing: 6) {
                 bullet("Got it moves a word up one stage. Missed it moves it down one, never below Apprentice 1.")
                 bullet("A word's stage changes only on its first answer in a sitting. A missed word returns later in the same sitting for another try, without moving again.")
