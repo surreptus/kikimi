@@ -20,8 +20,8 @@ struct RootView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(windowColor)
-        .containerBackground(windowColor, for: .window)
+        .background { ZStack { windowColor; NoiseOverlay() } }
+        .containerBackground(for: .window) { ZStack { windowColor; NoiseOverlay() } }
         .toolbar(removing: .title)
         .toolbarBackground(.hidden, for: .windowToolbar)
         .tint(Theme.accent)
@@ -54,7 +54,7 @@ struct RootView: View {
             }
             .animation(Theme.screenChange(reduceMotion), value: app.section)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Theme.field)
+            .background { ZStack { Theme.field; NoiseOverlay() } }
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))   // a page sliding in stays inside the card
             .padding(.top, 10).padding(.trailing, 10).padding(.bottom, 10)
             .ignoresSafeArea(.container, edges: .top)   // the card starts 10 points from the window's top edge
