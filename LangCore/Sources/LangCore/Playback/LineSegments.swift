@@ -86,13 +86,13 @@ extension LangEnvironment {
 
     /// Your words matching `term`; when none do, the words for its dictionary forms ("corremos" finds "correr").
     public func searchWords(
-        _ term: String, profile: any LanguageProfile, status: WordStatus? = nil
+        _ term: String, profile: any LanguageProfile, status: WordStatus? = nil, pos: PartOfSpeech? = nil
     ) async -> [WordRow] {
-        let direct = (try? await database.words(language: profile.code, search: term, status: status)) ?? []
+        let direct = (try? await database.words(language: profile.code, search: term, status: status, pos: pos)) ?? []
         guard direct.isEmpty, !term.trimmingCharacters(in: .whitespaces).isEmpty else { return direct }
         var found: [WordRow] = []
         for lemma in profile.lemmas(of: term) where lemma != term {
-            let rows = (try? await database.words(language: profile.code, search: lemma, status: status)) ?? []
+            let rows = (try? await database.words(language: profile.code, search: lemma, status: status, pos: pos)) ?? []
             found += rows.filter { row in !found.contains { $0.id == row.id } }
         }
         return found

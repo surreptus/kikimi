@@ -58,9 +58,10 @@ extension LangDatabase {
         }
     }
 
-    /// Words of one language, most frequent in your videos first. `search` matches anywhere in the lemma.
+    /// Words of one language, most frequent in your videos first. `search` matches anywhere in the lemma; `status`
+    /// and `pos` (noun, verb...) narrow it, and either left nil means all.
     public func words(
-        language: String, search: String = "", status: WordStatus? = nil, limit: Int = 50_000
+        language: String, search: String = "", status: WordStatus? = nil, pos: PartOfSpeech? = nil, limit: Int = 50_000
     ) async throws -> [WordRow] {
         let escaped = search
             .replacingOccurrences(of: "\\", with: "\\\\")
@@ -70,10 +71,11 @@ extension LangDatabase {
             try WordRow.fetchAll(db, sql: """
                 SELECT words.*, (SELECT COUNT(*) FROM occurrences WHERE word_id = words.id) AS occurrence_count
                 FROM words
-                WHERE language = ?1 AND (?2 IS NULL OR status = ?2) AND lemma LIKE ?3 ESCAPE '\\'
+                WHERE language = ?1 AND (?2 IS NULL OR status = ?2) AND (?5 IS NULL OR pos = ?5)
+                  AND lemma LIKE ?3 ESCAPE '\\'
                 ORDER BY occurrence_count DESC, lemma
                 LIMIT ?4
-                """, arguments: [language, status?.rawValue, "%\(escaped)%", limit])
+                """, arguments: [language, status?.rawValue, "%\(escaped)%", limit, pos?.rawValue])
         }
     }
 
