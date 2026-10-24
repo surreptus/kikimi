@@ -2,7 +2,7 @@ import AppKit
 import LangCore
 import SwiftUI
 
-/// The tabs of the Settings window, listed down its left side.
+/// The tabs of the Settings window.
 enum SettingsTab: String, CaseIterable, Identifiable {
     case general = "General"
     case languages = "Languages"
@@ -13,80 +13,43 @@ enum SettingsTab: String, CaseIterable, Identifiable {
 
     var symbol: String {
         switch self {
-        case .general: "slider.horizontal.3"
+        case .general: "gearshape"
         case .languages: "globe"
-        case .data: "externaldrive.fill"
-        case .about: "info.circle.fill"
+        case .data: "externaldrive"
+        case .about: "info.circle"
         }
     }
 }
 
-/// Settings (⌘,): a page in the sidebar like the others, with a row of tabs across the top and the chosen tab's
-/// content below. Everything here changes the same stored values the rest of the app uses, so the two places never
-/// disagree.
+/// The Settings window (⌘,). It is deliberately an ordinary Mac settings window, with icon tabs along the top and
+/// grouped forms, so it looks like the settings of every other app. Everything here changes the same stored values
+/// the rest of the app uses, so the two places never disagree.
 struct SettingsView: View {
     @Environment(AppState.self) private var app
+    @AppStorage(Appearance.key) private var appearance = Appearance.system
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            ScreenTitle(text: "Settings", subtitle: "How Reprise looks, works and keeps your data.")
-            tabBar
-            Group {
-                if case .ready(let env) = app.phase {
-                    switch app.settingsTab {
-                    case .general: GeneralTab()
-                    case .languages: LanguagesTab(env: env)
-                    case .data: DataTab(env: env)
-                    case .about: AboutTab()
-                    }
-                } else {
-                    ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+        Group {
+            if case .ready(let env) = app.phase {
+                TabView(selection: Bindable(app).settingsTab) {
+                    GeneralTab()
+                        .tabItem { Label(SettingsTab.general.rawValue, systemImage: SettingsTab.general.symbol) }
+                        .tag(SettingsTab.general)
+                    LanguagesTab(env: env)
+                        .tabItem { Label(SettingsTab.languages.rawValue, systemImage: SettingsTab.languages.symbol) }
+                        .tag(SettingsTab.languages)
+                    DataTab(env: env)
+                        .tabItem { Label(SettingsTab.data.rawValue, systemImage: SettingsTab.data.symbol) }
+                        .tag(SettingsTab.data)
+                    AboutTab()
+                        .tabItem { Label(SettingsTab.about.rawValue, systemImage: SettingsTab.about.symbol) }
+                        .tag(SettingsTab.about)
                 }
+            } else {
+                ProgressView().frame(width: 480, height: 200)
             }
         }
-        .padding(Theme.screenPadding)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
-
-    /// The sub-tabs, as the Mac's own segmented control: arrow keys, VoiceOver and the system look come with it.
-    private var tabBar: some View {
-        Picker("Settings section", selection: Bindable(app).settingsTab) {
-            ForEach(SettingsTab.allCases) { Text($0.rawValue).tag($0) }
-        }
-        .pickerStyle(.segmented)
-        .labelsHidden()
-        .fixedSize()
-    }
-}
-
-// MARK: Page building blocks
-
-/// A tab's content: its groups, scrolling, at a width that is comfortable to read.
-private struct SettingsPage<Content: View>: View {
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 22) { content }
-                .frame(maxWidth: 680, alignment: .leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, 20)
-        }
-    }
-}
-
-/// A heading, an optional line under it, and what belongs to it.
-private struct SettingsGroup<Content: View>: View {
-    let title: String
-    var note: String?
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(title).font(Theme.title(17)).foregroundStyle(Theme.ink)
-            if let note { Text(note).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true) }
-            content
-        }
+        .preferredColorScheme(appearance.colorScheme)
     }
 }
 
@@ -98,16 +61,17 @@ private struct GeneralTab: View {
     @AppStorage(Appearance.key) private var appearance = Appearance.system
 
     var body: some View {
-        SettingsPage {
-            SettingsGroup(title: "Appearance", note: "Match system follows your Mac's Light or Dark setting.") {
+        Form {
+            Section {
                 Picker("Appearance", selection: $appearance) {
                     ForEach(Appearance.allCases, id: \.self) { Text($0.title).tag($0) }
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .frame(maxWidth: 380)
+            } footer: {
+                Text("Match system follows your Mac's Light or Dark setting.")
             }
         }
+        .formStyle(.grouped)
+        .frame(width: 520, height: 170)
     }
 }
 
@@ -120,24 +84,24 @@ private struct LanguagesTab: View {
     @State private var refresh = 0
 
     var body: some View {
-        SettingsPage {
-            Text("A model downloads once, from the Videos page, the first time you need it. The model applies to videos you add from now on; videos already added keep their transcripts.")
-                .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+        Form {
             ForEach(LanguageProfiles.all, id: \.code) { profile in
-                SettingsGroup(title: profile.displayName) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Picker("Speech model", selection: modelBinding(profile)) {
-                            ForEach(choices(for: profile), id: \.self) { Text(label(for: $0, profile: profile)).tag($0) }
-                        }
-                        Picker("Sentence audio on review cards", selection: audioBinding(profile)) {
-                            ForEach(SentenceAudioMode.allCases, id: \.self) { Text($0.title).tag($0) }
-                        }
+                Section(profile.displayName) {
+                    Picker("Speech model", selection: modelBinding(profile)) {
+                        ForEach(choices(for: profile), id: \.self) { Text(label(for: $0, profile: profile)).tag($0) }
                     }
-                    .panel()
+                    Picker("Sentence audio on review cards", selection: audioBinding(profile)) {
+                        ForEach(SentenceAudioMode.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
                 }
             }
+            Section {} footer: {
+                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts.")
+            }
         }
+        .formStyle(.grouped)
         .id(refresh)
+        .frame(width: 520, height: 400)
     }
 
     private func modelBinding(_ profile: any LanguageProfile) -> Binding<String> {
@@ -175,37 +139,52 @@ private struct LanguagesTab: View {
 private struct DataTab: View {
     let env: LangEnvironment
     @Environment(AppState.self) private var app
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         @Bindable var backup = app.backup
-        SettingsPage {
-            SettingsGroup(
-                title: "Back up your progress",
-                note: "Saves the words you are learning and the ones you know, with their stages and review dates, to a file. It doesn't include videos or speech models.") {
-                    HStack(spacing: 12) {
-                        Button("Save backup…") { Task { await app.backup.export(env: env) } }
-                            .buttonStyle(.pill)
-                            .disabled(isWorking)
-                        if case .exported(let url, let words) = backup.state {
-                            Text("Saved \(plural(words, "word")).").font(Theme.small).foregroundStyle(Theme.ink)
-                            Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
-                                .buttonStyle(.pill(.secondary, compact: true))
-                        }
+        Form {
+            Section {
+                HStack(spacing: 12) {
+                    Button("Save backup…") { Task { await app.backup.export(env: env) } }
+                        .disabled(isWorking)
+                    if case .exported(let url, let words) = backup.state {
+                        Text("Saved \(plural(words, "word")).").foregroundStyle(.secondary)
+                        Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
                     }
                 }
+            } header: {
+                Text("Back up your progress")
+            } footer: {
+                Text("Saves the words you are learning and the ones you know, with their stages and review dates, to a file. It doesn't include videos or speech models.")
+            }
 
-            SettingsGroup(
-                title: "Restore from a backup",
-                note: "Choose a backup file, or drop one here. You'll see what would change before anything does, and progress you already have is never overwritten.") {
-                    restore(backup)
-                }
+            Section {
+                restore(backup)
+            } header: {
+                Text("Restore from a backup")
+            } footer: {
+                Text("Choose a backup file, or drop one on this window. You'll see what would change before anything does, and progress you already have is never overwritten.")
+            }
 
-            SettingsGroup(title: "Storage", note: "Speech models and your saved videos are kept on this Mac.") {
+            Section {
                 Button("Manage storage…") {
+                    openWindow(id: "main")
+                    NSApp.activate(ignoringOtherApps: true)
                     app.showStorage = true
                 }
-                .buttonStyle(.pill(.secondary, compact: true))
+            } header: {
+                Text("Storage")
+            } footer: {
+                Text("Speech models and your saved videos are kept on this Mac.")
             }
+        }
+        .formStyle(.grouped)
+        .frame(width: 560, height: 520)
+        .dropDestination(for: URL.self) { urls, _ in
+            guard let url = urls.first(where: { $0.pathExtension == ProgressBackup.fileExtension }) else { return false }
+            Task { await app.backup.open(url, env: env) }
+            return true
         }
         // The File menu's Export and Import items land here and ask for the action.
         .task(id: app.backup.request) {
@@ -229,52 +208,35 @@ private struct DataTab: View {
         case .working:
             ProgressView().controlSize(.small)
         case .previewing(let pending):
-            previewCard(pending, backup)
+            previewContent(pending, backup)
         case .restored(let report, let settingsRestored):
-            card {
-                Text("Restored").font(.system(.headline, design: .rounded))
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Restored").font(.headline)
                 Text(restoredLine(report) + (settingsRestored ? " Settings restored too." : ""))
-                    .foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
-                Button("Done") { backup.reset() }.buttonStyle(.pill(compact: true))
+                    .foregroundStyle(.secondary)
+                Button("Done") { backup.reset() }
             }
         case .failed(let message):
-            card {
-                Text(message).foregroundStyle(Theme.red).fixedSize(horizontal: false, vertical: true)
-                Button("Try again") { backup.reset() }.buttonStyle(.pill(.secondary, compact: true))
+            VStack(alignment: .leading, spacing: 8) {
+                Text(message).foregroundStyle(.red)
+                Button("Try again") { backup.reset() }
             }
         case .idle, .exported:
-            chooser(backup)
+            Button("Choose file…") { Task { await backup.chooseFile(env: env) } }
         }
     }
 
-    private func chooser(_ backup: BackupModel) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Button("Choose file…") { Task { await backup.chooseFile(env: env) } }.buttonStyle(.pill(.secondary))
-        }
-        .frame(maxWidth: .infinity, minHeight: 78, alignment: .center)
-        .background(RoundedRectangle(cornerRadius: 18).fill(Theme.soft.opacity(0.5)))
-        .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(Theme.ink.opacity(0.3), style: StrokeStyle(lineWidth: 1.5, dash: [8, 7])))
-        .dropDestination(for: URL.self) { urls, _ in
-            guard let url = urls.first(where: { $0.pathExtension == ProgressBackup.fileExtension }) else { return false }
-            Task { await backup.open(url, env: env) }
-            return true
-        }
-    }
-
-    private func previewCard(_ pending: BackupModel.Pending, _ backup: BackupModel) -> some View {
+    private func previewContent(_ pending: BackupModel.Pending, _ backup: BackupModel) -> some View {
         let preview = pending.preview, report = preview.report
         let total = preview.learning + preview.known + preview.burned
         let languages = preview.languages.compactMap { LanguageProfiles.profile(for: $0)?.displayName }.joined(separator: ", ")
-        return card {
-            Text("Backup from \(preview.createdAt.formatted(date: .abbreviated, time: .omitted))")
-                .font(.system(.headline, design: .rounded))
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("Backup from \(preview.createdAt.formatted(date: .abbreviated, time: .omitted))").font(.headline)
             Text("\(plural(total, "word")): \(preview.learning) learning, \(preview.known) known, \(preview.burned) finished"
                  + (languages.isEmpty ? "" : " · \(languages)"))
-                .foregroundStyle(Theme.muted)
+                .foregroundStyle(.secondary)
             VStack(alignment: .leading, spacing: 4) {
-                if report.changes == 0 {
-                    Text("Everything in this file is already here, so nothing would change.")
-                }
+                if report.changes == 0 { Text("Everything in this file is already here, so nothing would change.") }
                 if report.restored > 0 { Text("• \(plural(report.restored, "word")) here will take the backup's progress.") }
                 if report.added > 0 {
                     Text("• \(plural(report.added, "word")) not in your library yet will be added, and join their sentences when you add the videos.")
@@ -288,12 +250,13 @@ private struct DataTab: View {
                 @Bindable var backup = backup
                 Toggle("Also restore the settings in this file", isOn: $backup.includeSettings)
             }
-            HStack(spacing: 10) {
+            HStack {
                 if report.changes > 0 {
-                    Button("Restore") { Task { await backup.restore(env: env, app: app) } }.buttonStyle(.pill(compact: true))
-                    Button("Cancel") { backup.reset() }.buttonStyle(.pill(.secondary, compact: true))
+                    Button("Restore") { Task { await backup.restore(env: env, app: app) } }
+                        .keyboardShortcut(.defaultAction)
+                    Button("Cancel") { backup.reset() }
                 } else {
-                    Button("Done") { backup.reset() }.buttonStyle(.pill(compact: true))
+                    Button("Done") { backup.reset() }
                 }
             }
         }
@@ -306,54 +269,51 @@ private struct DataTab: View {
         if report.kept > 0 { parts.append("\(plural(report.kept, "word")) kept as they were") }
         return parts.isEmpty ? "Nothing needed changing." : parts.joined(separator: ", ") + "."
     }
-
-    private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 10, content: content)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(Theme.ink)
-            .panel(padding: 16)
-    }
 }
 
 // MARK: About
 
 private struct AboutTab: View {
     @Environment(AppState.self) private var app
+    @Environment(\.openWindow) private var openWindow
 
     private var version: String {
         let info = Bundle.main.infoDictionary
         let short = info?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = info?["CFBundleVersion"] as? String ?? "1"
-        return "Version \(short) (\(build))"
+        return "\(short) (\(build))"
     }
 
     var body: some View {
-        SettingsPage {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Reprise").font(Theme.title(24)).foregroundStyle(Theme.ink)
-                Text(version).font(Theme.small).foregroundStyle(Theme.muted)
-                Text("Learn Spanish or Japanese from videos you own, on your Mac.").foregroundStyle(Theme.muted)
-                    .padding(.top, 4)
+        Form {
+            Section {
+                LabeledContent("Reprise", value: "Version \(version)")
+                Text("Learn Spanish or Japanese from videos you own, on your Mac.").foregroundStyle(.secondary)
             }
-            SettingsGroup(title: "Read more") {
-                HStack(spacing: 10) {
-                    link("How it works") { app.showAbout = true }
-                    link("Privacy policy") { app.showPrivacy = true }
-                    link("Acknowledgements") { app.showAcknowledgements = true }
-                }
+            Section("Read more") {
+                Button("How Reprise works") { inMainWindow { app.showAbout = true } }
+                Button("Privacy policy") { inMainWindow { app.showPrivacy = true } }
+                Button("Acknowledgements") { inMainWindow { app.showAcknowledgements = true } }
             }
-            SettingsGroup(title: "Open source", note: "Reprise is free software under the MIT licence.") {
+            Section {
                 if let url = URL(string: "https://github.com/surreptus/reprise") {
-                    Link("github.com/surreptus/reprise", destination: url).foregroundStyle(Theme.ink).underline()
+                    Link("github.com/surreptus/reprise", destination: url)
                 }
+            } header: {
+                Text("Open source")
+            } footer: {
+                Text("Reprise is free software under the MIT licence.")
             }
         }
+        .formStyle(.grouped)
+        .frame(width: 520, height: 420)
     }
 
-    /// Opens one of the other panels.
-    private func link(_ title: String, _ open: @escaping () -> Void) -> some View {
-        Button(title) { open() }
-        .buttonStyle(.pill(.secondary, compact: true))
+    /// Those panels belong to the main window, so bring it forward and open them there.
+    private func inMainWindow(_ action: () -> Void) {
+        openWindow(id: "main")
+        NSApp.activate(ignoringOtherApps: true)
+        action()
     }
 }
 

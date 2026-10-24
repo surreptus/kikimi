@@ -27,6 +27,8 @@ final class AppState {
     let backup = BackupModel()
     /// Which tab the Settings window shows; set before opening it to land on one.
     var settingsTab: SettingsTab = .general
+    /// Bumped to ask the main window to open the Settings window.
+    private(set) var settingsRequest = 0
     /// +1 when moving down the nav list, -1 when moving up; decides which way the new screen slides in.
     private(set) var navDirection: CGFloat = 1
     /// Asked for by the menu bar; the Videos page and the Words page act on them when they show.
@@ -79,10 +81,10 @@ final class AppState {
         }
     }
 
-    /// Goes to the Settings page, on a tab.
+    /// Opens the Settings window on a tab.
     func openSettings(_ tab: SettingsTab) {
         settingsTab = tab
-        select(.settings)
+        settingsRequest += 1   // the main window sees this and opens it (only a view can, through `openSettings`)
     }
 
     /// A `.reprise` file opened from Finder or dropped on the Dock icon: show what it would restore.

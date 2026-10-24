@@ -58,7 +58,7 @@ the Words screen's search, filter and selection, so they survive switching scree
 | `VideosView`, `ImportSection` | Add videos (drop zone, model choice and download, import progress), then your videos: details, delete |
 | `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
 | `StorageView` | Downloaded models and videos, with removal |
-| `SettingsView`, `BackupModel` | ⌘, goes to the last page in the sidebar, with tabs across the top: General, Languages, Data (save and restore progress, via LangCore's `ProgressBackup`), About |
+| `SettingsView`, `BackupModel` | The ⌘, window: a standard Mac settings window with icon tabs General, Languages, Data (save and restore progress, via LangCore's `ProgressBackup`), About |
 | `AppCommands` | The menu bar: Add Videos, Storage, the Go menu (pages and Find Words), Help pages; Export and Import Progress open Settings on the Data tab |
 
 `Theme.swift` is the design system: one colour field for the whole window, a monotone ink accent, pill buttons and flat panels. `SideNav` is the left strip, and `Modal.swift` shows panels that close on an outside click. Use these rather than styling views ad hoc.

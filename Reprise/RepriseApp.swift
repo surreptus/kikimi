@@ -17,5 +17,10 @@ struct RepriseApp: App {
         }
         .defaultSize(width: 1240, height: 800)
         .commands { AppCommands(app: app) }
+
+        // A standard Settings window. SwiftUI adds the Settings… item (⌘,) to the app menu for it.
+        Settings {
+            SettingsView().environment(app)
+        }
     }
 }

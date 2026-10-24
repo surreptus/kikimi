@@ -6,13 +6,6 @@ struct AppCommands: Commands {
     let app: AppState
 
     var body: some Commands {
-        // Settings is a panel in the window, so the menu item is ours (a Settings scene would open a second window).
-        CommandGroup(replacing: .appSettings) {
-            Button("Settings…") { app.openSettings(app.settingsTab) }
-                .keyboardShortcut(",")
-                .disabled(!app.isReady)
-        }
-
         // One window, so there is no "New Window". Adding a video is what "New" means here.
         CommandGroup(replacing: .newItem) {
             Button("Add Videos…") { app.requestAddVideos() }

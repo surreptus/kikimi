@@ -4,6 +4,7 @@ import SwiftUI
 struct RootView: View {
     @Environment(AppState.self) private var app
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         Group {
@@ -22,6 +23,10 @@ struct RootView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background { ZStack { windowColor; NoiseOverlay() } }
         .containerBackground(for: .window) { ZStack { windowColor; NoiseOverlay() } }
+        .onChange(of: app.settingsRequest) { _, _ in
+            NSApp.activate(ignoringOtherApps: true)
+            openSettings()
+        }
         .toolbar(removing: .title)
         .toolbarBackground(.hidden, for: .windowToolbar)
         .tint(Theme.accent)
@@ -43,7 +48,8 @@ struct RootView: View {
             SideNav(
                 selection: selection, dueCount: app.dueCount,
                 languages: LanguageProfiles.all.map { ($0.code, $0.displayName) },
-                language: $app.languageCode, showAbout: { app.showAbout = true })
+                language: $app.languageCode, showAbout: { app.showAbout = true },
+                showSettings: { app.openSettings(app.settingsTab) })
             ZStack {
                 detail(env: env)
                     .id(app.section)
@@ -70,7 +76,6 @@ struct RootView: View {
         case .videos: VideosView(env: env)
         case .words: WordsView(env: env)
         case .review: ReviewView(env: env)
-        case .settings: SettingsView()
         }
     }
 }
