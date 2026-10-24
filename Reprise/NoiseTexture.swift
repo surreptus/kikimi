@@ -5,8 +5,8 @@ import SwiftUI
 /// never changes between launches), then repeated. It only nudges the colour a little, so text keeps its contrast,
 /// and it goes away when the Mac's Increase Contrast setting is on.
 struct NoiseOverlay: View {
-    /// How strong the grain is. At 0.10 the background varies by about 5 of 255 brightness levels: felt more than seen.
-    var strength: Double = 0.10
+    /// How strong the grain is. At 0.18 the background varies by about 8 of 255 brightness levels: a visible, soft grain.
+    var strength: Double = 0.18
     @Environment(\.colorSchemeContrast) private var contrast
 
     var body: some View {
