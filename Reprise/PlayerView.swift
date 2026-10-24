@@ -36,20 +36,25 @@ struct PlayerView: View {
     private var shownToken: Token? { pinnedToken ?? hoveredToken ?? lingerToken }
 
     var body: some View {
-        VStack(spacing: 0) {
-            topBar
-            Group {
-                if let controller {
-                    content(controller)
-                } else if let failure {
-                    ContentUnavailableView("Can't play this video", systemImage: "exclamationmark.triangle",
-                                           description: Text(failure))
-                } else {
-                    ProgressView()
+        Group {
+            if let controller {
+                content(controller)   // the Back button is in its left column, so the side panel runs to the top
+            } else {
+                VStack(spacing: 0) {
+                    topBar.padding(.horizontal, 20).padding(.top, 20)
+                    Group {
+                        if let failure {
+                            ContentUnavailableView("Can't play this video", systemImage: "exclamationmark.triangle",
+                                                   description: Text(failure))
+                        } else {
+                            ProgressView()
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .task { await load() }
         .task(id: shownToken?.lemma) { await refreshHint(announce: pinnedToken != nil) }
         .task(id: app.dataVersion) {
@@ -114,7 +119,6 @@ struct PlayerView: View {
             Text("Back to \(backTitle)").font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(Theme.muted)
             Spacer()
         }
-        .padding(.horizontal, 20).padding(.top, 16)
     }
 
     private func load() async {
@@ -132,6 +136,7 @@ struct PlayerView: View {
     private func content(_ controller: PlaybackController) -> some View {
         HStack(spacing: 0) {
             VStack(spacing: 14) {
+                topBar
                 VideoPlayer(player: controller.player)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(Theme.line, lineWidth: 1))
@@ -189,7 +194,7 @@ struct PlayerView: View {
             .lineLimit(2)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 16).padding(.top, 16).padding(.bottom, 6)
+            .padding(.horizontal, 16).padding(.top, 20).padding(.bottom, 6)
             .accessibilityAddTraits(.isHeader)
     }
 
