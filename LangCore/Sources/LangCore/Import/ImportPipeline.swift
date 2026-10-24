@@ -115,6 +115,9 @@ public actor ImportPipeline {
         of staged: URL, profile: any LanguageProfile, model: String, progress: ProgressHandler
     ) async throws {
         progress(ImportProgress(stage: .detectingLanguage, fraction: 0))
+        // Usually the first thing to need the model, so a slow load shows up here; a failure is left for the transcribe
+        // step to report, since this check is only advice.
+        try? await prepareModel(model, stage: .detectingLanguage, progress: progress, failing: false)
         if let guess = try? await transcriber.detectLanguage(mediaURL: staged, model: model),
            guess.confidence >= Self.languageConfidence, guess.code != profile.whisperCode,
            let other = LanguageProfiles.all.first(where: { $0.whisperCode == guess.code }) {
@@ -127,11 +130,25 @@ public actor ImportPipeline {
         _ staged: URL, profile: any LanguageProfile, model: String, progress: @escaping ProgressHandler
     ) async throws -> [TranscriptSegment] {
         progress(ImportProgress(stage: .transcribing, fraction: 0))
+        // Already loaded if the language check ran; otherwise this is where a slow load happens.
+        try await prepareModel(model, stage: .transcribing, progress: progress, failing: true)
         do {
             return try await transcriber.transcribe(
                 mediaURL: staged, whisperCode: profile.whisperCode, model: model,
                 progress: { progress(ImportProgress(stage: .transcribing, fraction: $0)) })
         } catch { throw Self.wrapped(error, ImportError.transcriptionFailed) }
+    }
+
+    /// Loads the model if it isn't already, saying so while it does: the first load can take minutes, and the bar
+    /// has nothing to show for it. Nothing is reported when it is already loaded.
+    private func prepareModel(
+        _ model: String, stage: ImportStage, progress: ProgressHandler, failing: Bool
+    ) async throws {
+        guard await !transcriber.isModelLoaded(model) else { return }
+        progress(ImportProgress(stage: stage, fraction: 0, note: .loadingModel))
+        do { try await transcriber.loadModel(model) }
+        catch { if failing { throw Self.wrapped(error, ImportError.transcriptionFailed) } }
+        progress(ImportProgress(stage: stage, fraction: 0))   // clears the note
     }
 
     /// The library files built in staging, before they are moved in.

@@ -52,6 +52,10 @@ public final class ImportQueue {
         public var fileName: String { url.lastPathComponent }
         /// False for an import the user chose to go ahead with after a language warning.
         public var checksLanguage: Bool { !skipsLanguageCheck }
+        /// What is worth saying about the current step, such as that the model is loading.
+        public fileprivate(set) var note: ImportNote?
+        /// When the current step began (or, if the model was loading, when that finished), for the time left.
+        public fileprivate(set) var stageStartedAt: Date?
     }
 
     public private(set) var jobs: [Job] = []
@@ -121,7 +125,7 @@ public final class ImportQueue {
             let job = jobs[index]
             set(job.id, .running(.hashing, 0))
             let update: @Sendable (ImportProgress) -> Void = { [weak self] p in
-                Task { @MainActor in self?.set(job.id, .running(p.stage, p.fraction)) }
+                Task { @MainActor in self?.report(job.id, p) }
             }
             let work = Task { [pipeline] in
                 try await pipeline.importVideo(
@@ -146,6 +150,20 @@ public final class ImportQueue {
             }
         }
         worker = nil
+    }
+
+    /// Records a progress report: the status, the note, and when the step started (restarted when the model finishes
+    /// loading, so the load doesn't count against the time left).
+    private func report(_ id: UUID, _ progress: ImportProgress) {
+        guard let index = jobs.firstIndex(where: { $0.id == id }) else { return }
+        let before = jobs[index]
+        set(id, .running(progress.stage, progress.fraction))
+        guard isRunning(jobs[index].status) else { return }   // a late report from a job that has finished
+        var sameStage = false
+        if case .running(let stage, _) = before.status, stage == progress.stage { sameStage = true }
+        let modelJustLoaded = before.note != nil && progress.note == nil
+        if !sameStage || before.stageStartedAt == nil || modelJustLoaded { jobs[index].stageStartedAt = Date() }
+        jobs[index].note = progress.note
     }
 
     /// Late progress updates from a finished job must not overwrite its final status.

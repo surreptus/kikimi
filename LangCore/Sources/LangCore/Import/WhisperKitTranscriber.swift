@@ -20,6 +20,10 @@ public actor WhisperKitTranscriber: Transcriber {
         self.chunking = chunking
     }
 
+    public func isModelLoaded(_ model: String) async -> Bool { loaded?.model == model }
+
+    public func loadModel(_ model: String) async throws { _ = try await kit(for: model) }
+
     public func detectLanguage(mediaURL: URL, model: String) async throws -> LanguageGuess? {
         let kit = try await kit(for: model)
         let opening = try await AudioExtractor.pcm16kMono(from: mediaURL, limit: 30)

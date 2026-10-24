@@ -20,10 +20,22 @@ public enum ImportStage: String, Sendable, CaseIterable {
     }
 }
 
+/// Something worth saying about a step beyond its name.
+public enum ImportNote: Sendable, Equatable {
+    /// The speech model is being loaded into memory. The first time on a Mac it is also compiled for it, which can
+    /// take minutes, and nothing else is reported meanwhile.
+    case loadingModel
+}
+
 public struct ImportProgress: Sendable {
     public let stage: ImportStage
     /// 0...1 within the stage.
     public let fraction: Double
+    public let note: ImportNote?
+
+    public init(stage: ImportStage, fraction: Double, note: ImportNote? = nil) {
+        self.stage = stage; self.fraction = fraction; self.note = note
+    }
 }
 
 public typealias ProgressHandler = @Sendable (ImportProgress) -> Void
@@ -93,6 +105,11 @@ public protocol Transcriber: Sendable {
         mediaURL: URL, whisperCode: String, model: String,
         progress: @escaping @Sendable (Double) -> Void
     ) async throws -> [TranscriptSegment]
+
+    /// Whether `model` is loaded and ready, and a way to load it. These let the pipeline tell the user when the
+    /// wait is the model loading; the defaults say "always ready".
+    func isModelLoaded(_ model: String) async -> Bool
+    func loadModel(_ model: String) async throws
 }
 
 public protocol MediaTranscoder: Sendable {
@@ -104,4 +121,9 @@ public protocol MediaTranscoder: Sendable {
 
 extension Transcriber {
     public func detectLanguage(mediaURL: URL, model: String) async throws -> LanguageGuess? { nil }
+    /// Whether `model` is ready to use right now. A transcriber with nothing to load is always ready.
+    public func isModelLoaded(_ model: String) async -> Bool { true }
+    /// Loads `model` ahead of its first use, so the pipeline can say it is doing so.
+    public func loadModel(_ model: String) async throws {}
 }
+

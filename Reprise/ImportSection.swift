@@ -200,8 +200,12 @@ struct ImportSection: View {
                         }
                     }
                     if case .running(let stage, let fraction) = job.status {
-                        // Without a real fraction (the language check, for one) the bar moves instead of sitting empty.
-                        ProgressView(value: stage.reportsProgress ? fraction : nil).progressViewStyle(.thin)
+                        // Without a real fraction (the language check, or while the model loads) the bar moves instead
+                        // of sitting empty.
+                        ProgressView(value: stage.reportsProgress && job.note == nil ? fraction : nil).progressViewStyle(.thin)
+                        if let detail = detailText(job) {
+                            Text(detail).font(Theme.small).foregroundStyle(Theme.muted)
+                        }
                     }
                     if case .failed(let message) = job.status {
                         Text(message).font(Theme.small).foregroundStyle(Theme.red)
@@ -269,6 +273,19 @@ struct ImportSection: View {
         case .running: Theme.ink
         default: .secondary
         }
+    }
+
+    /// The line under the bar: that the model is loading (the quiet wait before anything can be measured), or how far
+    /// along transcribing or compressing is, with the time left once there is enough to judge it by.
+    private func detailText(_ job: ImportQueue.Job) -> String? {
+        guard case .running(let stage, let fraction) = job.status else { return nil }
+        if job.note == .loadingModel { return "Loading the speech model. The first time can take a few minutes." }
+        guard stage.reportsProgress, fraction > 0 else { return nil }
+        let percent = "\(Int((fraction * 100).rounded()))%"
+        guard let started = job.stageStartedAt,
+              let left = ProgressEstimate.secondsLeft(elapsed: Date().timeIntervalSince(started), fraction: fraction)
+        else { return percent }
+        return "\(percent) · \(ProgressEstimate.phrase(secondsLeft: left))"
     }
 
     /// "3 of 8 · Transcribing": the step's place in the import (out of 7 if the language check was skipped).
