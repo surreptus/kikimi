@@ -31,6 +31,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `SRS/`, `Review/` | The nine review stages and their intervals; review sessions and sentence audio. |
 | `Playback/` | The player controller, subtitle timeline and word hints. |
 | `Export/` | Audio and video clip export. |
+| `Backup/` | `ProgressBackup`: the `.reprise` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. |
 | `Environment/` | `LangEnvironment` and where videos live on disk. |
 
 ## The import pipeline
@@ -57,8 +58,8 @@ the Words screen's search, filter and selection, so they survive switching scree
 | `VideosView`, `ImportSection` | Add videos (drop zone, model choice and download, import progress), then your videos: details, delete |
 | `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
 | `StorageView` | Downloaded models and videos, with removal |
-| `SettingsView` | ⌘, window: appearance, and the speech model and sentence audio for each language |
-| `AppCommands` | The menu bar: Add Videos, Storage, the Go menu (pages and Find Words), Help pages |
+| `SettingsView`, `BackupModel` | ⌘, panel with tabs on the left: General, Languages, Data (save and restore progress, via LangCore's `ProgressBackup`), About |
+| `AppCommands` | The menu bar: Add Videos, Storage, the Go menu (pages and Find Words), Help pages; Export and Import Progress open Settings on the Data tab |
 
 `Theme.swift` is the design system: one colour field for the whole window, a monotone ink accent, pill buttons and flat panels. `SideNav` is the left strip, and `Modal.swift` shows panels that close on an outside click. Use these rather than styling views ad hoc.
 

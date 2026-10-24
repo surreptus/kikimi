@@ -35,6 +35,10 @@ The first time you need a speech model, Reprise downloads it from Hugging Face (
 
 Once a model is downloaded, Reprise works without an internet connection.
 
+## Backups
+
+If you choose Save backup in Settings, Reprise writes a file with your progress to the place you pick. It is never uploaded anywhere; where it goes after that is up to you.
+
 ## What Reprise does not do
 
 - It does not create accounts or ask for your name, email or any personal details.

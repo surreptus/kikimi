@@ -12,6 +12,15 @@ enum ExportPanels {
         return panel.runModal() == .OK ? panel.url : nil
     }
 
+    /// Choose one file with this extension (a `.reprise` backup).
+    static func openFile(fileExtension: String) -> URL? {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.allowedContentTypes = UTType(filenameExtension: fileExtension).map { [$0] } ?? []
+        return panel.runModal() == .OK ? panel.url : nil
+    }
+
     static func chooseFolder(message: String) -> URL? {
         let panel = NSOpenPanel()
         panel.canChooseFiles = false

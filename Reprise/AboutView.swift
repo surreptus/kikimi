@@ -23,6 +23,7 @@ struct AboutView: View {
                     gettingStarted
                     importSteps
                     reviews
+                    backups
                     shortcuts
                 }
                 .padding(.horizontal, 24).padding(.bottom, 28)
@@ -136,6 +137,13 @@ struct AboutView: View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text("•").accessibilityHidden(true)
             paragraph(text)
+        }
+    }
+
+    private var backups: some View {
+        section("Keeping your progress safe") {
+            paragraph("In Settings, under Data, Save backup writes the words you are learning and the ones you know, with their stages and review dates, to a file ending in .reprise. It doesn't include videos or speech models.")
+            paragraph("To restore, choose the file in the same place, drop it there, or double-click it. You'll see what would change first, and progress you already have is never overwritten. Words from a backup join their sentences when you add the videos again.")
         }
     }
 

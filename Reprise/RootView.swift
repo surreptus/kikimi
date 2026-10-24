@@ -39,8 +39,8 @@ struct RootView: View {
             SideNav(
                 selection: selection, dueCount: app.dueCount,
                 languages: LanguageProfiles.all.map { ($0.code, $0.displayName) },
-                language: $app.languageCode, showAbout: { app.showAbout = true }, showPrivacy: { app.showPrivacy = true }, showStorage: { app.showStorage = true },
-                showAcknowledgements: { app.showAcknowledgements = true })
+                language: $app.languageCode, showAbout: { app.showAbout = true },
+                showSettings: { app.openSettings(app.settingsTab) })
             ZStack {
                 detail(env: env)
                     .id(app.section)
@@ -53,6 +53,7 @@ struct RootView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(.container, edges: .top)   // no gap above the content; the title bar has nothing in it
         }
+        .modal(isPresented: $app.showSettings) { SettingsView() }
         .modal(isPresented: $app.showStorage) { StorageView(env: env) }
         .modal(isPresented: $app.showAbout) { AboutView() }
         .modal(isPresented: $app.showPrivacy) { PrivacyView() }

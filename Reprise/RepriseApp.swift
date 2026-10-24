@@ -13,12 +13,9 @@ struct RepriseApp: App {
                 .task { await app.start() }
                 .frame(minWidth: 980, minHeight: 620)
                 .preferredColorScheme(appearance.colorScheme)
+                .onOpenURL { app.handleOpen($0) }
         }
         .defaultSize(width: 1240, height: 800)
         .commands { AppCommands(app: app) }
-
-        Settings {
-            SettingsView().environment(app)
-        }
     }
 }

@@ -23,6 +23,11 @@ final class AppState {
     var showPrivacy = false
     var showStorage = false
     var showAcknowledgements = false
+    var showSettings = false
+    /// Saving and restoring progress; shared so the File menu, the Settings window and a double-clicked file all use it.
+    let backup = BackupModel()
+    /// Which tab the Settings window shows; set before opening it to land on one.
+    var settingsTab: SettingsTab = .general
     /// +1 when moving down the nav list, -1 when moving up; decides which way the new screen slides in.
     private(set) var navDirection: CGFloat = 1
     /// Asked for by the menu bar; the Videos page and the Words page act on them when they show.
@@ -66,10 +71,31 @@ final class AppState {
             importQueue = ImportQueue(pipeline: env.pipeline)
             phase = .ready(env)
             await refreshDue()
+            if let url = fileWaitingForLibrary {
+                fileWaitingForLibrary = nil
+                handleOpen(url)
+            }
         } catch {
             phase = .failed(error.localizedDescription)
         }
     }
+
+    /// Opens the Settings panel on a tab.
+    func openSettings(_ tab: SettingsTab) {
+        settingsTab = tab
+        showSettings = true
+    }
+
+    /// A `.reprise` file opened from Finder or dropped on the Dock icon: show what it would restore.
+    /// On a cold start the file arrives before the library has opened, so it waits until it has.
+    func handleOpen(_ url: URL) {
+        guard url.pathExtension == ProgressBackup.fileExtension else { return }
+        guard case .ready(let env) = phase else { fileWaitingForLibrary = url; return }
+        openSettings(.data)
+        Task { await backup.open(url, env: env) }
+    }
+
+    private var fileWaitingForLibrary: URL?
 
     var isReady: Bool {
         if case .ready = phase { return true }

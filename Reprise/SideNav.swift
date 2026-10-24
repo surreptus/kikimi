@@ -26,9 +26,7 @@ struct SideNav: View {
     var languages: [(code: String, name: String)]
     @Binding var language: String
     var showAbout: () -> Void
-    var showPrivacy: () -> Void
-    var showStorage: () -> Void
-    var showAcknowledgements: () -> Void
+    var showSettings: () -> Void
     @Namespace private var pill
 
     var body: some View {
@@ -64,15 +62,9 @@ struct SideNav: View {
             .buttonStyle(.plain)
             .menuIndicator(.hidden)
 
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 12) {
-                    Button("How it works", action: showAbout)
-                    Button("Privacy", action: showPrivacy)
-                }
-                HStack(spacing: 12) {
-                    Button("Storage", action: showStorage)
-                    Button("Acknowledgements", action: showAcknowledgements)
-                }
+            HStack(spacing: 12) {
+                Button("Settings", action: showSettings)
+                Button("How it works", action: showAbout)
             }
             .buttonStyle(.plain)
             .font(.system(size: 12, design: .rounded))
