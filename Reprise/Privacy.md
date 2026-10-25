@@ -13,6 +13,8 @@ _Last updated: 23 October 2026._
 
 ## What stays on your Mac
 
+> Everything you add and learn is kept on your Mac, and only you can remove it.
+
 Everything Reprise works with is stored on your Mac, in the app's own folder:
 
 - A smaller copy of each video you add, and its audio.
@@ -31,6 +33,8 @@ Transcription runs on your Mac using a speech model you have downloaded. The dic
 
 ## The one thing that uses the internet
 
+> The only time Reprise goes online is to download a speech model, and it sends nothing else.
+
 The first time you need a speech model, Reprise downloads it from Hugging Face (huggingface.co), a service that hosts it. When it does, Hugging Face can see your internet address and which model files you asked for, as any website would, and handles that under its own privacy policy. Reprise sends nothing else: not your videos, transcripts, words or how you use the app.
 
 Once a model is downloaded, Reprise works without an internet connection.
@@ -40,6 +44,8 @@ Once a model is downloaded, Reprise works without an internet connection.
 If you choose Save backup in Settings, Reprise writes a file with your progress to the place you pick. It is never uploaded anywhere; where it goes after that is up to you.
 
 ## What Reprise does not do
+
+> Reprise doesn't collect, track, advertise or share anything about you.
 
 - It does not create accounts or ask for your name, email or any personal details.
 - It does not track you or build a profile of you.

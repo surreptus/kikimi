@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// A bundled markdown document: the privacy policy (`Privacy.md`) or the terms of use (`Terms.md`). The file is also
+/// A bundled markdown document: the privacy policy (`Privacy.md`) or the terms of use (`Terms.md`), with `# `, `## `,
+/// `- ` bullets, `> ` one-line summaries and paragraphs. The file is also
 /// the one to publish at a URL, so there is one source and the two can't disagree.
 struct DocumentView: View {
     let title: String
@@ -8,17 +9,18 @@ struct DocumentView: View {
     @Environment(\.dismissModal) private var dismiss
 
     private enum Block: Identifiable {
-        case heading(String), bullet(String), paragraph(String)
+        case heading(String), bullet(String), paragraph(String), summary(String)
         var id: String {
             switch self {
             case .heading(let t): "h:" + t
             case .bullet(let t): "b:" + t
             case .paragraph(let t): "p:" + t
+            case .summary(let t): "s:" + t
             }
         }
     }
 
-    /// Headings, bullets and paragraphs: all the file uses. The page title is dropped; the panel has its own.
+    /// Headings, bullets, summaries and paragraphs: all the files use. The page title is dropped; the panel has its own.
     private var blocks: [Block] {
         guard let url = Bundle.main.url(forResource: resource, withExtension: "md"),
               let text = try? String(contentsOf: url, encoding: .utf8) else {
@@ -31,6 +33,7 @@ struct DocumentView: View {
             if line.hasPrefix("# ") { flush() }
             else if line.hasPrefix("## ") { flush(); result.append(.heading(String(line.dropFirst(3)))) }
             else if line.hasPrefix("- ") { flush(); result.append(.bullet(String(line.dropFirst(2)))) }
+            else if line.hasPrefix("> ") { flush(); result.append(.summary(String(line.dropFirst(2)))) }
             else if line.trimmingCharacters(in: .whitespaces).isEmpty { flush() }
             else { paragraph.append(line) }
         }
@@ -59,6 +62,16 @@ struct DocumentView: View {
                             }
                         case .paragraph(let text):
                             inline(text)
+                        case .summary(let text):
+                            // The one-line meaning of the section below it, set apart and stronger than the text.
+                            HStack(spacing: 10) {
+                                Capsule().fill(Theme.ink).frame(width: 3)
+                                Text((try? AttributedString(markdown: text)) ?? AttributedString(text))
+                                    .font(.system(.body, design: .rounded, weight: .semibold))
+                                    .foregroundStyle(Theme.ink)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .fixedSize(horizontal: false, vertical: true)
                         }
                     }
                 }

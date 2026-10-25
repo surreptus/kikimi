@@ -17,11 +17,15 @@ By opening or using Reprise you agree to these terms. If you do not agree, do no
 
 ## What you may do
 
+> You can use Reprise for free for your own learning, and its source code is open under the MIT licence.
+
 I give you a free, personal, non-exclusive, non-transferable licence to install and use Reprise on Macs you own or control, for learning and not for any unlawful purpose.
 
 Reprise's source code is also published under the MIT licence, in the LICENSE file of the project. Nothing in these terms takes away any right that licence gives you over the source code. These terms cover your use of the app as I distribute it.
 
 ## Your videos and your responsibility
+
+> Only use videos you are allowed to use, and what you do with them is up to you.
 
 - Reprise only works on files you give it. It does not find, stream or download videos from any website.
 - Use only videos you own, or that you are allowed to copy, transcribe and study. Do not use Reprise to get around copy protection or to infringe anyone's rights.
@@ -29,6 +33,8 @@ Reprise's source code is also published under the MIT licence, in the LICENSE fi
 - Copyright, privacy and other laws differ from place to place. Finding out what applies to you is your job.
 
 ## Learning, accuracy and no advice
+
+> Reprise can make mistakes, so treat it as a study aid and not as an authority.
 
 Transcripts, language detection, word lists, readings, dictionary entries, sentence audio and the fit of a video to your level are produced by software, from models and data made by others. They can be wrong. Reprise is a study aid and makes no promise about what you will learn, or how fast. Do not rely on it for anything where a mistake could cause harm, such as legal, medical or safety matters.
 
@@ -38,6 +44,8 @@ Everything Reprise keeps is stored on your Mac, as the privacy policy explains. 
 
 ## Other people's software and data
 
+> Reprise uses other people's software and data under their own licences, and isn't affiliated with them.
+
 Reprise includes and uses software, speech models and dictionary data from others, each under its own licence, listed under Acknowledgements. You can download speech models from a third-party service when you ask Reprise to; that service has its own terms, and I do not control what it offers or whether it stays available. Reprise is not affiliated with or endorsed by Apple, OpenAI, Hugging Face, or the makers of any dictionary or model it uses. Their names belong to them.
 
 ## No warranty
@@ -45,6 +53,8 @@ Reprise includes and uses software, speech models and dictionary data from other
 Reprise is provided "as is" and "as available", without warranties of any kind, express or implied, including any warranty of merchantability, fitness for a particular purpose, accuracy, non-infringement, or that it will work without errors or interruption, or without loss of data.
 
 ## Limit of liability
+
+> I'm not responsible for losses from using Reprise, as far as the law allows.
 
 To the fullest extent the law allows, I am not liable for any indirect, incidental, special, consequential or punitive damages, or for lost data, lost profits or lost time, arising from or related to Reprise or your use of it, whatever the legal theory and even if I was told it could happen. Because Reprise is free, to the extent I am liable at all my total liability for all claims is limited to zero dollars (US$0) where the law allows, and otherwise to the smallest amount the law allows.
 
