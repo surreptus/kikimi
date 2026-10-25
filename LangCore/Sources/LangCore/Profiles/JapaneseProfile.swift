@@ -4,7 +4,7 @@ public struct JapaneseProfile: LanguageProfile {
     public init() {}
 
     public let code = "ja"
-    public let displayName = "Japanese"
+    public var displayName: String { Locale.current.localizedString(forLanguageCode: code)?.localizedCapitalized ?? "Japanese" }
     public let whisperCode = "ja"
     public let defaultModel = "openai_whisper-large-v3"
     public let tokenizer: any WordTokenizer = JapaneseProfile.sharedTokenizer

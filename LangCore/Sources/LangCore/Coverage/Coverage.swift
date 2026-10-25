@@ -2,9 +2,9 @@ import Foundation
 import GRDB
 
 extension SRSStage {
-    /// A word being learned counts as known for coverage once its reviews are a week or more apart (Guru 1 and up):
+    /// A word being learned counts as known for coverage once its reviews are a week or more apart (stage 5 and up):
     /// by then you recognise it, even though you are still reviewing it.
-    public var isEstablished: Bool { rawValue >= SRSStage.guru1.rawValue }
+    public var isEstablished: Bool { rawValue >= SRSStage.stage5.rawValue }
 }
 
 /// How easy a video should be to follow, from how many of its content words you know.
@@ -33,10 +33,10 @@ public enum LevelFit: Int, Equatable, Sendable, CaseIterable {
 
     public var title: String {
         switch self {
-        case .hard: "Hard"
-        case .stretch: "A stretch"
-        case .comfortable: "Comfortable"
-        case .easy: "Easy"
+        case .hard: String(localized: "Hard", bundle: .module)
+        case .stretch: String(localized: "A stretch", bundle: .module)
+        case .comfortable: String(localized: "Comfortable", bundle: .module)
+        case .easy: String(localized: "Easy", bundle: .module)
         }
     }
 
@@ -107,7 +107,7 @@ public struct CoverageGoal: Equatable, Sendable {
 }
 
 private let knownCondition = """
-    (words.status IN ('known', 'burned') OR (words.status = 'learning' AND words.stage >= \(SRSStage.guru1.rawValue)))
+    (words.status IN ('known', 'burned') OR (words.status = 'learning' AND words.stage >= \(SRSStage.stage5.rawValue)))
     """
 
 extension LangDatabase {

@@ -13,12 +13,14 @@ public enum ProgressEstimate {
     /// to the minute under ten minutes, to five minutes above.
     public static func phrase(secondsLeft: TimeInterval) -> String {
         let seconds = max(0, secondsLeft)
-        if seconds < 45 { return "less than a minute left" }
-        if seconds < 90 { return "about 1 min left" }
+        if seconds < 45 { return String(localized: "less than a minute left", bundle: .module) }
+        if seconds < 90 { return String(localized: "about 1 min left", bundle: .module) }
         let minutes = seconds / 60
         let rounded = minutes < 10 ? Int(minutes.rounded()) : Int((minutes / 5).rounded()) * 5
-        if rounded < 60 { return "about \(rounded) min left" }
+        if rounded < 60 { return String(localized: "about \(rounded) min left", bundle: .module) }
         let hours = rounded / 60, rest = rounded % 60
-        return rest == 0 ? "about \(hours) h left" : "about \(hours) h \(rest) min left"
+        return rest == 0
+            ? String(localized: "about \(hours) h left", bundle: .module)
+            : String(localized: "about \(hours) h \(rest) min left", bundle: .module)
     }
 }

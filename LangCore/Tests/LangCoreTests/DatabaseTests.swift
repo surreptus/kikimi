@@ -79,13 +79,13 @@ final class DatabaseTests: XCTestCase {
         XCTAssertEqual(due.map(\.id), [id])
 
         let w = try await db.recordReview(wordID: id, correct: true, now: now)
-        XCTAssertEqual(w.stage, .apprentice2)
+        XCTAssertEqual(w.stage, .stage2)
         XCTAssertEqual(w.nextReview, now.addingTimeInterval(8 * 3600))
         due = try await db.dueWords(language: "es", now: now)
         XCTAssertTrue(due.isEmpty)
 
         let w2 = try await db.recordReview(wordID: id, correct: false, now: now)
-        XCTAssertEqual(w2.stage, .apprentice1)
+        XCTAssertEqual(w2.stage, .stage1)
     }
 
     func testBurnAndKnown() async throws {
@@ -96,8 +96,8 @@ final class DatabaseTests: XCTestCase {
         try await db.startLearning(wordID: id, now: now)
         var w = Word(language: "", lemma: "", pos: .noun)
         for _ in 0..<8 { w = try await db.recordReview(wordID: id, correct: true, now: now) }
-        XCTAssertEqual(w.status, .burned)
-        XCTAssertEqual(w.stage, .burned)
+        XCTAssertEqual(w.status, .finished)
+        XCTAssertEqual(w.stage, .finished)
         XCTAssertNil(w.nextReview)
 
         try await db.markKnown(wordID: id)

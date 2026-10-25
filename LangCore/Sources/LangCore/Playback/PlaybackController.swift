@@ -9,13 +9,6 @@ public final class PlaybackController {
     public private(set) var activeIndex: Int?
     public private(set) var currentTime: Double = 0
     public private(set) var isPlaying = false
-    /// Playback rate: 1 is normal. Applies now if playing, and to every later play.
-    public var speed: Float = 1 {
-        didSet {
-            player.defaultRate = speed
-            if isPlaying { player.rate = speed }
-        }
-    }
 
     @ObservationIgnored private let timeline: SubtitleTimeline
     @ObservationIgnored private var observer: Any?

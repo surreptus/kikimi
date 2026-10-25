@@ -10,7 +10,8 @@ extension LangRecord {
 }
 
 public enum WordStatus: String, Codable, Sendable {
-    case new, learning, known, burned
+    /// `finished` is stored as "burned": the name of this state in saved data and backups, kept so they stay valid.
+    case new, learning, known, finished = "burned"
 }
 
 public struct Video: LangRecord {
@@ -23,12 +24,15 @@ public struct Video: LangRecord {
     public var audioPath: String?
     public var duration: Double
     public var importedAt: Date
+    /// Seconds in where playback stopped; nil when there is nothing worth resuming (see `ResumePoint`).
+    public var resumePosition: Double?
 
     public init(id: Int64? = nil, language: String, title: String, contentHash: String,
-                videoPath: String, audioPath: String? = nil, duration: Double, importedAt: Date = Date()) {
+                videoPath: String, audioPath: String? = nil, duration: Double, importedAt: Date = Date(),
+                resumePosition: Double? = nil) {
         self.id = id; self.language = language; self.title = title; self.contentHash = contentHash
         self.videoPath = videoPath; self.audioPath = audioPath; self.duration = duration
-        self.importedAt = importedAt
+        self.importedAt = importedAt; self.resumePosition = resumePosition
     }
 
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }

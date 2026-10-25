@@ -69,9 +69,9 @@ public enum BackupError: Error, LocalizedError, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .notABackup: "This file isn't a Reprise backup."
-        case .newerVersion: "This backup was made by a newer version of Reprise. Update the app, then try again."
-        case .damaged: "This backup file is damaged, so nothing was changed."
+        case .notABackup: String(localized: "This file isn't a Reprise backup.", bundle: .module)
+        case .newerVersion: String(localized: "This backup was made by a newer version of Reprise. Update the app, then try again.", bundle: .module)
+        case .damaged: String(localized: "This backup file is damaged, so nothing was changed.", bundle: .module)
         }
     }
 }

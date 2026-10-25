@@ -17,9 +17,9 @@ final class KnownWordListTests: XCTestCase {
             for (language, lemma, pos, status, stage) in [
                 ("es", "casa", PartOfSpeech.noun, WordStatus.new, SRSStage?.none),
                 ("es", "casa", .verb, .new, nil),                              // same spelling, another part of speech
-                ("es", "perro", .noun, .learning, .apprentice2),
+                ("es", "perro", .noun, .learning, .stage2),
                 ("es", "mesa", .noun, .known, nil),
-                ("es", "libro", .noun, .burned, .burned),
+                ("es", "libro", .noun, .finished, .finished),
                 ("es", "árbol", .noun, .new, nil),
                 ("ja", "casa", .noun, .new, nil),                              // another language: never touched
             ] {
@@ -43,7 +43,7 @@ final class KnownWordListTests: XCTestCase {
         XCTAssertEqual(report.notInLibrary, 1, "gato isn't in the library, and isn't invented")
         let casa = try await status(db, "casa"); XCTAssertEqual(casa, [.known, .known])
         let perro = try await status(db, "perro"); XCTAssertEqual(perro, [.known])
-        let libro = try await status(db, "libro"); XCTAssertEqual(libro, [.burned], "finished stays finished")
+        let libro = try await status(db, "libro"); XCTAssertEqual(libro, [.finished], "finished stays finished")
         let gato = try await status(db, "gato"); XCTAssertEqual(gato, [])
         let perroRow = try await db.writer.read { try Word.filter(Column("lemma") == "perro").fetchOne($0)! }
         XCTAssertNil(perroRow.stage); XCTAssertNil(perroRow.nextReview, "it leaves the review queue")

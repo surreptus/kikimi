@@ -4,24 +4,24 @@ import Observation
 extension ImportError: LocalizedError {
     public var errorDescription: String? {
         switch self {
-        case .duplicate: "Already imported."
+        case .duplicate: String(localized: "Already imported.", bundle: .module)
         case .languageMismatch(let detected, let chosen, _):
-            "This sounds like \(LanguageProfiles.profile(for: detected)?.displayName ?? detected), not \(LanguageProfiles.profile(for: chosen)?.displayName ?? chosen)."
-        case .copyFailed(let e): "Couldn't copy the file: \(e.localizedDescription)"
+            String(localized: "This sounds like \(LanguageProfiles.profile(for: detected)?.displayName ?? detected), not \(LanguageProfiles.profile(for: chosen)?.displayName ?? chosen).", bundle: .module)
+        case .copyFailed(let e): String(localized: "Couldn't copy the file: \(e.localizedDescription)", bundle: .module)
         case .transcriptionFailed(let e): Self.describe(transcription: e)
-        case .transcodeFailed(let e): "Couldn't re-encode the video: \(e.localizedDescription)"
-        case .verificationFailed(let why): "The re-encoded video failed verification (\(why)). Your original is untouched."
-        case .audioExportFailed(let e): "Couldn't export the audio: \(e.localizedDescription)"
-        case .libraryMoveFailed(let e): "Couldn't save to the library: \(e.localizedDescription)"
-        case .databaseFailed(let e): "Couldn't save to the database: \(e.localizedDescription)"
+        case .transcodeFailed(let e): String(localized: "Couldn't re-encode the video: \(e.localizedDescription)", bundle: .module)
+        case .verificationFailed(let why): String(localized: "The re-encoded video failed verification (\(why)). Your original is untouched.", bundle: .module)
+        case .audioExportFailed(let e): String(localized: "Couldn't export the audio: \(e.localizedDescription)", bundle: .module)
+        case .libraryMoveFailed(let e): String(localized: "Couldn't save to the library: \(e.localizedDescription)", bundle: .module)
+        case .databaseFailed(let e): String(localized: "Couldn't save to the database: \(e.localizedDescription)", bundle: .module)
         }
     }
 
     private static func describe(transcription error: Error) -> String {
         switch error {
-        case ModelError.notInstalled: "The speech model isn't downloaded yet."
-        case AudioExtractionError.noAudioTrack: "This file has no audio track."
-        default: "Transcription failed: \(error.localizedDescription)"
+        case ModelError.notInstalled: String(localized: "The speech model isn't downloaded yet.", bundle: .module)
+        case AudioExtractionError.noAudioTrack: String(localized: "This file has no audio track.", bundle: .module)
+        default: String(localized: "Transcription failed: \(error.localizedDescription)", bundle: .module)
         }
     }
 }

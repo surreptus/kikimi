@@ -1,0 +1,135 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "A stretch" : {
+
+    },
+    "about %lld h %lld min left" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "about %1$lld h %2$lld min left"
+          }
+        }
+      }
+    },
+    "about %lld h left" : {
+
+    },
+    "about %lld min left" : {
+
+    },
+    "about 1 min left" : {
+
+    },
+    "Already imported." : {
+
+    },
+    "Comfortable" : {
+
+    },
+    "Couldn't copy the file: %@" : {
+
+    },
+    "Couldn't export the audio: %@" : {
+
+    },
+    "Couldn't re-encode the video: %@" : {
+
+    },
+    "Couldn't read the video: %@" : {
+
+    },
+    "Couldn't save to the database: %@" : {
+
+    },
+    "Couldn't save to the library: %@" : {
+
+    },
+    "Couldn't write the video: %@" : {
+
+    },
+    "Easy" : {
+
+    },
+    "Hard" : {
+
+    },
+    "less than a minute left" : {
+
+    },
+    "Off" : {
+
+    },
+    "Refusing to delete %@: it isn't inside the library." : {
+
+    },
+    "The %@ download didn't finish (missing %@). Check your connection and download again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The %1$@ download didn't finish (missing %2$@). Check your connection and download again."
+          }
+        }
+      }
+    },
+    "The %@ model is downloading right now. Wait for it to finish." : {
+
+    },
+    "The re-encoded video failed verification (%@). Your original is untouched." : {
+
+    },
+    "The speech model %@ isn't downloaded yet." : {
+
+    },
+    "The speech model isn't downloaded yet." : {
+
+    },
+    "The video was removed from the app but its files couldn't be deleted: %@" : {
+
+    },
+    "This backup file is damaged, so nothing was changed." : {
+
+    },
+    "This backup was made by a newer version of Reprise. Update the app, then try again." : {
+
+    },
+    "This file has no audio track." : {
+
+    },
+    "This file has no video track." : {
+
+    },
+    "This file isn't a Reprise backup." : {
+
+    },
+    "This Mac can't export with %@." : {
+
+    },
+    "This sounds like %@, not %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This sounds like %1$@, not %2$@."
+          }
+        }
+      }
+    },
+    "Transcription failed: %@" : {
+
+    },
+    "unknown error" : {
+
+    },
+    "When the answer is shown" : {
+
+    },
+    "When the card appears" : {
+
+    }
+  },
+  "version" : "1.0"
+}

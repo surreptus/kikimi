@@ -27,8 +27,8 @@ public enum VideoStorageError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .unsafePath(let path): "Refusing to delete \(path): it isn't inside the library."
-        case .filesRemain(let url): "The video was removed from the app but its files couldn't be deleted: \(url.path)"
+        case .unsafePath(let path): String(localized: "Refusing to delete \(path): it isn't inside the library.", bundle: .module)
+        case .filesRemain(let url): String(localized: "The video was removed from the app but its files couldn't be deleted: \(url.path)", bundle: .module)
         }
     }
 }

@@ -4,7 +4,7 @@ public struct SpanishProfile: LanguageProfile {
     public init() {}
 
     public let code = "es"
-    public let displayName = "Spanish"
+    public var displayName: String { Locale.current.localizedString(forLanguageCode: code)?.localizedCapitalized ?? "Spanish" }
     public let whisperCode = "es"
     public let defaultModel = "openai_whisper-medium"
     public let tokenizer: any WordTokenizer = NLTaggerTokenizer(language: .spanish)

@@ -10,9 +10,9 @@ public enum SentenceAudioMode: String, CaseIterable, Sendable {
 
     public var title: String {
         switch self {
-        case .off: "Off"
-        case .onReveal: "When the answer is shown"
-        case .onCardShown: "When the card appears"
+        case .off: String(localized: "Off", bundle: .module)
+        case .onReveal: String(localized: "When the answer is shown", bundle: .module)
+        case .onCardShown: String(localized: "When the card appears", bundle: .module)
         }
     }
 }
@@ -37,6 +37,9 @@ public struct ReviewAudioPreferences: @unchecked Sendable {
 @MainActor @Observable
 public final class SentenceAudioPlayer {
     public private(set) var isPlaying = false
+    /// The line that is playing, or about to (from the moment `play` is called, while it seeks), for showing which
+    /// one it is. Cleared when playback stops or another line replaces it.
+    public private(set) var playingLineID: ExampleLine.ID?
     public var isMuted: Bool {
         get { player.isMuted }
         set { player.isMuted = newValue }
@@ -58,6 +61,7 @@ public final class SentenceAudioPlayer {
         let mine = generation
         let url = libraryRoot.appending(path: line.mediaPath)
         guard FileManager.default.fileExists(atPath: url.path) else { return false }
+        playingLineID = line.id
 
         let item = AVPlayerItem(url: url)
         player.replaceCurrentItem(with: item)
@@ -85,5 +89,6 @@ public final class SentenceAudioPlayer {
         boundary = nil
         endToken = nil
         isPlaying = false
+        playingLineID = nil
     }
 }

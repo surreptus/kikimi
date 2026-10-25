@@ -23,7 +23,7 @@ public enum ExamplePicker {
     }
 }
 
-/// One sitting of reviews. WaniKani rules: a word's SRS stage changes once per session, on its first answer;
+/// One sitting of reviews. A word's SRS stage changes once per session, on its first answer;
 /// a missed word comes back later in the session but does not change stage again.
 public actor ReviewSession {
     private let database: LangDatabase

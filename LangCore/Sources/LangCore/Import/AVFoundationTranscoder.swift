@@ -30,10 +30,10 @@ public enum TranscodeError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .presetUnavailable(let preset): "This Mac can't export with \(preset)."
-        case .noVideoTrack: "This file has no video track."
-        case .readerFailed(let e): "Couldn't read the video: \(e?.localizedDescription ?? "unknown error")"
-        case .writerFailed(let e): "Couldn't write the video: \(e?.localizedDescription ?? "unknown error")"
+        case .presetUnavailable(let preset): String(localized: "This Mac can't export with \(preset).", bundle: .module)
+        case .noVideoTrack: String(localized: "This file has no video track.", bundle: .module)
+        case .readerFailed(let e): String(localized: "Couldn't read the video: \(e?.localizedDescription ?? String(localized: "unknown error", bundle: .module))", bundle: .module)
+        case .writerFailed(let e): String(localized: "Couldn't write the video: \(e?.localizedDescription ?? String(localized: "unknown error", bundle: .module))", bundle: .module)
         }
     }
 }

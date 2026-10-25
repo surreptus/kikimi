@@ -87,10 +87,10 @@ extension LangDatabase {
         switch status {
         case .new: return nil
         case .known: return (nil, nil)
-        case .burned: return (.burned, nil)
+        case .finished: return (.finished, nil)
         case .learning:
             // A learning word needs a stage from the first eight, and a date it is due (now, if none was kept).
-            guard let stage, let parsed = SRSStage(rawValue: stage), parsed != .burned else { return nil }
+            guard let stage, let parsed = SRSStage(rawValue: stage), parsed != .finished else { return nil }
             return (parsed, nextReview ?? now)
         }
     }

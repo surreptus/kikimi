@@ -10,10 +10,10 @@ public enum ModelError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .notInstalled(let model): "The speech model \(model) isn't downloaded yet."
-        case .busy(let model): "The \(ModelCatalog.name(for: model)) model is downloading right now. Wait for it to finish."
+        case .notInstalled(let model): String(localized: "The speech model \(model) isn't downloaded yet.", bundle: .module)
+        case .busy(let model): String(localized: "The \(ModelCatalog.name(for: model)) model is downloading right now. Wait for it to finish.", bundle: .module)
         case .incomplete(let model, let missing):
-            "The \(model) download didn't finish (missing \(missing.joined(separator: ", "))). Check your connection and download again."
+            String(localized: "The \(model) download didn't finish (missing \(missing.joined(separator: ", "))). Check your connection and download again.", bundle: .module)
         }
     }
 }

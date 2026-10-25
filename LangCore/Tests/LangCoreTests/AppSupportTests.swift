@@ -95,21 +95,21 @@ final class AppSupportTests: XCTestCase {
         let card = try await session.currentCard()!
         try await session.answer(correct: false, now: now)
         let afterMiss = try await db.writer.read { try Word.fetchOne($0, key: card.id)! }
-        XCTAssertEqual(afterMiss.stage, .apprentice1)
+        XCTAssertEqual(afterMiss.stage, .stage1)
 
         // Second card correct: advances.
         let second = try await session.currentCard()!
         XCTAssertNotEqual(second.id, card.id)
         try await session.answer(correct: true, now: now)
         let advanced = try await db.writer.read { try Word.fetchOne($0, key: second.id)! }
-        XCTAssertEqual(advanced.stage, .apprentice2)
+        XCTAssertEqual(advanced.stage, .stage2)
 
         // The missed card returns; answering it right now does not advance it (stage changes once per session).
         let retry = try await session.currentCard()!
         XCTAssertEqual(retry.id, card.id)
         try await session.answer(correct: true, now: now)
         let unchanged = try await db.writer.read { try Word.fetchOne($0, key: card.id)! }
-        XCTAssertEqual(unchanged.stage, .apprentice1)
+        XCTAssertEqual(unchanged.stage, .stage1)
 
         let done = try await session.currentCard()
         XCTAssertNil(done)
@@ -367,6 +367,7 @@ final class SentenceAudioTests: XCTestCase {
         let played = await player.play(line)
         XCTAssertTrue(played)
         XCTAssertTrue(player.isPlaying)
+        XCTAssertEqual(player.playingLineID, line.id)
 
         var stopped = false
         for _ in 0..<40 {
@@ -403,6 +404,7 @@ final class SentenceAudioTests: XCTestCase {
         let ok = await player.play(ghost)
         XCTAssertFalse(ok, "missing audio is reported, not a crash")
         XCTAssertFalse(player.isPlaying)
+        XCTAssertNil(player.playingLineID, "starting another line replaces the one that was playing")
     }
 }
 
@@ -433,10 +435,10 @@ final class BulkActionTests: XCTestCase {
 
         XCTAssertEqual(changed, 3, "the already-learning word is skipped")
         let progressed = try await fetch(db, ids[0])
-        XCTAssertEqual(progressed.stage, .apprentice2, "an existing stage is never reset")
+        XCTAssertEqual(progressed.stage, .stage2, "an existing stage is never reset")
         let formerlyKnown = try await fetch(db, ids[1])
         XCTAssertEqual(formerlyKnown.status, .learning)
-        XCTAssertEqual(formerlyKnown.stage, .apprentice1)
+        XCTAssertEqual(formerlyKnown.stage, .stage1)
         XCTAssertEqual(formerlyKnown.nextReview, now)
         let due = try await db.dueWords(language: "es", now: now).count
         XCTAssertEqual(due, 3 + 0, "word 0 isn't due yet; the other three are")
@@ -472,5 +474,18 @@ final class BulkActionTests: XCTestCase {
         XCTAssertEqual(none, 0)
         let all = try await db.words(language: "es", status: .known)
         XCTAssertEqual(all.count, 1_300, "the list isn't capped at 500")
+    }
+}
+
+final class VideoThumbnailTests: XCTestCase {
+    func testAFrameComesBackAtMostTheRequestedSize() async throws {
+        let url = FileManager.default.temporaryDirectory.appending(path: "thumb-\(UUID().uuidString).mov")
+        defer { try? FileManager.default.removeItem(at: url) }
+        try await FixtureVideo.make(at: url, seconds: 2, size: (640, 360))
+        let image = await VideoThumbnail.image(for: url, duration: 2, maxSize: 200)
+        XCTAssertNotNil(image)
+        XCTAssertLessThanOrEqual(max(image?.width ?? 999, image?.height ?? 999), 200)
+        let missing = await VideoThumbnail.image(for: url.appending(path: "nope"), duration: 2)
+        XCTAssertNil(missing, "an unreadable file gives no thumbnail, not a crash")
     }
 }

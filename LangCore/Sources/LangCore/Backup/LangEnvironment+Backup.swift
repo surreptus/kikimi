@@ -5,7 +5,7 @@ public struct BackupPreview: Equatable, Sendable {
     public var createdAt: Date
     public var learning = 0
     public var known = 0
-    public var burned = 0
+    public var finished = 0
     public var languages: [String] = []
     public var report: ProgressImportReport
     /// How many of the file's settings this version can use.
@@ -39,7 +39,7 @@ extension LangEnvironment {
             switch entry.status {
             case WordStatus.learning.rawValue: preview.learning += 1
             case WordStatus.known.rawValue: preview.known += 1
-            case WordStatus.burned.rawValue: preview.burned += 1
+            case WordStatus.finished.rawValue: preview.finished += 1
             default: break
             }
         }

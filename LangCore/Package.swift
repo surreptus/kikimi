@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "LangCore",
+    defaultLocalization: "en",
     platforms: [.macOS(.v26)],
     products: [.library(name: "LangCore", targets: ["LangCore"])],
     dependencies: [
@@ -26,7 +27,7 @@ let package = Package(
                 .product(name: "GRDB", package: "GRDB.swift"),
                 .product(name: "WhisperKit", package: "WhisperKit"),
             ],
-            resources: [.copy("Resources/ipadic"), .copy("Resources/dictionaries"), .copy("Resources/Licenses")]
+            resources: [.copy("Resources/ipadic"), .copy("Resources/dictionaries"), .copy("Resources/Licenses"), .process("Resources/Localizable.xcstrings")]
         ),
         .testTarget(name: "LangCoreTests", dependencies: ["LangCore"]),
     ],

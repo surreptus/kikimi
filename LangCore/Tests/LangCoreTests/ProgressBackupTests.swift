@@ -21,11 +21,11 @@ final class ProgressBackupTests: XCTestCase {
 
     private func sampleSource() async throws -> LangDatabase {
         let db = try LangDatabase()
-        try await word(db, "casa", status: .learning, stage: .guru1, due: now.addingTimeInterval(7 * 86_400))
+        try await word(db, "casa", status: .learning, stage: .stage5, due: now.addingTimeInterval(7 * 86_400))
         try await word(db, "abrir", .verb, status: .known)
-        try await word(db, "ventana", status: .burned, stage: .burned)
+        try await word(db, "ventana", status: .finished, stage: .finished)
         try await word(db, "mesa")                                        // new: not exported
-        try await word(db, "友達", language: "ja", status: .learning, stage: .apprentice2, due: now)
+        try await word(db, "友達", language: "ja", status: .learning, stage: .stage2, due: now)
         return db
     }
 
@@ -34,7 +34,7 @@ final class ProgressBackupTests: XCTestCase {
     func testExportHoldsOnlyWordsYouHaveWorkedOnInAStableOrder() async throws {
         let backup = try await sampleSource().exportProgress(now: now)
         XCTAssertEqual(backup.words.map(\.lemma), ["abrir", "casa", "ventana", "友達"], "language, then lemma; no new words")
-        XCTAssertEqual(backup.words.first { $0.lemma == "casa" }?.stage, SRSStage.guru1.rawValue)
+        XCTAssertEqual(backup.words.first { $0.lemma == "casa" }?.stage, SRSStage.stage5.rawValue)
         XCTAssertNil(backup.words.first { $0.lemma == "abrir" }?.stage)
         XCTAssertEqual(backup.format, "reprise-progress")
         XCTAssertEqual(backup.version, 1)
@@ -61,14 +61,14 @@ final class ProgressBackupTests: XCTestCase {
         XCTAssertEqual(report.restored + report.kept + report.skipped, 0)
         let casa = try await fetch(target, "casa")
         XCTAssertEqual(casa?.status, .learning)
-        XCTAssertEqual(casa?.stage, .guru1)
+        XCTAssertEqual(casa?.stage, .stage5)
         XCTAssertEqual(casa?.nextReview, now.addingTimeInterval(7 * 86_400), "dates survive the file exactly")
         let known = try await fetch(target, "abrir")
         XCTAssertEqual(known?.status, .known)
         let burned = try await fetch(target, "ventana")
-        XCTAssertEqual(burned?.stage, .burned)
+        XCTAssertEqual(burned?.stage, .finished)
         let ja = try await fetch(target, "友達", language: "ja")
-        XCTAssertEqual(ja?.stage, .apprentice2)
+        XCTAssertEqual(ja?.stage, .stage2)
         let mesa = try await fetch(target, "mesa")
         XCTAssertNil(mesa, "a word that was new isn't invented")
     }
@@ -85,7 +85,7 @@ final class ProgressBackupTests: XCTestCase {
 
         let casa = try await fetch(target, "casa")
         XCTAssertEqual(casa?.status, .learning, "the restored progress is still there")
-        XCTAssertEqual(casa?.stage, .guru1)
+        XCTAssertEqual(casa?.stage, .stage5)
         let occurrences = try await target.writer.read { try Occurrence.filter(Column("word_id") == casa!.id!).fetchCount($0) }
         XCTAssertEqual(occurrences, 1, "and the word now has its sentence")
         let count = try await target.writer.read { try Word.filter(Column("lemma") == "casa").fetchCount($0) }
@@ -98,8 +98,8 @@ final class ProgressBackupTests: XCTestCase {
         let backup = try await sampleSource().exportProgress(now: now)
         let target = try LangDatabase()
         try await word(target, "casa")                                              // new here: takes the backup
-        try await word(target, "abrir", .verb, status: .learning, stage: .apprentice3, due: now) // different here: kept
-        try await word(target, "ventana", status: .burned, stage: .burned)           // the same: unchanged
+        try await word(target, "abrir", .verb, status: .learning, stage: .stage3, due: now) // different here: kept
+        try await word(target, "ventana", status: .finished, stage: .finished)           // the same: unchanged
 
         let report = try await target.importProgress(backup, now: now)
 
@@ -108,10 +108,10 @@ final class ProgressBackupTests: XCTestCase {
         XCTAssertEqual(report.unchanged, 1)
         XCTAssertEqual(report.added, 1, "the Japanese word wasn't here at all")
         let casa = try await fetch(target, "casa")
-        XCTAssertEqual(casa?.stage, .guru1)
+        XCTAssertEqual(casa?.stage, .stage5)
         let abrir = try await fetch(target, "abrir")
         XCTAssertEqual(abrir?.status, .learning, "your own progress wins")
-        XCTAssertEqual(abrir?.stage, .apprentice3)
+        XCTAssertEqual(abrir?.stage, .stage3)
     }
 
     func testImportingTheSameFileTwiceChangesNothingTheSecondTime() async throws {
@@ -236,7 +236,7 @@ final class ProgressBackupTests: XCTestCase {
         let preview = try await env.previewBackup(data)
         XCTAssertEqual(preview.learning, 2)
         XCTAssertEqual(preview.known, 1)
-        XCTAssertEqual(preview.burned, 1)
+        XCTAssertEqual(preview.finished, 1)
         XCTAssertEqual(preview.languages, ["es", "ja"])
         XCTAssertEqual(preview.report.added, 4)
     }

@@ -19,9 +19,9 @@ final class CoverageTests: XCTestCase {
             func word(_ lemma: String, _ status: WordStatus, _ stage: SRSStage?, language: String = "es") throws -> Int64 {
                 var w = Word(language: language, lemma: lemma, pos: .noun, status: status, stage: stage); try w.insert(d); return w.id!
             }
-            let casa = try word("casa", .known, nil), mesa = try word("mesa", .learning, .guru1)
-            let perro = try word("perro", .learning, .apprentice2), gato = try word("gato", .new, nil)
-            let libro = try word("libro", .burned, .burned), tomo = try word("友達", .known, nil, language: "ja")
+            let casa = try word("casa", .known, nil), mesa = try word("mesa", .learning, .stage5)
+            let perro = try word("perro", .learning, .stage2), gato = try word("gato", .new, nil)
+            let libro = try word("libro", .finished, .finished), tomo = try word("友達", .known, nil, language: "ja")
             var line = 0
             func occur(_ wordID: Int64, times: Int, video: Int64) throws {
                 for _ in 0..<times {
@@ -47,9 +47,9 @@ final class CoverageTests: XCTestCase {
     }
 
     func testTheStageWhereALearningWordCountsAsKnown() {
-        XCTAssertFalse(SRSStage.apprentice4.isEstablished)
-        XCTAssertTrue(SRSStage.guru1.isEstablished)
-        XCTAssertTrue(SRSStage.enlightened.isEstablished)
+        XCTAssertFalse(SRSStage.stage4.isEstablished)
+        XCTAssertTrue(SRSStage.stage5.isEstablished)
+        XCTAssertTrue(SRSStage.stage8.isEstablished)
     }
 
     func testEachVideoGetsItsOwnCoverageAndLanguagesCanBeSeparated() async throws {

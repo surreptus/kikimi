@@ -63,6 +63,11 @@ public enum LangMigrations {
         }
 
         dropCopiedDictionary(in: &migrator)
+
+        // Where you stopped watching, so a video can offer to carry on from there.
+        migrator.registerMigration("v4-resume-position") { db in
+            try db.alter(table: "videos") { $0.add(column: "resume_position", .double) }
+        }
     }
 
     // The dictionaries are now read straight from their built files, so the copy in this database is dropped

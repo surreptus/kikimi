@@ -117,7 +117,7 @@ final class DropCopiedDictionaryMigrationTests: XCTestCase {
                 try db.execute(sql: "INSERT INTO dictionary (language, headword, reading, gloss) VALUES ('ja', ?, ?, ?)",
                                arguments: ["語\(i)", "ご\(i)", String(repeating: "meaning ", count: 18) + "\(i)"])
             }
-            var word = Word(language: "ja", lemma: "友達", pos: .noun, status: .learning, stage: .apprentice2)
+            var word = Word(language: "ja", lemma: "友達", pos: .noun, status: .learning, stage: .stage2)
             try word.insert(db)
         }
     }

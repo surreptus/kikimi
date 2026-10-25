@@ -7,15 +7,15 @@ final class SRSTests: XCTestCase {
     func testIntervals() {
         let h: TimeInterval = 3600, d: TimeInterval = 86400
         XCTAssertEqual(SRS.intervals, [4 * h, 8 * h, 23 * h, 47 * h, 7 * d, 14 * d, 30 * d, 120 * d])
-        XCTAssertNil(SRS.interval(for: .burned))
+        XCTAssertNil(SRS.interval(for: .finished))
     }
 
     func testCorrectAdvancesThroughEveryStage() {
-        var stage = SRSStage.apprentice1
+        var stage = SRSStage.stage1
         for expected in SRSStage.allCases.dropFirst() {
             let r = SRS.answer(stage: stage, correct: true, now: now)
             XCTAssertEqual(r.stage, expected)
-            if expected == .burned {
+            if expected == .finished {
                 XCTAssertNil(r.nextReview)
             } else {
                 XCTAssertEqual(r.nextReview, now.addingTimeInterval(SRS.interval(for: expected)!))
@@ -33,15 +33,15 @@ final class SRSTests: XCTestCase {
     }
 
     func testWrongNeverBelowStageOne() {
-        let r = SRS.answer(stage: .apprentice1, correct: false, now: now)
-        XCTAssertEqual(r.stage, .apprentice1)
+        let r = SRS.answer(stage: .stage1, correct: false, now: now)
+        XCTAssertEqual(r.stage, .stage1)
         XCTAssertEqual(r.nextReview, now.addingTimeInterval(4 * 3600))
     }
 
     func testBurnedIsTerminal() {
         for correct in [true, false] {
-            let r = SRS.answer(stage: .burned, correct: correct, now: now)
-            XCTAssertEqual(r.stage, .burned)
+            let r = SRS.answer(stage: .finished, correct: correct, now: now)
+            XCTAssertEqual(r.stage, .finished)
             XCTAssertNil(r.nextReview)
         }
     }

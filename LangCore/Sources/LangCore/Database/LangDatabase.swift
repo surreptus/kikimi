@@ -36,11 +36,11 @@ public final class LangDatabase: Sendable {
 
     // MARK: Words
 
-    /// Puts a word into the review queue at apprentice 1, due immediately.
+    /// Puts a word into the review queue at stage 1, due immediately.
     public func startLearning(wordID: Int64, now: Date = Date()) async throws {
         try await updateWord(wordID) { word in
             word.status = .learning
-            word.stage = .apprentice1
+            word.stage = .stage1
             word.nextReview = now
         }
     }
@@ -61,7 +61,7 @@ public final class LangDatabase: Sendable {
             let result = SRS.answer(stage: stage, correct: correct, now: now)
             word.stage = result.stage
             word.nextReview = result.nextReview
-            word.status = result.stage == .burned ? .burned : .learning
+            word.status = result.stage == .finished ? .finished : .learning
         }
     }
 

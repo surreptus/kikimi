@@ -131,7 +131,7 @@ extension LangDatabase {
         stride(from: 0, to: ids.count, by: 500).map { Array(ids[$0..<min($0 + 500, ids.count)]) }
     }
 
-    /// Puts words into the review queue at apprentice 1, due now. Words already being learned or burned are left alone
+    /// Puts words into the review queue at stage 1, due now. Words already being learned or finished are left alone
     /// (their stage is not reset). Returns how many were added.
     @discardableResult
     public func startLearning(wordIDs: [Int64], now: Date = Date()) async throws -> Int {
@@ -139,10 +139,10 @@ extension LangDatabase {
             var changed = 0
             for ids in chunks(wordIDs) {
                 changed += try Word.filter(keys: ids)
-                    .filter(Column("status") != WordStatus.learning.rawValue && Column("status") != WordStatus.burned.rawValue)
+                    .filter(Column("status") != WordStatus.learning.rawValue && Column("status") != WordStatus.finished.rawValue)
                     .updateAll(db,
                                Column("status").set(to: WordStatus.learning.rawValue),
-                               Column("stage").set(to: SRSStage.apprentice1.rawValue),
+                               Column("stage").set(to: SRSStage.stage1.rawValue),
                                Column("next_review").set(to: now))
             }
             return changed
