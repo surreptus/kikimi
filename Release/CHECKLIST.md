@@ -8,6 +8,7 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       container, so do that before anyone has data.
 - [ ] Choose your team in the target (Signing & Capabilities). Keep "Automatically manage signing" on.
 - [x] **App icon**: a repeat sign (𝄆) melted sideways across the full width, in dark green on lime, drawn for Reprise (`Scripts/icon/make_icon.swift` regenerates it) (PNGs in `Reprise/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
+- [ ] Open a video in the **Release** build, not only the Debug one: Release links differently (the AVKit link is set in the target's `OTHER_LDFLAGS` because SwiftUI's `VideoPlayer` never names it).
 - [ ] Set `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` (raise the build number for every upload).
 - [ ] Direct download only: create a notarization profile once:
       `xcrun notarytool store-credentials reprise --apple-id <you> --team-id <TEAM_ID>`
@@ -31,6 +32,8 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 ## Mac App Store extras
 - [ ] App record in App Store Connect with the same bundle ID.
 - [ ] Privacy policy URL: publish `Reprise/Privacy.md` (the app shows the same file) and add a contact line to it first.
+- [ ] Terms of use: fill in the `[Contact email]` placeholder in `Reprise/Terms.md` (governing law is California), and
+      have a lawyer read it, before publishing or shipping.
       Privacy "nutrition label": data not collected.
 - [ ] Export compliance: only standard HTTPS (model downloads) is used.
 - [ ] Screenshots, description, age rating, category (Education).
@@ -38,6 +41,7 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       first use, and works only on files the user provides.
 
 ## Licences to confirm before publishing
-- [ ] Whisper model card on Hugging Face (`argmaxinc/whisperkit-coreml`) states the licence you assumed (MIT).
-- [ ] JMdict and Wiktionary data stay under CC BY-SA 4.0 with attribution; do not commit the built dictionaries.
-- [ ] Do not use the name "WaniKani" in the app name or marketing; consider renaming the SRS stage names.
+- [x] Whisper model card on Hugging Face (`argmaxinc/whisperkit-coreml`) says MIT (checked 25 Oct 2026; check again when the model changes).
+- [x] JMdict and Wiktionary data stay under CC BY-SA 4.0 with attribution; the Acknowledgements say they were adapted and are shared under the same licence, and point to the build scripts. Do not commit the built dictionaries.
+- [x] The SRS stages are plain "Stage 1" to "Stage 8" and "Finished" (the WaniKani names are gone from the app, code and docs). Still do not use the name "WaniKani" in marketing.
+- [ ] When a package is added or updated, check `Package.resolved` against Acknowledgements (today: GRDB, WhisperKit and the swift-transformers code inside it; swift-argument-parser is resolved but not linked).
