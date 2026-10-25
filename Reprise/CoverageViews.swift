@@ -37,6 +37,15 @@ struct CoverageGoalView: View {
     private var targetPercent: String { "\(Int((goal.target * 100).rounded()))%" }
     private var currentPercent: String { "\(Int((goal.current.fraction * 100).rounded()))%" }
 
+    /// What learning these words would do, and how many are already in your reviews.
+    private func goalText(count: Int, notStarted: Int) -> String {
+        let what = count == 1
+            ? String(localized: "Learn the word you don't know yet and this video goes from \(currentPercent) to about \(targetPercent).")
+            : String(localized: "Learn the \(count) most common words you don't know yet and this video goes from \(currentPercent) to about \(targetPercent).")
+        guard notStarted < count else { return what }
+        return what + " " + String(localized: "\(count - notStarted) already in your reviews.")
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             CoverageBadge(coverage: goal.current)
@@ -45,14 +54,13 @@ struct CoverageGoalView: View {
                     .foregroundStyle(Theme.muted)
             } else {
                 let count = goal.words.count, fresh = goal.notStarted
-                Text("Learn the \(count == 1 ? "word" : "\(count) most common words") you don't know yet and this video goes from \(currentPercent) to about \(targetPercent)."
-                     + (fresh.count < count ? " \(count - fresh.count) of them \(count - fresh.count == 1 ? "is" : "are") already in your reviews." : ""))
+                Text(goalText(count: count, notStarted: fresh.count))
                     .foregroundStyle(Theme.muted)
                     .fixedSize(horizontal: false, vertical: true)
                 if !fresh.isEmpty {
-                    Text(fresh.prefix(8).map { "\($0.lemma) ×\($0.occurrences)" }.joined(separator: "   ") + (fresh.count > 8 ? "   and \(fresh.count - 8) more" : ""))
+                    Text(fresh.prefix(8).map { "\($0.lemma) ×\($0.occurrences)" }.joined(separator: "   ") + (fresh.count > 8 ? "   " + String(localized: "and \(fresh.count - 8) more") : ""))
                         .font(Theme.small).foregroundStyle(Theme.ink)
-                    Button("Start learning \(fresh.count) word\(fresh.count == 1 ? "" : "s")") { startLearning(fresh) }
+                    Button(inflected("Start learning ^[\(fresh.count) word](inflect: true)")) { startLearning(fresh) }
                         .buttonStyle(.pill(compact: true))
                 }
             }

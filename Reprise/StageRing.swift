@@ -31,7 +31,7 @@ struct StageRing: View {
             }
         }
         .frame(width: size, height: size)
-        .accessibilityLabel(stage >= 9 ? "Stage 9 of 9, finished" : stage == 0 ? "Not started" : "Stage \(stage) of 9")
+        .accessibilityLabel(stage >= 9 ? String(localized: "Stage 9 of 9, finished") : stage == 0 ? String(localized: "Not started") : String(localized: "Stage \(stage) of 9"))
     }
 
     /// One ninth of the ring, with a small gap either side, starting at the top and going clockwise.
@@ -58,7 +58,7 @@ struct StatusIndicator: View {
         switch status {
         case .new: StageRing(stage: 0, size: size)
         case .learning: StageRing(stage: max(1, stage ?? 1), size: size)
-        case .burned: StageRing(stage: 9, size: size)
+        case .finished: StageRing(stage: 9, size: size)
         case .known:
             ZStack {
                 Circle().fill(Theme.green)
@@ -79,14 +79,14 @@ struct StatusBadge: View {
     var body: some View {
         HStack(spacing: 6) {
             StatusIndicator(status: status, stage: stage?.rawValue, size: 18)
-            Text(status.rawValue.capitalized)
+            Text(status.title)
         }
         .font(.system(size: 12, weight: .medium, design: .rounded))
         .padding(.leading, 6).padding(.trailing, 10).padding(.vertical, 3)
         .background(Capsule().fill(Theme.softStrong))
         .foregroundStyle(Theme.ink)
-        .help(stage.map { "Stage \($0.rawValue) of 9" } ?? status.rawValue.capitalized)
+        .help(stage.map { String(localized: "Stage \($0.rawValue) of 9") } ?? status.title)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(stage.map { "\(status.rawValue.capitalized), stage \($0.rawValue) of 9" } ?? status.rawValue.capitalized)
+        .accessibilityLabel(stage.map { String(localized: "\(status.title), stage \($0.rawValue) of 9") } ?? status.title)
     }
 }

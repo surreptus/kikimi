@@ -87,9 +87,9 @@ struct StorageView: View {
     }
 
     private func detail(for model: InstalledModel) -> String {
-        if !model.isComplete { return "Incomplete download. Downloading it again resumes where it stopped." }
+        if !model.isComplete { return String(localized: "Incomplete download. Downloading it again resumes where it stopped.") }
         let users = languages(using: model).map(\.displayName)
-        return users.isEmpty ? "Not in use" : "In use for \(users.joined(separator: " and "))"
+        return users.isEmpty ? String(localized: "Not in use") : String(localized: "In use for \(listed(users))")
     }
 
     private func languages(using model: InstalledModel) -> [any LanguageProfile] {
@@ -98,9 +98,9 @@ struct StorageView: View {
 
     private func removalMessage(for model: InstalledModel) -> String {
         let users = languages(using: model).map(\.displayName)
-        let again = "You can download it again from Import."
+        let again = String(localized: "You can download it again from Import.")
         guard model.isComplete, !users.isEmpty else { return again }
-        return "\(users.joined(separator: " and ")) imports use it, so you'll need to download a model before importing again. \(again)"
+        return String(localized: "\(listed(users)) imports use it, so you'll need to download a model before importing again. \(again)")
     }
 
     private func remove(_ model: InstalledModel) {

@@ -10,6 +10,14 @@ enum SidebarItem: String, CaseIterable, Identifiable {
     /// Position in the nav, used to slide screens in the direction you moved.
     var order: Int { Self.allCases.firstIndex(of: self) ?? 0 }
 
+    var title: String {
+        switch self {
+        case .videos: String(localized: "Videos")
+        case .words: String(localized: "Words")
+        case .review: String(localized: "Review")
+        }
+    }
+
     var symbol: String {
         switch self {
         case .videos: "film.stack.fill"
@@ -84,7 +92,7 @@ struct SideNav: View {
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: item.symbol).font(.system(size: 15, weight: .medium)).frame(width: 22)
-                Text(item.rawValue)
+                Text(item.title)
                     .font(.system(size: 15, weight: .medium, design: .rounded))
                 Spacer()
                 if item == .review, dueCount > 0 {

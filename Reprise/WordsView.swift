@@ -9,7 +9,7 @@ extension WordRow {
         case .new: 0
         case .learning: 1
         case .known: 2
-        case .burned: 3
+        case .finished: 3
         }
     }
 }
@@ -44,8 +44,17 @@ struct WordsView: View {
     }
     /// What the filter button says: "All", or what is narrowing the list.
     private var filterSummary: String {
-        let parts = [filter?.rawValue.capitalized, typeFilter?.rawValue.capitalized].compactMap { $0 }
-        return parts.isEmpty ? "All" : parts.joined(separator: " · ")
+        let parts = [filter?.title, typeFilter?.title].compactMap { $0 }
+        return parts.isEmpty ? String(localized: "All") : parts.joined(separator: " · ")
+    }
+    /// "New words shown": selects every word with that status in the current list.
+    private func shownLabel(_ status: WordStatus) -> String {
+        switch status {
+        case .new: String(localized: "New words shown")
+        case .learning: String(localized: "Learning words shown")
+        case .known: String(localized: "Known words shown")
+        case .finished: String(localized: "Finished words shown")
+        }
     }
     private var selectionBinding: Binding<Set<Int64>> { Binding(get: { app.wordsSelection }, set: { app.wordsSelection = $0 }) }
 
@@ -88,7 +97,7 @@ struct WordsView: View {
         case .new: Theme.muted
         case .learning: Theme.orange
         case .known: Theme.green
-        case .burned: Theme.ink
+        case .finished: Theme.ink
         }
     }
 
@@ -121,14 +130,14 @@ struct WordsView: View {
                 Menu {
                     Picker("Status", selection: filterBinding) {
                         Text("All statuses").tag(WordStatus?.none)
-                        ForEach([WordStatus.new, .learning, .known, .burned], id: \.self) {
-                            Text($0.rawValue.capitalized).tag(WordStatus?.some($0))
+                        ForEach([WordStatus.new, .learning, .known, .finished], id: \.self) {
+                            Text($0.title).tag(WordStatus?.some($0))
                         }
                     }
                     .pickerStyle(.inline)
                     Picker("Type", selection: typeBinding) {
                         Text("All types").tag(PartOfSpeech?.none)
-                        ForEach(typeChoices, id: \.self) { Text($0.rawValue.capitalized).tag(PartOfSpeech?.some($0)) }
+                        ForEach(typeChoices, id: \.self) { Text($0.title).tag(PartOfSpeech?.some($0)) }
                     }
                     .pickerStyle(.inline)
                 } label: {
@@ -145,7 +154,7 @@ struct WordsView: View {
                     }
                     Divider()
                     ForEach([WordStatus.new, .learning, .known], id: \.self) { status in
-                        Button("\(status.rawValue.capitalized) words shown") {
+                        Button(shownLabel(status)) {
                             selection = Set(rows.filter { $0.word.status == status }.map(\.id))
                         }
                     }
@@ -183,7 +192,7 @@ struct WordsView: View {
             if let message { Text(message).font(Theme.small).foregroundStyle(Theme.muted).lineLimit(1) }
             Spacer()
             Button("Reset") {
-                if selectedRows.contains(where: { $0.word.status == .learning || $0.word.status == .burned }) {
+                if selectedRows.contains(where: { $0.word.status == .learning || $0.word.status == .finished }) {
                     confirmReset = true
                 } else {
                     apply(.reset)
@@ -213,18 +222,18 @@ struct WordsView: View {
                 case .learn:
                     let started = try await env.database.startLearning(wordIDs: ids)
                     let skipped = ids.count - started
-                    message = "Started learning \(started) word\(started == 1 ? "" : "s")"
+                    message = inflected("Started learning ^[\(started) word](inflect: true)")
                         + (skipped > 0 ? " (\(skipped) already in progress)" : "")
                 case .known:
                     let n = try await env.database.markKnown(wordIDs: ids)
-                    message = "Marked \(n) word\(n == 1 ? "" : "s") as known"
+                    message = inflected("Marked ^[\(n) word](inflect: true) as known")
                 case .reset:
                     let n = try await env.database.markNew(wordIDs: ids)
-                    message = "Reset \(n) word\(n == 1 ? "" : "s")"
+                    message = inflected("Reset ^[\(n) word](inflect: true)")
                 }
                 app.dataChanged()
             } catch {
-                message = "Failed: \(error.localizedDescription)"
+                message = String(localized: "Failed: \(error.localizedDescription)")
             }
         }
     }
@@ -244,9 +253,9 @@ struct WordsView: View {
         } else if selection.count > 1 {
             VStack(alignment: .leading, spacing: 10) {
                 Text("\(selection.count) words selected").font(.title2.bold())
-                ForEach([WordStatus.new, .learning, .known, .burned], id: \.self) { status in
+                ForEach([WordStatus.new, .learning, .known, .finished], id: \.self) { status in
                     let count = selectedRows.filter { $0.word.status == status }.count
-                    if count > 0 { HStack { StatusPill(text: status.rawValue, color: summaryColor(status)); Text("\(count)") } }
+                    if count > 0 { HStack { StatusPill(text: status.title, color: summaryColor(status)); Text("\(count)") } }
                 }
                 Text("Use the buttons below the list to start learning, mark known, or reset them all at once.")
                     .font(.callout).foregroundStyle(Theme.muted)

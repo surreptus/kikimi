@@ -112,7 +112,7 @@ struct ImportSection: View {
     private func label(for variant: String) -> String {
         let size = ModelCatalog.info(for: variant)
             .map { " · " + ByteCountFormatter.string(fromByteCount: $0.downloadBytes, countStyle: .file) } ?? ""
-        return ModelCatalog.name(for: variant) + size + (variant == app.profile.defaultModel ? " (recommended)" : "")
+        return ModelCatalog.name(for: variant) + size + (variant == app.profile.defaultModel ? String(localized: " (recommended)") : "")
     }
 
     private func loadModel() async {
@@ -152,7 +152,7 @@ struct ImportSection: View {
 
     private var dropZone: some View {
         VStack(spacing: 12) {
-            Text(canImport ? "Drop \(app.profile.displayName) videos here" : "Download the speech model to start importing")
+            Text(canImport ? String(localized: "Drop \(app.profile.displayName) videos here") : String(localized: "Download the speech model to start importing"))
                 .font(Theme.title(20))
             Text("Importing as \(app.profile.displayName). Change the language in the sidebar.")
                 .font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.ink)
@@ -246,14 +246,14 @@ struct ImportSection: View {
 
     private func statusText(_ job: ImportQueue.Job) -> String {
         switch job.status {
-        case .queued: "Waiting"
+        case .queued: String(localized: "Waiting")
         case .running(let stage, _): runningText(stage, job)
-        case .imported: "Imported · \(job.profile.displayName)"
-        case .duplicate: "Already in library"
-        case .languageMismatch: "Check language"
-        case .cancelling: "Cancelling…"
-        case .cancelled: "Cancelled"
-        case .failed: "Failed"
+        case .imported: String(localized: "Imported · \(job.profile.displayName)")
+        case .duplicate: String(localized: "Already in library")
+        case .languageMismatch: String(localized: "Check language")
+        case .cancelling: String(localized: "Cancelling…")
+        case .cancelled: String(localized: "Cancelled")
+        case .failed: String(localized: "Failed")
         }
     }
 
@@ -279,7 +279,7 @@ struct ImportSection: View {
     /// along transcribing or compressing is, with the time left once there is enough to judge it by.
     private func detailText(_ job: ImportQueue.Job) -> String? {
         guard case .running(let stage, let fraction) = job.status else { return nil }
-        if job.note == .loadingModel { return "Loading the speech model. The first time can take a few minutes." }
+        if job.note == .loadingModel { return String(localized: "Loading the speech model. The first time can take a few minutes.") }
         guard stage.reportsProgress, fraction > 0 else { return nil }
         let percent = "\(Int((fraction * 100).rounded()))%"
         guard let started = job.stageStartedAt,
@@ -291,19 +291,19 @@ struct ImportSection: View {
     /// "3 of 8 · Transcribing": the step's place in the import (out of 7 if the language check was skipped).
     private func runningText(_ stage: ImportStage, _ job: ImportQueue.Job) -> String {
         let place = stage.position(checkingLanguage: job.checksLanguage)
-        return "\(place.number) of \(place.of) · \(stageName(stage))"
+        return String(localized: "\(place.number) of \(place.of) · \(stageName(stage))")
     }
 
     private func stageName(_ stage: ImportStage) -> String {
         switch stage {
-        case .hashing: "Reading file"
-        case .staging: "Copying"
-        case .detectingLanguage: "Checking language"
-        case .transcribing: "Transcribing"
-        case .transcoding: "Compressing video"
-        case .verifying: "Verifying"
-        case .extractingAudio: "Extracting audio"
-        case .saving: "Saving"
+        case .hashing: String(localized: "Reading file")
+        case .staging: String(localized: "Copying")
+        case .detectingLanguage: String(localized: "Checking language")
+        case .transcribing: String(localized: "Transcribing")
+        case .transcoding: String(localized: "Compressing video")
+        case .verifying: String(localized: "Verifying")
+        case .extractingAudio: String(localized: "Extracting audio")
+        case .saving: String(localized: "Saving")
         }
     }
 }

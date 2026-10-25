@@ -1,0 +1,1146 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "   Audio" : {
+
+    },
+    "   Video" : {
+
+    },
+    " (recommended)" : {
+
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@ · ^[%lld line](inflect: true) · %@ · added %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · ^[%2$lld line](inflect: true) · %3$@ · added %4$@"
+          }
+        }
+      }
+    },
+    "%@ imports use it, so you'll need to download a model before importing again. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ imports use it, so you'll need to download a model before importing again. %2$@"
+          }
+        }
+      }
+    },
+    "%@ known · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ known · %2$@"
+          }
+        }
+      }
+    },
+    "%@, stage %lld of 9" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, stage %2$lld of 9"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
+    "%lld already in your reviews." : {
+
+    },
+    "%lld left" : {
+
+    },
+    "%lld most-seen new words" : {
+
+    },
+    "%lld of %lld · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld · %3$@"
+          }
+        }
+      }
+    },
+    "%lld of %lld answers right the first time." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld answers right the first time."
+          }
+        }
+      }
+    },
+    "%lld of %lld selected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld selected"
+          }
+        }
+      }
+    },
+    "%lld video%@. Delete them from the Videos page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld video%2$@. Delete them from the Videos page."
+          }
+        }
+      }
+    },
+    "%lld words" : {
+
+    },
+    "%lld words selected" : {
+
+    },
+    "%lld%%" : {
+
+    },
+    "%lld×" : {
+
+    },
+    "•" : {
+
+    },
+    "• %lld already match." : {
+
+    },
+    "• %lld are already known." : {
+
+    },
+    "• %lld aren't in your library yet, so there's nothing to change; they'll be new when they appear in a video." : {
+
+    },
+    "• ^[%lld entry](inflect: true) couldn't be read and will be skipped." : {
+
+    },
+    "• ^[%lld word](inflect: true) here will take the backup's progress." : {
+
+    },
+    "• ^[%lld word](inflect: true) not in your library yet will be added, and join their sentences when you add the videos." : {
+
+    },
+    "• ^[%lld word](inflect: true) you have already worked on here will be left as they are." : {
+
+    },
+    "^[%lld day](inflect: true)" : {
+
+    },
+    "^[%lld hour](inflect: true)" : {
+
+    },
+    "^[%lld video](inflect: true) · %@ on this Mac" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "^[%1$lld video](inflect: true) · %2$@ on this Mac"
+          }
+        }
+      }
+    },
+    "^[%lld word](inflect: true) added" : {
+
+    },
+    "^[%lld word](inflect: true) in the list" : {
+
+    },
+    "^[%lld word](inflect: true) kept as they were" : {
+
+    },
+    "^[%lld word](inflect: true) updated" : {
+
+    },
+    "↑ ↓ move, Shift extends, ⌘A selects all, Esc clears." : {
+
+    },
+    "⌘O adds videos. ⌘1, ⌘2 and ⌘3 go to Videos, Words and Review. ⌘F finds words. ⌘, opens Settings." : {
+
+    },
+    "A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts." : {
+
+    },
+    "A word counts as known if you marked it known, it is finished, or you are learning it and its reviews are a week or more apart (Stage 5 and above)." : {
+
+    },
+    "A word's stage changes only on its first answer in a sitting. A missed word returns later in the same sitting for another try, without moving again." : {
+
+    },
+    "About" : {
+
+    },
+    "Acknowledgements" : {
+
+    },
+    "Add a video" : {
+
+    },
+    "Add a video on the Videos page to collect words." : {
+
+    },
+    "Add Videos…" : {
+
+    },
+    "Added" : {
+
+    },
+    "Added ^[%lld word](inflect: true) to your reviews." : {
+
+    },
+    "Adjective" : {
+
+    },
+    "Adverb" : {
+
+    },
+    "All" : {
+
+    },
+    "All %lld shown" : {
+
+    },
+    "All done for now" : {
+
+    },
+    "All statuses" : {
+
+    },
+    "All types" : {
+
+    },
+    "Already in library" : {
+
+    },
+    "Also restore the settings in this file" : {
+
+    },
+    "An import is running, so models can't be removed right now." : {
+
+    },
+    "and %lld more" : {
+
+    },
+    "Anywhere" : {
+
+    },
+    "Appearance" : {
+
+    },
+    "Back to %@" : {
+
+    },
+    "Back up your progress" : {
+
+    },
+    "Backup from %@" : {
+
+    },
+    "Best fit first" : {
+
+    },
+    "Best fit puts the videos you already know most of, but not all, first" : {
+
+    },
+    "Can't play this video" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Cancelled" : {
+
+    },
+    "Cancelling…" : {
+
+    },
+    "Change" : {
+
+    },
+    "Check language" : {
+
+    },
+    "Checking language" : {
+
+    },
+    "Checks the copy plays and is the right length before anything is kept." : {
+
+    },
+    "Checks whether you've already added this video, by its contents rather than its name." : {
+
+    },
+    "Choose a backup file, or drop one on this window. You'll see what would change before anything does, and progress you already have is never overwritten." : {
+
+    },
+    "Choose a folder for the %@ clips" : {
+
+    },
+    "Choose a text file of %@ words you know, one per line (or the first column of a CSV, such as an Anki export). They're marked known, so each video's coverage reflects what you can really follow. Only words already in your library change; to do another language, switch it in the sidebar first." : {
+
+    },
+    "Choose file…" : {
+
+    },
+    "Choose files" : {
+
+    },
+    "Choose word list…" : {
+
+    },
+    "Choose your words" : {
+
+    },
+    "Clear finished" : {
+
+    },
+    "Clear search" : {
+
+    },
+    "Compressing video" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Copying" : {
+
+    },
+    "Couldn't mark those words: %@" : {
+
+    },
+    "Couldn't read that file as text: %@" : {
+
+    },
+    "Couldn't restore the backup: %@" : {
+
+    },
+    "Couldn't save the backup: %@" : {
+
+    },
+    "Couldn't start" : {
+
+    },
+    "Dark" : {
+
+    },
+    "Data" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delete \"%@\"?" : {
+
+    },
+    "Delete from this Mac" : {
+
+    },
+    "Dictionary" : {
+
+    },
+    "Done" : {
+
+    },
+    "Download model" : {
+
+    },
+    "Download the speech model to start importing" : {
+
+    },
+    "Drop %@ videos here" : {
+
+    },
+    "Drop one above and its words will appear on the Words page." : {
+
+    },
+    "Drop videos you own. They never leave this Mac." : {
+
+    },
+    "Duration" : {
+
+    },
+    "Everything in this file is already here, so nothing would change." : {
+
+    },
+    "Export audio clips…" : {
+
+    },
+    "Export failed: %@" : {
+
+    },
+    "Export Here" : {
+
+    },
+    "Export Progress…" : {
+
+    },
+    "Export this word's example sentences as clips" : {
+
+    },
+    "Export video clips…" : {
+
+    },
+    "Exporting…" : {
+
+    },
+    "Extracting audio" : {
+
+    },
+    "Failed" : {
+
+    },
+    "Failed: %@" : {
+
+    },
+    "Files are missing" : {
+
+    },
+    "Find Words" : {
+
+    },
+    "Finding videos at your level" : {
+
+    },
+    "Finished" : {
+
+    },
+    "Finished words shown" : {
+
+    },
+    "Finished: it never comes back" : {
+
+    },
+    "From your videos" : {
+
+    },
+    "General" : {
+
+    },
+    "Get Info…" : {
+
+    },
+    "github.com/surreptus/reprise" : {
+
+    },
+    "Go" : {
+
+    },
+    "Got it" : {
+
+    },
+    "Got it moves a word up one stage. Missed it moves it down one, never below Stage 1." : {
+
+    },
+    "Hard is under 80%, A stretch is 80 to 88%, Comfortable is 88 to 98%, and Easy is 98% or more." : {
+
+    },
+    "Hear" : {
+
+    },
+    "Highlight" : {
+
+    },
+    "Hover a word to see what it means. Click it to keep it here, and click anywhere else to let go." : {
+
+    },
+    "How it works" : {
+
+    },
+    "How Reprise works" : {
+
+    },
+    "How Reprise Works" : {
+
+    },
+    "How reviews are scheduled" : {
+
+    },
+    "Import as %@" : {
+
+    },
+    "Import as %@ anyway" : {
+
+    },
+    "Import Progress…" : {
+
+    },
+    "Imported · %@" : {
+
+    },
+    "Importing as %@. Change the language in the sidebar." : {
+
+    },
+    "In Settings, under Data, Save backup writes the words you are learning and the ones you know, with their stages and review dates, to a file ending in .reprise. It doesn't include videos or speech models." : {
+
+    },
+    "In Settings, under Data, you can mark a list of words you already know (one per line, or the first column of a CSV), so these numbers start out honest." : {
+
+    },
+    "In use for %@" : {
+
+    },
+    "Incomplete download. Downloading it again resumes where it stopped." : {
+
+    },
+    "Info" : {
+
+    },
+    "Jump to this line" : {
+
+    },
+    "Keeping your progress safe" : {
+
+    },
+    "Keyboard" : {
+
+    },
+    "Known" : {
+
+    },
+    "Known words shown" : {
+
+    },
+    "Language" : {
+
+    },
+    "Languages" : {
+
+    },
+    "Large" : {
+
+    },
+    "Larger" : {
+
+    },
+    "Learn" : {
+
+    },
+    "Learn Spanish or Japanese from videos you own, on your Mac." : {
+
+    },
+    "Learn the %lld most common words you don't know yet and this video goes from %@ to about %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn the %1$lld most common words you don't know yet and this video goes from %2$@ to about %3$@."
+          }
+        }
+      }
+    },
+    "Learn the word you don't know yet and this video goes from %@ to about %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn the word you don't know yet and this video goes from %1$@ to about %2$@."
+          }
+        }
+      }
+    },
+    "Learning" : {
+
+    },
+    "Learning words shown" : {
+
+    },
+    "Let it transcribe" : {
+
+    },
+    "Light" : {
+
+    },
+    "Line at %@" : {
+
+    },
+    "Listens to a short sample so a Japanese video can't be added as Spanish by mistake." : {
+
+    },
+    "Loading the speech model. The first time can take a few minutes." : {
+
+    },
+    "Location" : {
+
+    },
+    "Makes a working copy. Seconds." : {
+
+    },
+    "Manage storage…" : {
+
+    },
+    "Mark as known" : {
+
+    },
+    "Mark known" : {
+
+    },
+    "Mark this word as known (K)" : {
+
+    },
+    "Marked ^[%lld word](inflect: true) as known" : {
+
+    },
+    "Marked ^[%lld word](inflect: true) as known." : {
+
+    },
+    "Match system" : {
+
+    },
+    "Match system follows your Mac's Light or Dark setting." : {
+
+    },
+    "Missed it" : {
+
+    },
+    "New" : {
+
+    },
+    "New words shown" : {
+
+    },
+    "Newest first" : {
+
+    },
+    "Next line" : {
+
+    },
+    "Next review" : {
+
+    },
+    "Next review comes after" : {
+
+    },
+    "No entry found." : {
+
+    },
+    "No matches" : {
+
+    },
+    "No speech models are downloaded." : {
+
+    },
+    "No videos yet" : {
+
+    },
+    "No words found" : {
+
+    },
+    "No words yet" : {
+
+    },
+    "None" : {
+
+    },
+    "Not in use" : {
+
+    },
+    "Not started" : {
+
+    },
+    "Nothing due" : {
+
+    },
+    "Nothing in this list would change." : {
+
+    },
+    "Nothing needed changing." : {
+
+    },
+    "Noun" : {
+
+    },
+    "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. Come back whenever the number beside Review is above zero." : {
+
+    },
+    "On Videos, drop a video file you own. The first time, pick a speech model and let it download once; the sizes are shown next to each choice." : {
+
+    },
+    "On Videos, each video shows how much of it you already know, such as 91% known · Comfortable. It counts the nouns, verbs, adjectives and adverbs you know. Small words like articles and particles aren't kept; they make up about half of what is said and are nearly always known, so the share you really understand is higher than the figure. About 90% of the words that are kept is roughly 95% of everything, which is around where following along gets comfortable." : {
+
+    },
+    "On Words, the words from your videos are listed by how often they appear. Select the ones you want to learn and press Start learning, or mark the ones you already know." : {
+
+    },
+    "Open a video's Info to see the commonest words you don't know yet, and start learning them all at once." : {
+
+    },
+    "Open source" : {
+
+    },
+    "Open the video at this moment" : {
+
+    },
+    "Open video" : {
+
+    },
+    "Opening your library…" : {
+
+    },
+    "Order" : {
+
+    },
+    "Other" : {
+
+    },
+    "Pause" : {
+
+    },
+    "Play" : {
+
+    },
+    "Play sentence" : {
+
+    },
+    "Play the sentence" : {
+
+    },
+    "Play this sentence from your video (R)" : {
+
+    },
+    "Play this sentence's audio from your video, right here" : {
+
+    },
+    "Practise" : {
+
+    },
+    "Previous line" : {
+
+    },
+    "Privacy policy" : {
+
+    },
+    "Privacy Policy" : {
+
+    },
+    "Read more" : {
+
+    },
+    "Reading file" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Remove and free %@" : {
+
+    },
+    "Remove the %@ model?" : {
+
+    },
+    "Removes the app's copy (%@) and its ^[%lld subtitle line](inflect: true). Words you've started learning or marked known are kept; untouched words found only in this video are removed. Your original file isn't affected. This can't be undone, but you can import the file again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Removes the app's copy (%1$@) and its ^[%2$lld subtitle line](inflect: true). Words you've started learning or marked known are kept; untouched words found only in this video are removed. Your original file isn't affected. This can't be undone, but you can import the file again."
+          }
+        }
+      }
+    },
+    "Rename" : {
+
+    },
+    "Rename video" : {
+
+    },
+    "Rename…" : {
+
+    },
+    "Reprise" : {
+
+    },
+    "Reprise is free software under the MIT licence." : {
+
+    },
+    "Reprise listens to the video on this Mac and writes out what is said, with times. This is the long step. In our tests the medium model took about 3 minutes for a 10 minute video on an Apple silicon Mac; larger models are slower." : {
+
+    },
+    "Reprise uses spaced repetition: a word you get right comes back after a longer wait each time, and one you miss comes back sooner. A word you are learning moves through these stages:" : {
+
+    },
+    "Reset" : {
+
+    },
+    "Reset %lld words?" : {
+
+    },
+    "Reset ^[%lld word](inflect: true)" : {
+
+    },
+    "Restore" : {
+
+    },
+    "Restore from a backup" : {
+
+    },
+    "Restored" : {
+
+    },
+    "Review" : {
+
+    },
+    "Review failed" : {
+
+    },
+    "Save" : {
+
+    },
+    "Save audio clip…" : {
+
+    },
+    "Save backup…" : {
+
+    },
+    "Save video clip…" : {
+
+    },
+    "Saved %@" : {
+
+    },
+    "Saved ^[%lld clip](inflect: true) to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Saved ^[%1$lld clip](inflect: true) to %2$@"
+          }
+        }
+      }
+    },
+    "Saved ^[%lld word](inflect: true)." : {
+
+    },
+    "Saves a small copy for playback; in our tests a 161 MB video became 29 MB. A video that is already small is kept as it is." : {
+
+    },
+    "Saves the sound on its own, for the sentence audio in reviews." : {
+
+    },
+    "Saves the words you are learning and the ones you know, with their stages and review dates, to a file. It doesn't include videos or speech models." : {
+
+    },
+    "Saving" : {
+
+    },
+    "Say word" : {
+
+    },
+    "Search words" : {
+
+    },
+    "Select" : {
+
+    },
+    "Sentence audio on review cards" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Show %lld more" : {
+
+    },
+    "Show answer" : {
+
+    },
+    "Show fewer" : {
+
+    },
+    "Show in Finder" : {
+
+    },
+    "Shows what it means" : {
+
+    },
+    "Size on disk" : {
+
+    },
+    "Size, location, rename and delete" : {
+
+    },
+    "Small" : {
+
+    },
+    "Sort by %@" : {
+
+    },
+    "Sort by Best fit to put the videos worth watching next at the top: mostly understood, with a little new." : {
+
+    },
+    "Space plays and pauses. Click a word to keep its meaning; arrow keys move between words and Return keeps one. L starts learning it and K marks it known. Click anywhere outside the transcript, or press Esc, to let go." : {
+
+    },
+    "Space shows the answer. → is Got it, ← is Missed it. W says the word, R plays the sentence." : {
+
+    },
+    "Speech model" : {
+
+    },
+    "Speech model ready: %@" : {
+
+    },
+    "Speech models and your saved videos are kept on this Mac." : {
+
+    },
+    "Stage" : {
+
+    },
+    "Stage %lld of 9" : {
+
+    },
+    "Stage 1" : {
+
+    },
+    "Stage 2" : {
+
+    },
+    "Stage 3" : {
+
+    },
+    "Stage 4" : {
+
+    },
+    "Stage 5" : {
+
+    },
+    "Stage 6" : {
+
+    },
+    "Stage 7" : {
+
+    },
+    "Stage 8" : {
+
+    },
+    "Stage 9 of 9, finished" : {
+
+    },
+    "Standard" : {
+
+    },
+    "Start learning" : {
+
+    },
+    "Start learning ^[%lld word](inflect: true)" : {
+
+    },
+    "Start learning this word (L)" : {
+
+    },
+    "Start learning words from the Words tab, or come back later." : {
+
+    },
+    "Start over" : {
+
+    },
+    "Started learning ^[%lld word](inflect: true)" : {
+
+    },
+    "Status" : {
+
+    },
+    "Step %lld: %@. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Step %1$lld: %2$@. %3$@"
+          }
+        }
+      }
+    },
+    "Stop" : {
+
+    },
+    "Stop this import. Your original file is untouched." : {
+
+    },
+    "Storage" : {
+
+    },
+    "Storage…" : {
+
+    },
+    "Stores the lines and words in one step. Either everything is saved or nothing is." : {
+
+    },
+    "Subtitle lines" : {
+
+    },
+    "Terms of use" : {
+
+    },
+    "Terms of Use" : {
+
+    },
+    "That audio file is missing from the library." : {
+
+    },
+    "That file has no words in it." : {
+
+    },
+    "The first time" : {
+
+    },
+    "The long step: about a quarter of the video's length with the medium model in our tests, longer with larger models." : {
+
+    },
+    "The sentence on a card is picked at random from your videos each time, so you meet the word in different places." : {
+
+    },
+    "The size of the subtitle lines beside the video." : {
+
+    },
+    "This is the app's own copy. Your original file, wherever you imported it from, is not touched by the app." : {
+
+    },
+    "This sounds like %@, but you're importing as %@. Nothing has been imported yet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This sounds like %1$@, but you're importing as %2$@. Nothing has been imported yet."
+          }
+        }
+      }
+    },
+    "Title" : {
+
+    },
+    "To restore, choose the file in the same place, drop it there, or double-click it. You'll see what would change first, and progress you already have is never overwritten. Words from a backup join their sentences when you add the videos again." : {
+
+    },
+    "Transcribing" : {
+
+    },
+    "Transcript text" : {
+
+    },
+    "Try a different search or status." : {
+
+    },
+    "Try again" : {
+
+    },
+    "Type" : {
+
+    },
+    "Use the buttons below the list to start learning, mark known, or reset them all at once." : {
+
+    },
+    "Verb" : {
+
+    },
+    "Verifying" : {
+
+    },
+    "Video" : {
+
+    },
+    "Videos" : {
+
+    },
+    "Waiting" : {
+
+    },
+    "What happens when you add a video" : {
+
+    },
+    "When to play the sentence audio" : {
+
+    },
+    "Word meaning" : {
+
+    },
+    "Words" : {
+
+    },
+    "Words being learned or finished lose their review progress and go back to new." : {
+
+    },
+    "Words found" : {
+
+    },
+    "Words marked Known are never reviewed. Reset on the Words page puts a word back to new." : {
+
+    },
+    "Words you already know" : {
+
+    },
+    "You already know %@ of this video's words. Nothing more is needed to follow it comfortably." : {
+
+    },
+    "You can cancel at any point before saving, and nothing is left behind. The other steps are usually much shorter than transcribing; we haven't timed each one." : {
+
+    },
+    "You can download it again from Import." : {
+
+    },
+    "You know %@ of its words: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You know %1$@ of its words: %2$@"
+          }
+        }
+      }
+    },
+    "You know %lld of this video's %lld content words (counted once per line). About 90%% of content words is roughly 95%% of everything said, around where listening becomes comfortable." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You know %1$lld of this video's %2$lld content words (counted once per line). About 90%% of content words is roughly 95%% of everything said, around where listening becomes comfortable."
+          }
+        }
+      }
+    },
+    "You stopped at %@." : {
+
+    },
+    "You'll see the same circle beside a word on the Words page, in its panel and in the video. It fills as the word moves up, from red through yellow to green, and becomes a white disc once it is finished. An empty ring is a new word, and a green tick is a word you marked known." : {
+
+    },
+    "Your original file is only ever read, never changed or deleted. Reprise works on a copy and keeps a smaller one for playback. While a video is being added, its row says which step it is on, such as 4 of 8 · Transcribing. If you chose to go ahead despite a language warning, the language check is skipped and there are 7 steps." : {
+
+    },
+    "Your original files are never changed or deleted." : {
+
+    },
+    "Your videos" : {
+
+    },
+    "日本語 · Una frase de ejemplo" : {
+
+    }
+  },
+  "version" : "1.0"
+}

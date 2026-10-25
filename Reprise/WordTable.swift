@@ -152,7 +152,7 @@ private struct WordTableRow: View {
         HStack(spacing: 0) {
             Text(row.word.lemma).font(.system(.body, design: .rounded, weight: .medium)).lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            if showsType { Text(row.word.pos.rawValue).foregroundStyle(secondary).frame(width: 80, alignment: .leading) }
+            if showsType { Text(row.word.pos.title).foregroundStyle(secondary).frame(width: 80, alignment: .leading) }
             Text("\(row.occurrenceCount)×").foregroundStyle(secondary).monospacedDigit().frame(width: 60, alignment: .leading)
             status.frame(width: 96, alignment: .leading)
             if showsNext {

@@ -21,6 +21,7 @@ final class AppState {
     /// The panels over the window. They live here, not in the views, so the menu bar can open them too.
     var showAbout = false
     var showPrivacy = false
+    var showTerms = false
     var showStorage = false
     var showAcknowledgements = false
     /// Saving and restoring progress; shared so the File menu, the Settings window and a double-clicked file all use it.

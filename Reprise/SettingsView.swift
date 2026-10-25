@@ -11,6 +11,15 @@ enum SettingsTab: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var title: LocalizedStringKey {
+        switch self {
+        case .general: "General"
+        case .languages: "Languages"
+        case .data: "Data"
+        case .about: "About"
+        }
+    }
+
     var symbol: String {
         switch self {
         case .general: "gearshape"
@@ -33,16 +42,16 @@ struct SettingsView: View {
             if case .ready(let env) = app.phase {
                 TabView(selection: Bindable(app).settingsTab) {
                     GeneralTab()
-                        .tabItem { Label(SettingsTab.general.rawValue, systemImage: SettingsTab.general.symbol) }
+                        .tabItem { Label(SettingsTab.general.title, systemImage: SettingsTab.general.symbol) }
                         .tag(SettingsTab.general)
                     LanguagesTab(env: env)
-                        .tabItem { Label(SettingsTab.languages.rawValue, systemImage: SettingsTab.languages.symbol) }
+                        .tabItem { Label(SettingsTab.languages.title, systemImage: SettingsTab.languages.symbol) }
                         .tag(SettingsTab.languages)
                     DataTab(env: env)
-                        .tabItem { Label(SettingsTab.data.rawValue, systemImage: SettingsTab.data.symbol) }
+                        .tabItem { Label(SettingsTab.data.title, systemImage: SettingsTab.data.symbol) }
                         .tag(SettingsTab.data)
                     AboutTab()
-                        .tabItem { Label(SettingsTab.about.rawValue, systemImage: SettingsTab.about.symbol) }
+                        .tabItem { Label(SettingsTab.about.title, systemImage: SettingsTab.about.symbol) }
                         .tag(SettingsTab.about)
                 }
             } else {
@@ -53,12 +62,12 @@ struct SettingsView: View {
     }
 }
 
-private func plural(_ count: Int, _ noun: String) -> String { "\(count) \(noun)\(count == 1 ? "" : "s")" }
 
 // MARK: General
 
 private struct GeneralTab: View {
     @AppStorage(Appearance.key) private var appearance = Appearance.system
+    @AppStorage(TranscriptSize.key) private var transcriptSize = TranscriptSize.standard
 
     var body: some View {
         Form {
@@ -69,9 +78,19 @@ private struct GeneralTab: View {
             } footer: {
                 Text("Match system follows your Mac's Light or Dark setting.")
             }
+            Section {
+                Picker("Transcript text", selection: $transcriptSize) {
+                    ForEach(TranscriptSize.allCases, id: \.self) { Text($0.title).tag($0) }
+                }
+                Text("日本語 · Una frase de ejemplo")
+                    .font(.system(size: transcriptSize.points, design: .rounded))
+                    .foregroundStyle(.secondary)
+            } footer: {
+                Text("The size of the subtitle lines beside the video.")
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 520, height: 170)
+        .frame(width: 520, height: 320)
     }
 }
 
@@ -129,7 +148,7 @@ private struct LanguagesTab: View {
     private func label(for variant: String, profile: any LanguageProfile) -> String {
         let size = ModelCatalog.info(for: variant)
             .map { " · " + ByteCountFormatter.string(fromByteCount: $0.downloadBytes, countStyle: .file) } ?? ""
-        return ModelCatalog.name(for: variant) + size + (variant == profile.defaultModel ? " (recommended)" : "")
+        return ModelCatalog.name(for: variant) + size + (variant == profile.defaultModel ? String(localized: " (recommended)") : "")
     }
 }
 
@@ -150,7 +169,7 @@ private struct DataTab: View {
                     Button("Save backup…") { Task { await app.backup.export(env: env) } }
                         .disabled(isWorking)
                     if case .exported(let url, let words) = backup.state {
-                        Text("Saved \(plural(words, "word")).").foregroundStyle(.secondary)
+                        Text("Saved ^[\(words) word](inflect: true).").foregroundStyle(.secondary)
                         Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
                     }
                 }
@@ -237,22 +256,22 @@ private struct DataTab: View {
 
     private func previewContent(_ pending: BackupModel.Pending, _ backup: BackupModel) -> some View {
         let preview = pending.preview, report = preview.report
-        let total = preview.learning + preview.known + preview.burned
+        let total = preview.learning + preview.known + preview.finished
         let languages = preview.languages.compactMap { LanguageProfiles.profile(for: $0)?.displayName }.joined(separator: ", ")
         return VStack(alignment: .leading, spacing: 8) {
             Text("Backup from \(preview.createdAt.formatted(date: .abbreviated, time: .omitted))").font(.headline)
-            Text("\(plural(total, "word")): \(preview.learning) learning, \(preview.known) known, \(preview.burned) finished"
+            Text("^[\(total) word](inflect: true): \(preview.learning) learning, \(preview.known) known, \(preview.finished) finished"
                  + (languages.isEmpty ? "" : " · \(languages)"))
                 .foregroundStyle(.secondary)
             VStack(alignment: .leading, spacing: 4) {
                 if report.changes == 0 { Text("Everything in this file is already here, so nothing would change.") }
-                if report.restored > 0 { Text("• \(plural(report.restored, "word")) here will take the backup's progress.") }
+                if report.restored > 0 { Text("• ^[\(report.restored) word](inflect: true) here will take the backup's progress.") }
                 if report.added > 0 {
-                    Text("• \(plural(report.added, "word")) not in your library yet will be added, and join their sentences when you add the videos.")
+                    Text("• ^[\(report.added) word](inflect: true) not in your library yet will be added, and join their sentences when you add the videos.")
                 }
-                if report.kept > 0 { Text("• \(plural(report.kept, "word")) you have already worked on here will be left as they are.") }
+                if report.kept > 0 { Text("• ^[\(report.kept) word](inflect: true) you have already worked on here will be left as they are.") }
                 if report.unchanged > 0 { Text("• \(report.unchanged) already match.") }
-                if report.skipped > 0 { Text("• \(plural(report.skipped, "entry")) couldn't be read and will be skipped.") }
+                if report.skipped > 0 { Text("• ^[\(report.skipped) entry](inflect: true) couldn't be read and will be skipped.") }
             }
             .fixedSize(horizontal: false, vertical: true)
             if preview.settingsCount > 0 {
@@ -287,10 +306,10 @@ private struct DataTab: View {
             Button("Choose word list…") { Task { await chooseKnownList() } }
         case .previewing(let words, let report):
             VStack(alignment: .leading, spacing: 8) {
-                Text("\(plural(report.listed, "word")) in the list").font(.headline)
+                Text("^[\(report.listed) word](inflect: true) in the list").font(.headline)
                 VStack(alignment: .leading, spacing: 4) {
                     if report.marked > 0 {
-                        Text("• \(plural(report.marked, "word")) in your \(app.profile.displayName) library will be marked known."
+                        Text("• ^[\(report.marked) word](inflect: true) in your \(app.profile.displayName) library will be marked known."
                              + (report.fromLearning > 0 ? " \(report.fromLearning) of them are being learned, and leave your reviews." : ""))
                     }
                     if report.alreadyKnown > 0 { Text("• \(report.alreadyKnown) are already known.") }
@@ -311,7 +330,7 @@ private struct DataTab: View {
             }
         case .done(let report):
             VStack(alignment: .leading, spacing: 8) {
-                Text("Marked \(plural(report.marked, "word")) as known.").font(.headline)
+                Text("Marked ^[\(report.marked) word](inflect: true) as known.").font(.headline)
                 Button("Done") { known = .idle }
             }
         case .failed(let message):
@@ -329,11 +348,11 @@ private struct DataTab: View {
         do {
             let text = try String(contentsOf: url, encoding: .utf8)
             let words = KnownWordList.parse(text)
-            guard !words.isEmpty else { known = .failed("That file has no words in it."); return }
+            guard !words.isEmpty else { known = .failed(String(localized: "That file has no words in it.")); return }
             let report = try await env.database.markKnown(lemmas: words, language: app.languageCode, dryRun: true)
             known = .previewing(words: words, report: report)
         } catch {
-            known = .failed("Couldn't read that file as text: \(error.localizedDescription)")
+            known = .failed(String(localized: "Couldn't read that file as text: \(error.localizedDescription)"))
         }
     }
 
@@ -343,16 +362,16 @@ private struct DataTab: View {
             app.dataChanged()
             known = .done(report)
         } catch {
-            known = .failed("Couldn't mark those words: \(error.localizedDescription)")
+            known = .failed(String(localized: "Couldn't mark those words: \(error.localizedDescription)"))
         }
     }
 
     private func restoredLine(_ report: ProgressImportReport) -> String {
         var parts: [String] = []
-        if report.restored > 0 { parts.append("\(plural(report.restored, "word")) updated") }
-        if report.added > 0 { parts.append("\(plural(report.added, "word")) added") }
-        if report.kept > 0 { parts.append("\(plural(report.kept, "word")) kept as they were") }
-        return parts.isEmpty ? "Nothing needed changing." : parts.joined(separator: ", ") + "."
+        if report.restored > 0 { parts.append(inflected("^[\(report.restored) word](inflect: true) updated")) }
+        if report.added > 0 { parts.append(inflected("^[\(report.added) word](inflect: true) added")) }
+        if report.kept > 0 { parts.append(inflected("^[\(report.kept) word](inflect: true) kept as they were")) }
+        return parts.isEmpty ? String(localized: "Nothing needed changing.") : listed(parts) + "."
     }
 }
 
@@ -378,6 +397,7 @@ private struct AboutTab: View {
             Section("Read more") {
                 Button("How Reprise works") { inMainWindow { app.showAbout = true } }
                 Button("Privacy policy") { inMainWindow { app.showPrivacy = true } }
+                Button("Terms of use") { inMainWindow { app.showTerms = true } }
                 Button("Acknowledgements") { inMainWindow { app.showAcknowledgements = true } }
             }
             Section {
@@ -407,7 +427,7 @@ enum Appearance: String, CaseIterable {
     case system, light, dark
 
     static let key = "appearance"
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .system: "Match system"
         case .light: "Light"

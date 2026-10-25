@@ -24,7 +24,7 @@ struct AppCommands: Commands {
 
         CommandMenu("Go") {
             ForEach(Array(SidebarItem.allCases.enumerated()), id: \.element) { index, item in
-                Button(item.rawValue) { app.select(item) }
+                Button(item.title) { app.select(item) }
                     .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")))
                     .disabled(!app.isReady)
             }
@@ -38,6 +38,8 @@ struct AppCommands: Commands {
             Button("How Reprise Works") { app.showAbout = true }
                 .disabled(!app.isReady)
             Button("Privacy Policy") { app.showPrivacy = true }
+                .disabled(!app.isReady)
+            Button("Terms of Use") { app.showTerms = true }
                 .disabled(!app.isReady)
             Button("Acknowledgements") { app.showAcknowledgements = true }
                 .disabled(!app.isReady)

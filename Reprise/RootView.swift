@@ -67,7 +67,8 @@ struct RootView: View {
         }
         .modal(isPresented: $app.showStorage) { StorageView(env: env) }
         .modal(isPresented: $app.showAbout) { AboutView() }
-        .modal(isPresented: $app.showPrivacy) { PrivacyView() }
+        .modal(isPresented: $app.showPrivacy) { DocumentView(title: "Privacy policy", resource: "Privacy") }
+        .modal(isPresented: $app.showTerms) { DocumentView(title: "Terms of use", resource: "Terms") }
     }
 
     @ViewBuilder

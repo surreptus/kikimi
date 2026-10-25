@@ -10,7 +10,8 @@ struct WordDetail: View {
     @State private var examples: [ExampleLine] = []
     @State private var exportMessage: String?
     @State private var audio: SentenceAudioPlayer?
-    @State private var playingLine: Int64?
+    @State private var showsAllExamples = false
+    private let examplesShownFirst = 5
 
     var body: some View {
         ScrollView {
@@ -26,7 +27,13 @@ struct WordDetail: View {
                 }
 
                 Text("From your videos").font(Theme.title(17))
-                ForEach(examples) { line in exampleRow(line) }
+                ForEach(showsAllExamples ? examples : Array(examples.prefix(examplesShownFirst))) { line in exampleRow(line) }
+                if examples.count > examplesShownFirst {
+                    Button(showsAllExamples ? String(localized: "Show fewer") : String(localized: "Show \(examples.count - examplesShownFirst) more")) {
+                        showsAllExamples.toggle()
+                    }
+                    .buttonStyle(.plain).font(Theme.small).foregroundStyle(Theme.muted)
+                }
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -36,7 +43,6 @@ struct WordDetail: View {
             entries = (try? await env.database.lookup(language: row.word.language, term: row.word.lemma, limit: 5)) ?? []
             examples = (try? await env.database.examples(wordID: row.id)) ?? []
         }
-        .onChange(of: audio?.isPlaying) { _, playing in if playing != true { playingLine = nil } }
         .onDisappear { audio?.stop() }
     }
 
@@ -68,58 +74,54 @@ struct WordDetail: View {
     }
 
     private func exampleRow(_ line: ExampleLine) -> some View {
-        let isPlaying = playingLine == line.id
-        return VStack(alignment: .leading, spacing: 8) {
+        let isPlaying = audio?.playingLineID == line.id
+        return VStack(alignment: .leading, spacing: 4) {
             Text(line.text).font(.system(.body, design: .rounded)).textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(Theme.small).foregroundStyle(Theme.muted)
-            HStack(spacing: 8) {
-                Button(isPlaying ? "Stop" : "Hear", systemImage: isPlaying ? "stop.fill" : "speaker.wave.2.fill") {
+            HStack(spacing: 4) {
+                Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(Theme.small).foregroundStyle(Theme.muted)
+                    .lineLimit(1).truncationMode(.middle)
+                Spacer(minLength: 8)
+                Button(isPlaying ? String(localized: "Stop") : String(localized: "Hear"), systemImage: isPlaying ? "stop.fill" : "speaker.wave.2") {
                     togglePlayback(line)
                 }
-                .labelStyle(.titleAndIcon)
-                .buttonStyle(.pill(isPlaying ? .primary : .secondary, compact: true))
-                .fixedSize()
                 .help("Play this sentence's audio from your video, right here")
-                Button("Open video", systemImage: "play.rectangle.fill") {
+                Button("Open video", systemImage: "play.rectangle") {
                     audio?.stop()
                     app.openVideo(id: line.videoID, at: line.startTime)
                 }
-                .labelStyle(.titleAndIcon)
-                .buttonStyle(.pill(.secondary, compact: true))
-                .fixedSize()
                 .help("Open the video at this moment")
             }
+            .labelStyle(.iconOnly).foregroundStyle(Theme.muted).font(.system(size: 13))
+            // Speaker and stop are different widths; a fixed box keeps the icons, and the text beside them, still.
+            .buttonStyle(IconSlotStyle())
         }
         .padding(.vertical, 6)
     }
 
     private func togglePlayback(_ line: ExampleLine) {
         guard let audio else { return }
-        if playingLine == line.id {
+        if audio.playingLineID == line.id {
             audio.stop()
-            playingLine = nil
             return
         }
-        playingLine = line.id
         Task {
-            if await !audio.play(line) {
-                playingLine = nil
-                exportMessage = "That audio file is missing from the library."
+            if await !audio.play(line), !FileManager.default.fileExists(atPath: env.libraryURL.appending(path: line.mediaPath).path) {
+                exportMessage = String(localized: "That audio file is missing from the library.")
             }
         }
     }
 
     private func exportExamples(_ kind: ClipKind) {
-        guard let folder = ExportPanels.chooseFolder(message: "Choose a folder for the \(row.word.lemma) clips") else { return }
-        exportMessage = "Exporting…"
+        guard let folder = ExportPanels.chooseFolder(message: String(localized: "Choose a folder for the \(row.word.lemma) clips")) else { return }
+        exportMessage = String(localized: "Exporting…")
         Task {
             do {
                 let files = try await env.exportClips(forWord: row.id, kind: kind, into: folder)
-                exportMessage = "Saved \(files.count) clip\(files.count == 1 ? "" : "s") to \(folder.lastPathComponent)"
+                exportMessage = inflected("Saved ^[\(files.count) clip](inflect: true) to \(folder.lastPathComponent)")
                 NSWorkspace.shared.activateFileViewerSelecting(files)
             } catch {
-                exportMessage = "Export failed: \(error.localizedDescription)"
+                exportMessage = String(localized: "Export failed: \(error.localizedDescription)")
             }
         }
     }
@@ -144,5 +146,15 @@ struct EntryView: View {
             }
             Text(entry.gloss).font(.callout).textSelection(.enabled)
         }
+    }
+}
+
+/// A plain icon button in a fixed 24 x 20 box, so swapping its symbol never changes the layout around it.
+private struct IconSlotStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(width: 24, height: 20)
+            .contentShape(Rectangle())
+            .opacity(configuration.isPressed ? 0.5 : 1)
     }
 }

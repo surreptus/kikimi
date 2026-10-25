@@ -35,7 +35,7 @@ enum ExportPanels {
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.canCreateDirectories = true
-        panel.prompt = "Export Here"
+        panel.prompt = String(localized: "Export Here")
         panel.message = message
         return panel.runModal() == .OK ? panel.url : nil
     }

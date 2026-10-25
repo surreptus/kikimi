@@ -26,7 +26,7 @@ struct VideosView: View {
     var body: some View {
         ZStack {
             if let playing {
-                PlayerView(env: env, video: playing, startAt: startAt, backTitle: app.returnSection?.rawValue ?? "Videos") {
+                PlayerView(env: env, video: playing, startAt: startAt, backTitle: (app.returnSection ?? .videos).title) {
                     closePlayer()
                 }
                 .id(playing.id)
@@ -59,8 +59,8 @@ struct VideosView: View {
             VStack(alignment: .leading, spacing: 14) {
                 ScreenTitle(
                     text: "Videos",
-                    subtitle: items.isEmpty ? "Drop videos you own. They never leave this Mac."
-                        : "\(items.count) video\(items.count == 1 ? "" : "s") · \(formatBytes(totalBytes)) on this Mac")
+                    subtitle: items.isEmpty ? String(localized: "Drop videos you own. They never leave this Mac.")
+                        : inflected("^[\(items.count) video](inflect: true) · \(formatBytes(totalBytes)) on this Mac"))
                 ImportSection(env: env)
                 if items.isEmpty {
                     VStack(spacing: 8) {
@@ -93,7 +93,7 @@ struct VideosView: View {
                 }
                 .pickerStyle(.inline)
             } label: {
-                Label(sort == "fit" ? "Best fit first" : "Newest first", systemImage: "arrow.up.arrow.down")
+                Label(sort == "fit" ? String(localized: "Best fit first") : String(localized: "Newest first"), systemImage: "arrow.up.arrow.down")
             }
             .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
             .help("Best fit puts the videos you already know most of, but not all, first")
@@ -103,9 +103,10 @@ struct VideosView: View {
 
     private func row(_ item: LibraryEntry) -> some View {
         HStack(spacing: 14) {
+            VideoThumbnailView(url: env.fileURL(for: item.video), duration: item.video.duration)
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.video.title).font(.system(.headline, design: .rounded)).lineLimit(2)
-                Text("\(duration(item.video.duration)) · \(item.subtitleCount) lines · \(sizes[item.id].map(formatBytes) ?? "…") · added \(item.video.importedAt.formatted(date: .abbreviated, time: .omitted))")
+                Text("\(duration(item.video.duration)) · ^[\(item.subtitleCount) line](inflect: true) · \(sizes[item.id].map(formatBytes) ?? "…") · added \(item.video.importedAt.formatted(date: .abbreviated, time: .omitted))")
                     .font(Theme.small).foregroundStyle(Theme.muted)
                 CoverageBadge(coverage: coverages[item.id]).padding(.top, 2)
             }
@@ -239,7 +240,7 @@ private struct VideoInfoSheet: View {
                     row("Duration", duration(video.duration))
                     row("Subtitle lines", "\(details.subtitleCount)")
                     row("Words found", "\(details.wordCount)")
-                    row("Size on disk", details.filesMissing ? "Files are missing" : formatBytes(details.totalBytes))
+                    row("Size on disk", details.filesMissing ? String(localized: "Files are missing") : formatBytes(details.totalBytes))
                     if !details.filesMissing {
                         row("   Video", formatBytes(details.videoBytes))
                         row("   Audio", formatBytes(details.audioBytes))
@@ -295,14 +296,14 @@ private struct VideoInfoSheet: View {
             Button("Delete from this Mac", role: .destructive) { delete() }
         } message: {
             Text("""
-                Removes the app's copy (\(formatBytes(details?.totalBytes ?? 0))) and its \(details?.subtitleCount ?? 0) subtitle lines. \
+                Removes the app's copy (\(formatBytes(details?.totalBytes ?? 0))) and its ^[\(details?.subtitleCount ?? 0) subtitle line](inflect: true). \
                 Words you've started learning or marked known are kept; untouched words found only in this video are removed. \
                 Your original file isn't affected. This can't be undone, but you can import the file again.
                 """)
         }
     }
 
-    private func row(_ label: String, _ value: String) -> some View {
+    private func row(_ label: LocalizedStringKey, _ value: String) -> some View {
         GridRow {
             Text(label).foregroundStyle(Theme.muted).gridColumnAlignment(.trailing)
             Text(value).font(.system(.body, design: .rounded, weight: .semibold))
@@ -321,7 +322,7 @@ private struct VideoInfoSheet: View {
                 let added = try await env.database.startLearning(wordIDs: entries.map(\.wordID))
                 app.dataChanged()
                 await loadGoal()
-                goalMessage = "Added \(added) word\(added == 1 ? "" : "s") to your reviews."
+                goalMessage = inflected("Added ^[\(added) word](inflect: true) to your reviews.")
             } catch {
                 self.error = error.localizedDescription
             }

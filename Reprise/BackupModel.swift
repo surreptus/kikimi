@@ -42,7 +42,7 @@ final class BackupModel {
             try data.write(to: url, options: .atomic)
             state = .exported(url, words: try ProgressBackup.decode(data).words.count)
         } catch {
-            state = .failed("Couldn't save the backup: \(error.localizedDescription)")
+            state = .failed(String(localized: "Couldn't save the backup: \(error.localizedDescription)"))
         }
     }
 
@@ -77,7 +77,7 @@ final class BackupModel {
             app.dataChanged()
             state = .restored(result.report, settingsRestored: includeSettings && pending.preview.settingsCount > 0)
         } catch {
-            state = .failed("Couldn't restore the backup: \(error.localizedDescription)")
+            state = .failed(String(localized: "Couldn't restore the backup: \(error.localizedDescription)"))
         }
     }
 

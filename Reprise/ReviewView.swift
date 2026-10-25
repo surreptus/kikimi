@@ -66,7 +66,7 @@ struct ReviewView: View {
 
             VStack(spacing: 12) {
                 Text(card.word.lemma).font(.system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
-                StatusPill(text: card.word.pos.rawValue)
+                StatusPill(text: card.word.pos.title)
 
                 if revealed {
                     VStack(spacing: 10) {

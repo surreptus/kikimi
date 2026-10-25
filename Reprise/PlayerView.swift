@@ -11,6 +11,8 @@ struct PlayerView: View {
 
     @State private var controller: PlaybackController?
     @State private var message: String?
+    /// Where you stopped last time, while the choice to continue from there or start over is on offer.
+    @State private var resumeOffer: Double?
     @State private var failure: String?
     @State private var hoveredToken: Token?
     /// A word whose meaning is kept in the hint bar until you unpin it, so its buttons can be reached.
@@ -57,6 +59,8 @@ struct PlayerView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .task { await load() }
         .task(id: shownToken?.lemma) { await refreshHint(announce: pinnedToken != nil) }
+        .task(id: controller != nil) { await keepPlace() }
+        .onChange(of: controller?.isPlaying) { _, playing in if playing == true { resumeOffer = nil } }
         .task(id: app.dataVersion) {
             guard let id = video.id else { return }
             statuses = (try? await env.database.wordStatuses(videoID: id)) ?? [:]
@@ -72,6 +76,7 @@ struct PlayerView: View {
         }
         .onAppear { installClickMonitor() }
         .onDisappear {
+            savePlace()
             controller?.stop()
             if let clickMonitor { NSEvent.removeMonitor(clickMonitor) }
             clickMonitor = nil
@@ -113,10 +118,9 @@ struct PlayerView: View {
     /// A visible way back, inside the card.
     private var topBar: some View {
         HStack(spacing: 14) {
-            Button("Back", systemImage: "chevron.left") { close() }
+            Button(backTitle, systemImage: "chevron.left") { close() }
                 .buttonStyle(.pill(.secondary, compact: true))
                 .help("Back to \(backTitle)")
-            Text("Back to \(backTitle)").font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(Theme.muted)
             Spacer()
         }
     }
@@ -125,7 +129,12 @@ struct PlayerView: View {
         do {
             let new = try await env.playback(for: video)
             controller = new
-            if let startAt { await new.seek(to: startAt, play: true) }
+            if let startAt {
+                await new.seek(to: startAt, play: true)
+            } else if let id = video.id, let spot = try? await env.database.video(id: id)?.resumePosition {
+                await new.seek(to: spot)   // waits, paused, until you choose
+                resumeOffer = spot
+            }
         } catch {
             failure = error.localizedDescription
         }
@@ -140,6 +149,7 @@ struct PlayerView: View {
                 VideoPlayer(player: controller.player)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(Theme.line, lineWidth: 1))
+                if let resumeOffer { resumeBar(resumeOffer, controller) }
                 controls(controller)
             }
             .padding(20)
@@ -162,27 +172,54 @@ struct PlayerView: View {
         }
     }
 
+    /// Offered when you come back to a video you stopped part-way through.
+    private func resumeBar(_ spot: Double, _ controller: PlaybackController) -> some View {
+        HStack(spacing: 10) {
+            Text("You stopped at \(clock(spot)).").font(Theme.small).foregroundStyle(Theme.muted)
+            Spacer(minLength: 8)
+            Button("Start over") {
+                resumeOffer = nil
+                Task { await controller.seek(to: 0, play: true) }
+            }
+            .buttonStyle(.pill(.secondary, compact: true))
+            Button("Continue") {
+                resumeOffer = nil
+                controller.play()
+            }
+            .buttonStyle(.pill(compact: true))
+        }
+    }
+
+    private func clock(_ seconds: Double) -> String {
+        let s = Int(seconds)
+        return s >= 3600 ? String(format: "%d:%02d:%02d", s / 3600, s % 3600 / 60, s % 60) : String(format: "%d:%02d", s / 60, s % 60)
+    }
+
+    /// Remembers the place every few seconds while the video plays, so a crash or quit loses little.
+    private func keepPlace() async {
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(5))
+            if controller?.isPlaying == true { savePlace() }
+        }
+    }
+
+    private func savePlace() {
+        guard let controller, let id = video.id else { return }
+        let seconds = controller.currentTime, database = env.database
+        Task { try? await database.saveResumePosition(videoID: id, seconds: seconds) }
+    }
+
     private func controls(_ controller: PlaybackController) -> some View {
         HStack(spacing: 12) {
             Button("Previous line", systemImage: "backward.fill") { Task { await controller.previousLine() } }
                 .buttonStyle(.pill(.secondary, compact: true))
-            Button(controller.isPlaying ? "Pause" : "Play", systemImage: controller.isPlaying ? "pause.fill" : "play.fill") {
+            Button(controller.isPlaying ? String(localized: "Pause") : String(localized: "Play"), systemImage: controller.isPlaying ? "pause.fill" : "play.fill") {
                 controller.togglePlayback()
             }
             .buttonStyle(.pill(compact: true))
             .keyboardShortcut(.space, modifiers: [])
             Button("Next line", systemImage: "forward.fill") { Task { await controller.nextLine() } }
                 .buttonStyle(.pill(.secondary, compact: true))
-            Menu {
-                Picker("Speed", selection: Binding(get: { controller.speed }, set: { controller.speed = $0 })) {
-                    ForEach([Float(0.5), 0.75, 1, 1.25, 1.5, 2], id: \.self) { Text(speedLabel($0)).tag($0) }
-                }
-                .pickerStyle(.inline)
-            } label: {
-                Text(speedLabel(controller.speed)).frame(minWidth: 30)
-            }
-            .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
-            .help("Playback speed")
         }
         .labelStyle(.iconOnly)
     }
@@ -198,7 +235,7 @@ struct PlayerView: View {
             .accessibilityAddTraits(.isHeader)
     }
 
-    /// What the tints mean, and one switch for them. Two states only: a burned word is simply a known one.
+    /// What the tints mean, and one switch for them. Two states only: a finished word is simply a known one.
     private var legendBar: some View {
         HStack(spacing: 14) {
             legendDot(Theme.orange, "Learning", underlined: true)
@@ -224,7 +261,7 @@ struct PlayerView: View {
     private func subtitleList(_ controller: PlaybackController) -> some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(spacing: 8) {
+                LazyVStack(spacing: 3) {
                     ForEach(Array(controller.lines.enumerated()), id: \.offset) { index, line in
                         SubtitleRow(
                             line: line, index: index, active: controller.activeIndex == index, profile: profile,
@@ -242,7 +279,7 @@ struct PlayerView: View {
                         .id(index)
                     }
                 }
-                .padding(14)
+                .padding(10)
             }
             .onChange(of: controller.activeIndex) { _, new in
                 if let new { withAnimation { proxy.scrollTo(new, anchor: .center) } }
@@ -259,14 +296,14 @@ struct PlayerView: View {
                     if let reading = hint?.reading ?? token.reading {
                         Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
                     }
-                    StatusPill(text: token.pos.rawValue)
+                    StatusPill(text: token.pos.title)
                     // A new word needs no badge: Learn and Known beside it already say it is new.
                     if let status = hint?.status, status != .new {
                         StatusBadge(status: status, stage: hint?.stage)
                     }
                     Spacer()
                     if hint?.wordID != nil {
-                        if hint?.status != .learning && hint?.status != .burned {
+                        if hint?.status != .learning && hint?.status != .finished {
                             Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
                                 .keyboardShortcut("l", modifiers: [])
                                 .help("Start learning this word (L)")
@@ -303,22 +340,18 @@ struct PlayerView: View {
         .accessibilityLabel("Word meaning")
     }
 
-    private func speedLabel(_ speed: Float) -> String {
-        (speed == speed.rounded() ? String(Int(speed)) : String(format: "%g", speed)) + "×"
-    }
-
     // MARK: Export
 
     private func export(_ line: Subtitle, kind: ClipKind) {
         let name = "\(ClipExporter.sanitized(video.title)) \(stamp(line.startTime).replacingOccurrences(of: ":", with: "-"))"
         guard let url = ExportPanels.saveFile(suggestedName: name, fileExtension: kind.fileExtension) else { return }
-        message = "Exporting…"
+        message = String(localized: "Exporting…")
         Task {
             do {
                 try await env.clips.export(video: video, start: line.startTime, end: line.endTime, kind: kind, to: url)
-                message = "Saved \(url.lastPathComponent)"
+                message = String(localized: "Saved \(url.lastPathComponent)")
             } catch {
-                message = "Export failed: \(error.localizedDescription)"
+                message = String(localized: "Export failed: \(error.localizedDescription)")
             }
         }
     }

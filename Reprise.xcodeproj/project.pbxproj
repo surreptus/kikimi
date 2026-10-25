@@ -207,8 +207,13 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					AVKit,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.surreptus.Reprise;
 				PRODUCT_NAME = Reprise;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -232,8 +237,13 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					AVKit,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.surreptus.Reprise;
 				PRODUCT_NAME = Reprise;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};

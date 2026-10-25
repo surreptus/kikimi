@@ -204,7 +204,7 @@ struct StatusPill: View {
     var body: some View {
         HStack(spacing: 6) {
             if let color { Circle().fill(color).frame(width: 7, height: 7) }
-            Text(text.prefix(1).uppercased() + text.dropFirst())
+            Text(text)
         }
         .font(.system(size: 12, weight: .medium, design: .rounded))
         .padding(.horizontal, 10).padding(.vertical, 3)
@@ -215,7 +215,7 @@ struct StatusPill: View {
 
 /// Section headline used across screens.
 struct ScreenTitle: View {
-    let text: String
+    let text: LocalizedStringKey
     var subtitle: String?
 
     var body: some View {
@@ -375,8 +375,8 @@ enum Illustration {
 
 /// Nothing here yet: a character, a title and one line saying what to do. Not for errors, which keep the warning icon.
 struct EmptyState: View {
-    let title: String
-    let message: String
+    let title: LocalizedStringKey
+    let message: LocalizedStringKey
     var illustration: Illustration = .flower
 
     var body: some View {

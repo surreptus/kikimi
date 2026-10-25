@@ -21,6 +21,7 @@ struct SubtitleRow: View {
     let exportAudio: () -> Void
     let exportVideo: () -> Void
 
+    @AppStorage(TranscriptSize.key) private var size = TranscriptSize.standard
     @State private var segments: [LineSegment] = []
     @State private var rowHovered = false
     @State private var hoveredChunk: Int?
@@ -65,9 +66,12 @@ struct SubtitleRow: View {
         (profile?.display.showsReadings ?? false) && segments.contains { $0.token?.reading != nil }
     }
 
+    /// The transcript's text.
+    private var textFont: Font { .system(size: size.points, weight: .regular, design: .rounded) }
+
     /// Furigana is a reading aid set above the text, conventionally about half its size, so it is exempt from the
     /// 12 pt minimum used elsewhere. The full-size reading is always in the hint bar.
-    private static let rubySize: CGFloat = 10
+    private var rubySize: CGFloat { max(10, (size.points * 0.55).rounded()) }
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
@@ -75,7 +79,7 @@ struct SubtitleRow: View {
                 .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(active ? Theme.ink : Theme.muted)
             if segments.isEmpty {
-                Text(line.text).font(.system(.body, design: .rounded, weight: .regular))
+                Text(line.text).font(textFont)
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 FlowLayout {
@@ -86,7 +90,7 @@ struct SubtitleRow: View {
                 .accessibilityLabel("Line at \(stamp(line.startTime))")
             }
         }
-        .padding(.horizontal, 12).padding(.vertical, 9)
+        .padding(.horizontal, 10).padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 14).fill(active ? Theme.soft : .clear))
         .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(active ? Theme.ink.opacity(0.6) : Theme.line.opacity(0.7), lineWidth: 1))
@@ -158,7 +162,7 @@ struct SubtitleRow: View {
             if reservesRuby {
                 // Always reserved, so showing furigana never moves the text.
                 Text(chunk.token?.reading ?? " ")
-                    .font(.system(size: Self.rubySize, weight: .medium, design: .rounded))
+                    .font(.system(size: rubySize, weight: .medium, design: .rounded))
                     .foregroundStyle(Theme.ink)
                     .opacity(showRuby && chunk.token?.reading != nil ? 1 : 0)
                     .accessibilityHidden(true)   // VoiceOver gets the reading in the word's label
@@ -166,7 +170,7 @@ struct SubtitleRow: View {
             HStack(spacing: 0) {
                 Text(chunk.text)
                     .underline(status(of: chunk.token) == .learning, pattern: .dot, color: Theme.orange)
-                    .font(.system(.body, design: .rounded, weight: .regular))
+                    .font(textFont)
                     // The highlight is slightly wider than the word, but takes no layout space (no gaps in Japanese).
                     .background(RoundedRectangle(cornerRadius: 5)
                         .fill(isPinned ? Theme.ink.opacity(0.2) : isHovered ? Theme.ink.opacity(0.12) : tint(for: chunk.token))
@@ -176,7 +180,7 @@ struct SubtitleRow: View {
                         if hasCaret { RoundedRectangle(cornerRadius: 5).strokeBorder(Theme.ink, lineWidth: 2).padding(-2) }
                     }
                 if !chunk.trailing.isEmpty {
-                    Text(chunk.trailing).font(.system(.body, design: .rounded, weight: .regular))
+                    Text(chunk.trailing).font(textFont)
                 }
             }
         }
@@ -206,7 +210,7 @@ struct SubtitleRow: View {
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(chunk.text + (token.reading.map { ", read \($0)" } ?? ""))
-                .accessibilityValue(status(of: token).map { $0 == .new ? "" : ($0 == .learning ? "Learning" : "Known") } ?? "")
+                .accessibilityValue(status(of: token).map { $0 == .new ? "" : $0.title } ?? "")
                 .accessibilityHint("Shows what it means")
                 .accessibilityAddTraits(.isButton)
                 .accessibilityAction { togglePin(token) }
@@ -220,12 +224,12 @@ struct SubtitleRow: View {
     }
 
     /// Colour is never the only signal: learning words also get a dotted underline. Learning is orange, known (and
-    /// burned) green; untouched words get nothing, so they stay quiet.
+    /// finished) green; untouched words get nothing, so they stay quiet.
     private func tint(for token: Token?) -> Color {
         guard let current = status(of: token) else { return .clear }
         switch current {
         case .learning: return Theme.orange.opacity(0.30)
-        case .known, .burned: return Theme.green.opacity(0.22)
+        case .known, .finished: return Theme.green.opacity(0.22)
         case .new: return .clear
         }
     }
@@ -238,4 +242,27 @@ struct SubtitleRow: View {
 
 private extension Array {
     subscript(safe index: Int) -> Element? { indices.contains(index) ? self[index] : nil }
+}
+
+/// How large the transcript's text is. The Mac has no system text-size setting, so the app keeps its own.
+enum TranscriptSize: String, CaseIterable {
+    case small, standard, large, larger
+
+    static let key = "transcriptSize"
+    var points: CGFloat {
+        switch self {
+        case .small: 15
+        case .standard: 18
+        case .large: 22
+        case .larger: 26
+        }
+    }
+    var title: LocalizedStringKey {
+        switch self {
+        case .small: "Small"
+        case .standard: "Standard"
+        case .large: "Large"
+        case .larger: "Larger"
+        }
+    }
 }

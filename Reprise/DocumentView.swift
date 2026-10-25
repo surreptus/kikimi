@@ -1,8 +1,10 @@
 import SwiftUI
 
-/// The privacy policy, shown from the nav footer. The text is `Privacy.md`, which is also the file to publish at a
-/// URL (the App Store asks for one), so there is one source and the two can't disagree.
-struct PrivacyView: View {
+/// A bundled markdown document: the privacy policy (`Privacy.md`) or the terms of use (`Terms.md`). The file is also
+/// the one to publish at a URL, so there is one source and the two can't disagree.
+struct DocumentView: View {
+    let title: String
+    let resource: String
     @Environment(\.dismissModal) private var dismiss
 
     private enum Block: Identifiable {
@@ -18,9 +20,9 @@ struct PrivacyView: View {
 
     /// Headings, bullets and paragraphs: all the file uses. The page title is dropped; the panel has its own.
     private var blocks: [Block] {
-        guard let url = Bundle.main.url(forResource: "Privacy", withExtension: "md"),
+        guard let url = Bundle.main.url(forResource: resource, withExtension: "md"),
               let text = try? String(contentsOf: url, encoding: .utf8) else {
-            return [.paragraph("The privacy policy could not be loaded.")]
+            return [.paragraph("\(title) could not be loaded.")]
         }
         var result: [Block] = []
         var paragraph: [String] = []
@@ -39,7 +41,7 @@ struct PrivacyView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Privacy policy").font(Theme.title(22))
+                Text(title).font(Theme.title(22))
                 Spacer()
                 Button("Done") { dismiss() }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
             }

@@ -7,7 +7,8 @@ struct AboutView: View {
     @Environment(\.dismissModal) private var dismiss
 
     private static let stageNames = [
-        "Apprentice 1", "Apprentice 2", "Apprentice 3", "Apprentice 4", "Guru 1", "Guru 2", "Master", "Enlightened",
+        String(localized: "Stage 1"), String(localized: "Stage 2"), String(localized: "Stage 3"), String(localized: "Stage 4"),
+        String(localized: "Stage 5"), String(localized: "Stage 6"), String(localized: "Stage 7"), String(localized: "Stage 8"),
     ]
 
     var body: some View {
@@ -39,14 +40,14 @@ struct AboutView: View {
 
     // MARK: Sections
 
-    private func section<Content: View>(_ title: String, @ViewBuilder _ content: () -> Content) -> some View {
+    private func section<Content: View>(_ title: LocalizedStringKey, @ViewBuilder _ content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title).font(Theme.title(17))
             content()
         }
     }
 
-    private func paragraph(_ text: String) -> some View {
+    private func paragraph(_ text: LocalizedStringKey) -> some View {
         Text(text).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
     }
 
@@ -61,7 +62,7 @@ struct AboutView: View {
         }
     }
 
-    private func step(_ number: Int, _ title: String, _ text: String) -> some View {
+    private func step(_ number: Int, _ title: LocalizedStringKey, _ text: LocalizedStringKey) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text("\(number)").font(.system(size: 14, weight: .semibold, design: .rounded))
                 .frame(width: 26, height: 26).background(Circle().fill(Theme.softStrong))
@@ -92,7 +93,7 @@ struct AboutView: View {
         }
     }
 
-    private func row(_ name: String, _ text: String) -> some View {
+    private func row(_ name: LocalizedStringKey, _ text: LocalizedStringKey) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text(name).font(.system(.body, design: .rounded, weight: .medium)).frame(width: 150, alignment: .leading)
             paragraph(text)
@@ -113,20 +114,20 @@ struct AboutView: View {
                 ForEach(Array(SRS.intervals.enumerated()), id: \.offset) { index, interval in
                     GridRow {
                         StageRing(stage: index + 1, size: 18)
-                        Text("\(index + 1). \(Self.stageNames[index])")
+                        Text(Self.stageNames[index])
                         Text(Self.describe(interval))
                     }
                 }
                 GridRow {
                     StageRing(stage: 9, size: 18)
-                    Text("9. Burned")
+                    Text("Finished")
                     Text("Finished: it never comes back")
                 }
             }
             .padding(14).frame(maxWidth: .infinity, alignment: .leading).panel(padding: 0)
-            paragraph("You'll see the same circle beside a word on the Words page, in its panel and in the video. It fills as the word moves up, from red through yellow to green, and becomes a white disc once it is burned. An empty ring is a new word, and a green tick is a word you marked known.")
+            paragraph("You'll see the same circle beside a word on the Words page, in its panel and in the video. It fills as the word moves up, from red through yellow to green, and becomes a white disc once it is finished. An empty ring is a new word, and a green tick is a word you marked known.")
             VStack(alignment: .leading, spacing: 6) {
-                bullet("Got it moves a word up one stage. Missed it moves it down one, never below Apprentice 1.")
+                bullet("Got it moves a word up one stage. Missed it moves it down one, never below Stage 1.")
                 bullet("A word's stage changes only on its first answer in a sitting. A missed word returns later in the same sitting for another try, without moving again.")
                 bullet("The sentence on a card is picked at random from your videos each time, so you meet the word in different places.")
                 bullet("Words marked Known are never reviewed. Reset on the Words page puts a word back to new.")
@@ -134,7 +135,7 @@ struct AboutView: View {
         }
     }
 
-    private func bullet(_ text: String) -> some View {
+    private func bullet(_ text: LocalizedStringKey) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text("•").accessibilityHidden(true)
             paragraph(text)
@@ -146,7 +147,7 @@ struct AboutView: View {
             paragraph("On Videos, each video shows how much of it you already know, such as 91% known · Comfortable. It counts the nouns, verbs, adjectives and adverbs you know. Small words like articles and particles aren't kept; they make up about half of what is said and are nearly always known, so the share you really understand is higher than the figure. About 90% of the words that are kept is roughly 95% of everything, which is around where following along gets comfortable.")
             VStack(alignment: .leading, spacing: 6) {
                 bullet("Hard is under 80%, A stretch is 80 to 88%, Comfortable is 88 to 98%, and Easy is 98% or more.")
-                bullet("A word counts as known if you marked it known, it is finished, or you are learning it and its reviews are a week or more apart (Guru 1 and above).")
+                bullet("A word counts as known if you marked it known, it is finished, or you are learning it and its reviews are a week or more apart (Stage 5 and above).")
                 bullet("Sort by Best fit to put the videos worth watching next at the top: mostly understood, with a little new.")
                 bullet("Open a video's Info to see the commonest words you don't know yet, and start learning them all at once.")
                 bullet("In Settings, under Data, you can mark a list of words you already know (one per line, or the first column of a CSV), so these numbers start out honest.")
@@ -172,7 +173,7 @@ struct AboutView: View {
         }
     }
 
-    private func shortcut(_ place: String, _ text: String) -> some View {
+    private func shortcut(_ place: LocalizedStringKey, _ text: LocalizedStringKey) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text(place).font(.system(.body, design: .rounded, weight: .medium)).frame(width: 70, alignment: .leading)
             paragraph(text)
@@ -183,7 +184,7 @@ struct AboutView: View {
     /// 4 hours, 47 hours, 7 days: hours until two days, then days.
     private static func describe(_ interval: TimeInterval) -> String {
         let hours = Int(interval / 3600)
-        if hours <= 48 { return "\(hours) hours" }
-        return "\(hours / 24) days"
+        if hours <= 48 { return inflected("^[\(hours) hour](inflect: true)") }
+        return inflected("^[\(hours / 24) day](inflect: true)")
     }
 }
