@@ -78,15 +78,14 @@ struct AboutView: View {
 
     private var importSteps: some View {
         section("What happens when you add a video") {
-            paragraph("Your original file is only ever read, never changed or deleted. Reprise works on a copy and keeps a smaller one for playback. While a video is being added, its row says which step it is on, such as 4 of 8 · Transcribing. If you chose to go ahead despite a language warning, the language check is skipped and there are 7 steps.")
+            paragraph("Your original file is only ever read, never changed or deleted. Reprise works on a copy and keeps a smaller one for playback. While a video is being added, its row says which step it is on, such as 4 of 7 · Transcribing. If you chose to go ahead despite a language warning, the language check is skipped and there are 6 steps.")
             VStack(alignment: .leading, spacing: 8) {
                 row("Reading file", "Checks whether you've already added this video, by its contents rather than its name.")
                 row("Copying", "Makes a working copy. Seconds.")
                 row("Checking language", "Listens to a short sample so a Japanese video can't be added as Spanish by mistake.")
                 row("Transcribing", "The long step: about a quarter of the video's length with the medium model in our tests, longer with larger models.")
-                row("Compressing video", "Saves a small copy for playback; in our tests a 161 MB video became 29 MB. A video that is already small is kept as it is.")
+                row("Compressing video", "Saves a small copy for playback, with its sound kept small too; in our tests a 161 MB video became 29 MB. A video that is already small is kept as it is. Sentence audio in reviews plays from this same copy.")
                 row("Verifying", "Checks the copy plays and is the right length before anything is kept.")
-                row("Extracting audio", "Saves the sound on its own, for the sentence audio in reviews.")
                 row("Saving", "Stores the lines and words in one step. Either everything is saved or nothing is.")
             }
             paragraph("You can cancel at any point before saving, and nothing is left behind. The other steps are usually much shorter than transcribing; we haven't timed each one.")

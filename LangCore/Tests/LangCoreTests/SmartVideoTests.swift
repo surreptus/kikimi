@@ -51,6 +51,21 @@ final class VideoPlanTests: XCTestCase {
     }
 }
 
+final class AudioPlanTests: XCTestCase {
+    func testLoudSourcesAreRecompressedAndSmallOnesCopied() {
+        XCTAssertEqual(AudioPlan.plan(isAAC: true, channels: 2, bitrate: 128_000), .reencode(bitrate: 64_000))
+        XCTAssertEqual(AudioPlan.plan(isAAC: true, channels: 2, bitrate: 96_000), .copy, "up to 1.5x the target is kept")
+        XCTAssertEqual(AudioPlan.plan(isAAC: true, channels: 2, bitrate: 64_000), .copy)
+        XCTAssertEqual(AudioPlan.plan(isAAC: true, channels: 1, bitrate: 128_000), .reencode(bitrate: 48_000))
+        XCTAssertEqual(AudioPlan.plan(isAAC: true, channels: 1, bitrate: 64_000), .copy)
+    }
+
+    func testOtherFormatsAndUnknownRatesAreEncoded() {
+        XCTAssertEqual(AudioPlan.plan(isAAC: false, channels: 2, bitrate: 32_000), .reencode(bitrate: 64_000))
+        XCTAssertEqual(AudioPlan.plan(isAAC: true, channels: 2, bitrate: 0), .reencode(bitrate: 64_000))
+    }
+}
+
 final class SmartTranscoderTests: XCTestCase {
     private let transcoder = AVFoundationTranscoder()
 
@@ -136,6 +151,9 @@ final class SmartTranscoderTests: XCTestCase {
         let b = try await inspect(out)
         XCTAssertEqual(b.audioCodec, kAudioFormatMPEG4AAC)
         XCTAssertLessThan(b.bytes, a.bytes)
+        let track = try await AVURLAsset(url: out).loadTracks(withMediaType: .audio).first!
+        let rate = try await track.load(.estimatedDataRate)
+        XCTAssertLessThanOrEqual(rate, 64_000 * 1.3, "speech doesn't need more than about 64 kbps")
         // The speech must still be there for transcription.
         let samples = try await AudioExtractor.pcm16kMono(from: out)
         let rms = (samples.map { $0 * $0 }.reduce(0, +) / Float(samples.count)).squareRoot()
@@ -161,7 +179,7 @@ final class SmartTranscoderTests: XCTestCase {
         let dir = scratch()
         let video = dir.appending(path: "in.mov"), audio = dir.appending(path: "in.m4a")
         try await FixtureVideo.make(at: video, seconds: 2)
-        try await transcoder.extractAAC(source: video, destination: audio)
+        try await FixtureVideo.exportAudioOnly(from: video, to: audio)
         do {
             try await transcoder.compact(source: audio, destination: dir.appending(path: "out.mov"), progress: { _ in })
             XCTFail("expected noVideoTrack")

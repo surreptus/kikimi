@@ -23,7 +23,6 @@ struct StubTranscriber: Transcriber {
 /// Real AVFoundation by default; individual steps can be replaced to inject failures.
 struct StubTranscoder: MediaTranscoder {
     var hevc: (@Sendable (URL, URL) async throws -> Void)?
-    var aac: (@Sendable (URL, URL) async throws -> Void)?
     private let real = AVFoundationTranscoder()
 
     func compactVideo(source: URL, destination: URL, progress: @escaping @Sendable (Double) -> Void) async throws {
@@ -31,10 +30,6 @@ struct StubTranscoder: MediaTranscoder {
         else { try await real.compactVideo(source: source, destination: destination, progress: progress) }
     }
 
-    func extractAAC(source: URL, destination: URL) async throws {
-        if let aac { try await aac(source, destination) }
-        else { try await real.extractAAC(source: source, destination: destination) }
-    }
 }
 
 struct Failure: Error {}

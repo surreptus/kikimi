@@ -243,7 +243,7 @@ private struct VideoInfoSheet: View {
                     row("Size on disk", details.filesMissing ? String(localized: "Files are missing") : formatBytes(details.totalBytes))
                     if !details.filesMissing {
                         row("   Video", formatBytes(details.videoBytes))
-                        row("   Audio", formatBytes(details.audioBytes))
+                        if details.audioBytes > 0 { row("   Audio", formatBytes(details.audioBytes)) }
                     }
                     GridRow(alignment: .top) {
                         Text("Location").foregroundStyle(Theme.muted).gridColumnAlignment(.trailing)

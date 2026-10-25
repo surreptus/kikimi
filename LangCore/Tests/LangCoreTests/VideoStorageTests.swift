@@ -34,17 +34,29 @@ final class VideoStorageTests: XCTestCase {
         let (env, a, _, _, _) = try await library()
         let details = try await env.details(for: a)
         let videoSize = try FileManager.default.attributesOfItem(atPath: env.fileURL(for: a).path)[.size] as! Int64
-        let audioSize = try FileManager.default.attributesOfItem(atPath: env.libraryURL.appending(path: a.audioPath!).path)[.size] as! Int64
 
         XCTAssertEqual(details.videoBytes, videoSize)
-        XCTAssertEqual(details.audioBytes, audioSize)
-        XCTAssertEqual(details.totalBytes, videoSize + audioSize)
+        XCTAssertEqual(details.audioBytes, 0, "new imports keep no separate audio file")
+        XCTAssertEqual(details.totalBytes, videoSize)
         XCTAssertGreaterThan(details.totalBytes, 0)
         XCTAssertEqual(details.subtitleCount, 1)
         XCTAssertEqual(details.wordCount, 3, "casa, ser (from es) and grande: content words only")
         XCTAssertTrue(details.folder.path.hasPrefix(env.libraryURL.standardizedFileURL.path + "/"))
         XCTAssertFalse(details.filesMissing)
         XCTAssertEqual(env.bytesOnDisk(for: a), details.totalBytes)
+    }
+
+    func testAnAudioFileFromAnEarlierVersionIsStillCountedAndRemoved() async throws {
+        let (env, a, _, _, _) = try await library()
+        var legacy = a
+        legacy.audioPath = "\(a.contentHash)/audio.m4a"
+        let file = env.libraryURL.appending(path: legacy.audioPath!)
+        try Data(count: 1234).write(to: file)
+
+        let details = try await env.details(for: legacy)
+        XCTAssertEqual(details.audioBytes, 1234)
+        XCTAssertEqual(details.totalBytes, details.videoBytes + 1234)
+        XCTAssertEqual(env.bytesOnDisk(for: legacy), details.totalBytes)
     }
 
     func testLibraryBytesCoversEveryVideo() async throws {

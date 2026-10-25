@@ -18,9 +18,9 @@ final class ImportPipelineTests: XCTestCase {
 
         let library = h.container.appending(path: "Library")
         let videoURL = library.appending(path: video.videoPath)
-        let audioURL = library.appending(path: video.audioPath!)
         XCTAssertTrue(FileManager.default.fileExists(atPath: videoURL.path))
-        XCTAssertTrue(FileManager.default.fileExists(atPath: audioURL.path))
+        XCTAssertNil(video.audioPath, "the video's own sound is the only audio kept")
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: videoURL.deletingLastPathComponent().path), ["video.mov"])
 
         let asset = AVURLAsset(url: videoURL)
         let seconds = try await asset.load(.duration).seconds
@@ -46,7 +46,7 @@ final class ImportPipelineTests: XCTestCase {
             seen.mutate { if $0.last != p.stage { $0.append(p.stage) } }
         }
         XCTAssertEqual(seen.value, [.hashing, .staging, .detectingLanguage, .transcribing, .transcoding, .verifying,
-                                    .extractingAudio, .saving])
+                                    .saving])
     }
 
     // MARK: Duplicates
@@ -98,9 +98,7 @@ final class ImportPipelineTests: XCTestCase {
 
     func testVerificationFailsWithoutVideoTrack() async throws {
         let h = try await ImportHarness()
-        let audioOnly = StubTranscoder(hevc: { source, dest in
-            try await AVFoundationTranscoder().extractAAC(source: source, destination: dest)
-        })
+        let audioOnly = StubTranscoder(hevc: { source, dest in try await FixtureVideo.exportAudioOnly(from: source, to: dest) })
         let pipeline = h.pipeline(transcoder: audioOnly)
         await assertFails(.verificationFailed) { _ = try await pipeline.importVideo(from: h.original, profile: spanish) }
         try h.assertOriginalUntouched()
@@ -112,14 +110,6 @@ final class ImportPipelineTests: XCTestCase {
         let wrongLength = StubTranscoder(hevc: { _, dest in try await FixtureVideo.make(at: dest, seconds: 5) })
         let pipeline = h.pipeline(transcoder: wrongLength)
         await assertFails(.verificationFailed) { _ = try await pipeline.importVideo(from: h.original, profile: spanish) }
-        try h.assertOriginalUntouched()
-        try await h.assertNothingLeft()
-    }
-
-    func testAudioExportFailure() async throws {
-        let h = try await ImportHarness()
-        let pipeline = h.pipeline(transcoder: StubTranscoder(aac: { _, _ in throw Failure() }))
-        await assertFails(.audioExportFailed) { _ = try await pipeline.importVideo(from: h.original, profile: spanish) }
         try h.assertOriginalUntouched()
         try await h.assertNothingLeft()
     }
@@ -168,7 +158,7 @@ final class ImportPipelineTests: XCTestCase {
         XCTAssertGreaterThan(rms, 0.1, "tone should survive decoding and resampling")
     }
 
-    private enum Expected { case transcriptionFailed, transcodeFailed, verificationFailed, audioExportFailed, databaseFailed }
+    private enum Expected { case transcriptionFailed, transcodeFailed, verificationFailed, databaseFailed }
 
     private func assertFails(
         _ expected: Expected, file: StaticString = #filePath, line: UInt = #line,
@@ -180,7 +170,7 @@ final class ImportPipelineTests: XCTestCase {
         } catch let error as ImportError {
             switch (error, expected) {
             case (.transcriptionFailed, .transcriptionFailed), (.transcodeFailed, .transcodeFailed),
-                 (.verificationFailed, .verificationFailed), (.audioExportFailed, .audioExportFailed),
+                 (.verificationFailed, .verificationFailed),
                  (.databaseFailed, .databaseFailed): break
             default: XCTFail("expected \(expected), got \(error)", file: file, line: line)
             }

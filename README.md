@@ -95,7 +95,9 @@ The original file is only ever read. Steps, in order:
 3. Transcribe with WhisperKit (Whisper sound tags are removed).
 4. Make the library copy: small HEVC is kept as is; otherwise low-bitrate HEVC with the short side at most 480 px.
    If re-encoding isn't smaller than the source, the original streams are copied instead.
-5. Verify the output (opens, has a video track, duration matches), and save a compact AAC audio track.
+5. Verify the output (opens, has a video track, duration matches). Its sound is AAC: copied when already small, otherwise
+   recompressed to about 64 kbps (48 for mono), which is plenty for speech. There is no separate audio file; sentence
+   audio and audio clips play from the video copy. (Videos added by earlier versions keep theirs until deleted.)
 6. Atomically move both into the library, then write all database rows in one transaction.
 7. Only then delete the staged copy.
 

@@ -82,7 +82,25 @@ public enum VideoPlan: Equatable, Sendable {
     private static func even(_ value: Double) -> Int { max(2, Int((value / 2).rounded()) * 2) }
 }
 
-/// Makes the library copy of a video (HEVC, see `VideoPlan`) and the AAC audio export.
+/// What happens to the sound in the library copy. Speech needs little, so loud sources are recompressed; a source that
+/// is already small is copied, to avoid a second lossy pass for no gain.
+public enum AudioPlan: Equatable, Sendable {
+    case copy
+    case reencode(bitrate: Int)   // AAC, bits per second across all channels
+
+    public static let monoBitrate = 48_000
+    public static let stereoBitrate = 64_000
+    /// An AAC source up to this multiple of the target is kept as it is.
+    public static let tolerance = 1.5
+
+    public static func plan(isAAC: Bool, channels: Int, bitrate: Double) -> AudioPlan {
+        let target = channels <= 1 ? monoBitrate : stereoBitrate
+        if isAAC, bitrate > 0, bitrate <= Double(target) * tolerance { return .copy }
+        return .reencode(bitrate: target)
+    }
+}
+
+/// Makes the library copy of a video (HEVC, see `VideoPlan`, with its sound as AAC, see `AudioPlan`).
 public struct AVFoundationTranscoder: MediaTranscoder {
     public enum Method: Equatable, Sendable {
         case passedThrough        // source streams copied unchanged
@@ -96,11 +114,6 @@ public struct AVFoundationTranscoder: MediaTranscoder {
         source: URL, destination: URL, progress: @escaping @Sendable (Double) -> Void
     ) async throws {
         try await compact(source: source, destination: destination, progress: progress)
-    }
-
-    public func extractAAC(source: URL, destination: URL) async throws {
-        try await export(source: source, preset: AVAssetExportPresetAppleM4A,
-                         type: .m4a, destination: destination, progress: { _ in })
     }
 
     /// Like `compactVideo`, but reports what it did.
@@ -282,13 +295,15 @@ public struct AVFoundationTranscoder: MediaTranscoder {
         var audioPair: (AVAssetReaderOutput, AVAssetWriterInput)?
         if let audio {
             let formats = try await audio.load(.formatDescriptions)
-            if let format = formats.first, CMFormatDescriptionGetMediaSubType(format) == kAudioFormatMPEG4AAC {
-                // AAC is copied as is: no second round of lossy compression.
+            let asbd = formats.first.flatMap { CMAudioFormatDescriptionGetStreamBasicDescription($0)?.pointee }
+            let channels = min(2, max(1, Int(asbd?.mChannelsPerFrame ?? 2)))
+            let isAAC = formats.first.map { CMFormatDescriptionGetMediaSubType($0) == kAudioFormatMPEG4AAC } ?? false
+            let audioRate = try await audio.load(.estimatedDataRate)
+            switch AudioPlan.plan(isAAC: isAAC, channels: channels, bitrate: Double(audioRate)) {
+            case .copy:
                 audioPair = (AVAssetReaderTrackOutput(track: audio, outputSettings: nil),
-                             AVAssetWriterInput(mediaType: .audio, outputSettings: nil, sourceFormatHint: format))
-            } else {
-                let asbd = formats.first.flatMap { CMAudioFormatDescriptionGetStreamBasicDescription($0)?.pointee }
-                let channels = min(2, max(1, Int(asbd?.mChannelsPerFrame ?? 2)))
+                             AVAssetWriterInput(mediaType: .audio, outputSettings: nil, sourceFormatHint: formats.first))
+            case .reencode(let audioBitrate):
                 let rate = (asbd?.mSampleRate).flatMap { $0 > 0 ? $0 : nil } ?? 44_100
                 audioPair = (
                     AVAssetReaderTrackOutput(track: audio, outputSettings: [
@@ -297,7 +312,7 @@ public struct AVFoundationTranscoder: MediaTranscoder {
                         AVLinearPCMIsNonInterleaved: false, AVNumberOfChannelsKey: channels, AVSampleRateKey: rate]),
                     AVAssetWriterInput(mediaType: .audio, outputSettings: [
                         AVFormatIDKey: kAudioFormatMPEG4AAC, AVNumberOfChannelsKey: channels,
-                        AVSampleRateKey: rate, AVEncoderBitRateKey: 64_000 * channels]))
+                        AVSampleRateKey: rate, AVEncoderBitRateKey: audioBitrate]))
             }
             reader.add(audioPair!.0)
             writer.add(audioPair!.1)

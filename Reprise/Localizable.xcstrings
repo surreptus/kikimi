@@ -410,9 +410,6 @@
     "Exporting…" : {
 
     },
-    "Extracting audio" : {
-
-    },
     "Failed" : {
 
     },
@@ -837,10 +834,7 @@
     "Saved ^[%lld word](inflect: true)." : {
 
     },
-    "Saves a small copy for playback; in our tests a 161 MB video became 29 MB. A video that is already small is kept as it is." : {
-
-    },
-    "Saves the sound on its own, for the sentence audio in reviews." : {
+    "Saves a small copy for playback, with its sound kept small too; in our tests a 161 MB video became 29 MB. A video that is already small is kept as it is. Sentence audio in reviews plays from this same copy." : {
 
     },
     "Saves the words you are learning and the ones you know, with their stages and review dates, to a file. It doesn't include videos or speech models." : {
@@ -1129,7 +1123,7 @@
     "You'll see the same circle beside a word on the Words page, in its panel and in the video. It fills as the word moves up, from red through yellow to green, and becomes a white disc once it is finished. An empty ring is a new word, and a green tick is a word you marked known." : {
 
     },
-    "Your original file is only ever read, never changed or deleted. Reprise works on a copy and keeps a smaller one for playback. While a video is being added, its row says which step it is on, such as 4 of 8 · Transcribing. If you chose to go ahead despite a language warning, the language check is skipped and there are 7 steps." : {
+    "Your original file is only ever read, never changed or deleted. Reprise works on a copy and keeps a smaller one for playback. While a video is being added, its row says which step it is on, such as 4 of 7 · Transcribing. If you chose to go ahead despite a language warning, the language check is skipped and there are 6 steps." : {
 
     },
     "Your original files are never changed or deleted." : {

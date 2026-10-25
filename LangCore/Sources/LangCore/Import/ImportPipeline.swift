@@ -77,7 +77,7 @@ public actor ImportPipeline {
             libraryDir = destination   // set only after the move, so a failed move never deletes an existing folder
             let video = Video(
                 language: profile.code, title: original.deletingPathExtension().lastPathComponent,
-                contentHash: hash, videoPath: "\(hash)/video.mov", audioPath: "\(hash)/audio.m4a",
+                contentHash: hash, videoPath: "\(hash)/video.mov",
                 duration: files.duration)
             let saved = try await save(video, segments: segments, profile: profile)
 
@@ -157,14 +157,13 @@ public actor ImportPipeline {
         var duration: Double
     }
 
-    /// 3-5. Make the compact video, verify it against the staged source, then export the AAC audio.
+    /// 3-4. Make the compact video (its sound is the library's only audio) and verify it against the staged source.
     private func makeLibraryFiles(
         from staged: URL, in work: URL, progress: @escaping ProgressHandler
     ) async throws -> LibraryFiles {
         let fm = FileManager.default
         let out = work.appending(path: "out", directoryHint: .isDirectory)
         let videoOut = out.appending(path: "video.mov")
-        let audioOut = out.appending(path: "audio.m4a")
         do {
             try fm.createDirectory(at: out, withIntermediateDirectories: true)
             try await transcoder.compactVideo(
@@ -180,9 +179,6 @@ public actor ImportPipeline {
         try await MediaVerifier.verify(output: videoOut, expectedDuration: duration)
         try Task.checkCancellation()
 
-        progress(ImportProgress(stage: .extractingAudio, fraction: 0))
-        do { try await transcoder.extractAAC(source: staged, destination: audioOut) }
-        catch { throw Self.wrapped(error, ImportError.audioExportFailed) }
         return LibraryFiles(folder: out, duration: duration)
     }
 

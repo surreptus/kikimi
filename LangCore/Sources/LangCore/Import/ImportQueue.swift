@@ -11,7 +11,6 @@ extension ImportError: LocalizedError {
         case .transcriptionFailed(let e): Self.describe(transcription: e)
         case .transcodeFailed(let e): String(localized: "Couldn't re-encode the video: \(e.localizedDescription)", bundle: .module)
         case .verificationFailed(let why): String(localized: "The re-encoded video failed verification (\(why)). Your original is untouched.", bundle: .module)
-        case .audioExportFailed(let e): String(localized: "Couldn't export the audio: \(e.localizedDescription)", bundle: .module)
         case .libraryMoveFailed(let e): String(localized: "Couldn't save to the library: \(e.localizedDescription)", bundle: .module)
         case .databaseFailed(let e): String(localized: "Couldn't save to the database: \(e.localizedDescription)", bundle: .module)
         }

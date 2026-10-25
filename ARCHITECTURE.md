@@ -40,8 +40,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 
 `ImportPipeline.importVideo` calls one small method per step, in this order:
 
-`stage` (copy the original) → `confirmLanguage` → `transcribe` → `makeLibraryFiles` (compact video, verify,
-AAC audio) → `moveIntoLibrary` → `save` (one database transaction) → delete the staged copy.
+`stage` (copy the original) → `confirmLanguage` → `transcribe` → `makeLibraryFiles` (compact video, verify) → `moveIntoLibrary` → `save` (one database transaction) → delete the staged copy.
 
 The original is only read. Any failure removes only what this import created. Tests inject a failure at each step
 and check the original is unchanged. `ImportQueue` runs imports one at a time for the UI and reports status.

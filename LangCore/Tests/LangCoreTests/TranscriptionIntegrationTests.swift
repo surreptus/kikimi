@@ -79,7 +79,7 @@ final class TranscriptionIntegrationTests: XCTestCase {
 
         let library = root.appending(path: "Library")
         XCTAssertTrue(FileManager.default.fileExists(atPath: library.appending(path: saved.videoPath).path))
-        XCTAssertTrue(FileManager.default.fileExists(atPath: library.appending(path: saved.audioPath!).path))
+        XCTAssertNil(saved.audioPath)
 
         let lemmas = try await database.writer.read { try String.fetchSet($0, sql: "SELECT lemma FROM words") }
         let lines = try await database.writer.read { try String.fetchAll($0, sql: "SELECT text FROM subtitles ORDER BY idx") }

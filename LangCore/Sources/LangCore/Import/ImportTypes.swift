@@ -1,7 +1,7 @@
 import Foundation
 
 public enum ImportStage: String, Sendable, CaseIterable {
-    case hashing, staging, detectingLanguage, transcribing, transcoding, verifying, extractingAudio, saving
+    case hashing, staging, detectingLanguage, transcribing, transcoding, verifying, saving
 
     /// Whether the step reports how far along it is. Only transcribing and compressing do; the others have no
     /// measurable progress, so the UI shows a bar that just moves instead of one stuck at empty.
@@ -13,7 +13,7 @@ public enum ImportStage: String, Sendable, CaseIterable {
         allCases.filter { checkingLanguage || $0 != .detectingLanguage }
     }
 
-    /// "3 of 8": this step's place in the import.
+    /// "3 of 7": this step's place in the import.
     public func position(checkingLanguage: Bool) -> (number: Int, of: Int) {
         let steps = Self.steps(checkingLanguage: checkingLanguage)
         return ((steps.firstIndex(of: self) ?? 0) + 1, steps.count)
@@ -59,7 +59,6 @@ public enum ImportError: Error {
     case transcriptionFailed(Error)
     case transcodeFailed(Error)
     case verificationFailed(String)
-    case audioExportFailed(Error)
     case libraryMoveFailed(Error)
     case databaseFailed(Error)
 }
@@ -116,7 +115,6 @@ public protocol MediaTranscoder: Sendable {
     func compactVideo(
         source: URL, destination: URL, progress: @escaping @Sendable (Double) -> Void
     ) async throws
-    func extractAAC(source: URL, destination: URL) async throws
 }
 
 extension Transcriber {

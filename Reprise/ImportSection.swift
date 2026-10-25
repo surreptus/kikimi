@@ -288,7 +288,7 @@ struct ImportSection: View {
         return "\(percent) · \(ProgressEstimate.phrase(secondsLeft: left))"
     }
 
-    /// "3 of 8 · Transcribing": the step's place in the import (out of 7 if the language check was skipped).
+    /// "3 of 7 · Transcribing": the step's place in the import (out of 6 if the language check was skipped).
     private func runningText(_ stage: ImportStage, _ job: ImportQueue.Job) -> String {
         let place = stage.position(checkingLanguage: job.checksLanguage)
         return String(localized: "\(place.number) of \(place.of) · \(stageName(stage))")
@@ -302,7 +302,6 @@ struct ImportSection: View {
         case .transcribing: String(localized: "Transcribing")
         case .transcoding: String(localized: "Compressing video")
         case .verifying: String(localized: "Verifying")
-        case .extractingAudio: String(localized: "Extracting audio")
         case .saving: String(localized: "Saving")
         }
     }

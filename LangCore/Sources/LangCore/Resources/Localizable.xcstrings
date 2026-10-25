@@ -32,9 +32,6 @@
     "Couldn't copy the file: %@" : {
 
     },
-    "Couldn't export the audio: %@" : {
-
-    },
     "Couldn't re-encode the video: %@" : {
 
     },

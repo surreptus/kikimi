@@ -144,4 +144,13 @@ enum FixtureVideo {
             packetDescriptions: nil, sampleBufferOut: &sample)
         return sample!
     }
+
+    /// A sound-only .m4a made from a video, for tests that need a file with no picture.
+    static func exportAudioOnly(from source: URL, to destination: URL) async throws {
+        guard let session = AVAssetExportSession(asset: AVURLAsset(url: source), presetName: AVAssetExportPresetAppleM4A) else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+        try? FileManager.default.removeItem(at: destination)
+        try await session.export(to: destination, as: .m4a)
+    }
 }
