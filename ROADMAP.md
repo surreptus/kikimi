@@ -41,8 +41,8 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       (a dependency, so ask first). Recommendation: the manual check.
 
 ### Quality
-- [ ] **Release the speech model after imports finish.** It stays loaded (1.5–3 GB) until the app quits.
-      Unload after a couple of minutes idle. (Principle 5.)
+- [x] **Release the speech model when idle.** It is let go after 2 minutes unused (never mid-import); the next
+      import reloads it.
 - [ ] **Transcript performance.** It felt slow in Debug. A 20-second sample of the Debug build showed the main
       thread about 74% idle and nothing in our code standing out. Confirm in the Release build; if it still lags,
       likely suspects are every row re-evaluating on hover and rows never being released. Test on a 25-minute video.
