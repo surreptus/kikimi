@@ -1,14 +1,13 @@
-// Draws the Reprise app icon: the musical repeat sign (𝄆), spread across the full width of the icon shape and
-// melted sideways, in dark green on the app's lime.
+// Draws the Reprise app icon: the musical repeat sign (𝄆), drawn larger than the icon shape so it fills it edge to
+// edge (the shape clips it), and zig-zagged sideways, in dark green on the app's lime.
 //
 // Run from the repository root (needs Xcode):
 //   swiftc -O -swift-version 5 Scripts/icon/make_icon.swift -o /tmp/make_icon && /tmp/make_icon /tmp/icon-out
 // It writes final.png (1024 px). Then make the other sizes into the asset catalog:
 //   for n in 16 32 64 128 256 512 1024; do sips -z $n $n /tmp/icon-out/final.png --out Reprise/Assets.xcassets/AppIcon.appiconset/icon_$n.png; done
 //
-// The look is set at the bottom: `glyphWidth` (how wide the sign is before melting), `amplitude` (how far rows slide
-// sideways) and `stretch` (how much they widen and narrow). The program prints how far the result reaches, so you can
-// keep it inside the icon shape (x 100 to 924 of 1024).
+// The look is set at the bottom: `glyphWidth` (how wide the sign is before warping), `amplitude` (how far rows slide
+// sideways) and `stretch` (how much they widen and narrow). The zig-zag's period is in `zigzag`.
 
 import AppKit
 import SwiftUI
@@ -36,23 +35,28 @@ func drawGlyph(width: Double) -> [UInt8] {
         } }
     }
     // Layout across the whole 100-wide box (x from -50 to 50): a thick bar, a thin bar, a gap, then the two dots.
-    let barTop = -37.0, barBottom = 37.0
+    // The bars run past the top and bottom of the icon shape, which clips them.
+    let barTop = -60.0, barBottom = 60.0
     fill(-50, -20, barTop, barBottom)       // thick bar, 30 wide
     fill(-10, 3, barTop, barBottom)         // thin bar, 13 wide
-    fill(21, 50, -24 - 14.5, -24 + 14.5, ellipse: true)    // upper dot, 29 across
-    fill(21, 50, 24 - 14.5, 24 + 14.5, ellipse: true)      // lower dot
+    fill(21, 50, -27 - 17, -27 + 17, ellipse: true)    // upper dot, 29 across
+    fill(21, 50, 27 - 17, 27 + 17, ellipse: true)      // lower dot
     return px
 }
 
-/// Melt: each row slides sideways and stretches, by a few overlapping waves, so shapes look poured and dripping.
+/// A triangle wave: -1...1, with straight runs and sharp turns, `period` long.
+func zigzag(_ y: Double, period: Double) -> Double { asin(sin(y / period * 2 * Double.pi)) * 2 / Double.pi }
+
+/// Zig-zag: each row slides sideways by a big and a small triangle wave, and stretches a little, so edges run
+/// diagonally and turn sharply.
 func melt(_ src: [UInt8], amplitude: Double, stretch: Double) -> [UInt8] {
     var out = [UInt8](repeating: 0, count: W * W * 4)
     let cx = Double(W) / 2
     let h = Double(W)
     for y in 0..<W {
         let t = Double(y) / h * 2 * Double.pi
-        // Two slow waves and one faster ripple; the slow ones carry the drip.
-        let shift = amplitude * (0.62 * sin(t * 1.5 + 0.6) + 0.30 * sin(t * 3.7 + 2.1) + 0.12 * sin(t * 8.5 + 0.3))
+        let yy = Double(y) + 40 * Double(ss)
+        let shift = amplitude * (0.75 * zigzag(yy, period: 230 * Double(ss)) + 0.25 * zigzag(yy, period: 86 * Double(ss)))
         let scale = 1 + stretch * (0.7 * sin(t * 2.1 + 1.3) + 0.3 * sin(t * 5.3))
         for x in 0..<W {
             let sx = cx + (Double(x) - cx - shift) / scale
@@ -103,6 +107,7 @@ struct Icon: View {
             RoundedRectangle(cornerRadius: 185, style: .continuous).fill(lime).frame(width: 824, height: 824)
                 .shadow(color: .black.opacity(0.28), radius: 16, y: 12)
             Image(nsImage: glyph).resizable().frame(width: 1024, height: 1024)
+                .mask(RoundedRectangle(cornerRadius: 185, style: .continuous).frame(width: 824, height: 824))
         }.frame(width: 1024, height: 1024)
     }
 }
@@ -123,5 +128,5 @@ struct Icon: View {
 MainActor.assumeIsolated {
     NSApplication.shared.setActivationPolicy(.prohibited)
     let out = CommandLine.arguments[1]
-    run(name: "final", glyphWidth: 712.0 * Double(ss), amplitude: 34 * Double(ss), stretch: 0.08, out: out)
+    run(name: "final", glyphWidth: 820.0 * Double(ss), amplitude: 52 * Double(ss), stretch: 0.06, out: out)
 }
