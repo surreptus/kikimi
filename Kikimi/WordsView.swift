@@ -22,6 +22,8 @@ struct WordsView: View {
     @State private var dictionaryHits: [DictionaryEntry] = []
     @State private var sort = WordSort(column: .seen, ascending: false)
     @State private var confirmReset = false
+    @State private var chooseAnki = false
+    @State private var ankiResult: AnkiExportResult?
     @FocusState private var searchFocused: Bool
     @State private var message: String?
 
@@ -84,6 +86,22 @@ struct WordsView: View {
         .onChange(of: app.languageCode) { selection = [] }
         .onChange(of: app.findWordsPending) { _, pending in if pending { focusSearch() } }
         .task { if app.findWordsPending { focusSearch() } }
+        .confirmationDialog("Export to Anki", isPresented: $chooseAnki) {
+            Button("Export with sentence audio") { exportAnki(includeAudio: true) }
+            Button("Export text only") { exportAnki(includeAudio: false) }
+        } message: {
+            Text(selection.isEmpty
+                 ? "Exports the words you are learning, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once."
+                 : "Exports the \(selection.count) selected words, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once.")
+        }
+        .alert("Anki file saved", isPresented: Binding(get: { ankiResult != nil }, set: { if !$0 { ankiResult = nil } })) {
+            if let ankiResult {
+                Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([ankiResult.file]) }
+            }
+            Button("OK", role: .cancel) {}
+        } message: {
+            if let ankiResult { Text(ankiMessage(ankiResult)) }
+        }
         .confirmationDialog("Reset \(selection.count) words?", isPresented: $confirmReset) {
             Button("Reset", role: .destructive) { apply(.reset) }
         } message: {
@@ -191,21 +209,52 @@ struct WordsView: View {
                 .foregroundStyle(Theme.muted)
             if let message { Text(message).font(Theme.small).foregroundStyle(Theme.muted).lineLimit(1) }
             Spacer()
-            Button("Reset") {
-                if selectedRows.contains(where: { $0.word.status == .learning || $0.word.status == .finished }) {
-                    confirmReset = true
-                } else {
-                    apply(.reset)
+            // Works with nothing selected too: it then exports the words you are learning.
+            Button("Export to Anki…") { chooseAnki = true }
+                .buttonStyle(.pill(.secondary, compact: true))
+                .help("Make a file Anki can import (File > Import), from the selected words or the ones you are learning")
+            HStack(spacing: 10) {
+                Button("Reset") {
+                    if selectedRows.contains(where: { $0.word.status == .learning || $0.word.status == .finished }) {
+                        confirmReset = true
+                    } else {
+                        apply(.reset)
+                    }
                 }
+                .buttonStyle(.pill(.secondary, compact: true))
+                Button("Mark known") { apply(.known) }.buttonStyle(.pill(.secondary, compact: true))
+                Button("Start learning") { apply(.learn) }.buttonStyle(.pill(compact: true))
             }
-            .buttonStyle(.pill(.secondary, compact: true))
-            Button("Mark known") { apply(.known) }.buttonStyle(.pill(.secondary, compact: true))
-            Button("Start learning") { apply(.learn) }.buttonStyle(.pill(compact: true))
+            .disabled(selection.isEmpty)
         }
-        .disabled(selection.isEmpty)
         .padding(.horizontal, Theme.screenPadding).padding(.vertical, 12)
         .background(Theme.soft.opacity(0.5))
         .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 1) }
+    }
+
+    private func exportAnki(includeAudio: Bool) {
+        guard let folder = ExportPanels.chooseFolder(message: String(localized: "Choose a folder for the Anki file")) else { return }
+        message = String(localized: "Exporting…")
+        Task {
+            do {
+                let ids = selection.isEmpty
+                    ? try await env.database.learningWordIDs(language: app.languageCode)
+                    : sortedRows.filter { selection.contains($0.id) }.map(\.id)
+                guard !ids.isEmpty else { message = String(localized: "No words to export."); return }
+                ankiResult = try await env.exportAnki(wordIDs: ids, language: app.languageCode, includeAudio: includeAudio, into: folder)
+                message = nil
+            } catch {
+                message = String(localized: "Export failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func ankiMessage(_ result: AnkiExportResult) -> String {
+        var text = String(localized: "Saved \(inflected("^[\(result.cards) card](inflect: true)")) to \(result.file.deletingLastPathComponent().lastPathComponent). In Anki, choose File > Import and pick \(result.file.lastPathComponent).")
+        if result.audioFiles > 0 {
+            text += " " + String(localized: "Copy the files in the media folder into Anki's collection.media folder first, so the sentence audio plays.")
+        }
+        return text
     }
 
     /// The words you meet most that you haven't touched yet: the best ones to start learning.

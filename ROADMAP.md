@@ -99,8 +99,9 @@ Ordered by how much each helps comprehensible input per unit of effort.
       per week, hours of listening (the measure that matters for comprehensible input), and how often you look
       each word up, so the words you keep checking stand out as your weakest. A new table, so a deliberate step;
       the log stays on the Mac and is left out of nothing the privacy policy promises.
-- [ ] **Anki export** for people who keep their cards elsewhere: a local file (words, meanings, the example sentence
-      and its audio), no account. Taalmaster offers this on its free plan, so people will look for it.
+- [x] **Anki export** (Words page > Export to Anki…): a local text file Anki imports (word, meaning, example sentence), with
+      optional sentence audio in a media folder. Checked against Anki 25.09's own importer: notes land in a
+      "Kikimi Spanish" deck, and exporting again updates them instead of duplicating.
 
 ### Keeping the numbers honest
 - [ ] **Check what you marked known.** Self-marked words (and imported lists) can inflate a video's coverage, so
