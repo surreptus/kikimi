@@ -108,7 +108,7 @@ struct SideNav: View {
             .background {
                 // One shared shape: it glides between rows when the selection changes.
                 if selected {
-                    RoundedRectangle(cornerRadius: 14).fill(Theme.softStrong)
+                    RoundedRectangle(cornerRadius: 14).fill(Theme.navSelection)
                         .matchedGeometryEffect(id: "selectionPill", in: pill)
                 }
             }

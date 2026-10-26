@@ -15,7 +15,8 @@ extension Color {
     }
 }
 
-/// The look of the app: one flat field of colour (mint), text is near-black (or near-white in dark mode),
+/// The look of the app: a coloured window (green) around an off-white (or off-black) card; text is deep green (or
+/// off-white in dark mode),
 /// and the one action that matters on a screen is a solid pill. The accent is the ink; nothing is decorative.
 enum Theme {
     static let ink = Color(light: Color(hex: 0x153A0B), dark: Color(hex: 0xF4F1EA))
@@ -29,12 +30,15 @@ enum Theme {
 
     /// Behind the floating nav, and behind sheets.
     static let page = Color(light: Color(hex: 0xF6F4EF), dark: Color(hex: 0x121212))
-    /// The nav card.
-    static let card = Color(light: .white, dark: Color(hex: 0x1F1F1F))
-    /// A panel on a coloured field: translucent, so it works on every section colour.
-    static let soft = Color(light: .white.opacity(0.62), dark: .white.opacity(0.09))
-    static let softStrong = Color(light: .white.opacity(0.85), dark: .white.opacity(0.16))
+    /// The content card: off-white, and off-black with a trace of green, so text and tables sit on the calmest
+    /// ground. The colour stays in the window around it (`chrome`) and the nav.
+    static let card = Color(light: Color(hex: 0xF8F6EF), dark: Color(hex: 0x151917))
+    /// A panel on the card: a faint tint of the ink, so it reads as a shape without a border.
+    static let soft = Color(light: Color(hex: 0x153A0B).opacity(0.06), dark: .white.opacity(0.07))
+    static let softStrong = Color(light: Color(hex: 0x153A0B).opacity(0.11), dark: .white.opacity(0.14))
     static let line = Color(light: .black.opacity(0.12), dark: .white.opacity(0.16))
+    /// The selected nav item, on the coloured window.
+    static let navSelection = Color(light: .white.opacity(0.85), dark: .white.opacity(0.16))
 
     /// The colour of the whole window: a bright yellow-green, and a deep green in dark mode.
     static let field = Color(light: Color(hex: 0x66CC0A), dark: Color(hex: 0x124632))
@@ -42,16 +46,16 @@ enum Theme {
     /// The window itself, behind the sidebar and around the content card: the field, a shade darker, so the card
     /// reads as a lighter shape on it.
     static let chrome = Color(light: Color(hex: 0x5DBA09), dark: Color(hex: 0x0C2D20))
-    /// A selected table row: a soft lighter tint, with ink text still on it.
-    static let selection = Color(light: .white.opacity(0.4), dark: .white.opacity(0.18))
+    /// A selected table row: a soft tint, with ink text still on it.
+    static let selection = Color(light: Color(hex: 0x153A0B).opacity(0.12), dark: .white.opacity(0.16))
     /// Alternate table rows: barely there.
-    static let stripe = Color(light: .black.opacity(0.04), dark: .white.opacity(0.04))
+    static let stripe = Color(light: .black.opacity(0.03), dark: .white.opacity(0.035))
 
     // Status and feedback. Always shown with a word as well, never as colour alone.
     static let red = Color(light: Color(hex: 0x801010), dark: Color(hex: 0xFFBDB5))
-    static let green = Color(light: Color(hex: 0x1E8A55), dark: Color(hex: 0x6FD6A0))
-    static let orange = Color(light: Color(hex: 0xB86E00), dark: Color(hex: 0xFFB84D))
-    static let purple = Color(light: Color(hex: 0x7C4DDB), dark: Color(hex: 0xC3A6FF))
+    static let green = Color(light: Color(hex: 0x197548), dark: Color(hex: 0x6FD6A0))
+    static let orange = Color(light: Color(hex: 0x935800), dark: Color(hex: 0xFFB84D))
+    static let purple = Color(light: Color(hex: 0x6F45C5), dark: Color(hex: 0xC3A6FF))
 
     static let cornerRadius: CGFloat = 20
     /// Inset of every screen's content from the window edge, so headings sit in the same place everywhere.

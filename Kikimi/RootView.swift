@@ -62,7 +62,7 @@ struct RootView: View {
             }
             .animation(Theme.screenChange(reduceMotion), value: app.section)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Theme.field)   // the card is plain; only the window around it has grain
+            .background(Theme.card)   // the card is plain; only the window around it has grain
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))   // a page sliding in stays inside the card
             .padding(.top, 10).padding(.trailing, 10).padding(.bottom, 10)
             .ignoresSafeArea(.container, edges: .top)   // the card starts 10 points from the window's top edge
