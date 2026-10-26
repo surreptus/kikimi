@@ -61,6 +61,9 @@ How we build Kikimi. Read this before changing anything; update it when we agree
   the system formatters. Layouts must survive text that is longer, so avoid fixed widths for text. Strings are kept in
   `Kikimi/Localizable.xcstrings` and `LangCore/Sources/LangCore/Resources/Localizable.xcstrings`; Xcode adds new
   keys when it builds in the IDE.
+- **Buttons in a row match.** Pill buttons of one size are the same height whether they hold text or an icon
+  (`PillButtonStyle` sets a minimum height), and icon-only pills use `.labelStyle(.pillIcon)` for the same width.
+  When adding or changing a button, put it beside its neighbours and check they line up, in a render if need be.
 - **Code reads like the code around it**: same comment density, naming and idiom. Comments say why, not what.
 
 ## Commands

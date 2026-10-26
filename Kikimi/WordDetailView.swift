@@ -73,7 +73,7 @@ struct WordDetail: View {
                     } label: {
                         Image(systemName: "ellipsis")
                             .font(.system(size: 14, weight: .medium))
-                            .frame(width: 22, height: 18)
+                            .frame(width: PillIconStyle.width)
                     }
                     .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
                     .help("Export this word's example sentences as clips")

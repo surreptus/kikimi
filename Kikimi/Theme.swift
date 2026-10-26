@@ -86,6 +86,7 @@ struct PillButtonStyle: ButtonStyle {
         configuration.label
             .font(.system(size: compact ? 13 : 15, weight: .medium, design: .rounded))
             .foregroundStyle(text)
+            .frame(minHeight: compact ? 16 : 20)   // text and icon pills of one size are the same height
             .padding(.vertical, compact ? 7 : 12)
             .padding(.horizontal, compact ? 14 : 26)
             .frame(maxWidth: fullWidth ? .infinity : nil)
@@ -111,6 +112,18 @@ struct PillButtonStyle: ButtonStyle {
         case .danger: .white
         }
     }
+}
+
+/// An icon-only label in a fixed-width slot, so pills holding different symbols (a play arrow, a repeat sign) match.
+struct PillIconStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.icon.frame(width: PillIconStyle.width)
+    }
+    static let width: CGFloat = 24
+}
+
+extension LabelStyle where Self == PillIconStyle {
+    static var pillIcon: PillIconStyle { .init() }
 }
 
 extension ButtonStyle where Self == PillButtonStyle {

@@ -472,7 +472,16 @@
     "Duration" : {
 
     },
+    "Edit line" : {
+
+    },
+    "Edit line…" : {
+
+    },
     "End session" : {
+
+    },
+    "Ends %@" : {
 
     },
     "Everything in this file is already here, so nothing would change." : {
@@ -523,6 +532,9 @@
     "Finished: it never comes back" : {
 
     },
+    "Fix what the transcript got wrong. The words in this line are found again." : {
+
+    },
     "From your videos" : {
 
     },
@@ -557,6 +569,9 @@
 
     },
     "Hover a word to see what it means. Click it to keep it here, and click anywhere else to let go." : {
+
+    },
+    "How fast a looped line plays" : {
 
     },
     "How it works" : {
@@ -684,6 +699,9 @@
     "Line at %@" : {
 
     },
+    "Line text" : {
+
+    },
     "Listens to a short sample so a Japanese video can't be added as Spanish by mistake." : {
 
     },
@@ -691,6 +709,15 @@
 
     },
     "Location" : {
+
+    },
+    "Loop speed" : {
+
+    },
+    "Loop this line" : {
+
+    },
+    "Looping this line (R). Press again to stop." : {
 
     },
     "Makes a working copy. Seconds." : {
@@ -786,6 +813,12 @@
     "Noun" : {
 
     },
+    "Off" : {
+
+    },
+    "On" : {
+
+    },
     "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. Come back whenever the number beside Review is above zero." : {
 
     },
@@ -825,6 +858,15 @@
     "Pause" : {
 
     },
+    "Pause after each line" : {
+
+    },
+    "Pause after each line (P), to think or look a word up" : {
+
+    },
+    "Pausing after each line (P). Press again to play straight through." : {
+
+    },
     "Play" : {
 
     },
@@ -837,10 +879,16 @@
     "Play the sentence" : {
 
     },
+    "Play this part" : {
+
+    },
     "Play this sentence from your video (R)" : {
 
     },
     "Play this sentence's audio from your video, right here" : {
+
+    },
+    "Plays from the start to the end you've set, so you can check it" : {
 
     },
     "Practise" : {
@@ -887,6 +935,9 @@
 
     },
     "Rename…" : {
+
+    },
+    "Repeat this line (R), until you stop it" : {
 
     },
     "Reset" : {
@@ -956,6 +1007,16 @@
     "Search words" : {
 
     },
+    "Seen in ^[%lld line](inflect: true) across ^[%lld video](inflect: true)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Seen in ^[%1$lld line](inflect: true) across ^[%2$lld video](inflect: true)"
+          }
+        }
+      }
+    },
     "Select" : {
 
     },
@@ -995,7 +1056,7 @@
     "Sort by Best fit to put the videos worth watching next at the top: mostly understood, with a little new." : {
 
     },
-    "Space plays and pauses. Click a word to keep its meaning; arrow keys move between words and Return keeps one. L starts learning it and K marks it known. Click anywhere outside the transcript, or press Esc, to let go." : {
+    "Space plays and pauses. Click a word to keep its meaning; arrow keys move between words and Return keeps one. L starts learning it and K marks it known. P turns on pausing after each line, and R repeats the line you are on (the 1×, 0.75× and 0.5× button sets how fast). Right-click a line and choose Edit line to fix its text or its timing. Click anywhere outside the transcript, or press Esc, to let go." : {
 
     },
     "Space shows the answer. → is Got it, ← is Missed it. W says the word, R plays the sentence." : {
@@ -1075,6 +1136,9 @@
 
     },
     "Started learning ^[%lld word](inflect: true)" : {
+
+    },
+    "Starts %@" : {
 
     },
     "Status" : {

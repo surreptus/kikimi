@@ -56,7 +56,7 @@ struct ReviewView: View {
         VStack(spacing: 20) {
             HStack(spacing: 14) {
                 Button("End session", systemImage: "xmark") { endSession() }
-                    .labelStyle(.iconOnly).buttonStyle(.pill(.secondary, compact: true))
+                    .labelStyle(.pillIcon).buttonStyle(.pill(.secondary, compact: true))
                     .keyboardShortcut(.escape, modifiers: [])
                     .help("Back to the overview (Esc). Your answers so far are kept.")
                 ProgressView(value: Double(max(0, total - remaining)), total: Double(max(1, total)))
@@ -69,7 +69,7 @@ struct ReviewView: View {
                     }
                     .pickerStyle(.inline)
                 } label: {
-                    Image(systemName: "speaker.wave.2.fill").font(.system(size: 13, weight: .medium)).frame(width: 26, height: 24)
+                    Image(systemName: "speaker.wave.2.fill").font(.system(size: 13, weight: .medium)).frame(width: PillIconStyle.width)
                 }
                 .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
                 .help("When to play the sentence audio")

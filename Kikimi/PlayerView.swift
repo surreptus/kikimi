@@ -260,19 +260,24 @@ struct PlayerView: View {
                 .help(controller.loopingIndex != nil ? "Looping this line (R). Press again to stop."
                                                      : "Repeat this line (R), until you stop it")
                 .accessibilityValue(controller.loopingIndex != nil ? "On" : "Off")
-            Menu {
-                Picker("Loop speed", selection: $loopSpeed) {
-                    ForEach([1.0, 0.75, 0.5], id: \.self) { Text(String(format: "%g×", $0)).tag($0) }
+            // Only while a line is looping: it has no meaning otherwise.
+            if controller.loopingIndex != nil {
+                Menu {
+                    Picker("Loop speed", selection: $loopSpeed) {
+                        ForEach([1.0, 0.75, 0.5], id: \.self) { Text(String(format: "%g×", $0)).tag($0) }
+                    }
+                    .pickerStyle(.inline)
+                } label: {
+                    Text(String(format: "%g×", loopSpeed)).frame(minWidth: 30)
                 }
-                .pickerStyle(.inline)
-            } label: {
-                Text(String(format: "%g×", loopSpeed)).frame(minWidth: 30)
+                .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+                .help("How fast the looped line plays")
+                .accessibilityLabel("Loop speed")
+                .transition(.opacity)
             }
-            .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
-            .help("How fast a looped line plays")
-            .accessibilityLabel("Loop speed")
         }
-        .labelStyle(.iconOnly)
+        .labelStyle(.pillIcon)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: controller.loopingIndex != nil)
     }
 
     /// The video's title, at the top of the transcript panel, left-aligned.

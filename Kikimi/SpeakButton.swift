@@ -34,7 +34,7 @@ struct SpeakButton: View {
         } else {
             // The same icon size and frame as the ⋯ menu beside it in the word panel, so the two match.
             Button(action: action) {
-                Image(systemName: "speaker.wave.2.fill").font(.system(size: 14, weight: .medium)).frame(width: 22, height: 18)
+                Image(systemName: "speaker.wave.2.fill").font(.system(size: 14, weight: .medium)).frame(width: PillIconStyle.width)
             }
             .buttonStyle(.pill(.secondary, compact: true))
             .accessibilityLabel("Say word")
