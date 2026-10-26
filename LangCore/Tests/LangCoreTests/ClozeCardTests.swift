@@ -55,6 +55,18 @@ final class ClozeCardTests: XCTestCase {
         XCTAssertNil(ClozeCard.shortGloss("1. (noun) "))
     }
 
+    func testEachStyleSaysWhetherACardSuitsIt() throws {
+        let withSentence = try card(lemma: "casa", surface: "casa", text: "La casa es grande.", gloss: "house")
+        let wordNotInIt = try card(lemma: "casa", surface: "perro", text: "La casa es grande.", gloss: "house")
+        let noSentence = ReviewCard(word: withSentence.word, entries: withSentence.entries, example: nil)
+        XCTAssertTrue(ReviewStyle.meaning.suits(noSentence, showsReading: false), "the usual card needs nothing")
+        XCTAssertTrue(ReviewStyle.cloze.suits(withSentence, showsReading: false))
+        XCTAssertFalse(ReviewStyle.cloze.suits(wordNotInIt, showsReading: false))
+        XCTAssertTrue(ReviewStyle.listening.suits(wordNotInIt, showsReading: false), "listening only needs the audio")
+        XCTAssertFalse(ReviewStyle.listening.suits(noSentence, showsReading: false))
+        XCTAssertEqual(ReviewStyle.allCases.map(\.rawValue), ["meaning", "cloze", "listening"])
+    }
+
     func testTheStyleDefaultsToMeaningPerLanguageAndIsRemembered() {
         let defaults = UserDefaults(suiteName: "rs-\(UUID().uuidString)")!
         let preference = ReviewStylePreference(defaults: defaults)

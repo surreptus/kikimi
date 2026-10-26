@@ -16,6 +16,9 @@ struct ReviewView: View {
     @State private var audio: SentenceAudioPlayer?
     @State private var mode: SentenceAudioMode = .onReveal
     @State private var style: ReviewStyle = .meaning
+    /// A check of words marked known: the summary says what was missed and sent back to learning.
+    @State private var checking = false
+    @State private var returned = 0
 
     var body: some View {
         Group {
@@ -26,13 +29,13 @@ struct ReviewView: View {
             } else if let summary {
                 VStack(spacing: 0) {
                     finished(summary).padding(.top, 28)
-                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, start: startSession) }
+                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) }) }
                 }
             } else if let overview {
                 if overview.isEmpty {
                     EmptyState(title: "Nothing to review yet", message: "Start learning words from the Words tab, then come back.")
                 } else {
-                    ReviewOverviewView(overview: overview, start: startSession)
+                    ReviewOverviewView(overview: overview, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) })
                 }
             } else {
                 ProgressView()
@@ -47,9 +50,15 @@ struct ReviewView: View {
 
     private func finished(_ summary: (answered: Int, correct: Int)) -> some View {
         VStack(spacing: 12) {
-            Text("All done for now").font(Theme.title(30))
-            Text("\(summary.correct) of \(summary.answered) answers right the first time.")
+            Text(checking ? "Check finished" : "All done for now").font(Theme.title(30))
+            Text(checking
+                 ? "You knew \(summary.correct) of \(summary.answered) of the words you marked known."
+                 : "\(summary.correct) of \(summary.answered) answers right the first time.")
                 .font(.system(.title3, design: .rounded)).foregroundStyle(Theme.muted)
+            if checking, returned > 0 {
+                Text(inflected("^[\(returned) word](inflect: true) went back to your reviews, so each video's coverage no longer counts it as known."))
+                    .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+            }
         }
     }
 
@@ -80,6 +89,8 @@ struct ReviewView: View {
             VStack(spacing: 12) {
                 if let cloze = cloze(for: card) {
                     clozeFace(cloze, card)
+                } else if listening(for: card) {
+                    listenFace(card)
                 } else {
                 Text(card.word.lemma).font(.system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
                 StatusPill(text: card.word.pos.title)
@@ -143,7 +154,7 @@ struct ReviewView: View {
                 Button("Show answer") {
                     revealed = true
                     // In a fill-in card the sentence is the question, so hearing it before the answer would give it away.
-                    if mode == .onReveal || (mode == .onCardShown && cloze(for: card) != nil) { playSentence() }
+                    if !listening(for: card), mode == .onReveal || (mode == .onCardShown && cloze(for: card) != nil) { playSentence() }
                 }
                 .buttonStyle(.pill(.primary))
                 .keyboardShortcut(.space, modifiers: [])
@@ -156,6 +167,41 @@ struct ReviewView: View {
     /// The fill-in version of a card, when that is the chosen style and the word has a sentence to blank.
     private func cloze(for card: ReviewCard) -> ClozeCard? {
         style == .cloze ? ClozeCard.make(from: card, showsReading: app.profile.display.showsReadings) : nil
+    }
+
+    /// Whether this card is asked by ear: the chosen style, and a sentence to play.
+    private func listening(for card: ReviewCard?) -> Bool {
+        style == .listening && card?.example != nil
+    }
+
+    /// Only the sound of the sentence until the answer: the text, the word and its meaning follow.
+    @ViewBuilder
+    private func listenFace(_ card: ReviewCard) -> some View {
+        if revealed {
+            if let example = card.example {
+                Text(highlighted(example)).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
+            }
+            VStack(spacing: 8) {
+                Text(card.word.lemma).font(Theme.title(22))
+                if app.profile.display.showsReadings, let reading = card.entries.first?.reading {
+                    Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
+                }
+                Text(card.entries.first?.gloss ?? "No dictionary entry")
+                    .font(.system(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
+                if let example = card.example { Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint) }
+            }
+            .padding(.top, 6)
+            .transition(.opacity.combined(with: .scale(scale: 0.98)))
+        } else {
+            Image(systemName: "ear").font(.system(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
+            Text("Listen").font(Theme.title(26))
+            Text("What does the sentence say? Play it as often as you like, then show the answer.")
+                .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+            Button("Play again", systemImage: "speaker.wave.2.fill") { playSentence() }
+                .buttonStyle(.pill(.secondary, compact: true))
+                .keyboardShortcut("r", modifiers: [])
+                .help("Play the sentence again (R)")
+        }
     }
 
     /// The sentence with a blank (the question), filled in with its meaning once the answer is showing.
@@ -197,7 +243,7 @@ struct ReviewView: View {
 
     /// The keys that work right now: they change once the answer is showing.
     private var shortcutHints: [(key: String, action: String)] {
-        guard revealed else { return [("Space", "Show answer")] }
+        guard revealed else { return listening(for: card) ? [("Space", "Show answer"), ("R", "Play again")] : [("Space", "Show answer")] }
         var hints: [(key: String, action: String)] = [("←", "Missed it"), ("→", "Got it"), ("W", "Say word")]
         if card?.example != nil { hints.append(("R", "Play sentence")) }
         return hints
@@ -220,7 +266,7 @@ struct ReviewView: View {
 
     /// Loads the page's overview. After a session it is kept beneath the summary, and refreshed.
     private func loadOverview(keepingSummary: Bool = false) async {
-        if !keepingSummary { session = nil; card = nil; summary = nil }
+        if !keepingSummary { session = nil; card = nil; summary = nil; checking = false }
         error = nil
         do { overview = try await env.database.reviewOverview(language: app.languageCode) }
         catch { self.error = error.localizedDescription }
@@ -228,20 +274,23 @@ struct ReviewView: View {
 
     private func endSession() {
         audio?.stop()
-        session = nil; card = nil; summary = nil; revealed = false
+        session = nil; card = nil; summary = nil; revealed = false; checking = false
         Task { await loadOverview() }
     }
 
-    private func startSession() { Task { await begin() } }
+    private func startSession(checkingKnown: Bool = false) { Task { await begin(checkingKnown: checkingKnown) } }
 
-    private func begin() async {
+    private func begin(checkingKnown: Bool = false) async {
         session = nil; card = nil; summary = nil; error = nil; revealed = false
         audio?.stop()
         audio = SentenceAudioPlayer(libraryRoot: env.libraryURL)
         mode = env.reviewAudio.mode(for: app.profile)
         style = env.reviewStyle.style(for: app.profile)
         do {
-            let new = try await ReviewSession(database: env.database, language: app.languageCode)
+            let new = checkingKnown
+                ? try await ReviewSession(checkingKnown: env.database, language: app.languageCode)
+                : try await ReviewSession(database: env.database, language: app.languageCode)
+            checking = checkingKnown
             session = new
             total = await new.remaining
             remaining = total   // set together with the total, or the bar shows full for a moment
@@ -267,9 +316,14 @@ struct ReviewView: View {
             remaining = await session.remaining
             total = max(total, remaining)   // a missed word re-enters the queue, so the total can grow
             card = next
-            if mode == .onCardShown, let next, cloze(for: next) == nil { playSentence() }
+            if let next {
+                if listening(for: next) { playSentence() }   // the sentence is the question: it plays whatever the audio setting
+                else if mode == .onCardShown, cloze(for: next) == nil { playSentence() }
+            }
             if card == nil, await session.answered > 0 {
                 summary = (await session.answered, await session.correctFirstTry)
+                returned = await session.returnedToLearning
+                if await session.isKnownCheck { app.dataChanged() }   // coverage and the word lists have changed
                 await loadOverview(keepingSummary: true)
             }
         } catch { self.error = error.localizedDescription }

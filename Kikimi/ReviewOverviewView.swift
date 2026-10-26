@@ -5,6 +5,7 @@ import SwiftUI
 struct ReviewOverviewView: View {
     let overview: ReviewOverview
     let start: () -> Void
+    let checkKnown: () -> Void
 
     var body: some View {
         ScrollView {
@@ -114,6 +115,15 @@ struct ReviewOverviewView: View {
             }
             Text("Under each ring: how long until a word at that stage comes back for review.")
                 .font(Theme.small).foregroundStyle(Theme.muted)
+            if overview.known >= 3 {
+                HStack(spacing: 12) {
+                    Button("Check my known words") { checkKnown() }
+                        .buttonStyle(.pill(.secondary, compact: true))
+                    Text("A quick test of a few words you marked known. Any you miss go back to your reviews, so the numbers stay honest.")
+                        .font(Theme.small).foregroundStyle(Theme.muted)
+                }
+                .padding(.top, 4)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .panel()

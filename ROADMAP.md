@@ -96,7 +96,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [x] **Cloze cards** (Settings > Languages > Review cards > Fill in the word): the example sentence with the word blanked and a short
       hint of its meaning (and, for Japanese, its reading); you recall the word, then see it filled in with the
       sentence audio. Production in context, which avoids the ambiguity of meaning-to-word cards. **Listening
-      cards**: hear the sentence, answer before reading.
+      cards** (done, Settings > Languages > Review cards > Listen to the sentence): hear the sentence, answer before reading.
 - [ ] **Reverse (meaning to word) cards**, only as an optional extra: off by default, only for words that have reached
       about stage 4 so early reviews don't double, and counted in the overview so the workload shows. Prefer cloze.
       Evidence: reviews are recognition only today, and receptive practice doesn't reliably carry over to producing a
@@ -110,8 +110,8 @@ Ordered by how much each helps comprehensible input per unit of effort.
       "Kikimi Spanish" deck, and exporting again updates them instead of duplicating.
 
 ### Keeping the numbers honest
-- [ ] **Check what you marked known.** Self-marked words (and imported lists) can inflate a video's coverage, so
-      "Comfortable" overstates how easy it is. An occasional quick check on a sample of known words would catch that.
+- [x] **Check what you marked known** (Review page > Check my known words): a quiz of up to 10 random known words; any you
+      miss go back to learning, so coverage stops counting them. Self-marked words and imported lists can inflate it otherwise.
 - [x] **Encounters per word**: the Words table's Seen column, and the word panel's "Seen in N lines across M videos".
 - [x] **Measured the 95% claim** (26 Oct 2026, one Spanish and one Japanese transcript, 918 and 2,459 words): content words
       were 58% (es) and 40% (ja) of all words, so knowing 90% of them is about 94% (es) and 96% (ja) of everything,

@@ -122,6 +122,7 @@ private struct LanguagesTab: View {
                     Picker("Review cards", selection: styleBinding(profile)) {
                         Text("Word and meaning").tag(ReviewStyle.meaning)
                         Text("Fill in the word").tag(ReviewStyle.cloze)
+                        Text("Listen to the sentence").tag(ReviewStyle.listening)
                     }
                     Picker("Sentence audio on review cards", selection: audioBinding(profile)) {
                         ForEach(SentenceAudioMode.allCases, id: \.self) { Text($0.title).tag($0) }
@@ -129,12 +130,12 @@ private struct LanguagesTab: View {
                 }
             }
             Section {} footer: {
-                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. \"Fill in the word\" shows a sentence from your videos with the word blanked, for you to recall; a word with no sentence is asked the usual way, and the sentence audio then plays only after you show the answer.")
+                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. \"Fill in the word\" shows a sentence from your videos with the word blanked, for you to recall. \"Listen to the sentence\" plays only the sound of the sentence, and you show the answer to read it. A word with no sentence is asked the usual way, and in both styles the sentence audio plays only when it wouldn't give the answer away.")
             }
         }
         .formStyle(.grouped)
         .id(refresh)
-        .frame(width: 520, height: 500)
+        .frame(width: 520, height: 520)
     }
 
     private func modelBinding(_ profile: any LanguageProfile) -> Binding<String> {

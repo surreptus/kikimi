@@ -32,13 +32,27 @@ public actor ReviewSession {
     private var missed: Set<Int64> = []
     private var lastExample: [Int64: Int64] = [:]   // word id -> subtitle id shown last
     private var cached: ReviewCard?
+    /// A check of words marked known, not a review: answers don't move any stage.
+    public let isKnownCheck: Bool
     public private(set) var answered = 0
     public private(set) var correctFirstTry = 0
+    /// In a known-words check: how many were missed, and so went back to being learned.
+    public private(set) var returnedToLearning = 0
 
     public init(database: LangDatabase, language: String, now: Date = Date()) async throws {
         self.database = database
         self.language = language
+        isKnownCheck = false
         queue = try await database.dueWords(language: language, now: now).compactMap(\.id)
+    }
+
+    /// A quick check of a few words you marked known. A missed word goes back to being learned (so a video's coverage
+    /// stops counting it as known); a word you knew is left alone.
+    public init(checkingKnown database: LangDatabase, language: String, count: Int = 10) async throws {
+        self.database = database
+        self.language = language
+        isKnownCheck = true
+        queue = try await database.knownSample(language: language, count: count)
     }
 
     public var remaining: Int { queue.count }
@@ -63,6 +77,14 @@ public actor ReviewSession {
         queue.removeFirst()
         cached = nil
         answered += 1
+        if isKnownCheck {
+            if correct { correctFirstTry += 1 }
+            else {
+                try await database.startLearning(wordID: id, now: now)
+                returnedToLearning += 1
+            }
+            return
+        }
         if !missed.contains(id) {
             try await database.recordReview(wordID: id, correct: correct, now: now)
             if correct { correctFirstTry += 1 }

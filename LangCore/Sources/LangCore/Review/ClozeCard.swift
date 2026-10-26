@@ -1,10 +1,21 @@
 import Foundation
 
-/// How a review card asks: the word and its meaning ("meaning"), or a sentence from your videos with the word
-/// blanked, for you to recall ("cloze").
+/// How a review card asks: the word and its meaning ("meaning"), a sentence from your videos with the word blanked,
+/// for you to recall ("cloze"), or the sentence only as audio, to follow by ear before you read it ("listening").
 public enum ReviewStyle: String, CaseIterable, Sendable {
     case meaning
     case cloze
+    case listening
+
+    /// Whether `card` can be asked in this style. Cloze and listening need a sentence from your videos (cloze also
+    /// needs the word to be found in it); a card that can't is asked the usual way.
+    public func suits(_ card: ReviewCard, showsReading: Bool) -> Bool {
+        switch self {
+        case .meaning: true
+        case .cloze: ClozeCard.make(from: card, showsReading: showsReading) != nil
+        case .listening: card.example != nil
+        }
+    }
 }
 
 /// The chosen style for each language, kept in the app's settings.
