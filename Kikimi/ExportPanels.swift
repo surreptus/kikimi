@@ -12,7 +12,7 @@ enum ExportPanels {
         return panel.runModal() == .OK ? panel.url : nil
     }
 
-    /// Choose one file with this extension (a `.reprise` backup).
+    /// Choose one file with this extension (a `.kikimi` backup).
     static func openFile(fileExtension: String) -> URL? {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false

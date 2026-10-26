@@ -15,12 +15,12 @@ machine, release plumbing, and a few promises we have made but not kept (below).
 ## Needed for 1.0
 
 ### Promises and paperwork
-- [x] **Terms of use** drafted (`Reprise/Terms.md`, shown in the app beside the privacy policy).
+- [x] **Terms of use** drafted (`Kikimi/Terms.md`, shown in the app beside the privacy policy).
 - [ ] **Finish the terms**: governing law is set to California; fill in the contact placeholder (the same contact
       the privacy policy needs), and have a lawyer review them. They were not written by one, and what they can
       limit depends on where your users live.
 - [ ] **Privacy policy contact line.** Needs an email or page before the policy can be published.
-- [ ] **Check the name "Reprise"** is free to use (App Store, trademark search) before anything is public.
+- [ ] **Check the name "Kikimi"** is free to use (App Store, trademark search) before anything is public.
 - [ ] Confirm licences listed in the [release checklist](Release/CHECKLIST.md) (Whisper model card, JMdict and
       Wiktionary attribution, no use of the name "WaniKani"). Audited 25 Oct 2026: notices are complete, the
       model card says MIT, the stage names are renamed, and the dictionaries are credited as adaptations.

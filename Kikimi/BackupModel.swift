@@ -2,7 +2,7 @@ import AppKit
 import LangCore
 import SwiftUI
 
-/// Saving your progress to a `.reprise` file and restoring it, and where that has got to, for the Data settings.
+/// Saving your progress to a `.kikimi` file and restoring it, and where that has got to, for the Data settings.
 /// The work is in LangCore; this holds the steps a person sees: choose, preview, confirm, done.
 @MainActor @Observable
 final class BackupModel {
@@ -34,7 +34,7 @@ final class BackupModel {
     // MARK: Save
 
     func export(env: LangEnvironment) async {
-        let name = "Reprise progress \(Date().formatted(.iso8601.year().month().day()))"
+        let name = "Kikimi progress \(Date().formatted(.iso8601.year().month().day()))"
         guard let url = ExportPanels.saveFile(suggestedName: name, fileExtension: ProgressBackup.fileExtension) else { return }
         state = .working
         do {

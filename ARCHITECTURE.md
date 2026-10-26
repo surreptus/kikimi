@@ -4,7 +4,7 @@ A map for finding your way around. The [README](README.md) says what the app doe
 
 ## The one rule
 
-All logic lives in `LangCore/` (a Swift package with no UI). `Reprise/` holds SwiftUI views only and calls into
+All logic lives in `LangCore/` (a Swift package with no UI). `Kikimi/` holds SwiftUI views only and calls into
 `LangCore` through one object, `LangEnvironment`. If you are adding behaviour, it almost certainly belongs in
 `LangCore`, with a test.
 
@@ -16,7 +16,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
    dictionaries, the model manager and the import queue, and is what the views hold.
 2. `Profiles/LanguageProfile.swift`: everything that differs between languages.
 3. `Import/ImportPipeline.swift`: the most important flow. `importVideo` reads as a list of steps.
-4. `Reprise/RootView.swift`, then the view for the screen you care about.
+4. `Kikimi/RootView.swift`, then the view for the screen you care about.
 
 ## LangCore, by folder
 
@@ -31,9 +31,9 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `SRS/`, `Review/` | The nine review stages and their intervals; review sessions and sentence audio. |
 | `Playback/` | The player controller, subtitle timeline and word hints. |
 | `Export/` | Audio and video clip export. |
-| `Resources/Localizable.xcstrings` | Strings shown to the user from this package (errors, titles). The app's own are in `Reprise/Localizable.xcstrings`. |
+| `Resources/Localizable.xcstrings` | Strings shown to the user from this package (errors, titles). The app's own are in `Kikimi/Localizable.xcstrings`. |
 | `Coverage/` | How much of a video you know (`VideoCoverage`, `LevelFit`), the shortest word list that reaches a target (`wordsToReach`), and marking a list of known words. |
-| `Backup/` | `ProgressBackup`: the `.reprise` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. |
+| `Backup/` | `ProgressBackup`: the `.kikimi` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. |
 | `Environment/` | `LangEnvironment` and where videos live on disk. |
 
 ## The import pipeline
@@ -49,7 +49,7 @@ The two hardest files are `AVFoundationTranscoder.swift` (it starts with a readi
 
 ## The app
 
-`RepriseApp` → `RootView` (floating nav plus the current section). `AppState` holds which section is showing and
+`KikimiApp` → `RootView` (floating nav plus the current section). `AppState` holds which section is showing and
 the Words screen's search, filter and selection, so they survive switching screens.
 
 | View | Screen |
@@ -66,7 +66,7 @@ the Words screen's search, filter and selection, so they survive switching scree
 
 ## Data on disk
 
-Everything is in the app container, never the repo: `Application Support/Reprise/` holds `Library/` (videos and
+Everything is in the app container, never the repo: `Application Support/Kikimi/` holds `Library/` (videos and
 audio, one folder per content hash), `Staging/` (temporary), `models/` (speech models) and the SQLite database.
 
 ## Tests

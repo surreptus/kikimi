@@ -1,10 +1,10 @@
-// Draws the Reprise app icon: the musical repeat sign (𝄆), drawn larger than the icon shape so it fills it edge to
+// Draws the Kikimi app icon: the musical repeat sign (𝄆), drawn larger than the icon shape so it fills it edge to
 // edge (the shape clips it), and zig-zagged sideways, in dark green on the app's lime.
 //
 // Run from the repository root (needs Xcode):
 //   swiftc -O -swift-version 5 Scripts/icon/make_icon.swift -o /tmp/make_icon && /tmp/make_icon /tmp/icon-out
 // It writes final.png (1024 px). Then make the other sizes into the asset catalog:
-//   for n in 16 32 64 128 256 512 1024; do sips -z $n $n /tmp/icon-out/final.png --out Reprise/Assets.xcassets/AppIcon.appiconset/icon_$n.png; done
+//   for n in 16 32 64 128 256 512 1024; do sips -z $n $n /tmp/icon-out/final.png --out Kikimi/Assets.xcassets/AppIcon.appiconset/icon_$n.png; done
 //
 // The look is set at the bottom: `glyphWidth` (how wide the sign is before warping), `amplitude` (how far rows slide
 // sideways) and `stretch` (how much they widen and narrow). The zig-zag's period is in `zigzag`.

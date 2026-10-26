@@ -2,11 +2,11 @@ import Foundation
 
 /// What you've learned, as one file you can keep or move to another Mac: each word that isn't new (its status,
 /// stage and next review) and a few settings. It does not hold videos or models; videos are added again, and the
-/// words you restored attach to them. The file is plain JSON with the extension `.reprise`, so you can read it.
+/// words you restored attach to them. The file is plain JSON with the extension `.kikimi`, so you can read it.
 public struct ProgressBackup: Codable, Equatable, Sendable {
-    public static let format = "reprise-progress"
+    public static let format = "kikimi-progress"
     public static let currentVersion = 1
-    public static let fileExtension = "reprise"
+    public static let fileExtension = "kikimi"
 
     public var format: String
     public var version: Int
@@ -69,8 +69,8 @@ public enum BackupError: Error, LocalizedError, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .notABackup: String(localized: "This file isn't a Reprise backup.", bundle: .module)
-        case .newerVersion: String(localized: "This backup was made by a newer version of Reprise. Update the app, then try again.", bundle: .module)
+        case .notABackup: String(localized: "This file isn't a Kikimi backup.", bundle: .module)
+        case .newerVersion: String(localized: "This backup was made by a newer version of Kikimi. Update the app, then try again.", bundle: .module)
         case .damaged: String(localized: "This backup file is damaged, so nothing was changed.", bundle: .module)
         }
     }

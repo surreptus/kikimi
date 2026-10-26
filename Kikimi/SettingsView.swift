@@ -391,23 +391,23 @@ private struct AboutTab: View {
     var body: some View {
         Form {
             Section {
-                LabeledContent("Reprise", value: "Version \(version)")
+                LabeledContent("Kikimi", value: "Version \(version)")
                 Text("Learn Spanish or Japanese from videos you own, on your Mac.").foregroundStyle(.secondary)
             }
             Section("Read more") {
-                Button("How Reprise works") { inMainWindow { app.showAbout = true } }
+                Button("How Kikimi works") { inMainWindow { app.showAbout = true } }
                 Button("Privacy policy") { inMainWindow { app.showPrivacy = true } }
                 Button("Terms of use") { inMainWindow { app.showTerms = true } }
                 Button("Acknowledgements") { inMainWindow { app.showAcknowledgements = true } }
             }
             Section {
-                if let url = URL(string: "https://github.com/surreptus/reprise") {
-                    Link("github.com/surreptus/reprise", destination: url)
+                if let url = URL(string: "https://github.com/surreptus/kikimi") {
+                    Link("github.com/surreptus/kikimi", destination: url)
                 }
             } header: {
                 Text("Open source")
             } footer: {
-                Text("Reprise is free software under the MIT licence.")
+                Text("Kikimi is free software under the MIT licence.")
             }
         }
         .formStyle(.grouped)
