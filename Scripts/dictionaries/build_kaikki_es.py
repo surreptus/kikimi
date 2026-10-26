@@ -11,18 +11,40 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import dictbuild
 
-MAX_GLOSSES_PER_POS = 6
+MAX_GLOSSES_PER_POS = 8   # separate meanings, after repeats are removed
+
+
+def meanings(gloss):
+    """The separate meanings in one gloss, split at ';' outside brackets: "to have; to possess" is two."""
+    parts, depth, current = [], 0, ""
+    for ch in gloss:
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth = max(0, depth - 1)
+        if ch == ";" and depth == 0:
+            parts.append(current)
+            current = ""
+        else:
+            current += ch
+    parts.append(current)
+    return [p.strip() for p in parts if p.strip()]
 
 
 def pos_block(entry):
-    """(pos, glosses) for one kaikki entry, dropping inflected-form and alternative-form senses."""
-    glosses = []
+    """(pos, glosses) for one kaikki entry, dropping inflected-form and alternative-form senses. Wiktionary senses often
+    repeat each other's meanings ("to have; to possess" then "to have; to possess; to be..."), so each meaning is kept once."""
+    glosses, seen = [], set()
     for sense in entry.get("senses", []):
         if sense.get("form_of") or sense.get("alt_of"):
             continue
         chain = sense.get("glosses") or []
-        if chain and chain[-1] not in glosses:
-            glosses.append(chain[-1])
+        if not chain:
+            continue
+        for meaning in meanings(chain[-1]):
+            if meaning.casefold() not in seen:
+                seen.add(meaning.casefold())
+                glosses.append(meaning)
     return entry.get("pos", ""), glosses[:MAX_GLOSSES_PER_POS]
 
 

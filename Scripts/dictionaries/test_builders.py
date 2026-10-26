@@ -150,6 +150,27 @@ class KaikkiTests(unittest.TestCase):
             self.assertEqual(build_kaikki_es.build(src, out), 1)
             self.assertEqual(rows(out), [("casa", None, "1. (noun) house; home; household\n2. (verb) to marry")])
 
+    def test_a_meaning_repeated_across_senses_is_kept_once(self):
+        # Wiktionary's senses often restate each other: "to have; to possess" then "to have; to possess; to be ...".
+        lines = [{"word": "tener", "lang_code": "es", "pos": "verb", "senses": [
+            {"glosses": ["to have; to possess"]},
+            {"glosses": ["to have; to possess; to be (a condition or quality)"]},
+            {"glosses": ["to hold; to grasp"]},
+            {"glosses": ["To Have"]},
+        ]}]
+        with tempfile.TemporaryDirectory() as d:
+            src, out = os.path.join(d, "k.jsonl"), os.path.join(d, "es.sqlite")
+            with open(src, "w", encoding="utf-8") as f:
+                f.write("\n".join(json.dumps(x) for x in lines))
+            build_kaikki_es.build(src, out)
+            self.assertEqual(rows(out), [("tener", None, "1. (verb) to have; to possess; to be (a condition or quality); to hold; to grasp")])
+
+    def test_a_semicolon_inside_brackets_does_not_split_a_meaning(self):
+        self.assertEqual(
+            build_kaikki_es.meanings('to contain; to hold (e.g. "the key"; "a clue", etc.); to keep'),
+            ["to contain", 'to hold (e.g. "the key"; "a clue", etc.)', "to keep"])
+        self.assertEqual(build_kaikki_es.meanings(""), [])
+
 
 if __name__ == "__main__":
     unittest.main()
