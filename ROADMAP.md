@@ -76,10 +76,10 @@ Ordered by how much each helps comprehensible input per unit of effort.
       is supported before offering it.
 - [ ] **Subtitle modes**: target language only, target plus translation, none (listening practice), and a
       reveal-on-click mode.
-- [x] **Pause after each line** (P in the player). Still to do: **loop this line**, with replay at reduced speed.
+- [x] **Pause after each line** (P) and **loop this line** (R), with a 1×, 0.75× or 0.5× speed for loops.
 - [ ] **Import subtitles** (.srt / .vtt) when a video already has good ones, instead of transcribing.
-- [x] **Edit a transcript line** (right-click a line > Edit line…): fixes the text and finds its words again. Still to do:
-      fixing a line's timing.
+- [x] **Edit a transcript line** (right-click a line > Edit line…): fixes the text and its timing (with a preview), and
+      finds its words again.
 - [ ] **Word-level timestamps**, so a single word can be played and clips are tighter.
 
 ### Finding the right material
@@ -98,8 +98,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
 ### Keeping the numbers honest
 - [ ] **Check what you marked known.** Self-marked words (and imported lists) can inflate a video's coverage, so
       "Comfortable" overstates how easy it is. An occasional quick check on a sample of known words would catch that.
-- [ ] **Encounters per word**: how many times you have met a word across your videos, so a word you have heard once
-      reads differently from one you have heard twenty times.
+- [x] **Encounters per word**: the Words table's Seen column, and the word panel's "Seen in N lines across M videos".
 - [ ] **Measure the 95% claim**: the README and About page say about 90% of content words is roughly 95% of all words.
       That is an estimate; count real transcripts and state the real figure, or soften the text.
 - [ ] **Resurface finished words** now and then (a sparse, rare review, or a nudge when one appears in a video), since

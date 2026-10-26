@@ -32,6 +32,8 @@ struct PlayerView: View {
     @State private var statuses: [WordKey: WordStatus] = [:]
     @AppStorage("highlightWords") private var highlightWords = true
     @AppStorage("pauseAfterLine") private var pauseAfterLine = false
+    /// How fast a looped line plays (1 is normal).
+    @AppStorage("loopSpeed") private var loopSpeed = 1.0
     /// The line being corrected, with its place in the transcript.
     @State private var editing: (index: Int, line: Subtitle)?
     @Environment(AppState.self) private var app
@@ -65,13 +67,17 @@ struct PlayerView: View {
         .task(id: shownToken?.lemma) { await refreshHint(announce: pinnedToken != nil) }
         .task(id: controller != nil) { await keepPlace() }
         .onChange(of: pauseAfterLine) { _, on in controller?.pausesAfterLines = on }
+        .onChange(of: loopSpeed) { _, speed in controller?.loopSpeed = Float(speed) }
         .sheet(isPresented: Binding(get: { editing != nil }, set: { if !$0 { editing = nil } })) {
             if let editing, let controller {
-                EditLineSheet(line: editing.line, profile: profile, env: env) { saved in
-                    controller.replaceText(at: editing.index, with: saved.text)
-                    app.dataChanged()
-                    self.editing = nil
-                } cancel: { self.editing = nil }
+                EditLineSheet(
+                    line: editing.line, duration: video.duration, profile: profile, env: env,
+                    preview: { start, end in Task { await controller.playRange(from: start, to: end) } },
+                    saved: { saved in
+                        controller.replaceLine(at: editing.index, with: saved)
+                        app.dataChanged()
+                        self.editing = nil
+                    }, cancel: { controller.pause(); self.editing = nil })
             }
         }
         .onChange(of: message) { _, text in
@@ -146,6 +152,7 @@ struct PlayerView: View {
         do {
             let new = try await env.playback(for: video)
             new.pausesAfterLines = pauseAfterLine
+            new.loopSpeed = Float(loopSpeed)
             controller = new
             if let startAt {
                 await new.seek(to: startAt, play: true)
@@ -247,6 +254,23 @@ struct PlayerView: View {
                 .help(pauseAfterLine ? "Pausing after each line (P). Press again to play straight through."
                                      : "Pause after each line (P), to think or look a word up")
                 .accessibilityValue(pauseAfterLine ? "On" : "Off")
+            Button("Loop this line", systemImage: "repeat") { Task { await controller.toggleLoop() } }
+                .buttonStyle(.pill(controller.loopingIndex != nil ? .primary : .secondary, compact: true))
+                .keyboardShortcut("r", modifiers: [])
+                .help(controller.loopingIndex != nil ? "Looping this line (R). Press again to stop."
+                                                     : "Repeat this line (R), until you stop it")
+                .accessibilityValue(controller.loopingIndex != nil ? "On" : "Off")
+            Menu {
+                Picker("Loop speed", selection: $loopSpeed) {
+                    ForEach([1.0, 0.75, 0.5], id: \.self) { Text(String(format: "%g×", $0)).tag($0) }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Text(String(format: "%g×", loopSpeed)).frame(minWidth: 30)
+            }
+            .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+            .help("How fast a looped line plays")
+            .accessibilityLabel("Loop speed")
         }
         .labelStyle(.iconOnly)
     }

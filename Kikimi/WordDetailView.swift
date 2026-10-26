@@ -11,6 +11,7 @@ struct WordDetail: View {
     @State private var exportMessage: String?
     @State private var audio: SentenceAudioPlayer?
     @State private var showsAllExamples = false
+    @State private var seen = WordSeen()
     private let examplesShownFirst = 5
 
     var body: some View {
@@ -42,6 +43,7 @@ struct WordDetail: View {
             audio = SentenceAudioPlayer(libraryRoot: env.libraryURL)
             entries = (try? await env.database.lookup(language: row.word.language, term: row.word.lemma, limit: 5)) ?? []
             examples = (try? await env.database.examples(wordID: row.id)) ?? []
+            seen = (try? await env.database.seen(wordID: row.id)) ?? WordSeen()
         }
         .onDisappear { audio?.stop() }
         .onChange(of: exportMessage) { _, text in
@@ -54,6 +56,10 @@ struct WordDetail: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.7).textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            if seen.lines > 0 {
+                Text("Seen in ^[\(seen.lines) line](inflect: true) across ^[\(seen.videos) video](inflect: true)")
+                    .font(Theme.small).foregroundStyle(Theme.muted)
+            }
             HStack(spacing: 10) {
                 StatusBadge(status: row.word.status, stage: row.word.stage)
                 Spacer(minLength: 8)

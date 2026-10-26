@@ -6,6 +6,8 @@ public enum LangError: Error, Equatable {
     case notLearning
     case emptyTitle
     case emptyLine
+    /// A line must start at or after 0, end after it starts, and stay within the video.
+    case badTiming
 }
 
 public final class LangDatabase: Sendable {

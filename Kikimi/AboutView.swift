@@ -166,7 +166,7 @@ struct AboutView: View {
             VStack(alignment: .leading, spacing: 8) {
                 shortcut("Anywhere", "⌘O adds videos. ⌘1, ⌘2 and ⌘3 go to Videos, Words and Review. ⌘F finds words. ⌘, opens Settings.")
                 shortcut("Review", "Space shows the answer. → is Got it, ← is Missed it. W says the word, R plays the sentence.")
-                shortcut("Video", "Space plays and pauses. Click a word to keep its meaning; arrow keys move between words and Return keeps one. L starts learning it and K marks it known. P turns on pausing after each line. Right-click a line and choose Edit line to fix what the transcript got wrong. Click anywhere outside the transcript, or press Esc, to let go.")
+                shortcut("Video", "Space plays and pauses. Click a word to keep its meaning; arrow keys move between words and Return keeps one. L starts learning it and K marks it known. P turns on pausing after each line, and R repeats the line you are on (the 1×, 0.75× and 0.5× button sets how fast). Right-click a line and choose Edit line to fix its text or its timing. Click anywhere outside the transcript, or press Esc, to let go.")
                 shortcut("Words", "↑ ↓ move, Shift extends, ⌘A selects all, Esc clears.")
             }
         }

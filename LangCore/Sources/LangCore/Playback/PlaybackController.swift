@@ -15,9 +15,20 @@ public final class PlaybackController {
         didSet { arm(activeIndex) }
     }
 
-    @ObservationIgnored private let timeline: SubtitleTimeline
+    /// The line being repeated, until you turn looping off or go somewhere else.
+    public private(set) var loopingIndex: Int?
+    /// How fast a looped line plays: 1 is normal. Slower makes a hard line easier to catch.
+    public var loopSpeed: Float = 1 {
+        didSet { if loopingIndex != nil { applyLoopRate() } }
+    }
+
+    @ObservationIgnored private var timeline: SubtitleTimeline
     @ObservationIgnored private var observer: Any?
-    @ObservationIgnored private var lineEnd: Any?
+    @ObservationIgnored private var boundary: Any?
+    /// Set while a range is being previewed: playback pauses there.
+    @ObservationIgnored private var rangeEnd: Double?
+    /// A little before a line, so its first word isn't clipped when it starts over.
+    private static let loopLeadIn = 0.15
 
     public init(url: URL, lines: [Subtitle]) {
         player = AVPlayer(url: url)
@@ -36,26 +47,35 @@ public final class PlaybackController {
         if let observer { player.removeTimeObserver(observer) }
         observer = nil
         disarm()
+        loopingIndex = nil
+        rangeEnd = nil
+        player.defaultRate = 1
         isPlaying = false
     }
 
-    /// Changes one line's text (after it is edited). Timing is untouched, so playback carries on undisturbed.
-    public func replaceText(at index: Int, with text: String) {
+    /// Puts an edited line in place (its text, and its timing if that changed), and tells the timeline.
+    public func replaceLine(at index: Int, with line: Subtitle) {
         guard lines.indices.contains(index) else { return }
-        lines[index].text = text
+        var updated = lines
+        updated[index] = line
+        timeline = SubtitleTimeline(updated)
+        lines = timeline.lines
+        if loopingIndex != nil { loopingIndex = lines.firstIndex { $0.id == line.id } }
+        activeIndex = timeline.index(at: currentTime)
+        arm(activeIndex)
     }
 
     public func play() { player.play(); isPlaying = true }
     public func pause() { player.pause(); isPlaying = false }
     public func togglePlayback() { isPlaying ? pause() : play() }
 
+    // MARK: Seeking
+
+    /// Where you chose to go: any loop or previewed range ends.
     public func seek(to seconds: Double, play shouldPlay: Bool = false) async {
-        let target = max(0, seconds)
-        await player.seek(to: CMTime(seconds: target, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
-        currentTime = target
-        activeIndex = timeline.index(at: target + 0.001)
-        arm(activeIndex)
-        if shouldPlay { play() }
+        stopLooping()
+        rangeEnd = nil
+        await move(to: seconds, play: shouldPlay)
     }
 
     public func seek(toLine index: Int, play shouldPlay: Bool = true) async {
@@ -73,6 +93,15 @@ public final class PlaybackController {
         await seek(toLine: max((activeIndex ?? 1) - 1, 0))
     }
 
+    private func move(to seconds: Double, play shouldPlay: Bool) async {
+        let target = max(0, seconds)
+        await player.seek(to: CMTime(seconds: target, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
+        currentTime = target
+        activeIndex = timeline.index(at: target + 0.001)
+        arm(activeIndex)
+        if shouldPlay { play() }
+    }
+
     private func tick(_ seconds: Double) {
         guard seconds.isFinite else { return }
         currentTime = seconds
@@ -82,26 +111,79 @@ public final class PlaybackController {
         if activeIndex != previous { arm(activeIndex) }
     }
 
-    // MARK: Pausing after a line
+    // MARK: Looping
 
-    /// Watches for the end of line `index`, so the pause lands on it rather than up to a tick later.
+    /// Starts repeating the line being played (or the nearest one), or stops.
+    public func toggleLoop() async {
+        if loopingIndex != nil { stopLooping(); return }
+        guard let index = activeIndex ?? lines.lastIndex(where: { $0.startTime <= currentTime }) ?? lines.indices.first
+        else { return }
+        rangeEnd = nil
+        loopingIndex = index
+        applyLoopRate()
+        await startLoopPass()
+    }
+
+    public func stopLooping() {
+        guard loopingIndex != nil else { return }
+        loopingIndex = nil
+        player.defaultRate = 1
+        if isPlaying { player.rate = 1 }
+        arm(activeIndex)
+    }
+
+    private func applyLoopRate() {
+        player.defaultRate = loopSpeed
+        if isPlaying { player.rate = loopSpeed }
+    }
+
+    private func startLoopPass() async {
+        guard let index = loopingIndex, lines.indices.contains(index) else { return }
+        await move(to: lines[index].startTime - Self.loopLeadIn, play: true)
+    }
+
+    // MARK: Previewing a range
+
+    /// Plays `start...end` once and pauses, for checking a line's timing while it is being edited.
+    public func playRange(from start: Double, to end: Double) async {
+        stopLooping()
+        rangeEnd = end
+        await move(to: start, play: true)
+    }
+
+    // MARK: Boundary: where the current line, loop or range ends
+
+    /// Watches for the moment playback should stop or turn back, so it lands on it rather than up to a tick later.
     private func arm(_ index: Int?) {
         disarm()
-        guard pausesAfterLines, let index, lines.indices.contains(index) else { return }
-        let end = lines[index].endTime
-        guard end > currentTime + 0.02 else { return }
-        lineEnd = player.addBoundaryTimeObserver(
-            forTimes: [NSValue(time: CMTime(seconds: end, preferredTimescale: 600))], queue: .main
-        ) { [weak self] in MainActor.assumeIsolated { self?.pauseAtLineEnd() } }
+        if let end = rangeEnd {
+            watch(end) { $0.finishRange() }
+        } else if let loop = loopingIndex, lines.indices.contains(loop) {
+            watch(lines[loop].endTime) { controller in Task { await controller.startLoopPass() } }
+        } else if pausesAfterLines, let index, lines.indices.contains(index) {
+            watch(lines[index].endTime) { $0.pauseAtBoundary() }
+        }
+    }
+
+    private func watch(_ time: Double, then action: @escaping @MainActor (PlaybackController) -> Void) {
+        guard time > currentTime + 0.02 else { return }
+        boundary = player.addBoundaryTimeObserver(
+            forTimes: [NSValue(time: CMTime(seconds: time, preferredTimescale: 600))], queue: .main
+        ) { [weak self] in MainActor.assumeIsolated { if let self { action(self) } } }
     }
 
     private func disarm() {
-        if let lineEnd { player.removeTimeObserver(lineEnd) }
-        lineEnd = nil
+        if let boundary { player.removeTimeObserver(boundary) }
+        boundary = nil
     }
 
-    private func pauseAtLineEnd() {
+    private func pauseAtBoundary() {
         disarm()
         pause()
+    }
+
+    private func finishRange() {
+        rangeEnd = nil
+        pauseAtBoundary()
     }
 }

@@ -48,13 +48,57 @@ final class PauseAfterLineTests: XCTestCase {
         c.stop()
     }
 
-    func testEditedTextReplacesOnlyThatLine() async throws {
+    func testEditedLineReplacesThatLineAndTimingFollows() async throws {
         let c = try await controller()
-        c.replaceText(at: 1, with: "tres")
+        var edited = c.lines[1]
+        edited.text = "tres"
+        c.replaceLine(at: 1, with: edited)
         XCTAssertEqual(c.lines.map(\.text), ["uno", "tres"])
-        XCTAssertEqual(c.lines.map(\.startTime), [0.5, 2.5], "timing is untouched")
-        c.replaceText(at: 9, with: "no")   // out of range: ignored
+
+        edited.startTime = 0.1; edited.endTime = 0.4      // moved before the first line: the order follows the times
+        c.replaceLine(at: 1, with: edited)
+        XCTAssertEqual(c.lines.map(\.text), ["tres", "uno"])
+        c.replaceLine(at: 9, with: edited)               // out of range: ignored
         XCTAssertEqual(c.lines.count, 2)
+        c.stop()
+    }
+
+    func testLoopingRepeatsTheLineAndAtTheChosenSpeed() async throws {
+        let c = try await controller()
+        c.loopSpeed = 1
+        await c.seek(to: 0.6, play: true)
+        await c.toggleLoop()
+        XCTAssertEqual(c.loopingIndex, 0)
+
+        var times: [Double] = []
+        for _ in 0..<80 { try await Task.sleep(for: .milliseconds(40)); times.append(c.player.currentTime().seconds) }
+        XCTAssertLessThan(times.max() ?? 99, 1.9, "it never gets past the first line's end")
+        let wraps = zip(times, times.dropFirst()).filter { $0 - $1 > 0.5 }.count
+        XCTAssertGreaterThanOrEqual(wraps, 1, "it went back to the start at least once")
+
+        c.loopSpeed = 0.5
+        XCTAssertEqual(c.player.rate, 0.5, accuracy: 0.01, "slower while looping")
+        c.stopLooping()
+        XCTAssertEqual(c.player.rate, 1, accuracy: 0.01, "normal again afterwards")
+        XCTAssertNil(c.loopingIndex)
+        c.stop()
+    }
+
+    func testGoingSomewhereElseEndsTheLoop() async throws {
+        let c = try await controller()
+        await c.seek(to: 0.6, play: true)
+        await c.toggleLoop()
+        await c.seek(toLine: 1)
+        XCTAssertNil(c.loopingIndex)
+        c.stop()
+    }
+
+    func testAPreviewedRangePlaysOnceThenPauses() async throws {
+        let c = try await controller()
+        await c.playRange(from: 0.5, to: 1.3)
+        try await Task.sleep(for: .milliseconds(300))
+        try await waitUntilPaused(c)
+        XCTAssertEqual(c.player.currentTime().seconds, 1.3, accuracy: 0.35)
         c.stop()
     }
 }

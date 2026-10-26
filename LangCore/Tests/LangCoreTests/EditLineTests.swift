@@ -51,6 +51,34 @@ final class EditLineTests: XCTestCase {
         XCTAssertFalse(survivors.contains("ser"), "new and now nowhere: removed")
     }
 
+    func testTimingCanBeMovedButNotNonsense() async throws {
+        let (db, line) = try await library()
+        let moved = try await db.editSubtitle(id: line, text: "La casa es grande", start: 0.4, end: 2.6, profile: spanish)
+        XCTAssertEqual([moved.startTime, moved.endTime], [0.4, 2.6])
+
+        let onlyEnd = try await db.editSubtitle(id: line, text: "La casa es grande", end: 3.0, profile: spanish)
+        XCTAssertEqual([onlyEnd.startTime, onlyEnd.endTime], [0.4, 3.0], "a timing left out keeps its value")
+
+        for bad in [(-1.0, 2.0), (2.0, 2.0), (3.0, 1.0), (0.0, 99.0)] {
+            do { try await db.editSubtitle(id: line, text: "x casa", start: bad.0, end: bad.1, profile: spanish); XCTFail("\(bad)") }
+            catch { XCTAssertEqual(error as? LangError, .badTiming, "\(bad)") }
+        }
+        let still = try await db.subtitles(videoID: 1).first
+        XCTAssertEqual(still?.startTime, 0.4, "a refused change leaves the line as it was")
+    }
+
+    func testCountsLinesAndVideosAWordIsSeenIn() async throws {
+        let (db, _) = try await library()   // "casa" is in two lines of one video
+        let casa = try await db.writer.read { try Word.filter(Column("lemma") == "casa").fetchOne($0)!.id! }
+        let grande = try await db.writer.read { try Word.filter(Column("lemma") == "grande").fetchOne($0)!.id! }
+        let seen = try await db.seen(wordID: casa)
+        XCTAssertEqual(seen, WordSeen(lines: 2, videos: 1))
+        let once = try await db.seen(wordID: grande)
+        XCTAssertEqual(once, WordSeen(lines: 1, videos: 1))
+        let none = try await db.seen(wordID: 9999)
+        XCTAssertEqual(none, WordSeen(lines: 0, videos: 0))
+    }
+
     func testAnEmptyLineIsRefusedAndAMissingOneReported() async throws {
         let (db, line) = try await library()
         do { try await db.editSubtitle(id: line, text: "   ", profile: spanish); XCTFail() }
