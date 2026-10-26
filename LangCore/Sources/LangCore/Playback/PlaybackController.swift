@@ -5,13 +5,19 @@ import Observation
 @MainActor @Observable
 public final class PlaybackController {
     public let player: AVPlayer
-    public let lines: [Subtitle]
+    public private(set) var lines: [Subtitle]
     public private(set) var activeIndex: Int?
     public private(set) var currentTime: Double = 0
     public private(set) var isPlaying = false
 
+    /// Pause when the line being played ends, so you can think about it, look a word up, or hear it again.
+    public var pausesAfterLines = false {
+        didSet { arm(activeIndex) }
+    }
+
     @ObservationIgnored private let timeline: SubtitleTimeline
     @ObservationIgnored private var observer: Any?
+    @ObservationIgnored private var lineEnd: Any?
 
     public init(url: URL, lines: [Subtitle]) {
         player = AVPlayer(url: url)
@@ -29,7 +35,14 @@ public final class PlaybackController {
         player.pause()
         if let observer { player.removeTimeObserver(observer) }
         observer = nil
+        disarm()
         isPlaying = false
+    }
+
+    /// Changes one line's text (after it is edited). Timing is untouched, so playback carries on undisturbed.
+    public func replaceText(at index: Int, with text: String) {
+        guard lines.indices.contains(index) else { return }
+        lines[index].text = text
     }
 
     public func play() { player.play(); isPlaying = true }
@@ -41,6 +54,7 @@ public final class PlaybackController {
         await player.seek(to: CMTime(seconds: target, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
         currentTime = target
         activeIndex = timeline.index(at: target + 0.001)
+        arm(activeIndex)
         if shouldPlay { play() }
     }
 
@@ -48,6 +62,7 @@ public final class PlaybackController {
         guard lines.indices.contains(index) else { return }
         await seek(to: lines[index].startTime, play: shouldPlay)
         activeIndex = index
+        arm(index)
     }
 
     public func nextLine() async {
@@ -62,6 +77,31 @@ public final class PlaybackController {
         guard seconds.isFinite else { return }
         currentTime = seconds
         isPlaying = player.rate != 0
+        let previous = activeIndex
         activeIndex = timeline.index(at: seconds)
+        if activeIndex != previous { arm(activeIndex) }
+    }
+
+    // MARK: Pausing after a line
+
+    /// Watches for the end of line `index`, so the pause lands on it rather than up to a tick later.
+    private func arm(_ index: Int?) {
+        disarm()
+        guard pausesAfterLines, let index, lines.indices.contains(index) else { return }
+        let end = lines[index].endTime
+        guard end > currentTime + 0.02 else { return }
+        lineEnd = player.addBoundaryTimeObserver(
+            forTimes: [NSValue(time: CMTime(seconds: end, preferredTimescale: 600))], queue: .main
+        ) { [weak self] in MainActor.assumeIsolated { self?.pauseAtLineEnd() } }
+    }
+
+    private func disarm() {
+        if let lineEnd { player.removeTimeObserver(lineEnd) }
+        lineEnd = nil
+    }
+
+    private func pauseAtLineEnd() {
+        disarm()
+        pause()
     }
 }

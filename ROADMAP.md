@@ -76,9 +76,10 @@ Ordered by how much each helps comprehensible input per unit of effort.
       is supported before offering it.
 - [ ] **Subtitle modes**: target language only, target plus translation, none (listening practice), and a
       reveal-on-click mode.
-- [ ] **Loop this line** and **pause after each line**, with replay at reduced speed.
+- [x] **Pause after each line** (P in the player). Still to do: **loop this line**, with replay at reduced speed.
 - [ ] **Import subtitles** (.srt / .vtt) when a video already has good ones, instead of transcribing.
-- [ ] **Edit the transcript**: fix a line or its timing when Whisper is wrong.
+- [x] **Edit a transcript line** (right-click a line > Edit line…): fixes the text and finds its words again. Still to do:
+      fixing a line's timing.
 - [ ] **Word-level timestamps**, so a single word can be played and clips are tighter.
 
 ### Finding the right material

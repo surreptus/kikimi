@@ -31,6 +31,9 @@ struct PlayerView: View {
     /// Status of every word in this video, so learning and known words can be tinted in the subtitles.
     @State private var statuses: [WordKey: WordStatus] = [:]
     @AppStorage("highlightWords") private var highlightWords = true
+    @AppStorage("pauseAfterLine") private var pauseAfterLine = false
+    /// The line being corrected, with its place in the transcript.
+    @State private var editing: (index: Int, line: Subtitle)?
     @Environment(AppState.self) private var app
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -61,6 +64,16 @@ struct PlayerView: View {
         .task { await load() }
         .task(id: shownToken?.lemma) { await refreshHint(announce: pinnedToken != nil) }
         .task(id: controller != nil) { await keepPlace() }
+        .onChange(of: pauseAfterLine) { _, on in controller?.pausesAfterLines = on }
+        .sheet(isPresented: Binding(get: { editing != nil }, set: { if !$0 { editing = nil } })) {
+            if let editing, let controller {
+                EditLineSheet(line: editing.line, profile: profile, env: env) { saved in
+                    controller.replaceText(at: editing.index, with: saved.text)
+                    app.dataChanged()
+                    self.editing = nil
+                } cancel: { self.editing = nil }
+            }
+        }
         .onChange(of: message) { _, text in
             if let text { AccessibilityNotification.Announcement(text).post() }   // VoiceOver can't see the status line change
         }
@@ -132,6 +145,7 @@ struct PlayerView: View {
     private func load() async {
         do {
             let new = try await env.playback(for: video)
+            new.pausesAfterLines = pauseAfterLine
             controller = new
             if let startAt {
                 await new.seek(to: startAt, play: true)
@@ -227,6 +241,12 @@ struct PlayerView: View {
             .keyboardShortcut(.space, modifiers: [])
             Button("Next line", systemImage: "forward.fill") { Task { await controller.nextLine() } }
                 .buttonStyle(.pill(.secondary, compact: true))
+            Button("Pause after each line", systemImage: "pause.rectangle") { pauseAfterLine.toggle() }
+                .buttonStyle(.pill(pauseAfterLine ? .primary : .secondary, compact: true))
+                .keyboardShortcut("p", modifiers: [])
+                .help(pauseAfterLine ? "Pausing after each line (P). Press again to play straight through."
+                                     : "Pause after each line (P), to think or look a word up")
+                .accessibilityValue(pauseAfterLine ? "On" : "Off")
         }
         .labelStyle(.iconOnly)
     }
@@ -282,7 +302,8 @@ struct PlayerView: View {
                             },
                             seek: { Task { await controller.seek(toLine: index) } },
                             exportAudio: { export(line, kind: .audio) },
-                            exportVideo: { export(line, kind: .video) })
+                            exportVideo: { export(line, kind: .video) },
+                            edit: { editing = (index, line) })
                         .id(index)
                     }
                 }

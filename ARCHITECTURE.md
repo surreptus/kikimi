@@ -32,6 +32,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `Playback/` | The player controller, subtitle timeline and word hints. |
 | `Export/` | Audio and video clip export. |
 | `Resources/Localizable.xcstrings` | Strings shown to the user from this package (errors, titles). The app's own are in `Kikimi/Localizable.xcstrings`. |
+| `Database/LangDatabase+EditLine.swift` | Editing a subtitle line and re-finding its words. |
 | `Coverage/` | How much of a video you know (`VideoCoverage`, `LevelFit`), the shortest word list that reaches a target (`wordsToReach`), and marking a list of known words. |
 | `Backup/` | `ProgressBackup`: the `.kikimi` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. |
 | `Environment/` | `LangEnvironment` and where videos live on disk. |

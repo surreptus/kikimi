@@ -20,6 +20,7 @@ struct SubtitleRow: View {
     let seek: () -> Void
     let exportAudio: () -> Void
     let exportVideo: () -> Void
+    let edit: () -> Void
 
     @AppStorage(TranscriptSize.key) private var size = TranscriptSize.standard
     @State private var segments: [LineSegment] = []
@@ -101,10 +102,13 @@ struct SubtitleRow: View {
         .onHover { rowHovered = $0 }
         .animation(.easeOut(duration: 0.12), value: rowHovered)
         .contextMenu {
+            Button("Edit line…", action: edit)
+            Divider()
             Button("Save audio clip…", action: exportAudio)
             Button("Save video clip…", action: exportVideo)
         }
         .accessibilityAction(named: "Jump to this line", seek)
+        .accessibilityAction(named: "Edit line", edit)
         .focusable()
         .focused(focusedLine, equals: index)
         .focusEffectDisabled()
@@ -126,7 +130,7 @@ struct SubtitleRow: View {
                 hovered = nil
             }
         }
-        .task {
+        .task(id: line.text) {
             guard let profile else { return }
             let text = line.text
             segments = await Task.detached { profile.lineSegments(in: text) }.value

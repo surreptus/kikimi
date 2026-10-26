@@ -2,6 +2,24 @@ import Foundation
 import GRDB
 
 extension LangDatabase {
+    /// The id of the word a token is, adding the word if it is new. `cache` spares repeat lookups within one write.
+    static func wordID(for token: Token, language: String, cache: inout [WordKey: Int64], in db: Database) throws -> Int64 {
+        let key = WordKey(lemma: token.lemma, pos: token.pos)
+        if let cached = cache[key] { return cached }
+        let id: Int64
+        if let existing = try Word
+            .filter(Column("language") == language && Column("lemma") == token.lemma && Column("pos") == token.pos.rawValue)
+            .fetchOne(db) {
+            id = existing.id!
+        } else {
+            var word = Word(language: language, lemma: token.lemma, pos: token.pos)
+            try word.insert(db)
+            id = word.id!
+        }
+        cache[key] = id
+        return id
+    }
+
     public func videoID(forContentHash hash: String) async throws -> Int64? {
         try await writer.read { db in
             try Int64.fetchOne(db, sql: "SELECT id FROM videos WHERE content_hash = ?", arguments: [hash])
@@ -13,11 +31,9 @@ extension LangDatabase {
         video: Video, subtitles: [(segment: TranscriptSegment, tokens: [Token])]
     ) async throws -> Video {
         try await writer.write { db in
-            struct Key: Hashable { let lemma: String; let pos: PartOfSpeech }
-
             var video = video
             try video.insert(db)
-            var wordIDs: [Key: Int64] = [:]
+            var wordIDs: [WordKey: Int64] = [:]
 
             for (index, item) in subtitles.enumerated() {
                 var subtitle = Subtitle(
@@ -26,21 +42,7 @@ extension LangDatabase {
                 try subtitle.insert(db)
 
                 for token in item.tokens {
-                    let key = Key(lemma: token.lemma, pos: token.pos)
-                    let wordID: Int64
-                    if let cached = wordIDs[key] {
-                        wordID = cached
-                    } else if let existing = try Word
-                        .filter(Column("language") == video.language && Column("lemma") == token.lemma
-                                && Column("pos") == token.pos.rawValue)
-                        .fetchOne(db) {
-                        wordID = existing.id!
-                    } else {
-                        var word = Word(language: video.language, lemma: token.lemma, pos: token.pos)
-                        try word.insert(db)
-                        wordID = word.id!
-                    }
-                    wordIDs[key] = wordID
+                    let wordID = try Self.wordID(for: token, language: video.language, cache: &wordIDs, in: db)
                     var occurrence = Occurrence(wordId: wordID, subtitleId: subtitle.id!, surface: token.surface)
                     try occurrence.insert(db, onConflict: .ignore)
                 }
