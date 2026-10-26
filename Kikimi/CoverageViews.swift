@@ -17,7 +17,7 @@ struct CoverageBadge: View {
                 Text("\(percent(coverage)) known · \(fit.title)")
                     .font(Theme.small).foregroundStyle(Theme.ink)
             }
-            .help("You know \(coverage.knownWords) of this video's \(coverage.totalWords) content words (counted once per line). About 90% of content words is roughly 95% of everything said, around where listening becomes comfortable.")
+            .help("You know \(coverage.knownWords) of this video's \(coverage.totalWords) content words (counted once per line). In our samples, knowing 90% of the content words was about 94% to 96% of everything said (counting the small words as known), around where listening becomes comfortable.")
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("You know \(percent(coverage)) of its words: \(fit.title)")
         } else {

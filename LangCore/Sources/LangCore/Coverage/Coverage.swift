@@ -10,9 +10,10 @@ extension SRSStage {
 /// How easy a video should be to follow, from how many of its content words you know.
 ///
 /// Coverage here counts content words only (nouns, verbs, adjectives, adverbs), since small words like articles and
-/// particles aren't kept. They make up roughly half of any speech and are nearly always known, so the share of all
-/// words you understand is higher than the figure shown: about 90% of content words is roughly 95% of everything,
-/// which is around the point listening becomes comfortable.
+/// particles aren't kept. Counted on one Spanish and one Japanese transcript, content words were 58% and 40% of all
+/// words; the rest are nearly always known, so the share of all words you understand is higher than the figure shown:
+/// knowing 90% of content words was about 94% (Spanish) to 96% (Japanese) of everything, which is around the point
+/// listening becomes comfortable (research puts adequate listening at about 95% and a high level at 98%).
 public enum LevelFit: Int, Equatable, Sendable, CaseIterable {
     case hard, stretch, comfortable, easy
 

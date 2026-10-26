@@ -113,8 +113,9 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Check what you marked known.** Self-marked words (and imported lists) can inflate a video's coverage, so
       "Comfortable" overstates how easy it is. An occasional quick check on a sample of known words would catch that.
 - [x] **Encounters per word**: the Words table's Seen column, and the word panel's "Seen in N lines across M videos".
-- [ ] **Measure the 95% claim**: the README and About page say about 90% of content words is roughly 95% of all words.
-      That is an estimate; count real transcripts and state the real figure, or soften the text.
+- [x] **Measured the 95% claim** (26 Oct 2026, one Spanish and one Japanese transcript, 918 and 2,459 words): content words
+      were 58% (es) and 40% (ja) of all words, so knowing 90% of them is about 94% (es) and 96% (ja) of everything,
+      assuming the small words are known. The text now says that. A small sample; recount with more videos.
 - [ ] **Resurface finished words** now and then (a sparse, rare review, or a nudge when one appears in a video), since
       stopping at the last interval can let words fade.
 - [ ] **Smarter review timing** (FSRS-style scheduling): low priority; the evidence is benchmark data, not trials.
