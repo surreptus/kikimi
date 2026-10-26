@@ -7,3 +7,8 @@ DerivedData/
 xcuserdata/
 __pycache__/
 *.pyc
+
+# The website (site/)
+site/node_modules/
+site/dist/
+site/.astro/

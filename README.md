@@ -68,12 +68,17 @@ Some tests need real models or files, so they are opt-in and skipped by default:
 
 ## How it is organised
 
-Two parts in one repository:
+Three parts in one repository:
 
 - **`LangCore/`**, a Swift package with no UI, and all the logic: language profiles, SRS, database (GRDB with
   migrations), tokenizing, the import pipeline, playback, clip export, and review sessions.
 - **`Kikimi.xcodeproj`** with **`Kikimi/`**: the SwiftUI interface, app lifecycle, assets, entitlements and
   `Info.plist`. It contains no logic of its own; views call into `LangCore`.
+- **`site/`**, the website, built with [Astro](https://astro.build) as static pages in the app's colours. Its privacy
+  and terms pages are the app's own `Kikimi/Privacy.md` and `Terms.md`, so they can't differ. Run it with
+  `cd site && npm install && npm run dev`; `npm run build` writes `site/dist`. A workflow
+  (`.github/workflows/site.yml`) publishes it to GitHub Pages once Pages is switched on for the repository
+  (Settings > Pages > Source: GitHub Actions).
 
 ### Language profiles
 
@@ -116,7 +121,7 @@ The licence texts are in `LangCore/Sources/LangCore/Resources/Licenses/` and are
 **Acknowledgements**. The app's own code is under the [MIT licence](LICENSE); the dictionary data and the other components keep the licences above.
 
 The privacy policy is [`Kikimi/Privacy.md`](Kikimi/Privacy.md) and the terms of use are [`Kikimi/Terms.md`](Kikimi/Terms.md).
-The app shows the same files (Help menu, and Settings > About), and they are the text to publish on the download page.
+The app shows the same files (Help menu, and Settings > About), and the website publishes them at `/privacy/` and `/terms/`.
 
 ## Release
 

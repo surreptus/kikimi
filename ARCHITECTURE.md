@@ -47,6 +47,12 @@ and check the original is unchanged. `ImportQueue` runs imports one at a time fo
 
 The two hardest files are `AVFoundationTranscoder.swift` (it starts with a reading guide) and `ImportPipeline.swift`.
 
+## The website
+
+`site/` is an [Astro](https://astro.build) project of static pages (home, privacy, terms) in the app's colours, with no client
+script. The privacy and terms pages import `Kikimi/Privacy.md` and `Kikimi/Terms.md` directly, so there is one copy
+of each. `.github/workflows/site.yml` builds it and deploys to GitHub Pages.
+
 ## The app
 
 `KikimiApp` → `RootView` (floating nav plus the current section). `AppState` holds which section is showing and

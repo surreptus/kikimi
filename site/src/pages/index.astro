@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Base title="Kikimi: learn a language from videos you own">
+  <h1 style="margin-top: 40px">Learn a language from videos you already have.</h1>
+  <p>
+    Kikimi listens to your videos on your Mac, finds the words you will meet, and helps you learn them with spaced
+    repetition, using real sentences from the videos. Spanish and Japanese, with more to come.
+  </p>
+  <!-- The link goes in when there is a notarized release to point at. -->
+  <a class="button" aria-disabled="true" href="#" tabindex="-1">Download for Mac (coming soon)</a>
+  <p class="small">Free. Needs macOS 26 or later; Apple silicon recommended.</p>
+
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li><strong>Add a video.</strong> Drop in a file you own. Nothing is downloaded from video sites.</li>
+    <li><strong>It transcribes on your Mac.</strong> A speech model you download once does the work; nothing is uploaded.</li>
+    <li><strong>Choose your words.</strong> See what you already know, start learning the rest, and look words up as you watch.</li>
+    <li><strong>Practise.</strong> Review words at the right time, each with a sentence from your own videos.</li>
+  </ol>
+
+  <h2>Made for comprehensible input</h2>
+  <p>
+    Each video shows how much of it you already understand, so you can pick material that is mostly familiar with a
+    little new. One button starts learning the commonest words that would make a video comfortable.
+  </p>
+
+  <h2>Private by design</h2>
+  <p>
+    No accounts, no ads, no analytics. Your videos, transcripts and progress stay on your Mac. The only time Kikimi
+    goes online is to download a speech model when you ask. Read the <a href={`${base}/privacy/`}>privacy policy</a>.
+  </p>
+</Base>

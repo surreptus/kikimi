@@ -34,7 +34,9 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       fixed), so this is not a formality.
 - [ ] Walk through every screen in the final build: Videos, Words, Review, Player, Storage, Settings, About.
 - [ ] Rebuild the shareable zip from the final build.
-- [ ] A download page: the notarized `.zip`, what it needs (macOS 26, Apple silicon), the privacy policy and terms.
+- [ ] The website (`site/`, Astro, GitHub Pages): scaffolded with the home, privacy and terms pages. To do: switch on
+      Pages (Settings > Pages > Source: GitHub Actions), a screenshot, and the Download link once there is a notarized
+      release. The terms page shows `[Contact email]` until you fill it in, so don't publish before then.
 - [ ] **How people get updates.** Direct download has no App Store to do it. Options: tell people to download again
       (nothing to build), a manual "Check for updates" that reads a small file from the download page (no new
       dependency; a network request to our own page, which the privacy policy must then mention), or Sparkle

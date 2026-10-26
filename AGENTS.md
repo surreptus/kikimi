@@ -75,6 +75,9 @@ python3 Scripts/dictionaries/test_builders.py                # dictionary builde
 Scripts/check_leaks.sh                                       # LangCore tests under `leaks`
 ```
 
+The website: `cd site && npm install && npm run build` (Node 22 or later). Keep Astro pinned to an exact version, and
+add no other npm package without asking. The site stays static and free of analytics and third-party scripts.
+
 The Release build is `xcodebuild … -configuration Release`; the shipping procedure is
 [Release/CHECKLIST.md](Release/CHECKLIST.md). Generated dictionaries are gitignored; a fresh clone needs
 `Scripts/build_ipadic.sh` and `Scripts/build_dictionaries.sh` before it will build.
