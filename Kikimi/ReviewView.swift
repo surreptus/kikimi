@@ -5,6 +5,7 @@ struct ReviewView: View {
     let env: LangEnvironment
     @Environment(AppState.self) private var app
 
+    @State private var overview: ReviewOverview?
     @State private var session: ReviewSession?
     @State private var card: ReviewCard?
     @State private var revealed = false
@@ -22,22 +23,29 @@ struct ReviewView: View {
             } else if let card {
                 cardView(card)
             } else if let summary {
-                finished(summary)
-            } else if session != nil {
-                EmptyState(title: "Nothing due", message: "Start learning words from the Words tab, or come back later.")
+                VStack(spacing: 0) {
+                    finished(summary).padding(.top, 28)
+                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, start: startSession) }
+                }
+            } else if let overview {
+                if overview.isEmpty {
+                    EmptyState(title: "Nothing to review yet", message: "Start learning words from the Words tab, then come back.")
+                } else {
+                    ReviewOverviewView(overview: overview, start: startSession)
+                }
             } else {
                 ProgressView()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onChange(of: mode) { _, new in env.reviewAudio.setMode(new, for: app.profile) }
-        .task(id: app.languageCode) { await begin() }
+        .task(id: app.languageCode) { await loadOverview() }
+        .task(id: app.dataVersion) { if card == nil { await loadOverview(keepingSummary: true) } }
         .onDisappear { audio?.stop() }
     }
 
     private func finished(_ summary: (answered: Int, correct: Int)) -> some View {
-        VStack(spacing: 18) {
-            Blob()
+        VStack(spacing: 12) {
             Text("All done for now").font(Theme.title(30))
             Text("\(summary.correct) of \(summary.answered) answers right the first time.")
                 .font(.system(.title3, design: .rounded)).foregroundStyle(Theme.muted)
@@ -47,6 +55,10 @@ struct ReviewView: View {
     private func cardView(_ card: ReviewCard) -> some View {
         VStack(spacing: 20) {
             HStack(spacing: 14) {
+                Button("End session", systemImage: "xmark") { endSession() }
+                    .labelStyle(.iconOnly).buttonStyle(.pill(.secondary, compact: true))
+                    .keyboardShortcut(.escape, modifiers: [])
+                    .help("Back to the overview (Esc). Your answers so far are kept.")
                 ProgressView(value: Double(max(0, total - remaining)), total: Double(max(1, total)))
                     .progressViewStyle(.thin)
                 Text("\(remaining) left").font(.system(size: 12, weight: .medium, design: .rounded)).foregroundStyle(Theme.muted)
@@ -158,6 +170,22 @@ struct ReviewView: View {
         return text
     }
 
+    /// Loads the page's overview. After a session it is kept beneath the summary, and refreshed.
+    private func loadOverview(keepingSummary: Bool = false) async {
+        if !keepingSummary { session = nil; card = nil; summary = nil }
+        error = nil
+        do { overview = try await env.database.reviewOverview(language: app.languageCode) }
+        catch { self.error = error.localizedDescription }
+    }
+
+    private func endSession() {
+        audio?.stop()
+        session = nil; card = nil; summary = nil; revealed = false
+        Task { await loadOverview() }
+    }
+
+    private func startSession() { Task { await begin() } }
+
     private func begin() async {
         session = nil; card = nil; summary = nil; error = nil; revealed = false
         audio?.stop()
@@ -193,6 +221,7 @@ struct ReviewView: View {
             if mode == .onCardShown { playSentence() }
             if card == nil, await session.answered > 0 {
                 summary = (await session.answered, await session.correctFirstTry)
+                await loadOverview(keepingSummary: true)
             }
         } catch { self.error = error.localizedDescription }
     }

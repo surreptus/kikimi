@@ -28,7 +28,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `Database/` | GRDB records, migrations (`LangMigrations`) and queries. Schema changes are new migrations only. |
 | `Import/` | The import pipeline, queue, transcription, video compaction and the language check. |
 | `Models/` | Speech-model download, listing and removal (`ModelManager`), plus `ModelCatalog` (sizes and notes). |
-| `SRS/`, `Review/` | The nine review stages and their intervals; review sessions and sentence audio. |
+| `SRS/`, `Review/` | The nine review stages and their intervals; review sessions and sentence audio; the overview (ready, coming up, words per stage). |
 | `Playback/` | The player controller, subtitle timeline and word hints. |
 | `Export/` | Audio and video clip export. |
 | `Resources/Localizable.xcstrings` | Strings shown to the user from this package (errors, titles). The app's own are in `Kikimi/Localizable.xcstrings`. |
@@ -55,7 +55,7 @@ the Words screen's search, filter and selection, so they survive switching scree
 | View | Screen |
 |---|---|
 | `WordsView`, `WordTable`, `WordDetailView` | Search and bulk actions; the hand-built word table (square rows, keyboard selection); the inspector |
-| `ReviewView` | Spaced-repetition cards |
+| `ReviewView`, `ReviewOverviewView` | The review overview, then spaced-repetition cards |
 | `VideosView`, `ImportSection` | Add videos (drop zone, model choice and download, import progress), then your videos: details, delete |
 | `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
 | `StorageView` | Downloaded models and videos, with removal |

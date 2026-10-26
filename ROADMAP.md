@@ -60,7 +60,7 @@ Import with progress and cancel; language check before transcribing; idempotent,
 extraction; dictionary lookup (JMdict, Wiktionary); word table with filters and bulk actions; review with
 sentence audio; synced player with furigana, hints, clip export; coverage per video and level fit; known-words list;
 backup and restore; Storage view for models; Settings window; menu commands; About, Privacy and Acknowledgements;
-transcript text size; resume where you stopped; video thumbnails; app icon; keyboard and VoiceOver for word hints.
+review overview (ready now, next 7 days, words per stage); transcript text size; resume where you stopped; video thumbnails; app icon; keyboard and VoiceOver for word hints.
 
 ## After 1.0
 
