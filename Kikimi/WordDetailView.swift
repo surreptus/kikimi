@@ -44,6 +44,9 @@ struct WordDetail: View {
             examples = (try? await env.database.examples(wordID: row.id)) ?? []
         }
         .onDisappear { audio?.stop() }
+        .onChange(of: exportMessage) { _, text in
+            if let text { AccessibilityNotification.Announcement(text).post() }
+        }
     }
 
     /// The word gets a line to itself, so even a long one isn't squeezed; its status and actions share the line below.
@@ -86,17 +89,22 @@ struct WordDetail: View {
                     togglePlayback(line)
                 }
                 .help("Play this sentence's audio from your video, right here")
+                .accessibilityLabel(isPlaying ? "Stop the sentence" : "Hear the sentence")
                 Button("Open video", systemImage: "play.rectangle") {
                     audio?.stop()
                     app.openVideo(id: line.videoID, at: line.startTime)
                 }
                 .help("Open the video at this moment")
+                .accessibilityLabel("Open the video at this sentence")
             }
             .labelStyle(.iconOnly).foregroundStyle(Theme.muted).font(.system(size: 13))
             // Speaker and stop are different widths; a fixed box keeps the icons, and the text beside them, still.
             .buttonStyle(IconSlotStyle())
         }
         .padding(.vertical, 6)
+        // One group per sentence, named by the sentence, so the buttons inside say which one they are for.
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(line.text)
     }
 
     private func togglePlayback(_ line: ExampleLine) {
@@ -149,11 +157,11 @@ struct EntryView: View {
     }
 }
 
-/// A plain icon button in a fixed 24 x 20 box, so swapping its symbol never changes the layout around it.
+/// A plain icon button in a fixed 28 x 24 box, so swapping its symbol never changes the layout around it.
 private struct IconSlotStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .frame(width: 24, height: 20)
+            .frame(width: 28, height: 24)
             .contentShape(Rectangle())
             .opacity(configuration.isPressed ? 0.5 : 1)
     }

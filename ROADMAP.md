@@ -46,8 +46,10 @@ machine, release plumbing, and a few promises we have made but not kept (below).
 - [ ] **Transcript performance.** It felt slow in Debug. A 20-second sample of the Debug build showed the main
       thread about 74% idle and nothing in our code standing out. Confirm in the Release build; if it still lags,
       likely suspects are every row re-evaluating on hover and rows never being released. Test on a 25-minute video.
-- [ ] Accessibility pass on the newer features: resume bar, example icons, coverage badges, text-size setting,
-      thumbnails. Keyboard and VoiceOver, Light and Dark.
+- [x] Accessibility pass on the newer features (code review and fixes, 26 Oct 2026): buttons name their video or
+      sentence, the resume offer and status messages are announced, auto-scroll honours Reduce Motion, previews are
+      hidden from VoiceOver. **Still to do by hand:** listen to it with VoiceOver on, and tab through with Full Keyboard
+      Access, in Light and Dark.
 - [ ] Decide whether the progress backup should include where you stopped in each video (it does not now).
 - [ ] Help and feedback: a "Report a problem" route (a mailto link with the app version, no data attached).
 - [ ] App-wide text size. Today the setting covers only the transcript; macOS has no system text-size setting for

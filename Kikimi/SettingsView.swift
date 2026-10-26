@@ -85,6 +85,7 @@ private struct GeneralTab: View {
                 Text("日本語 · Una frase de ejemplo")
                     .font(.system(size: transcriptSize.points, design: .rounded))
                     .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)   // a preview of the size, not content
             } footer: {
                 Text("The size of the subtitle lines beside the video.")
             }

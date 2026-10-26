@@ -112,10 +112,12 @@ struct VideosView: View {
             }
             Spacer()
             Button("Info", systemImage: "info.circle") { info = item.video }
+                .accessibilityLabel("Info for \(item.video.title)")
                 .labelStyle(.iconOnly).buttonStyle(.plain)
                 .font(.system(size: 20)).foregroundStyle(Theme.muted)
                 .help("Size, location, rename and delete")
             Button("Play", systemImage: "play.circle.fill") { open(item.video, at: nil) }
+                .accessibilityLabel("Play \(item.video.title)")
                 .labelStyle(.iconOnly).buttonStyle(.plain)
                 .font(.system(size: 28)).foregroundStyle(Theme.ink)
                 .help("Play")

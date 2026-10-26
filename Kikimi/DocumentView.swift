@@ -65,7 +65,7 @@ struct DocumentView: View {
                         case .summary(let text):
                             // The one-line meaning of the section below it, set apart and stronger than the text.
                             HStack(spacing: 10) {
-                                Capsule().fill(Theme.ink).frame(width: 3)
+                                Capsule().fill(Theme.ink).frame(width: 3).accessibilityHidden(true)
                                 Text((try? AttributedString(markdown: text)) ?? AttributedString(text))
                                     .font(.system(.body, design: .rounded, weight: .semibold))
                                     .foregroundStyle(Theme.ink)

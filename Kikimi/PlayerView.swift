@@ -32,6 +32,7 @@ struct PlayerView: View {
     @State private var statuses: [WordKey: WordStatus] = [:]
     @AppStorage("highlightWords") private var highlightWords = true
     @Environment(AppState.self) private var app
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var profile: (any LanguageProfile)? { LanguageProfiles.profile(for: video.language) }
     /// The word the hint bar describes: the pinned one, else the one under the pointer or the keyboard.
@@ -60,6 +61,9 @@ struct PlayerView: View {
         .task { await load() }
         .task(id: shownToken?.lemma) { await refreshHint(announce: pinnedToken != nil) }
         .task(id: controller != nil) { await keepPlace() }
+        .onChange(of: message) { _, text in
+            if let text { AccessibilityNotification.Announcement(text).post() }   // VoiceOver can't see the status line change
+        }
         .onChange(of: controller?.isPlaying) { _, playing in if playing == true { resumeOffer = nil } }
         .task(id: app.dataVersion) {
             guard let id = video.id else { return }
@@ -134,6 +138,7 @@ struct PlayerView: View {
             } else if let id = video.id, let spot = try? await env.database.video(id: id)?.resumePosition {
                 await new.seek(to: spot)   // waits, paused, until you choose
                 resumeOffer = spot
+                AccessibilityNotification.Announcement(String(localized: "You stopped at \(clock(spot)). Continue or start over.")).post()
             }
         } catch {
             failure = error.localizedDescription
@@ -188,6 +193,8 @@ struct PlayerView: View {
             }
             .buttonStyle(.pill(compact: true))
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("You stopped at \(clock(spot))")
     }
 
     private func clock(_ seconds: Double) -> String {
@@ -270,7 +277,7 @@ struct PlayerView: View {
                             moveFocus: { delta in
                                 let target = index + delta
                                 guard controller.lines.indices.contains(target) else { return }
-                                withAnimation { proxy.scrollTo(target, anchor: .center) }
+                                withAnimation(reduceMotion ? nil : .default) { proxy.scrollTo(target, anchor: .center) }
                                 Task { @MainActor in focusedLine = target }   // after the row exists, if it was off screen
                             },
                             seek: { Task { await controller.seek(toLine: index) } },
@@ -282,7 +289,7 @@ struct PlayerView: View {
                 .padding(10)
             }
             .onChange(of: controller.activeIndex) { _, new in
-                if let new { withAnimation { proxy.scrollTo(new, anchor: .center) } }
+                if let new { withAnimation(reduceMotion ? nil : .default) { proxy.scrollTo(new, anchor: .center) } }
             }
         }
     }
