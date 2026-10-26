@@ -7,7 +7,7 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 - [x] **Bundle ID** is `com.surreptus.Kikimi` (set in the Kikimi target). Changing it later moves the app's data
       container, so do that before anyone has data.
 - [ ] Choose your team in the target (Signing & Capabilities). Keep "Automatically manage signing" on.
-- [x] **App icon**: an asanoha (hemp leaf) star in white line on dark green, drawn for Kikimi (`Scripts/icon/make_icon.swift` regenerates it) (PNGs in `Kikimi/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
+- [x] **App icon**: an asanoha (hemp leaf) star in white line on dark green, drawn for Kikimi (the Dock shows a light version in Light appearance) (`Scripts/icon/make_icon.swift` regenerates it) (PNGs in `Kikimi/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
 - [ ] Open a video in the **Release** build, not only the Debug one: Release links differently (the AVKit link is set in the target's `OTHER_LDFLAGS` because SwiftUI's `VideoPlayer` never names it).
 - [ ] Set `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` (raise the build number for every upload).
 - [ ] Direct download only: create a notarization profile once:

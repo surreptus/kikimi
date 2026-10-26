@@ -5,6 +5,7 @@ struct RootView: View {
     @Environment(AppState.self) private var app
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.openSettings) private var openSettings
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Group {
@@ -23,6 +24,7 @@ struct RootView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background { ZStack { windowColor; NoiseOverlay() } }
         .containerBackground(for: .window) { ZStack { windowColor; NoiseOverlay() } }
+        .onChange(of: colorScheme, initial: true) { _, scheme in DockIcon.show(for: scheme) }
         .onChange(of: app.settingsRequest) { _, _ in
             NSApp.activate(ignoringOtherApps: true)
             openSettings()
