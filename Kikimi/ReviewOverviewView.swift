@@ -68,7 +68,9 @@ struct ReviewOverviewView: View {
         return VStack(spacing: 4) {
             Spacer(minLength: 0)
             Text("\(count)").font(Theme.small).foregroundStyle(count == 0 ? Theme.faint : Theme.ink)
-            Capsule().fill(index == 0 ? Theme.ink : Theme.ink.opacity(0.35))
+            UnevenRoundedRectangle(topLeadingRadius: 6, bottomLeadingRadius: 2, bottomTrailingRadius: 2, topTrailingRadius: 6)
+                .fill(index == 0 ? Theme.ink : Theme.ink.opacity(0.35))
+                .frame(maxWidth: 48)
                 .frame(height: max(4, 64 * CGFloat(count) / CGFloat(tallest)))
             Text(dayName(index)).font(Theme.small).foregroundStyle(Theme.muted)
         }
