@@ -30,9 +30,9 @@ enum Theme {
 
     /// Behind the floating nav, and behind sheets.
     static let page = Color(light: Color(hex: 0xF6F4EF), dark: Color(hex: 0x121212))
-    /// The content card: off-white, and a very dark green of the window's hue, so text and tables sit on the calmest
+    /// The content card: a warm off-white (a touch of yellow-orange against the green window), and a very dark green of the window's hue, so text and tables sit on the calmest
     /// ground. The colour stays in the window around it (`chrome`) and the nav.
-    static let card = Color(light: Color(hex: 0xF8F6EF), dark: Color(hex: 0x081611))
+    static let card = Color(light: Color(hex: 0xFAF4E6), dark: Color(hex: 0x081611))
     /// A panel on the card: a faint tint of the ink, so it reads as a shape without a border.
     static let soft = Color(light: Color(hex: 0x153A0B).opacity(0.06), dark: .white.opacity(0.07))
     static let softStrong = Color(light: Color(hex: 0x153A0B).opacity(0.11), dark: .white.opacity(0.14))

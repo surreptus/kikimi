@@ -63,11 +63,31 @@
         }
       }
     },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
 
     },
     "%lld already in your reviews." : {
 
+    },
+    "%lld learning · %lld known · %lld finished" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld learning · %2$lld known · %3$lld finished"
+          }
+        }
+      }
     },
     "%lld left" : {
 
@@ -157,6 +177,15 @@
     "^[%lld hour](inflect: true)" : {
 
     },
+    "^[%lld more review](inflect: true) after that" : {
+
+    },
+    "^[%lld review](inflect: true)" : {
+
+    },
+    "^[%lld review](inflect: true) ready" : {
+
+    },
     "^[%lld video](inflect: true) · %@ on this Mac" : {
       "localizations" : {
         "en" : {
@@ -166,6 +195,9 @@
           }
         }
       }
+    },
+    "^[%lld word](inflect: true)" : {
+
     },
     "^[%lld word](inflect: true) added" : {
 
@@ -257,6 +289,9 @@
     "Back to %@" : {
 
     },
+    "Back to the overview (Esc). Your answers so far are kept." : {
+
+    },
     "Back up your progress" : {
 
     },
@@ -323,6 +358,9 @@
     "Clear search" : {
 
     },
+    "Coming up" : {
+
+    },
     "Compressing video" : {
 
     },
@@ -384,6 +422,9 @@
 
     },
     "Duration" : {
+
+    },
+    "End session" : {
 
     },
     "Everything in this file is already here, so nothing would change." : {
@@ -461,6 +502,9 @@
     "Hear" : {
 
     },
+    "Hear the sentence" : {
+
+    },
     "Highlight" : {
 
     },
@@ -509,6 +553,9 @@
     "Info" : {
 
     },
+    "Info for %@" : {
+
+    },
     "Jump to this line" : {
 
     },
@@ -516,6 +563,18 @@
 
     },
     "Keyboard" : {
+
+    },
+    "Kikimi" : {
+
+    },
+    "Kikimi is free software under the MIT licence." : {
+
+    },
+    "Kikimi listens to the video on this Mac and writes out what is said, with times. This is the long step. In our tests the medium model took about 3 minutes for a 10 minute video on an Apple silicon Mac; larger models are slower." : {
+
+    },
+    "Kikimi uses spaced repetition: a word you get right comes back after a longer wait each time, and one you miss comes back sooner. A word you are learning moves through these stages:" : {
 
     },
     "Known" : {
@@ -631,6 +690,9 @@
     "Next review" : {
 
     },
+    "Next review %@" : {
+
+    },
     "Next review comes after" : {
 
     },
@@ -661,13 +723,16 @@
     "Not started" : {
 
     },
-    "Nothing due" : {
-
-    },
     "Nothing in this list would change." : {
 
     },
     "Nothing needed changing." : {
+
+    },
+    "Nothing scheduled yet" : {
+
+    },
+    "Nothing to review yet" : {
 
     },
     "Noun" : {
@@ -694,6 +759,9 @@
     "Open the video at this moment" : {
 
     },
+    "Open the video at this sentence" : {
+
+    },
     "Open video" : {
 
     },
@@ -710,6 +778,9 @@
 
     },
     "Play" : {
+
+    },
+    "Play %@" : {
 
     },
     "Play sentence" : {
@@ -768,18 +839,6 @@
 
     },
     "Rename…" : {
-
-    },
-    "Kikimi" : {
-
-    },
-    "Kikimi is free software under the MIT licence." : {
-
-    },
-    "Kikimi listens to the video on this Mac and writes out what is said, with times. This is the long step. In our tests the medium model took about 3 minutes for a 10 minute video on an Apple silicon Mac; larger models are slower." : {
-
-    },
-    "Kikimi uses spaced repetition: a word you get right comes back after a longer wait each time, and one you miss comes back sooner. A word you are learning moves through these stages:" : {
 
     },
     "Reset" : {
@@ -909,6 +968,16 @@
     "Stage %lld of 9" : {
 
     },
+    "Stage %lld: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stage %1$lld: %2$@"
+          }
+        }
+      }
+    },
     "Stage 1" : {
 
     },
@@ -948,10 +1017,13 @@
     "Start learning this word (L)" : {
 
     },
-    "Start learning words from the Words tab, or come back later." : {
+    "Start learning words from the Words tab, then come back." : {
 
     },
     "Start over" : {
+
+    },
+    "Start reviewing" : {
 
     },
     "Started learning ^[%lld word](inflect: true)" : {
@@ -971,6 +1043,9 @@
       }
     },
     "Stop" : {
+
+    },
+    "Stop the sentence" : {
 
     },
     "Stop this import. Your original file is untouched." : {
@@ -1031,6 +1106,9 @@
     "To restore, choose the file in the same place, drop it there, or double-click it. You'll see what would change first, and progress you already have is never overwritten. Words from a backup join their sentences when you add the videos again." : {
 
     },
+    "Today" : {
+
+    },
     "Transcribing" : {
 
     },
@@ -1068,6 +1146,9 @@
 
     },
     "When to play the sentence audio" : {
+
+    },
+    "Where your words are" : {
 
     },
     "Word meaning" : {
@@ -1117,7 +1198,13 @@
         }
       }
     },
+    "You stopped at %@" : {
+
+    },
     "You stopped at %@." : {
+
+    },
+    "You stopped at %@. Continue or start over." : {
 
     },
     "You'll see the same circle beside a word on the Words page, in its panel and in the video. It fills as the word moves up, from red through yellow to green, and becomes a white disc once it is finished. An empty ring is a new word, and a green tick is a word you marked known." : {
