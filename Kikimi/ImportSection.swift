@@ -180,7 +180,7 @@ struct ImportSection: View {
         let media = urls.filter {
             UTType(filenameExtension: $0.pathExtension)?.conforms(to: .audiovisualContent) ?? false
         }
-        queue.enqueue(media, profile: app.profile, model: env.preferences.model(for: app.profile))
+        queue.enqueue(media, profile: app.profile, model: env.preferences.model(for: app.profile), quality: env.videoQuality.quality)
     }
 
     // MARK: Jobs
@@ -290,7 +290,7 @@ struct ImportSection: View {
 
     /// "3 of 7 · Transcribing": the step's place in the import (out of 6 if the language check was skipped).
     private func runningText(_ stage: ImportStage, _ job: ImportQueue.Job) -> String {
-        let place = stage.position(checkingLanguage: job.checksLanguage)
+        let place = stage.position(checkingLanguage: job.checksLanguage, compressing: job.compresses)
         return String(localized: "\(place.number) of \(place.of) · \(stageName(stage))")
     }
 

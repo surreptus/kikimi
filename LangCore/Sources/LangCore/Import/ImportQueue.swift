@@ -47,10 +47,13 @@ public final class ImportQueue {
         public fileprivate(set) var status: Status = .queued
         public fileprivate(set) var profile: any LanguageProfile
         fileprivate(set) var model: String
+        public let quality: VideoQuality
         fileprivate var skipsLanguageCheck = false
         public var fileName: String { url.lastPathComponent }
         /// False for an import the user chose to go ahead with after a language warning.
         public var checksLanguage: Bool { !skipsLanguageCheck }
+        /// False when the video is kept as it is, so there is no compressing step to count.
+        public var compresses: Bool { quality == .smallest }
         /// What is worth saying about the current step, such as that the model is loading.
         public fileprivate(set) var note: ImportNote?
         /// When the current step began (or, if the model was loading, when that finished), for the time left.
@@ -66,8 +69,8 @@ public final class ImportQueue {
 
     public init(pipeline: ImportPipeline) { self.pipeline = pipeline }
 
-    public func enqueue(_ urls: [URL], profile: any LanguageProfile, model: String) {
-        jobs += urls.map { Job(url: $0, profile: profile, model: model) }
+    public func enqueue(_ urls: [URL], profile: any LanguageProfile, model: String, quality: VideoQuality = .smallest) {
+        jobs += urls.map { Job(url: $0, profile: profile, model: model, quality: quality) }
         kick()
     }
 
@@ -129,7 +132,7 @@ public final class ImportQueue {
             let work = Task { [pipeline] in
                 try await pipeline.importVideo(
                     from: job.url, profile: job.profile, model: job.model,
-                    checkLanguage: !job.skipsLanguageCheck, progress: update)
+                    checkLanguage: !job.skipsLanguageCheck, quality: job.quality, progress: update)
             }
             currentImport = work
             // A cancel may have arrived between marking the job running and starting the task.

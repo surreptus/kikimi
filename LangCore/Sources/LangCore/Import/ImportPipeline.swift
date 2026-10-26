@@ -40,7 +40,7 @@ public actor ImportPipeline {
     /// the video is moved into the library, after which the move and the database write finish as one unit.
     public func importVideo(
         from original: URL, profile: any LanguageProfile, model: String? = nil, checkLanguage: Bool = true,
-        progress: @escaping ProgressHandler = { _ in }
+        quality: VideoQuality = .smallest, progress: @escaping ProgressHandler = { _ in }
     ) async throws -> Video {
         let scoped = original.startAccessingSecurityScopedResource()
         defer { if scoped { original.stopAccessingSecurityScopedResource() } }
@@ -67,7 +67,7 @@ public actor ImportPipeline {
             let segments = try await transcribe(staged, profile: profile, model: model, progress: progress)
             try Task.checkCancellation()
 
-            let files = try await makeLibraryFiles(from: staged, in: work, progress: progress)
+            let files = try await makeLibraryFiles(from: staged, in: work, quality: quality, progress: progress)
             // The last point where a cancel is honoured.
             try Task.checkCancellation()
 
@@ -77,7 +77,7 @@ public actor ImportPipeline {
             libraryDir = destination   // set only after the move, so a failed move never deletes an existing folder
             let video = Video(
                 language: profile.code, title: original.deletingPathExtension().lastPathComponent,
-                contentHash: hash, videoPath: "\(hash)/video.mov",
+                contentHash: hash, videoPath: "\(hash)/\(files.videoName)",
                 duration: files.duration)
             let saved = try await save(video, segments: segments, profile: profile)
 
@@ -155,31 +155,41 @@ public actor ImportPipeline {
     private struct LibraryFiles {
         var folder: URL
         var duration: Double
+        var videoName: String
     }
 
-    /// 3-4. Make the compact video (its sound is the library's only audio) and verify it against the staged source.
+    /// 3-4. Make the library copy (compact, or the file as it is) and verify it against the staged source.
     private func makeLibraryFiles(
-        from staged: URL, in work: URL, progress: @escaping ProgressHandler
+        from staged: URL, in work: URL, quality: VideoQuality, progress: @escaping ProgressHandler
     ) async throws -> LibraryFiles {
         let fm = FileManager.default
         let out = work.appending(path: "out", directoryHint: .isDirectory)
-        let videoOut = out.appending(path: "video.mov")
+        // Kept as it is, the file keeps its own extension (the container decides how it is read); a compact copy is .mov.
+        let ext = staged.pathExtension.lowercased()
+        let videoName = quality == .original && !ext.isEmpty ? "video.\(ext)" : "video.mov"
+        let videoOut = out.appending(path: videoName)
+        let duration: Double
+        do { duration = try await MediaVerifier.duration(of: staged) }
+        catch { throw ImportError.verificationFailed("source unreadable: \(error)") }
         do {
             try fm.createDirectory(at: out, withIntermediateDirectories: true)
-            try await transcoder.compactVideo(
-                source: staged, destination: videoOut,
-                progress: { progress(ImportProgress(stage: .transcoding, fraction: $0)) })
+            switch quality {
+            case .smallest:
+                try await transcoder.compactVideo(
+                    source: staged, destination: videoOut,
+                    progress: { progress(ImportProgress(stage: .transcoding, fraction: $0)) })
+            case .original:
+                // The staged copy is already a private copy of your file, so it is moved, not copied again.
+                try fm.moveItem(at: staged, to: videoOut)
+            }
         } catch { throw Self.wrapped(error, ImportError.transcodeFailed) }
         try Task.checkCancellation()
 
         progress(ImportProgress(stage: .verifying, fraction: 0))
-        let duration: Double
-        do { duration = try await MediaVerifier.duration(of: staged) }
-        catch { throw ImportError.verificationFailed("source unreadable: \(error)") }
         try await MediaVerifier.verify(output: videoOut, expectedDuration: duration)
         try Task.checkCancellation()
 
-        return LibraryFiles(folder: out, duration: duration)
+        return LibraryFiles(folder: out, duration: duration, videoName: videoName)
     }
 
     /// 6. Move the files into the library with one directory rename.

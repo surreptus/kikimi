@@ -84,7 +84,7 @@ struct AboutView: View {
                 row("Copying", "Makes a working copy. Seconds.")
                 row("Checking language", "Listens to a short sample so a Japanese video can't be added as Spanish by mistake.")
                 row("Transcribing", "The long step: about a quarter of the video's length with the medium model in our tests, longer with larger models.")
-                row("Compressing video", "Saves a small copy for playback, with its sound kept small too; in our tests a 161 MB video became 29 MB. A video that is already small is kept as it is. Sentence audio in reviews plays from this same copy.")
+                row("Compressing video", "Saves a small copy for playback, with its sound kept small too; in our tests a 161 MB video became 29 MB. A video that is already small is kept as it is, and in Settings you can choose Original quality to keep every video exactly as you added it (that step is then skipped). Sentence audio in reviews plays from this same copy.")
                 row("Verifying", "Checks the copy plays and is the right length before anything is kept.")
                 row("Saving", "Stores the lines and words in one step. Either everything is saved or nothing is.")
             }

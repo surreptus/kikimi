@@ -66,6 +66,9 @@ Some tests need real models or files, so they are opt-in and skipped by default:
 | `LANGCORE_FILE=<media>` | With the benchmark: transcribe or detect the language of one file (read-only) |
 | `LANGCORE_COMPACT_FILE=<video>` | Report what the video compaction does to one file (read-only) |
 
+The library copy of each video is the smallest HEVC by default; Settings > General > Video quality can keep your file as it is
+instead (no compression, so the same size).
+
 ## How it is organised
 
 Three parts in one repository:

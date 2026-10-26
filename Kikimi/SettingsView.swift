@@ -68,6 +68,7 @@ struct SettingsView: View {
 private struct GeneralTab: View {
     @AppStorage(Appearance.key) private var appearance = Appearance.system
     @AppStorage(TranscriptSize.key) private var transcriptSize = TranscriptSize.standard
+    @AppStorage(VideoQualityPreference.key) private var videoQuality = VideoQuality.smallest.rawValue
 
     var body: some View {
         Form {
@@ -89,9 +90,17 @@ private struct GeneralTab: View {
             } footer: {
                 Text("The size of the subtitle lines beside the video.")
             }
+            Section {
+                Picker("Video quality", selection: $videoQuality) {
+                    Text("Smallest size (recommended)").tag(VideoQuality.smallest.rawValue)
+                    Text("Original quality").tag(VideoQuality.original.rawValue)
+                }
+            } footer: {
+                Text("The copy Kikimi keeps of each video you add. Smallest compresses it (in our tests a 161 MB video became 29 MB), which is plenty to follow along and study from. Original quality keeps your file exactly as it is: the best picture and sound, but the same size. Your own files are never changed either way, and this applies to videos you add from now on.")
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 520, height: 320)
+        .frame(width: 520, height: 470)
     }
 }
 

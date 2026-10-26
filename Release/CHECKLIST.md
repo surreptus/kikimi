@@ -17,6 +17,12 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 ## Every release
 - [ ] `Scripts/build_ipadic.sh` and `Scripts/build_dictionaries.sh` have been run (the build refuses otherwise).
 - [ ] `cd LangCore && swift test` passes (the script runs it unless `--skip-tests`).
+- [ ] **Run the model-based tests**, which the normal run skips because they need real models (coverage of
+      `WhisperKitTranscriber` is only 6% without them). With a network connection:
+      `cd LangCore && LANGCORE_INTEGRATION=1 swift test` (real transcription and language detection, tiny model, ~73 MB),
+      then once with a speech model you ship: `LANGCORE_BENCHMARK=1 LANGCORE_MODEL=<variant> LANGCORE_MODELS_DIR=<folder> swift test`.
+      Note the word error rate and speed in the release notes; a result far worse than the README's figures (about 23% on a
+      long Spanish passage with `medium`) is a reason to stop and look.
 - [ ] Open the project in Xcode once and check **Product > Archive > Generate Privacy Report**. Every API listed
       must be covered by `Kikimi/PrivacyInfo.xcprivacy` (it currently declares UserDefaults only; this was not
       checked against third-party packages).

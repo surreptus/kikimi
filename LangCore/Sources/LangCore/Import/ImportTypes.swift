@@ -8,14 +8,14 @@ public enum ImportStage: String, Sendable, CaseIterable {
     public var reportsProgress: Bool { self == .transcribing || self == .transcoding }
 
     /// The steps an import goes through, in order. The language check is left out when it was skipped (an import
-    /// the user chose to go ahead with anyway), so "3 of 7" is true.
-    public static func steps(checkingLanguage: Bool) -> [ImportStage] {
-        allCases.filter { checkingLanguage || $0 != .detectingLanguage }
+    /// the user chose to go ahead with anyway), and compressing when the video is kept as it is, so "3 of 7" is true.
+    public static func steps(checkingLanguage: Bool, compressing: Bool = true) -> [ImportStage] {
+        allCases.filter { (checkingLanguage || $0 != .detectingLanguage) && (compressing || $0 != .transcoding) }
     }
 
     /// "3 of 7": this step's place in the import.
-    public func position(checkingLanguage: Bool) -> (number: Int, of: Int) {
-        let steps = Self.steps(checkingLanguage: checkingLanguage)
+    public func position(checkingLanguage: Bool, compressing: Bool = true) -> (number: Int, of: Int) {
+        let steps = Self.steps(checkingLanguage: checkingLanguage, compressing: compressing)
         return ((steps.firstIndex(of: self) ?? 0) + 1, steps.count)
     }
 }

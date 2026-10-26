@@ -7,6 +7,7 @@ public final class LangEnvironment: Sendable {
     public let database: LangDatabase
     public let models: ModelManager
     public let preferences: ModelPreferences
+    public let videoQuality: VideoQualityPreference
     public let reviewAudio: ReviewAudioPreferences
     public let pipeline: ImportPipeline
 
@@ -24,6 +25,7 @@ public final class LangEnvironment: Sendable {
         models = ModelManager(directory: root.appending(path: "Models", directoryHint: .isDirectory))
         preferences = ModelPreferences(defaults: defaults)
         reviewAudio = ReviewAudioPreferences(defaults: defaults)
+        videoQuality = VideoQualityPreference(defaults: defaults)
         pipeline = ImportPipeline(
             database: database, root: root, transcriber: transcriber ?? WhisperKitTranscriber(models: models))
     }
