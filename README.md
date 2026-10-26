@@ -120,7 +120,7 @@ built dictionary files are adaptations of that data and must stay under that lic
 not committed; only the scripts that build them are. Japanese tokenizing uses a vendored copy of
 [MeCab](https://taku910.github.io/mecab/) (BSD licence) with the IPADIC dictionary.
 
-The licence texts are in `LangCore/Sources/LangCore/Resources/Licenses/` and are shown in the app under
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) lists every component and its licence. The licence texts are in `LangCore/Sources/LangCore/Resources/Licenses/` and are shown in the app under
 **Acknowledgements**. The app's own code is under the [MIT licence](LICENSE); the dictionary data and the other components keep the licences above.
 
 The privacy policy is [`Kikimi/Privacy.md`](Kikimi/Privacy.md) and the terms of use are [`Kikimi/Terms.md`](Kikimi/Terms.md).

@@ -226,11 +226,28 @@ final class AppSupportTests: XCTestCase {
 
     func testAcknowledgementsAreBundled() {
         let items = Acknowledgements.all()
-        XCTAssertEqual(items.count, 8)
+        XCTAssertEqual(items.count, 9)
+        XCTAssertTrue(items.contains { $0.title.contains("Kikimi") && $0.text.contains("MIT License") })
         // WhisperKit ships code from swift-transformers under the Apache licence, which has to travel with the app.
         XCTAssertTrue(items.contains { $0.title.contains("swift-transformers") && $0.text.contains("Apache License") && $0.text.contains("Hugging Face") })
         XCTAssertTrue(items.contains { $0.title.contains("IPADIC") && $0.text.contains("Nara Institute") })
         XCTAssertTrue(items.contains { $0.title.contains("JMdict") && $0.text.contains("CC BY-SA") })
+    }
+
+    /// A licence file added without a title would be bundled but never shown, so every file must be listed.
+    func testEveryBundledLicenceFileIsListedInTheAcknowledgements() throws {
+        let folder = try XCTUnwrap(Bundle.module.url(forResource: "Licenses", withExtension: nil))
+        let files = try FileManager.default.contentsOfDirectory(atPath: folder.path).filter { $0.hasSuffix(".txt") }
+        XCTAssertEqual(Acknowledgements.all().count, files.count, "every file in Licenses/ has an entry")
+    }
+
+    /// The app shows its own licence from a copy in the bundle; it must be the repository's LICENSE.
+    func testTheBundledCopyOfTheAppsLicenceIsTheRepositorysLicence() throws {
+        let repoRoot = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let license = try String(contentsOf: repoRoot.appending(path: "LICENSE"), encoding: .utf8)
+        let bundled = try XCTUnwrap(Acknowledgements.all().first { $0.title.contains("Kikimi") })
+        XCTAssertEqual(bundled.text, license)
     }
 
     func testEnvironmentOpensTheBundledDictionariesInPlace() async throws {

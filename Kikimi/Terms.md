@@ -46,7 +46,7 @@ Everything Kikimi keeps is stored on your Mac, as the privacy policy explains. I
 
 > Kikimi uses other people's software and data under their own licences, and isn't affiliated with them.
 
-Kikimi includes and uses software, speech models and dictionary data from others, each under its own licence, listed under Acknowledgements. You can download speech models from a third-party service when you ask Kikimi to; that service has its own terms, and I do not control what it offers or whether it stays available. Kikimi is not affiliated with or endorsed by Apple, OpenAI, Hugging Face, or the makers of any dictionary or model it uses. Their names belong to them.
+Kikimi includes and uses software, speech models and dictionary data from others, each under its own licence, listed under Acknowledgements. You can download speech models from a third-party service when you ask Kikimi to; that service has its own terms, and I do not control what it offers or whether it stays available. Kikimi is not affiliated with or endorsed by Apple, OpenAI, Hugging Face, Anki, or the makers of any dictionary or model it uses. Their names belong to them.
 
 ## No warranty
 
