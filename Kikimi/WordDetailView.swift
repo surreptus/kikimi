@@ -52,7 +52,7 @@ struct WordDetail: View {
     /// The word gets a line to itself, so even a long one isn't squeezed; its status and actions share the line below.
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.7)
+            Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.7).textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 10) {
                 StatusBadge(status: row.word.status, stage: row.word.stage)

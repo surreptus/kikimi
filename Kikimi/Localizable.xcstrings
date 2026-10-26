@@ -217,6 +217,54 @@
     "⌘O adds videos. ⌘1, ⌘2 and ⌘3 go to Videos, Words and Review. ⌘F finds words. ⌘, opens Settings." : {
 
     },
+    "1 day" : {
+
+    },
+    "1 month" : {
+
+    },
+    "1 week" : {
+
+    },
+    "1d" : {
+
+    },
+    "1m" : {
+
+    },
+    "1w" : {
+
+    },
+    "2 days" : {
+
+    },
+    "2 weeks" : {
+
+    },
+    "2d" : {
+
+    },
+    "2w" : {
+
+    },
+    "4 hours" : {
+
+    },
+    "4 months" : {
+
+    },
+    "4h" : {
+
+    },
+    "4m" : {
+
+    },
+    "8 hours" : {
+
+    },
+    "8h" : {
+
+    },
     "A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts." : {
 
     },
@@ -968,12 +1016,12 @@
     "Stage %lld of 9" : {
 
     },
-    "Stage %lld: %@" : {
+    "Stage %lld, back after %@: %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Stage %1$lld: %2$@"
+            "value" : "Stage %1$lld, back after %2$@: %3$@"
           }
         }
       }
@@ -1122,6 +1170,9 @@
 
     },
     "Type" : {
+
+    },
+    "Under each ring: how long until a word at that stage comes back for review." : {
 
     },
     "Use the buttons below the list to start learning, mark known, or reset them all at once." : {
