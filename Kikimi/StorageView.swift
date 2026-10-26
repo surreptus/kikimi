@@ -45,7 +45,7 @@ struct StorageView: View {
         }
         .padding(24)
         .frame(width: 540)
-        .background(Theme.page)
+        .background(Theme.card)
         .fontDesign(.rounded)
         .tint(Theme.ink)
         .task { await reload() }

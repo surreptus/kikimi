@@ -34,7 +34,7 @@ private struct ModalModifier<Panel: View>: ViewModifier {
                             .accessibilityHidden(true)
                         panel()
                             .environment(\.dismissModal, close)
-                            .background(Theme.page)
+                            .background(Theme.card)
                             .clipShape(RoundedRectangle(cornerRadius: 24))
                             .shadow(color: .black.opacity(0.25), radius: 30, y: 10)
                             .focusable()

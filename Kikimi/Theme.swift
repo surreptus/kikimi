@@ -28,8 +28,6 @@ enum Theme {
     /// Text and icons on an `accent` face.
     static let onAccent = Color(light: .white, dark: Color(hex: 0x121212))
 
-    /// Behind the floating nav, and behind sheets.
-    static let page = Color(light: Color(hex: 0xF6F4EF), dark: Color(hex: 0x121212))
     /// The content card: a warm off-white (a touch of yellow-orange against the green window), and a very dark green of the window's hue, so text and tables sit on the calmest
     /// ground. The colour stays in the window around it (`chrome`) and the nav.
     static let card = Color(light: Color(hex: 0xFAF4E6), dark: Color(hex: 0x081611))
@@ -241,7 +239,7 @@ struct ScreenShift: ViewModifier {
 
 /// The one character in the app: a flat flower with a small smile. Used only where something is finished or empty.
 struct Blob: View {
-    var color: Color = Color(light: .white, dark: Color(hex: 0xF4F1EA))
+    var color: Color = Mascot.paper
 
     var body: some View {
         ZStack {
@@ -259,11 +257,11 @@ struct Blob: View {
     }
 }
 
-/// What the illustrations share: a light body, features in a deep green (the app's own colour, not black), and a
-/// blush. None of them follows the ink, so they look the same in both modes.
+/// What the illustrations share: a body in the window's lime (Light) or an off-white (Dark), features in a deep
+/// green (the app's own colour, not black), and a blush. White would vanish on the cream card.
 private enum Mascot {
-    static let face = Color(light: Color(hex: 0x1E5A0B), dark: Color(hex: 0x124632))
-    static let paper = Color(light: .white, dark: Color(hex: 0xF4F1EA))
+    static let face = Color(light: Color(hex: 0x153A0B), dark: Color(hex: 0x124632))
+    static let paper = Color(light: Color(hex: 0x66CC0A), dark: Color(hex: 0xF4F1EA))
     static let blush = Color(hex: 0xFF8FA3).opacity(0.75)
 }
 

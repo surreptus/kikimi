@@ -287,7 +287,7 @@ private struct VideoInfoSheet: View {
         .padding(24)
         .frame(width: 540)
         .frame(maxHeight: 580)
-        .background(Theme.page)
+        .background(Theme.card)
         .fontDesign(.rounded)
         .tint(Theme.ink)
         .task {

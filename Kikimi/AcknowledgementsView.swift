@@ -23,7 +23,7 @@ struct AcknowledgementsView: View {
             }
         }
         .frame(width: 640, height: 520)
-        .background(Theme.page)
+        .background(Theme.card)
         .fontDesign(.rounded)
         .tint(Theme.ink)
     }
