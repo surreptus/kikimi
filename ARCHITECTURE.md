@@ -35,7 +35,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `Database/LangDatabase+EditLine.swift` | Editing a subtitle line and re-finding its words. |
 | `Export/AnkiExport.swift` | The Anki import file (tab-separated text with header lines) and the export of a set of words, with optional sentence audio. |
 | `Coverage/` | How much of a video you know (`VideoCoverage`, `LevelFit`), the shortest word list that reaches a target (`wordsToReach`), and marking a list of known words. |
-| `Backup/` | `ProgressBackup`: the `.kikimi` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. |
+| `Backup/` | `ProgressBackup`: the `.kikimi` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. `LibraryBackup`: the full-backup folder (progress file, `library.json` of transcripts, and the compressed videos), restored by adding the videos that aren't here yet. |
 | `Environment/` | `LangEnvironment` and where videos live on disk. |
 
 ## The import pipeline

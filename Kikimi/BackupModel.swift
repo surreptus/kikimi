@@ -12,19 +12,25 @@ final class BackupModel {
         let url: URL
         let data: Data
         let preview: BackupPreview
+        /// Set when `url` is a full backup folder: what it would do with the videos.
+        var full: FullBackupPreview?
     }
 
     enum State {
         case idle
         case working
-        case exported(URL, words: Int)
+        case exported(URL, words: Int, videos: Int)
         case previewing(Pending)
-        case restored(ProgressImportReport, settingsRestored: Bool)
+        case restored(ProgressImportReport, settingsRestored: Bool, videos: Int)
         case failed(String)
     }
 
     var state: State = .idle
     var includeSettings = true
+    /// Also save each video's compressed copy and transcript, in a folder.
+    var includeVideos = false
+    /// Access to a dropped or chosen folder is kept until the restore is over.
+    private var scopedURL: URL?
     /// Set by the File menu; the Data settings carry it out when they show.
     var request: Request?
 
@@ -34,13 +40,27 @@ final class BackupModel {
     // MARK: Save
 
     func export(env: LangEnvironment) async {
+        if includeVideos { await exportFolder(env: env); return }
         let name = "Kikimi progress \(Date().formatted(.iso8601.year().month().day()))"
         guard let url = ExportPanels.saveFile(suggestedName: name, fileExtension: ProgressBackup.fileExtension) else { return }
         state = .working
         do {
             let data = try await env.makeBackup(extraSettings: Self.currentAppSettings())
             try data.write(to: url, options: .atomic)
-            state = .exported(url, words: try ProgressBackup.decode(data).words.count)
+            state = .exported(url, words: try ProgressBackup.decode(data).words.count, videos: 0)
+        } catch {
+            state = .failed(String(localized: "Couldn't save the backup: \(error.localizedDescription)"))
+        }
+    }
+
+    /// A folder with the progress file, every transcript and the compressed videos.
+    private func exportFolder(env: LangEnvironment) async {
+        guard let parent = ExportPanels.chooseFolder(message: String(localized: "Choose where to save the backup folder")) else { return }
+        state = .working
+        do {
+            let name = "Kikimi backup \(Date().formatted(.iso8601.year().month().day()))"
+            let summary = try await env.writeFullBackup(in: parent, name: name, extraSettings: Self.currentAppSettings())
+            state = .exported(summary.folder, words: summary.words, videos: summary.videos)
         } catch {
             state = .failed(String(localized: "Couldn't save the backup: \(error.localizedDescription)"))
         }
@@ -49,19 +69,25 @@ final class BackupModel {
     // MARK: Restore
 
     func chooseFile(env: LangEnvironment) async {
-        guard let url = ExportPanels.openFile(fileExtension: ProgressBackup.fileExtension) else { return }
+        guard let url = ExportPanels.openBackup() else { return }
         await open(url, env: env)
     }
 
     /// Reads a file and shows what restoring it would do. Nothing changes until `restore`.
     func open(_ url: URL, env: LangEnvironment) async {
         state = .working
-        let scoped = url.startAccessingSecurityScopedResource()
-        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        stopAccess()
+        if url.startAccessingSecurityScopedResource() { scopedURL = url }
         do {
-            let data = try Data(contentsOf: url)
-            let preview = try await env.previewBackup(data, appSettingKeys: Self.appSettingKeys)
-            state = .previewing(Pending(url: url, data: data, preview: preview))
+            if LangEnvironment.isFullBackup(url) {
+                let full = try await env.previewFullBackup(at: url, appSettingKeys: Self.appSettingKeys)
+                let data = try Data(contentsOf: url.appending(path: LangEnvironment.progressFileName))
+                state = .previewing(Pending(url: url, data: data, preview: full.progress, full: full))
+            } else {
+                let data = try Data(contentsOf: url)
+                let preview = try await env.previewBackup(data, appSettingKeys: Self.appSettingKeys)
+                state = .previewing(Pending(url: url, data: data, preview: preview))
+            }
         } catch {
             state = .failed(error.localizedDescription)
         }
@@ -71,17 +97,32 @@ final class BackupModel {
         guard case .previewing(let pending) = state else { return }
         state = .working
         do {
-            let result = try await env.restoreBackup(
-                pending.data, includingSettings: includeSettings, appSettingKeys: Self.appSettingKeys)
-            apply(result.appSettings, to: app)
-            app.dataChanged()
-            state = .restored(result.report, settingsRestored: includeSettings && pending.preview.settingsCount > 0)
+            let settingsRestored = includeSettings && pending.preview.settingsCount > 0
+            if pending.full != nil {
+                let result = try await env.restoreFullBackup(
+                    from: pending.url, includingSettings: includeSettings, appSettingKeys: Self.appSettingKeys)
+                apply(result.appSettings, to: app)
+                app.dataChanged()
+                state = .restored(result.report, settingsRestored: settingsRestored, videos: result.videosAdded)
+            } else {
+                let result = try await env.restoreBackup(
+                    pending.data, includingSettings: includeSettings, appSettingKeys: Self.appSettingKeys)
+                apply(result.appSettings, to: app)
+                app.dataChanged()
+                state = .restored(result.report, settingsRestored: settingsRestored, videos: 0)
+            }
+            stopAccess()
         } catch {
             state = .failed(String(localized: "Couldn't restore the backup: \(error.localizedDescription)"))
         }
     }
 
-    func reset() { state = .idle }
+    func reset() { stopAccess(); state = .idle }
+
+    private func stopAccess() {
+        scopedURL?.stopAccessingSecurityScopedResource()
+        scopedURL = nil
+    }
 
     // MARK: The app's own settings
 

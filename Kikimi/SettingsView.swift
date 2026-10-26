@@ -161,23 +161,32 @@ private struct DataTab: View {
     @Environment(AppState.self) private var app
     @Environment(\.openWindow) private var openWindow
     @State private var known: KnownListState = .idle
+    @State private var libraryBytes: Int64 = 0
 
     var body: some View {
         @Bindable var backup = app.backup
         Form {
             Section {
-                HStack(spacing: 12) {
-                    Button("Save backup…") { Task { await app.backup.export(env: env) } }
-                        .disabled(isWorking)
-                    if case .exported(let url, let words) = backup.state {
-                        Text("Saved ^[\(words) word](inflect: true).").foregroundStyle(.secondary)
-                        Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+                VStack(alignment: .leading, spacing: 10) {
+                    Toggle("Include my videos and transcripts", isOn: $backup.includeVideos)
+                    HStack(spacing: 12) {
+                        Button("Save backup…") { Task { await app.backup.export(env: env) } }
+                            .disabled(isWorking)
+                        if case .exported(let url, let words, let videos) = backup.state {
+                            Text(videos > 0
+                                 ? inflected("Saved ^[\(words) word](inflect: true) and ^[\(videos) video](inflect: true).")
+                                 : inflected("Saved ^[\(words) word](inflect: true)."))
+                                .foregroundStyle(.secondary)
+                            Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+                        }
                     }
                 }
             } header: {
                 Text("Back up your progress")
             } footer: {
-                Text("Saves the words you are learning and the ones you know, with their stages and review dates, to a file. It doesn't include videos or speech models.")
+                Text(backup.includeVideos
+                     ? "Saves a folder with your progress, each video's transcript and its compressed copy (about \(ByteCountFormatter.string(fromByteCount: libraryBytes, countStyle: .file)) in all), so a new Mac needs no re-transcribing. Speech models aren't included; download them again."
+                     : "Saves the words you are learning and the ones you know, with their stages and review dates, to a small file. Turn on the option above to include your videos and transcripts too. Speech models are never included.")
             }
 
             Section {
@@ -185,7 +194,7 @@ private struct DataTab: View {
             } header: {
                 Text("Restore from a backup")
             } footer: {
-                Text("Choose a backup file, or drop one on this window. You'll see what would change before anything does, and progress you already have is never overwritten.")
+                Text("Choose a backup file or folder, or drop one on this window. You'll see what would change before anything does, and progress and videos you already have are never overwritten.")
             }
 
             Section {
@@ -211,10 +220,12 @@ private struct DataTab: View {
         .formStyle(.grouped)
         .frame(width: 560, height: 640)
         .dropDestination(for: URL.self) { urls, _ in
-            guard let url = urls.first(where: { $0.pathExtension == ProgressBackup.fileExtension }) else { return false }
+            guard let url = urls.first(where: { $0.pathExtension == ProgressBackup.fileExtension || LangEnvironment.isFullBackup($0) })
+            else { return false }
             Task { await app.backup.open(url, env: env) }
             return true
         }
+        .task { libraryBytes = env.libraryBytes() }
         // The File menu's Export and Import items land here and ask for the action.
         .task(id: app.backup.request) {
             guard let request = app.backup.request else { return }
@@ -238,10 +249,11 @@ private struct DataTab: View {
             ProgressView().controlSize(.small)
         case .previewing(let pending):
             previewContent(pending, backup)
-        case .restored(let report, let settingsRestored):
+        case .restored(let report, let settingsRestored, let videos):
             VStack(alignment: .leading, spacing: 8) {
                 Text("Restored").font(.headline)
-                Text(restoredLine(report) + (settingsRestored ? " Settings restored too." : ""))
+                Text((videos > 0 ? inflected("^[\(videos) video](inflect: true) added. ") : "")
+                     + restoredLine(report) + (settingsRestored ? " Settings restored too." : ""))
                     .foregroundStyle(.secondary)
                 Button("Done") { backup.reset() }
             }
@@ -265,7 +277,16 @@ private struct DataTab: View {
                  + (languages.isEmpty ? "" : " · \(languages)"))
                 .foregroundStyle(.secondary)
             VStack(alignment: .leading, spacing: 4) {
-                if report.changes == 0 { Text("Everything in this file is already here, so nothing would change.") }
+                if report.changes == 0 && (pending.full?.videosToAdd ?? 0) == 0 {
+                    Text("Everything in this file is already here, so nothing would change.")
+                }
+                if let full = pending.full {
+                    if full.videosToAdd > 0 {
+                        Text("• ^[\(full.videosToAdd) video](inflect: true) will be added (\(ByteCountFormatter.string(fromByteCount: full.bytesToCopy, countStyle: .file))), with transcripts and words.")
+                    }
+                    if full.videosAlreadyHere > 0 { Text("• ^[\(full.videosAlreadyHere) video](inflect: true) already here will be left as they are.") }
+                    if full.videosMissingFiles > 0 { Text("• ^[\(full.videosMissingFiles) video](inflect: true) can't be restored: the files are missing from the folder.") }
+                }
                 if report.restored > 0 { Text("• ^[\(report.restored) word](inflect: true) here will take the backup's progress.") }
                 if report.added > 0 {
                     Text("• ^[\(report.added) word](inflect: true) not in your library yet will be added, and join their sentences when you add the videos.")
@@ -280,7 +301,7 @@ private struct DataTab: View {
                 Toggle("Also restore the settings in this file", isOn: $backup.includeSettings)
             }
             HStack {
-                if report.changes > 0 {
+                if report.changes > 0 || (pending.full?.videosToAdd ?? 0) > 0 {
                     Button("Restore") { Task { await backup.restore(env: env, app: app) } }
                         .keyboardShortcut(.defaultAction)
                     Button("Cancel") { backup.reset() }

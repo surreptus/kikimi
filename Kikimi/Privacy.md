@@ -2,7 +2,7 @@
 
 Kikimi is built so that your videos, and what you learn from them, stay on your Mac.
 
-_Last updated: 23 October 2026._
+_Last updated: 26 October 2026._
 
 ## The short version
 
@@ -41,7 +41,7 @@ Once a model is downloaded, Kikimi works without an internet connection.
 
 ## Backups
 
-If you choose Save backup in Settings, Kikimi writes a file with your progress to the place you pick. It is never uploaded anywhere; where it goes after that is up to you.
+If you choose Save backup in Settings, Kikimi writes a file with your progress to the place you pick. If you also choose to include your videos and transcripts, it writes a folder with them and a smaller copy of each video. It is never uploaded anywhere; where it goes after that is up to you.
 
 ## What Kikimi does not do
 

@@ -21,6 +21,17 @@ enum ExportPanels {
         return panel.runModal() == .OK ? panel.url : nil
     }
 
+    /// Choose a `.kikimi` file, or a full backup folder.
+    static func openBackup() -> URL? {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = true
+        panel.allowedContentTypes = UTType(filenameExtension: "kikimi").map { [$0] } ?? []
+        panel.message = String(localized: "Choose a backup file, or a backup folder")
+        return panel.runModal() == .OK ? panel.url : nil
+    }
+
     /// Choose a plain-text or CSV/TSV file (a list of words).
     static func openTextFile() -> URL? {
         let panel = NSOpenPanel()

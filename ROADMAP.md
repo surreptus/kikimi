@@ -52,7 +52,8 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       sentence, the resume offer and status messages are announced, auto-scroll honours Reduce Motion, previews are
       hidden from VoiceOver. **Still to do by hand:** listen to it with VoiceOver on, and tab through with Full Keyboard
       Access, in Light and Dark.
-- [ ] Decide whether the progress backup should include where you stopped in each video (it does not now).
+- [x] A full backup (Settings > Data > Include my videos and transcripts) saves a folder with the compressed videos, their
+      transcripts and where you stopped. The small progress-only file still leaves out where you stopped; decide if it should.
 - [ ] Help and feedback: a "Report a problem" route (a mailto link with the app version, no data attached).
 - [ ] App-wide text size. Today the setting covers only the transcript; macOS has no system text-size setting for
       apps to follow.

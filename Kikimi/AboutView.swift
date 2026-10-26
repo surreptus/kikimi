@@ -156,7 +156,7 @@ struct AboutView: View {
 
     private var backups: some View {
         section("Keeping your progress safe") {
-            paragraph("In Settings, under Data, Save backup writes the words you are learning and the ones you know, with their stages and review dates, to a file ending in .kikimi. It doesn't include videos or speech models.")
+            paragraph("In Settings, under Data, Save backup writes the words you are learning and the ones you know, with their stages and review dates, to a file ending in .kikimi. Turn on Include my videos and transcripts to save a folder instead, with each video's compressed copy and transcript, so a new Mac needs no re-transcribing. To restore, choose the file or folder; what you already have is never overwritten. Speech models are never included.")
             paragraph("To restore, choose the file in the same place, drop it there, or double-click it. You'll see what would change first, and progress you already have is never overwritten. Words from a backup join their sentences when you add the videos again.")
         }
     }
