@@ -16,6 +16,14 @@ struct FlowLayout: Layout {
         }
     }
 
+    /// The first line's text baseline, so a label beside the layout lines up with its first line of text.
+    func explicitAlignment(
+        of guide: VerticalAlignment, in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()
+    ) -> CGFloat? {
+        guard guide == .firstTextBaseline, let first = subviews.first else { return nil }
+        return bounds.minY + first.dimensions(in: .unspecified)[.firstTextBaseline]
+    }
+
     private func arrange(width: CGFloat, subviews: Subviews) -> (size: CGSize, origins: [CGPoint]) {
         var origins: [CGPoint] = []
         var x: CGFloat = 0, y: CGFloat = 0, rowHeight: CGFloat = 0, widest: CGFloat = 0

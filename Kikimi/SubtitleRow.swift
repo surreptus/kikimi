@@ -92,8 +92,10 @@ struct SubtitleRow: View {
         }
         .padding(.horizontal, 10).padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 14).fill(active ? Theme.soft : .clear))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(active ? Theme.ink.opacity(0.6) : Theme.line.opacity(0.7), lineWidth: 1))
+        // No outline at rest: the line being played is filled, and a line you point at or tab to gets a border.
+        .background(RoundedRectangle(cornerRadius: 14).fill(active ? Theme.softStrong : .clear))
+        .overlay(RoundedRectangle(cornerRadius: 14)
+            .strokeBorder((rowHovered || isFocused) ? Theme.ink.opacity(0.45) : .clear, lineWidth: 1))
         .contentShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture { focusedLine.wrappedValue = index; seek() }
         .onHover { rowHovered = $0 }
@@ -184,6 +186,8 @@ struct SubtitleRow: View {
                 }
             }
         }
+        // The word's own baseline is what a label beside the line lines up with, not the furigana above it.
+        .alignmentGuide(.firstTextBaseline) { d in d[.lastTextBaseline] }
         .onHover { inside in
             guard let token = chunk.token, content else { return }
             if inside {
