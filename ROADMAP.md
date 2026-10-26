@@ -93,7 +93,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Audio-only import** (podcasts) for material with no picture.
 
 ### Practising
-- [ ] **Cloze cards** (next, chosen in the Review settings): the example sentence with the word blanked and a short
+- [x] **Cloze cards** (Settings > Languages > Review cards > Fill in the word): the example sentence with the word blanked and a short
       hint of its meaning (and, for Japanese, its reading); you recall the word, then see it filled in with the
       sentence audio. Production in context, which avoids the ambiguity of meaning-to-word cards. **Listening
       cards**: hear the sentence, answer before reading.

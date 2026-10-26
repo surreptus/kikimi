@@ -119,18 +119,22 @@ private struct LanguagesTab: View {
                     Picker("Speech model", selection: modelBinding(profile)) {
                         ForEach(choices(for: profile), id: \.self) { Text(label(for: $0, profile: profile)).tag($0) }
                     }
+                    Picker("Review cards", selection: styleBinding(profile)) {
+                        Text("Word and meaning").tag(ReviewStyle.meaning)
+                        Text("Fill in the word").tag(ReviewStyle.cloze)
+                    }
                     Picker("Sentence audio on review cards", selection: audioBinding(profile)) {
                         ForEach(SentenceAudioMode.allCases, id: \.self) { Text($0.title).tag($0) }
                     }
                 }
             }
             Section {} footer: {
-                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts.")
+                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. \"Fill in the word\" shows a sentence from your videos with the word blanked, for you to recall; a word with no sentence is asked the usual way, and the sentence audio then plays only after you show the answer.")
             }
         }
         .formStyle(.grouped)
         .id(refresh)
-        .frame(width: 520, height: 400)
+        .frame(width: 520, height: 500)
     }
 
     private func modelBinding(_ profile: any LanguageProfile) -> Binding<String> {
@@ -141,6 +145,12 @@ private struct LanguagesTab: View {
                 refresh += 1
                 app.dataChanged()   // so the Videos page re-reads its model choice
             })
+    }
+
+    private func styleBinding(_ profile: any LanguageProfile) -> Binding<ReviewStyle> {
+        Binding(
+            get: { env.reviewStyle.style(for: profile) },
+            set: { env.reviewStyle.setStyle($0, for: profile); refresh += 1 })
     }
 
     private func audioBinding(_ profile: any LanguageProfile) -> Binding<SentenceAudioMode> {

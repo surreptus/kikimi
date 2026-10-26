@@ -19,6 +19,7 @@ extension LangEnvironment {
         for profile in LanguageProfiles.all {
             settings["whisperModel.\(profile.code)"] = preferences.model(for: profile)
             settings["sentenceAudio.\(profile.code)"] = reviewAudio.mode(for: profile).rawValue
+            settings["reviewStyle.\(profile.code)"] = reviewStyle.style(for: profile).rawValue
         }
         return settings
     }
@@ -67,10 +68,10 @@ extension LangEnvironment {
 
     // MARK: Settings
 
-    private enum SettingKind { case model, audio }
+    private enum SettingKind { case model, audio, style }
 
     private static func parseSettingKey(_ key: String) -> (language: String, kind: SettingKind)? {
-        for (prefix, kind) in [("whisperModel.", SettingKind.model), ("sentenceAudio.", .audio)] where key.hasPrefix(prefix) {
+        for (prefix, kind) in [("whisperModel.", SettingKind.model), ("sentenceAudio.", .audio), ("reviewStyle.", .style)] where key.hasPrefix(prefix) {
             return (String(key.dropFirst(prefix.count)), kind)
         }
         return nil
@@ -85,6 +86,7 @@ extension LangEnvironment {
             switch kind {
             case .model: return ModelPreferences.choices.contains(value)
             case .audio: return SentenceAudioMode(rawValue: value) != nil
+            case .style: return ReviewStyle(rawValue: value) != nil
             }
         }
     }
@@ -94,6 +96,7 @@ extension LangEnvironment {
         switch kind {
         case .model: preferences.setModel(value == profile.defaultModel ? nil : value, for: profile)
         case .audio: if let mode = SentenceAudioMode(rawValue: value) { reviewAudio.setMode(mode, for: profile) }
+        case .style: if let style = ReviewStyle(rawValue: value) { reviewStyle.setStyle(style, for: profile) }
         }
     }
 }

@@ -57,7 +57,7 @@ struct AboutView: View {
                 step(1, "Add a video", "On Videos, drop a video file you own. The first time, pick a speech model and let it download once; the sizes are shown next to each choice.")
                 step(2, "Let it transcribe", "Kikimi listens to the video on this Mac and writes out what is said, with times. This is the long step. In our tests the medium model took about 3 minutes for a 10 minute video on an Apple silicon Mac; larger models are slower.")
                 step(3, "Choose your words", "On Words, the words from your videos are listed by how often they appear. Select the ones you want to learn and press Start learning, or mark the ones you already know.")
-                step(4, "Practise", "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. Come back whenever the number beside Review is above zero.")
+                step(4, "Practise", "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. In Settings > Languages, Review cards can be set to Fill in the word: the sentence appears with the word blanked and a short hint, and you recall it before showing the answer. Come back whenever the number beside Review is above zero.")
             }
         }
     }

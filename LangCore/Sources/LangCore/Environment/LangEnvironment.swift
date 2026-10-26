@@ -8,6 +8,7 @@ public final class LangEnvironment: Sendable {
     public let models: ModelManager
     public let preferences: ModelPreferences
     public let videoQuality: VideoQualityPreference
+    public let reviewStyle: ReviewStylePreference
     public let reviewAudio: ReviewAudioPreferences
     public let pipeline: ImportPipeline
 
@@ -26,6 +27,7 @@ public final class LangEnvironment: Sendable {
         preferences = ModelPreferences(defaults: defaults)
         reviewAudio = ReviewAudioPreferences(defaults: defaults)
         videoQuality = VideoQualityPreference(defaults: defaults)
+        reviewStyle = ReviewStylePreference(defaults: defaults)
         pipeline = ImportPipeline(
             database: database, root: root, transcriber: transcriber ?? WhisperKitTranscriber(models: models))
     }

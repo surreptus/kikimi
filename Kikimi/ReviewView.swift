@@ -15,6 +15,7 @@ struct ReviewView: View {
     @State private var error: String?
     @State private var audio: SentenceAudioPlayer?
     @State private var mode: SentenceAudioMode = .onReveal
+    @State private var style: ReviewStyle = .meaning
 
     var body: some View {
         Group {
@@ -77,6 +78,9 @@ struct ReviewView: View {
             Spacer(minLength: 0)
 
             VStack(spacing: 12) {
+                if let cloze = cloze(for: card) {
+                    clozeFace(cloze, card)
+                } else {
                 Text(card.word.lemma).font(.system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
                 StatusPill(text: card.word.pos.title)
 
@@ -98,6 +102,7 @@ struct ReviewView: View {
                     }
                     .padding(.top, 6)
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))
+                }
                 }
 
                 // Hearing the word or its sentence would give the answer away, so these wait for the reveal.
@@ -137,7 +142,8 @@ struct ReviewView: View {
             } else {
                 Button("Show answer") {
                     revealed = true
-                    if mode == .onReveal { playSentence() }
+                    // In a fill-in card the sentence is the question, so hearing it before the answer would give it away.
+                    if mode == .onReveal || (mode == .onCardShown && cloze(for: card) != nil) { playSentence() }
                 }
                 .buttonStyle(.pill(.primary))
                 .keyboardShortcut(.space, modifiers: [])
@@ -145,6 +151,48 @@ struct ReviewView: View {
             ShortcutHints(items: shortcutHints)
         }
         .padding(28)
+    }
+
+    /// The fill-in version of a card, when that is the chosen style and the word has a sentence to blank.
+    private func cloze(for card: ReviewCard) -> ClozeCard? {
+        style == .cloze ? ClozeCard.make(from: card, showsReading: app.profile.display.showsReadings) : nil
+    }
+
+    /// The sentence with a blank (the question), filled in with its meaning once the answer is showing.
+    @ViewBuilder
+    private func clozeFace(_ cloze: ClozeCard, _ card: ReviewCard) -> some View {
+        if revealed {
+            Text(filled(cloze)).font(.system(size: 28, design: .rounded)).multilineTextAlignment(.center)
+            VStack(spacing: 8) {
+                Text(card.word.lemma).font(Theme.title(22))
+                if app.profile.display.showsReadings, let reading = card.entries.first?.reading {
+                    Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
+                }
+                Text(card.entries.first?.gloss ?? "No dictionary entry")
+                    .font(.system(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
+                if let example = card.example {
+                    Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint)
+                }
+            }
+            .padding(.top, 6)
+            .transition(.opacity.combined(with: .scale(scale: 0.98)))
+        } else {
+            Text(cloze.prompt).font(.system(size: 28, design: .rounded)).multilineTextAlignment(.center)
+            if !cloze.hint.isEmpty {
+                Text(cloze.hint).font(.system(.title3, design: .rounded)).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+            }
+            StatusPill(text: card.word.pos.title)
+        }
+    }
+
+    private func filled(_ cloze: ClozeCard) -> AttributedString {
+        var text = AttributedString(cloze.before)
+        var answer = AttributedString(cloze.answer)
+        answer.font = .system(size: 28, weight: .semibold, design: .rounded)
+        answer.foregroundColor = Color(Theme.ink)
+        text.append(answer)
+        text.append(AttributedString(cloze.after))
+        return text
     }
 
     /// The keys that work right now: they change once the answer is showing.
@@ -191,6 +239,7 @@ struct ReviewView: View {
         audio?.stop()
         audio = SentenceAudioPlayer(libraryRoot: env.libraryURL)
         mode = env.reviewAudio.mode(for: app.profile)
+        style = env.reviewStyle.style(for: app.profile)
         do {
             let new = try await ReviewSession(database: env.database, language: app.languageCode)
             session = new
@@ -218,7 +267,7 @@ struct ReviewView: View {
             remaining = await session.remaining
             total = max(total, remaining)   // a missed word re-enters the queue, so the total can grow
             card = next
-            if mode == .onCardShown { playSentence() }
+            if mode == .onCardShown, let next, cloze(for: next) == nil { playSentence() }
             if card == nil, await session.answered > 0 {
                 summary = (await session.answered, await session.correctFirstTry)
                 await loadOverview(keepingSummary: true)
