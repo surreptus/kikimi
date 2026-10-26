@@ -162,6 +162,22 @@
     "• ^[%lld entry](inflect: true) couldn't be read and will be skipped." : {
 
     },
+    "• ^[%lld video](inflect: true) already here will be left as they are." : {
+
+    },
+    "• ^[%lld video](inflect: true) can't be restored: the files are missing from the folder." : {
+
+    },
+    "• ^[%lld video](inflect: true) will be added (%@), with transcripts and words." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "• ^[%1$lld video](inflect: true) will be added (%2$@), with transcripts and words."
+          }
+        }
+      }
+    },
     "• ^[%lld word](inflect: true) here will take the backup's progress." : {
 
     },
@@ -169,6 +185,9 @@
 
     },
     "• ^[%lld word](inflect: true) you have already worked on here will be left as they are." : {
+
+    },
+    "^[%lld card](inflect: true)" : {
 
     },
     "^[%lld day](inflect: true)" : {
@@ -196,6 +215,9 @@
         }
       }
     },
+    "^[%lld video](inflect: true) added. " : {
+
+    },
     "^[%lld word](inflect: true)" : {
 
     },
@@ -211,7 +233,7 @@
     "^[%lld word](inflect: true) updated" : {
 
     },
-    "↑ ↓ move, Shift extends, ⌘A selects all, Esc clears." : {
+    "↑ ↓ move, Shift extends, ⌘A selects all, Esc clears. Export to Anki makes a file for Anki's File > Import, from the selected words or the ones you are learning." : {
 
     },
     "⌘O adds videos. ⌘1, ⌘2 and ⌘3 go to Videos, Words and Review. ⌘F finds words. ⌘, opens Settings." : {
@@ -328,6 +350,9 @@
     "and %lld more" : {
 
     },
+    "Anki file saved" : {
+
+    },
     "Anywhere" : {
 
     },
@@ -379,10 +404,16 @@
     "Checks whether you've already added this video, by its contents rather than its name." : {
 
     },
-    "Choose a backup file, or drop one on this window. You'll see what would change before anything does, and progress you already have is never overwritten." : {
+    "Choose a backup file or folder, or drop one on this window. You'll see what would change before anything does, and progress and videos you already have are never overwritten." : {
+
+    },
+    "Choose a backup file, or a backup folder" : {
 
     },
     "Choose a folder for the %@ clips" : {
+
+    },
+    "Choose a folder for the Anki file" : {
 
     },
     "Choose a text file of %@ words you know, one per line (or the first column of a CSV, such as an Anki export). They're marked known, so each video's coverage reflects what you can really follow. Only words already in your library change; to do another language, switch it in the sidebar first." : {
@@ -392,6 +423,9 @@
 
     },
     "Choose files" : {
+
+    },
+    "Choose where to save the backup folder" : {
 
     },
     "Choose word list…" : {
@@ -413,6 +447,9 @@
 
     },
     "Continue" : {
+
+    },
+    "Copy the files in the media folder into Anki's collection.media folder first, so the sentence audio plays." : {
 
     },
     "Copying" : {
@@ -499,13 +536,31 @@
     "Export Progress…" : {
 
     },
+    "Export text only" : {
+
+    },
     "Export this word's example sentences as clips" : {
+
+    },
+    "Export to Anki" : {
+
+    },
+    "Export to Anki…" : {
 
     },
     "Export video clips…" : {
 
     },
+    "Export with sentence audio" : {
+
+    },
     "Exporting…" : {
+
+    },
+    "Exports the %lld selected words, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once." : {
+
+    },
+    "Exports the words you are learning, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once." : {
 
     },
     "Failed" : {
@@ -601,13 +656,16 @@
     "Importing as %@. Change the language in the sidebar." : {
 
     },
-    "In Settings, under Data, Save backup writes the words you are learning and the ones you know, with their stages and review dates, to a file ending in .kikimi. It doesn't include videos or speech models." : {
+    "In Settings, under Data, Save backup writes the words you are learning and the ones you know, with their stages and review dates, to a file ending in .kikimi. Turn on Include my videos and transcripts to save a folder instead, with each video's compressed copy and transcript, so a new Mac needs no re-transcribing. To restore, choose the file or folder; what you already have is never overwritten. Speech models are never included." : {
 
     },
     "In Settings, under Data, you can mark a list of words you already know (one per line, or the first column of a CSV), so these numbers start out honest." : {
 
     },
     "In use for %@" : {
+
+    },
+    "Include my videos and transcripts" : {
 
     },
     "Incomplete download. Downloading it again resumes where it stopped." : {
@@ -720,6 +778,9 @@
     "Looping this line (R). Press again to stop." : {
 
     },
+    "Make a file Anki can import (File > Import), from the selected words or the ones you are learning" : {
+
+    },
     "Makes a working copy. Seconds." : {
 
     },
@@ -786,6 +847,9 @@
     "No words found" : {
 
     },
+    "No words to export." : {
+
+    },
     "No words yet" : {
 
     },
@@ -814,6 +878,9 @@
 
     },
     "Off" : {
+
+    },
+    "OK" : {
 
     },
     "On" : {
@@ -850,6 +917,9 @@
 
     },
     "Order" : {
+
+    },
+    "Original quality" : {
 
     },
     "Other" : {
@@ -979,6 +1049,16 @@
     "Saved %@" : {
 
     },
+    "Saved %@ to %@. In Anki, choose File > Import and pick %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Saved %1$@ to %2$@. In Anki, choose File > Import and pick %3$@."
+          }
+        }
+      }
+    },
     "Saved ^[%lld clip](inflect: true) to %@" : {
       "localizations" : {
         "en" : {
@@ -989,13 +1069,26 @@
         }
       }
     },
+    "Saved ^[%lld word](inflect: true) and ^[%lld video](inflect: true)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Saved ^[%1$lld word](inflect: true) and ^[%2$lld video](inflect: true)."
+          }
+        }
+      }
+    },
     "Saved ^[%lld word](inflect: true)." : {
 
     },
-    "Saves a small copy for playback, with its sound kept small too; in our tests a 161 MB video became 29 MB. A video that is already small is kept as it is. Sentence audio in reviews plays from this same copy." : {
+    "Saves a folder with your progress, each video's transcript and its compressed copy (about %@ in all), so a new Mac needs no re-transcribing. Speech models aren't included; download them again." : {
 
     },
-    "Saves the words you are learning and the ones you know, with their stages and review dates, to a file. It doesn't include videos or speech models." : {
+    "Saves a small copy for playback, with its sound kept small too; in our tests a 161 MB video became 29 MB. A video that is already small is kept as it is, and in Settings you can choose Original quality to keep every video exactly as you added it (that step is then skipped). Sentence audio in reviews plays from this same copy." : {
+
+    },
+    "Saves the words you are learning and the ones you know, with their stages and review dates, to a small file. Turn on the option above to include your videos and transcripts too. Speech models are never included." : {
 
     },
     "Saving" : {
@@ -1048,6 +1141,9 @@
 
     },
     "Small" : {
+
+    },
+    "Smallest size (recommended)" : {
 
     },
     "Sort by %@" : {
@@ -1187,6 +1283,9 @@
     "That file has no words in it." : {
 
     },
+    "The copy Kikimi keeps of each video you add. Smallest compresses it (in our tests a 161 MB video became 29 MB), which is plenty to follow along and study from. Original quality keeps your file exactly as it is: the best picture and sound, but the same size. Your own files are never changed either way, and this applies to videos you add from now on." : {
+
+    },
     "The first time" : {
 
     },
@@ -1249,6 +1348,9 @@
 
     },
     "Video" : {
+
+    },
+    "Video quality" : {
 
     },
     "Videos" : {

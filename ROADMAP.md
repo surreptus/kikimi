@@ -93,7 +93,12 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Audio-only import** (podcasts) for material with no picture.
 
 ### Practising
-- [ ] **Listening cards**: hear the sentence, answer before reading. **Cloze cards**: the word blanked in its sentence.
+- [ ] **Cloze cards** (next, chosen in the Review settings): the example sentence with the word blanked and a short
+      hint of its meaning (and, for Japanese, its reading); you recall the word, then see it filled in with the
+      sentence audio. Production in context, which avoids the ambiguity of meaning-to-word cards. **Listening
+      cards**: hear the sentence, answer before reading.
+- [ ] **Reverse (meaning to word) cards**, only as an optional extra: off by default, only for words that have reached
+      about stage 4 so early reviews don't double, and counted in the overview so the workload shows. Prefer cloze.
       Evidence: reviews are recognition only today, and receptive practice doesn't reliably carry over to producing a
       word, so generating it (cloze, meaning-to-word) is the main upgrade to the review loop.
 - [ ] **Learning stats over time** (prioritised): a small history table, so the Review page can show words learned
