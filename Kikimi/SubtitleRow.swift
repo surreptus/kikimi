@@ -175,8 +175,8 @@ struct SubtitleRow: View {
             }
             HStack(spacing: 0) {
                 Text(chunk.text)
-                    .underline(status(of: chunk.token) == .learning, pattern: .dot, color: Theme.orange)
                     .font(textFont)
+                    .learningUnderline(status(of: chunk.token) == .learning)
                     // The highlight is slightly wider than the word, but takes no layout space (no gaps in Japanese).
                     .background(RoundedRectangle(cornerRadius: 5)
                         .fill(isPinned ? Theme.ink.opacity(0.2) : isHovered ? Theme.ink.opacity(0.12) : tint(for: chunk.token))
@@ -231,12 +231,13 @@ struct SubtitleRow: View {
         token.flatMap { statuses[WordKey(lemma: $0.lemma, pos: $0.pos)] }
     }
 
-    /// Colour is never the only signal: learning words also get a dotted underline. Learning is orange, known (and
-    /// finished) green; untouched words get nothing, so they stay quiet.
+    /// Colour is never the only signal: a learning word is marked by a thin underline alone, which stays quiet in a
+    /// full line; a known (and finished) word has a soft green tint; untouched words get nothing.
+    /// (The underline is `learningUnderline`; this is only the background.)
     private func tint(for token: Token?) -> Color {
         guard let current = status(of: token) else { return .clear }
         switch current {
-        case .learning: return Theme.orange.opacity(0.30)
+        case .learning: return .clear
         case .known, .finished: return Theme.green.opacity(0.22)
         case .new: return .clear
         }
@@ -245,6 +246,16 @@ struct SubtitleRow: View {
     private func stamp(_ seconds: Double) -> String {
         let s = Int(seconds)
         return String(format: "%d:%02d", s / 60, s % 60)
+    }
+}
+
+extension View {
+    /// A thin, soft underline for a word you are learning. Thinner and calmer than the system underline, and it
+    /// takes no layout space.
+    func learningUnderline(_ on: Bool = true) -> some View {
+        overlay(alignment: .bottom) {
+            if on { Capsule().fill(Theme.orange.opacity(0.8)).frame(height: 1.5).padding(.horizontal, 1).offset(y: 1) }
+        }
     }
 }
 

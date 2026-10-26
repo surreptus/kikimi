@@ -307,9 +307,9 @@ struct PlayerView: View {
 
     private func legendDot(_ color: Color, _ label: String, underlined: Bool = false) -> some View {
         HStack(spacing: 5) {
-            Circle().fill(color.opacity(0.85)).frame(width: 8, height: 8)
+            if !underlined { Circle().fill(color.opacity(0.85)).frame(width: 8, height: 8) }
             // The same marks the subtitles use, so the legend is a true sample, not a description.
-            Text(label).underline(underlined, pattern: .dot, color: color)
+            Text(label).learningUnderline(underlined)
                 .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
         }
     }
