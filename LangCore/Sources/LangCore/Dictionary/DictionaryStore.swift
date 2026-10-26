@@ -56,16 +56,19 @@ public final class DictionaryStore: Sendable {
         return try await file.read { try Int.fetchOne($0, sql: "SELECT COUNT(*) FROM entries") ?? 0 }
     }
 
-    /// Entries whose headword or reading equals `term`; headword matches first, then file order (common words first).
+    /// Entries whose headword or reading equals `term`; headword matches first, then file order (the commoner word first).
+    /// A word's other capitalisations count too: the lemma is lower case, but a dictionary can keep a sense under the
+    /// capitalised form (Wiktionary has "nochebuena" as the plant and "Nochebuena" as Christmas Eve).
     public func lookup(language: String, term: String, limit: Int) async throws -> [DictionaryEntry] {
         guard let file = files[language] else { return [] }
+        let capitalised = term.prefix(1).uppercased() + term.dropFirst()
         return try await file.read { db in
             try Row.fetchAll(db, sql: """
                 SELECT id, headword, reading, gloss FROM entries
-                WHERE headword = ?1 OR reading = ?1
-                ORDER BY headword = ?1 DESC, id
-                LIMIT ?2
-                """, arguments: [term, limit]).map {
+                WHERE headword IN (?1, ?2, ?3, ?4) OR reading = ?1
+                ORDER BY headword IN (?1, ?2, ?3, ?4) DESC, id
+                LIMIT ?5
+                """, arguments: [term, capitalised, term.lowercased(), term.uppercased(), limit]).map {
                 DictionaryEntry(id: $0["id"], language: language, headword: $0["headword"],
                                 reading: $0["reading"], gloss: $0["gloss"])
             }

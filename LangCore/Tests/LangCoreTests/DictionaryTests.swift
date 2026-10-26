@@ -16,6 +16,25 @@ final class DictionaryTests: XCTestCase {
         XCTAssertTrue(none.isEmpty)
     }
 
+    func testASenseKeptUnderAnotherCapitalisationIsFoundToo() async throws {
+        let db = try LangDatabase(dictionaries: TestDictionaries.store(["es": [
+            ("nochebuena", nil, "1. (noun) poinsettia"),
+            ("Nochebuena", nil, "1. (name) Christmas Eve"),
+            ("Madrid", nil, "1. (name) Madrid"),
+        ]]))
+        let hits = try await db.lookup(language: "es", term: "nochebuena")
+        XCTAssertEqual(hits.map(\.headword), ["nochebuena", "Nochebuena"], "both are found, in file order")
+        let capital = try await db.lookup(language: "es", term: "madrid")
+        XCTAssertEqual(capital.map(\.headword), ["Madrid"])
+        // The commoner sense comes first whichever capitalisation it is under: "Navidad" (Christmas) beats the
+        // lower-case "navidad" (a Christmas present) for the lower-case lemma the tokenizer gives.
+        let christmas = try LangDatabase(dictionaries: TestDictionaries.store(["es": [
+            ("Navidad", nil, "1. (name) Christmas"), ("navidad", nil, "1. (noun) Christmas present"),
+        ]]))
+        let first = try await christmas.lookup(language: "es", term: "navidad")
+        XCTAssertEqual(first.map(\.headword), ["Navidad", "navidad"])
+    }
+
     func testEachLanguageHasItsOwnDictionaryAndLimitsApply() async throws {
         let db = try LangDatabase(dictionaries: TestDictionaries.store([
             "es": [("casa", nil, "house"), ("casa", nil, "home"), ("casa", nil, "household")],
