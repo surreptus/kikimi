@@ -74,6 +74,9 @@ Ordered by how much each helps comprehensible input per unit of effort.
       show" as an option, because an always-visible translation encourages reading over listening. Needs the
       language pair installed once (Settings guides this). Quality varies, especially for Japanese; check the pair
       is supported before offering it.
+- [ ] **Explain this sentence** (on request, on-device only): a short grammar and meaning note for a line. First
+      check that the on-device model in macOS 26 handles Spanish and Japanese well enough; if it doesn't, drop it
+      rather than send text off the Mac.
 - [ ] **Subtitle modes**: target language only, target plus translation, none (listening practice), and a
       reveal-on-click mode.
 - [x] **Pause after each line** (P) and **loop this line** (R), with a 1×, 0.75× or 0.5× speed for loops.
@@ -92,8 +95,12 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Listening cards**: hear the sentence, answer before reading. **Cloze cards**: the word blanked in its sentence.
       Evidence: reviews are recognition only today, and receptive practice doesn't reliably carry over to producing a
       word, so generating it (cloze, meaning-to-word) is the main upgrade to the review loop.
-- [ ] **Listening-time stats** (hours of understandable input is the measure that matters) and a gentle daily view.
-- [ ] **Anki export** for people who keep their cards elsewhere.
+- [ ] **Learning stats over time** (prioritised): a small history table, so the Review page can show words learned
+      per week, hours of listening (the measure that matters for comprehensible input), and how often you look
+      each word up, so the words you keep checking stand out as your weakest. A new table, so a deliberate step;
+      the log stays on the Mac and is left out of nothing the privacy policy promises.
+- [ ] **Anki export** for people who keep their cards elsewhere: a local file (words, meanings, the example sentence
+      and its audio), no account. Taalmaster offers this on its free plan, so people will look for it.
 
 ### Keeping the numbers honest
 - [ ] **Check what you marked known.** Self-marked words (and imported lists) can inflate a video's coverage, so
