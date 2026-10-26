@@ -1,7 +1,7 @@
 # Roadmap
 
 What exists, what is left for 1.0, and what comes after. Measured against the principles in
-[AGENTS.md](AGENTS.md). Last updated 2026-10-25.
+[AGENTS.md](AGENTS.md). Last updated 2026-10-26.
 
 ## Where we are
 
@@ -89,8 +89,21 @@ Ordered by how much each helps comprehensible input per unit of effort.
 
 ### Practising
 - [ ] **Listening cards**: hear the sentence, answer before reading. **Cloze cards**: the word blanked in its sentence.
+      Evidence: reviews are recognition only today, and receptive practice doesn't reliably carry over to producing a
+      word, so generating it (cloze, meaning-to-word) is the main upgrade to the review loop.
 - [ ] **Listening-time stats** (hours of understandable input is the measure that matters) and a gentle daily view.
 - [ ] **Anki export** for people who keep their cards elsewhere.
+
+### Keeping the numbers honest
+- [ ] **Check what you marked known.** Self-marked words (and imported lists) can inflate a video's coverage, so
+      "Comfortable" overstates how easy it is. An occasional quick check on a sample of known words would catch that.
+- [ ] **Encounters per word**: how many times you have met a word across your videos, so a word you have heard once
+      reads differently from one you have heard twenty times.
+- [ ] **Measure the 95% claim**: the README and About page say about 90% of content words is roughly 95% of all words.
+      That is an estimate; count real transcripts and state the real figure, or soften the text.
+- [ ] **Resurface finished words** now and then (a sparse, rare review, or a nudge when one appears in a video), since
+      stopping at the last interval can let words fade.
+- [ ] **Smarter review timing** (FSRS-style scheduling): low priority; the evidence is benchmark data, not trials.
 
 ### More languages
 - [ ] **Romance languages next** (decided): French, Italian and Portuguese, one at a time. The `medium` Whisper
