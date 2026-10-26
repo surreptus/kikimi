@@ -85,22 +85,32 @@ struct ReviewOverviewView: View {
 
     // MARK: Where your words are
 
+    /// How long until a word at each stage is reviewed again (the intervals in `SRS.intervals`), short and in full.
+    private static let gaps: [(short: String, long: String)] = [
+        (String(localized: "4h"), String(localized: "4 hours")), (String(localized: "8h"), String(localized: "8 hours")),
+        (String(localized: "1d"), String(localized: "1 day")), (String(localized: "2d"), String(localized: "2 days")),
+        (String(localized: "1w"), String(localized: "1 week")), (String(localized: "2w"), String(localized: "2 weeks")),
+        (String(localized: "1m"), String(localized: "1 month")), (String(localized: "4m"), String(localized: "4 months")),
+    ]
+
     private var stages: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Where your words are").font(Theme.title(17))
+            Text("\(overview.learning) learning · \(overview.known) known · \(overview.finished) finished")
+                .font(Theme.small).foregroundStyle(Theme.muted)
             HStack(spacing: 0) {
                 ForEach(0..<8, id: \.self) { i in
                     VStack(spacing: 6) {
                         StageRing(stage: i + 1, size: 24)
                         Text("\(overview.perStage[i])").font(.system(size: 14, weight: .semibold, design: .rounded))
-                        Text("\(i + 1)").font(Theme.small).foregroundStyle(Theme.muted)
+                        Text(Self.gaps[i].short).font(Theme.small).foregroundStyle(Theme.muted)
                     }
                     .frame(maxWidth: .infinity)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Stage \(i + 1): \(inflected("^[\(overview.perStage[i]) word](inflect: true)"))")
+                    .accessibilityLabel("Stage \(i + 1), back after \(Self.gaps[i].long): \(inflected("^[\(overview.perStage[i]) word](inflect: true)"))")
                 }
             }
-            Text("\(overview.learning) learning · \(overview.known) known · \(overview.finished) finished")
+            Text("Under each ring: how long until a word at that stage comes back for review.")
                 .font(Theme.small).foregroundStyle(Theme.muted)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
