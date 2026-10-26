@@ -41,30 +41,43 @@ public final class LangDatabase: Sendable {
 
     /// Puts a word into the review queue at stage 1, due immediately.
     public func startLearning(wordID: Int64, now: Date = Date()) async throws {
-        try await updateWord(wordID) { word in
+        try await writer.write { db in
+            guard var word = try Word.fetchOne(db, key: wordID) else { throw LangError.notFound }
+            let started = word.status != .learning && word.status != .finished
             word.status = .learning
             word.stage = .stage1
             word.nextReview = now
+            try word.update(db)
+            if started { try Self.bump(.learn, subject: wordID, at: now, in: db) }
         }
     }
 
     public func markKnown(wordID: Int64) async throws {
-        try await updateWord(wordID) { word in
+        try await writer.write { db in
+            guard var word = try Word.fetchOne(db, key: wordID) else { throw LangError.notFound }
+            let changed = word.status != .known
             word.status = .known
             word.stage = nil
             word.nextReview = nil
+            try word.update(db)
+            if changed { try Self.bump(.known, subject: wordID, at: Date(), in: db) }
         }
     }
 
     /// Applies an SRS answer to a word that is being learned.
     @discardableResult
     public func recordReview(wordID: Int64, correct: Bool, now: Date = Date()) async throws -> Word {
-        try await updateWord(wordID) { word in
+        try await writer.write { db in
+            guard var word = try Word.fetchOne(db, key: wordID) else { throw LangError.notFound }
             guard word.status == .learning, let stage = word.stage else { throw LangError.notLearning }
             let result = SRS.answer(stage: stage, correct: correct, now: now)
             word.stage = result.stage
             word.nextReview = result.nextReview
             word.status = result.stage == .finished ? .finished : .learning
+            try word.update(db)
+            try Self.bump(.review, subject: wordID, at: now, in: db)
+            if correct { try Self.bump(.reviewCorrect, subject: wordID, at: now, in: db) }
+            return word
         }
     }
 

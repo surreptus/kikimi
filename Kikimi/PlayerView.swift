@@ -123,6 +123,8 @@ struct PlayerView: View {
         if announce, let hint {
             AccessibilityNotification.Announcement("\(hint.lemma). \(hint.gloss ?? "No dictionary entry")").post()
         }
+        // Pinning a word is looking it up on purpose (hovering is not), so it goes in the tally.
+        if announce, let wordID = hint?.wordID { try? await env.database.record(.lookup, subject: wordID) }
     }
 
     /// Start learning or mark known without leaving the video.
@@ -153,6 +155,10 @@ struct PlayerView: View {
             let new = try await env.playback(for: video)
             new.pausesAfterLines = pauseAfterLine
             new.loopSpeed = Float(loopSpeed)
+            if let videoID = video.id {
+                let database = env.database
+                new.onListened = { seconds in Task { try? await database.record(.listen, subject: videoID, amount: seconds) } }
+            }
             controller = new
             if let startAt {
                 await new.seek(to: startAt, play: true)

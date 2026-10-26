@@ -22,6 +22,11 @@ public final class PlaybackController {
         didSet { if loopingIndex != nil { applyLoopRate() } }
     }
 
+    /// Told how many seconds you have watched, every so often and when the screen closes. For the listening tally.
+    public var onListened: (@MainActor (TimeInterval) -> Void)?
+    @ObservationIgnored private var listenedPending: TimeInterval = 0
+    @ObservationIgnored private var lastTickAt: Date?
+
     @ObservationIgnored private var timeline: SubtitleTimeline
     @ObservationIgnored private var observer: Any?
     @ObservationIgnored private var boundary: Any?
@@ -43,6 +48,8 @@ public final class PlaybackController {
 
     /// Call when the player screen goes away.
     public func stop() {
+        flushListening()
+        lastTickAt = nil
         player.pause()
         if let observer { player.removeTimeObserver(observer) }
         observer = nil
@@ -102,10 +109,23 @@ public final class PlaybackController {
         if shouldPlay { play() }
     }
 
+    /// Reports the time watched so far (under a second isn't worth reporting) and starts counting again.
+    public func flushListening() {
+        guard listenedPending >= 1 else { return }
+        let seconds = listenedPending
+        listenedPending = 0
+        onListened?(seconds)
+    }
+
     private func tick(_ seconds: Double) {
         guard seconds.isFinite else { return }
         currentTime = seconds
         isPlaying = player.rate != 0
+        // Real time spent playing. A gap (the Mac slept, the app was busy) counts as at most a second.
+        let now = Date()
+        if isPlaying, let last = lastTickAt { listenedPending += min(now.timeIntervalSince(last), 1) }
+        lastTickAt = isPlaying ? now : nil
+        if listenedPending >= 15 { flushListening() }
         let previous = activeIndex
         activeIndex = timeline.index(at: seconds)
         if activeIndex != previous { arm(activeIndex) }

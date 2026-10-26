@@ -102,3 +102,24 @@ final class PauseAfterLineTests: XCTestCase {
         c.stop()
     }
 }
+
+@MainActor
+final class ListeningTimeTests: XCTestCase {
+    func testTimeSpentPlayingIsReportedAndPausedTimeIsNot() async throws {
+        let url = FileManager.default.temporaryDirectory.appending(path: "listen-\(UUID().uuidString).mov")
+        addTeardownBlock { try? FileManager.default.removeItem(at: url) }
+        try await FixtureVideo.make(at: url, seconds: 6)
+        let c = PlaybackController(url: url, lines: [])
+        c.player.isMuted = true
+        var reported: TimeInterval = 0
+        c.onListened = { reported += $0 }
+
+        await c.seek(to: 0.2, play: true)
+        try await Task.sleep(for: .milliseconds(1800))
+        c.pause()
+        try await Task.sleep(for: .milliseconds(1500))   // paused: this must not count
+        c.stop()
+        XCTAssertGreaterThan(reported, 1.0, "about the 1.8 seconds it played")
+        XCTAssertLessThan(reported, 2.4, "not the pause as well")
+    }
+}

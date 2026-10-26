@@ -27,7 +27,9 @@ final class FullBackupTests: XCTestCase {
         _ = try await a.pipeline.importVideo(from: video, profile: SpanishProfile())
         let casa = try await a.database.writer.read { try Word.filter(Column("lemma") == "casa").fetchOne($0)!.id! }
         try await a.database.startLearning(wordID: casa)
-        try await a.database.writer.write { try $0.execute(sql: "UPDATE videos SET resume_position = 3") }   // the fixture is too short for saveResumePosition
+        try await a.database.writer.write { try $0.execute(sql: "UPDATE videos SET resume_position = 3") }
+        try await a.database.record(.listen, subject: 1, amount: 90)
+        try await a.database.record(.lookup, subject: casa)   // the fixture is too short for saveResumePosition
         return a
     }
 
@@ -67,6 +69,9 @@ final class FullBackupTests: XCTestCase {
 
         let result = try await b.restoreFullBackup(from: backup, includingSettings: false)
         XCTAssertEqual(result.videosAdded, 1)
+        let history = try await b.database.learningStats(language: "es")
+        XCTAssertEqual(history.listenedTotal, 90, "listening history comes back, matched to the video by its hash")
+        XCTAssertEqual(history.mostLookedUp.map(\.lemma), ["casa"])
         let video = try await b.database.video(id: 1)!
         XCTAssertTrue(FileManager.default.fileExists(atPath: b.fileURL(for: video).path), "the video file is back")
         XCTAssertEqual(video.resumePosition, 3)
@@ -80,6 +85,9 @@ final class FullBackupTests: XCTestCase {
         // Running it again changes nothing.
         let second = try await b.restoreFullBackup(from: backup, includingSettings: false)
         XCTAssertEqual(second.videosAdded, 0)
+        let again = try await b.database.learningStats(language: "es")
+        XCTAssertEqual(again.listenedTotal, 90, "restoring twice doesn't double the history")
+        XCTAssertEqual(again.mostLookedUp.first?.count, 1)
         let count = try await b.database.writer.read { try Video.fetchCount($0) }
         XCTAssertEqual(count, 1)
         let preview2 = try await b.previewFullBackup(at: backup)

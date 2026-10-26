@@ -101,7 +101,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
       about stage 4 so early reviews don't double, and counted in the overview so the workload shows. Prefer cloze.
       Evidence: reviews are recognition only today, and receptive practice doesn't reliably carry over to producing a
       word, so generating it (cloze, meaning-to-word) is the main upgrade to the review loop.
-- [ ] **Learning stats over time** (prioritised): a small history table, so the Review page can show words learned
+- [x] **Learning stats over time** (built; Review page > Your progress; carried in the full backup): a small history table, so the Review page can show words learned
       per week, hours of listening (the measure that matters for comprehensible input), and how often you look
       each word up, so the words you keep checking stand out as your weakest. A new table, so a deliberate step;
       the log stays on the Mac and is left out of nothing the privacy policy promises.

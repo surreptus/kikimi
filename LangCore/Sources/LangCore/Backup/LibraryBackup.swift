@@ -10,6 +10,17 @@ public struct LibraryBackup: Codable, Equatable, Sendable {
     public var format = LibraryBackup.format
     public var version = LibraryBackup.currentVersion
     public var videos: [Entry]
+    /// Your history (listening, lookups, reviews), keyed by what it was about so it can be matched on another Mac.
+    /// Left out of older backups, which restore without it.
+    public var activity: [ActivityEntry]?
+
+    public struct ActivityEntry: Codable, Equatable, Sendable {
+        public var day: String
+        public var kind: String
+        /// "w|<language>|<lemma>|<pos>" for a word, "v|<content hash>" for a video.
+        public var subject: String
+        public var amount: Double
+    }
 
     public struct Entry: Codable, Equatable, Sendable {
         public var language: String
@@ -102,7 +113,8 @@ extension LangEnvironment {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
-        try encoder.encode(LibraryBackup(videos: entries)).write(to: folder.appending(path: Self.libraryFileName), options: .atomic)
+        let activity = try await database.exportActivity()
+        try encoder.encode(LibraryBackup(videos: entries, activity: activity)).write(to: folder.appending(path: Self.libraryFileName), options: .atomic)
         let words = try ProgressBackup.decode(progress).words.count
         return FullBackupSummary(folder: folder, videos: entries.count, words: words, bytes: bytes)
     }
@@ -150,7 +162,8 @@ extension LangEnvironment {
     ) async throws -> (report: ProgressImportReport, videosAdded: Int, appSettings: [String: String]) {
         let fm = FileManager.default
         var added = 0
-        for entry in try readLibrary(at: folder).videos {
+        let library = try readLibrary(at: folder)
+        for entry in library.videos {
             guard isUsable(entry, in: folder), try await database.videoID(forContentHash: entry.contentHash) == nil,
                   let profile = LanguageProfiles.profile(for: entry.language) else { continue }
             let destination = libraryURL.appending(path: entry.contentHash, directoryHint: .isDirectory)
@@ -178,6 +191,55 @@ extension LangEnvironment {
         }
         let progress = try Data(contentsOf: folder.appending(path: Self.progressFileName))
         let result = try await restoreBackup(progress, includingSettings: includingSettings, appSettingKeys: appSettingKeys)
+        try await database.importActivity(library.activity ?? [])
         return (result.report, added, result.appSettings)
+    }
+}
+
+extension LangDatabase {
+    private static let wordKinds: Set<String> = ["lookup", "learn", "known", "review", "review_correct"]
+
+    func exportActivity() async throws -> [LibraryBackup.ActivityEntry] {
+        try await writer.read { db in
+            try Row.fetchAll(db, sql: """
+                SELECT a.day, a.kind, a.amount, w.language, w.lemma, w.pos, v.content_hash
+                FROM activity a
+                LEFT JOIN words w ON a.kind IN ('lookup', 'learn', 'known', 'review', 'review_correct') AND w.id = a.subject
+                LEFT JOIN videos v ON a.kind = 'listen' AND v.id = a.subject
+                ORDER BY a.day, a.kind
+                """).compactMap { row in
+                let kind: String = row["kind"]
+                let subject: String
+                if Self.wordKinds.contains(kind), let language: String = row["language"], let lemma: String = row["lemma"], let pos: String = row["pos"] {
+                    subject = "w|\(language)|\(lemma)|\(pos)"
+                } else if kind == "listen", let hash: String = row["content_hash"] {
+                    subject = "v|\(hash)"
+                } else { return nil }
+                return .init(day: row["day"], kind: kind, subject: subject, amount: row["amount"])
+            }
+        }
+    }
+
+    /// Adds history from a backup. Where a day already has a figure, the larger one is kept, so restoring twice (or over
+    /// history you already have) never inflates it. Entries about words or videos that aren't here are dropped.
+    func importActivity(_ entries: [LibraryBackup.ActivityEntry]) async throws {
+        guard !entries.isEmpty else { return }
+        try await writer.write { db in
+            for entry in entries {
+                let parts = entry.subject.split(separator: "|", maxSplits: 3, omittingEmptySubsequences: false).map(String.init)
+                var id: Int64?
+                if parts.count == 4, parts[0] == "w" {
+                    id = try Int64.fetchOne(db, sql: "SELECT id FROM words WHERE language = ? AND lemma = ? AND pos = ?",
+                                            arguments: [parts[1], parts[2], parts[3]])
+                } else if parts.count == 2, parts[0] == "v" {
+                    id = try Int64.fetchOne(db, sql: "SELECT id FROM videos WHERE content_hash = ?", arguments: [parts[1]])
+                }
+                guard let id, ActivityKind(rawValue: entry.kind) != nil, entry.amount > 0, entry.amount.isFinite else { continue }
+                try db.execute(sql: """
+                    INSERT INTO activity (day, kind, subject, amount) VALUES (?, ?, ?, ?)
+                    ON CONFLICT (day, kind, subject) DO UPDATE SET amount = MAX(amount, excluded.amount)
+                    """, arguments: [entry.day, entry.kind, id, entry.amount])
+            }
+        }
     }
 }

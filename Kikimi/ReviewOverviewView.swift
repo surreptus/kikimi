@@ -4,6 +4,7 @@ import SwiftUI
 /// The review page before a session: what is ready, what is coming, and where your words stand.
 struct ReviewOverviewView: View {
     let overview: ReviewOverview
+    let stats: LearningStats?
     let start: () -> Void
     let checkKnown: () -> Void
 
@@ -13,6 +14,7 @@ struct ReviewOverviewView: View {
                 ready
                 comingUp
                 stages
+                if let stats { progress(stats) }
             }
             .frame(maxWidth: 640)
             .padding(28)
@@ -84,6 +86,77 @@ struct ReviewOverviewView: View {
         if index == 0 { return String(localized: "Today") }
         let date = Calendar.current.date(byAdding: .day, value: index, to: Date()) ?? Date()
         return date.formatted(.dateTime.weekday(long ? .wide : .abbreviated))
+    }
+
+    // MARK: Your progress
+
+    private func progress(_ stats: LearningStats) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Your progress").font(Theme.title(17))
+            if stats.isEmpty {
+                Text("It builds up here as you watch videos and review words.").font(Theme.small).foregroundStyle(Theme.muted)
+            } else {
+                HStack(alignment: .top, spacing: 28) {
+                    figure(spoken(stats.listenedThisWeek), "listening this week")
+                    figure(spoken(stats.listenedTotal), "listening in all")
+                    if let accuracy = stats.accuracy {
+                        figure("\(Int((accuracy * 100).rounded()))%", "right in reviews, last 30 days")
+                    }
+                }
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Words you started learning, by week").font(Theme.small).foregroundStyle(Theme.muted)
+                    weeklyBars(stats.startedPerWeek)
+                }
+                if !stats.mostLookedUp.isEmpty {
+                    Text("Looked up most: " + stats.mostLookedUp.map { "\($0.lemma) ×\($0.count)" }.joined(separator: "   "))
+                        .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .panel()
+        .accessibilityElement(children: .contain)
+    }
+
+    private func figure(_ value: String, _ label: LocalizedStringKey) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value).font(.system(size: 24, weight: .semibold, design: .rounded))
+            Text(label).font(Theme.small).foregroundStyle(Theme.muted)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func weeklyBars(_ counts: [Int]) -> some View {
+        let tallest = max(1, counts.max() ?? 1)
+        let calendar = Calendar.current
+        let thisWeek = calendar.dateInterval(of: .weekOfYear, for: Date())?.start ?? Date()
+        return HStack(alignment: .bottom, spacing: 8) {
+            ForEach(Array(counts.enumerated()), id: \.offset) { index, count in
+                let start = calendar.date(byAdding: .day, value: -7 * (counts.count - 1 - index), to: thisWeek) ?? thisWeek
+                let label = start.formatted(.dateTime.month(.abbreviated).day())
+                VStack(spacing: 4) {
+                    Spacer(minLength: 0)
+                    Text("\(count)").font(Theme.small).foregroundStyle(count == 0 ? Theme.faint : Theme.ink)
+                    UnevenRoundedRectangle(topLeadingRadius: 6, bottomLeadingRadius: 2, bottomTrailingRadius: 2, topTrailingRadius: 6)
+                        .fill(index == counts.count - 1 ? Theme.ink : Theme.ink.opacity(0.35))
+                        .frame(maxWidth: 40)
+                        .frame(height: max(4, 48 * CGFloat(count) / CGFloat(tallest)))
+                    Text(label).font(.system(size: 11, design: .rounded)).foregroundStyle(Theme.muted)
+                }
+                .frame(maxWidth: .infinity)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Week of \(label): \(inflected("^[\(count) word](inflect: true)")) started")
+            }
+        }
+        .frame(height: 90)
+    }
+
+    /// "45 min", "2 h 10 min".
+    private func spoken(_ seconds: TimeInterval) -> String {
+        let minutes = Int((seconds / 60).rounded())
+        if seconds > 0, minutes == 0 { return String(localized: "1 min") }
+        if minutes < 60 { return String(localized: "\(minutes) min") }
+        return minutes % 60 == 0 ? String(localized: "\(minutes / 60) h") : String(localized: "\(minutes / 60) h \(minutes % 60) min")
     }
 
     // MARK: Where your words are

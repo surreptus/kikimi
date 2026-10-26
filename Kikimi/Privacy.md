@@ -20,6 +20,7 @@ Everything Kikimi works with is stored on your Mac, in the app's own folder:
 - A copy of each video you add: smaller than the original by default, or exactly your file if you choose Original quality in Settings.
 - The transcript of each video, and the words found in it.
 - Which words you are learning, which you know, and your review history.
+- A daily tally of your activity: how long you have watched, which words you looked up, and how many reviews you answered. It is only counts, kept to show your progress.
 - The speech models you have downloaded.
 - Your settings, such as the language you chose.
 

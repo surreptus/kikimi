@@ -6,6 +6,7 @@ struct ReviewView: View {
     @Environment(AppState.self) private var app
 
     @State private var overview: ReviewOverview?
+    @State private var stats: LearningStats?
     @State private var session: ReviewSession?
     @State private var card: ReviewCard?
     @State private var revealed = false
@@ -29,13 +30,13 @@ struct ReviewView: View {
             } else if let summary {
                 VStack(spacing: 0) {
                     finished(summary).padding(.top, 28)
-                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) }) }
+                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, stats: stats, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) }) }
                 }
             } else if let overview {
                 if overview.isEmpty {
                     EmptyState(title: "Nothing to review yet", message: "Start learning words from the Words tab, then come back.")
                 } else {
-                    ReviewOverviewView(overview: overview, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) })
+                    ReviewOverviewView(overview: overview, stats: stats, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) })
                 }
             } else {
                 ProgressView()
@@ -268,8 +269,10 @@ struct ReviewView: View {
     private func loadOverview(keepingSummary: Bool = false) async {
         if !keepingSummary { session = nil; card = nil; summary = nil; checking = false }
         error = nil
-        do { overview = try await env.database.reviewOverview(language: app.languageCode) }
-        catch { self.error = error.localizedDescription }
+        do {
+            overview = try await env.database.reviewOverview(language: app.languageCode)
+            stats = try await env.database.learningStats(language: app.languageCode)
+        } catch { self.error = error.localizedDescription }
     }
 
     private func endSession() {

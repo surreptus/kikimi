@@ -39,6 +39,11 @@ struct WordDetail: View {
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        // Opened for a moment longer than it takes to arrow past: that is a lookup.
+        .task(id: row.id) {
+            try? await Task.sleep(for: .seconds(1.5))
+            if !Task.isCancelled { try? await env.database.record(.lookup, subject: row.id) }
+        }
         .task {
             audio = SentenceAudioPlayer(libraryRoot: env.libraryURL)
             entries = (try? await env.database.lookup(language: row.word.language, term: row.word.lemma, limit: 5)) ?? []

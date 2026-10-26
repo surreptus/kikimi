@@ -138,6 +138,10 @@ extension LangDatabase {
         try await writer.write { [chunks] db in
             var changed = 0
             for ids in chunks(wordIDs) {
+                let starting = try Word.filter(keys: ids)
+                    .filter(Column("status") != WordStatus.learning.rawValue && Column("status") != WordStatus.finished.rawValue)
+                    .fetchAll(db).compactMap(\.id)
+                for id in starting { try Self.bump(.learn, subject: id, at: now, in: db) }
                 changed += try Word.filter(keys: ids)
                     .filter(Column("status") != WordStatus.learning.rawValue && Column("status") != WordStatus.finished.rawValue)
                     .updateAll(db,
@@ -154,7 +158,9 @@ extension LangDatabase {
     public func markKnown(wordIDs: [Int64]) async throws -> Int {
         try await writer.write { [chunks] db in
             try chunks(wordIDs).reduce(0) { total, ids in
-                total + (try Word.filter(keys: ids).updateAll(
+                let becoming = try Word.filter(keys: ids).filter(Column("status") != WordStatus.known.rawValue).fetchAll(db).compactMap(\.id)
+                for id in becoming { try Self.bump(.known, subject: id, at: Date(), in: db) }
+                return total + (try Word.filter(keys: ids).updateAll(
                     db, Column("status").set(to: WordStatus.known.rawValue),
                     Column("stage").set(to: nil), Column("next_review").set(to: nil)))
             }

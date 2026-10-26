@@ -68,6 +68,18 @@ public enum LangMigrations {
         migrator.registerMigration("v4-resume-position") { db in
             try db.alter(table: "videos") { $0.add(column: "resume_position", .double) }
         }
+
+        // A tally of what you do, by day: listening, looking words up, starting and finishing learning, reviewing.
+        // Daily totals only (one row per day, kind and subject), so it stays small. It starts empty; the past isn't known.
+        migrator.registerMigration("v5-activity") { db in
+            try db.create(table: "activity") { t in
+                t.column("day", .text).notNull()            // YYYY-MM-DD, local
+                t.column("kind", .text).notNull()
+                t.column("subject", .integer).notNull().defaults(to: 0)   // a word id, a video id, or 0
+                t.column("amount", .double).notNull()       // seconds for listening, otherwise a count
+                t.primaryKey(["day", "kind", "subject"])
+            }
+        }
     }
 
     // The dictionaries are now read straight from their built files, so the copy in this database is dropped
