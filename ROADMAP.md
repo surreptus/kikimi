@@ -85,6 +85,9 @@ Ordered by how much each helps comprehensible input per unit of effort.
       "qué tipo de" an "adjective phrase", and for a Japanese line explained a different line's ending as a "polite
       negative suggestion". A wrong grammar note is worse than none for a learner. Revisit when the model improves, or
       with a checked, fixed set of grammar notes instead of generated ones.
+- [x] **Grammar link-out for Japanese** (27 Oct 2026): the word bar names a verb's or adjective's form (from MeCab's inflection) and
+      links to its Tsumiki page. Next, if wanted: map the auxiliary morphemes (させ, られ, た) to Tsumiki's suffix pages
+      and show the whole derivation in the app from Tsumiki's data (CC BY-SA, so credited in the Acknowledgements).
 - [ ] **Subtitle modes**: target language only, target plus translation, none (listening practice), and a
       reveal-on-click mode.
 - [x] **Pause after each line** (P) and **loop this line** (R), with a 1×, 0.75× or 0.5× speed for loops.

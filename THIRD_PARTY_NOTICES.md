@@ -18,6 +18,8 @@ are shown in the app under Help > Acknowledgements, and are on the website at `/
 The dictionary files in the app are adaptations of JMdict and Wiktionary and are shared under the same licence
 (CC BY-SA 4.0). The scripts that build them are in `Scripts/dictionaries/`, so they can be rebuilt from the original data.
 
+The player links to [Tsumiki](https://surreptus.github.io/tsumiki/) (the author's own Japanese grammar guide, CC BY-SA 4.0); it only opens its pages in the browser and no content is copied into the app.
+
 The website (`site/`) is built with [Astro](https://astro.build) (MIT). The built pages do not include Astro's code.
 
 Names such as Apple, macOS, Anki, OpenAI, Whisper, Hugging Face and WaniKani belong to their owners. Kikimi is not

@@ -360,6 +360,15 @@ struct PlayerView: View {
                         Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
                     }
                     StatusPill(text: token.pos.title)
+                    // Japanese verbs and adjectives show the form they are in; the link opens the page on how it is built.
+                    if let stem = TsumikiStem.stem(for: token) {
+                        Link(destination: stem.url) {
+                            Text("\(stem.name) ↗").font(.system(size: 12, weight: .semibold, design: .rounded))
+                        }
+                        .foregroundStyle(Theme.ink)
+                        .help("How \(stem.label) is built (opens Tsumiki, a Japanese grammar guide, in your browser)")
+                        .accessibilityLabel("Grammar: \(stem.name), \(stem.label). Opens a web page.")
+                    }
                     // A new word needs no badge: Learn and Known beside it already say it is new.
                     if let status = hint?.status, status != .new {
                         StatusBadge(status: status, stage: hint?.stage)

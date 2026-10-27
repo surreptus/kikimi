@@ -37,7 +37,7 @@ public struct JapaneseProfile: LanguageProfile {
         }
         // f[7] is the katakana reading of this exact surface form (so inflected 行き is いき, not いく).
         let reading = f.count > 7 && f[7] != "*" && Self.containsKanji(surface) ? Self.hiragana(fromKatakana: f[7]) : nil
-        return Token(surface: surface, lemma: lemma, pos: pos, reading: reading)
+        return Token(surface: surface, lemma: lemma, pos: pos, reading: reading, inflection: f[5] == "*" ? nil : f[5])
     }
 
     static func containsKanji(_ text: String) -> Bool {

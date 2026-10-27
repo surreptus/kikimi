@@ -11,12 +11,16 @@ public struct Token: Equatable, Sendable {
     public let pos: PartOfSpeech
     /// How `surface` is read, in hiragana, when it contains kanji (shown as furigana). nil otherwise.
     public let reading: String?
+    /// The form this word is in, when the tokenizer says (Japanese: IPADIC's 活用形, such as 未然形). nil for the
+    /// dictionary form and for words that don't inflect.
+    public let inflection: String?
 
-    public init(surface: String, lemma: String, pos: PartOfSpeech, reading: String? = nil) {
+    public init(surface: String, lemma: String, pos: PartOfSpeech, reading: String? = nil, inflection: String? = nil) {
         self.surface = surface
         self.lemma = lemma
         self.pos = pos
         self.reading = reading
+        self.inflection = inflection
     }
 }
 

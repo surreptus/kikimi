@@ -2,7 +2,7 @@
 
 Kikimi is built so that your videos, and what you learn from them, stay on your Mac.
 
-_Last updated: 26 October 2026._
+_Last updated: 27 October 2026._
 
 ## The short version
 
@@ -35,6 +35,8 @@ Transcription runs on your Mac using a speech model you have downloaded. The dic
 ## The one thing that uses the internet
 
 > The only time Kikimi goes online is to download a speech model, and it sends nothing else.
+
+A few links open a web page in your browser, such as a Japanese grammar guide. That is your browser visiting the page, as when you click any link: Kikimi sends nothing, and the site sees your visit as any website would.
 
 The first time you need a speech model, Kikimi downloads it from Hugging Face (huggingface.co), a service that hosts it. When it does, Hugging Face can see your internet address and which model files you asked for, as any website would, and handles that under its own privacy policy. Kikimi sends nothing else: not your videos, transcripts, words or how you use the app.
 
