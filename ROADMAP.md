@@ -70,14 +70,21 @@ review overview (ready now, next 7 days, words per stage); transcript text size;
 Ordered by how much each helps comprehensible input per unit of effort.
 
 ### Understanding the material
-- [ ] **Translations in your native language**, per sentence, with Apple's on-device Translation framework. Stored
+- [ ] **Translations in your native language** (findings, 27 Oct 2026: Apple's Translation framework translates each line
+      of a multi-line request separately, so a window of lines gives the same result as one at a time, and it returns no
+      alignment (no attributed result), so mapping a context-aware translation back to one line isn't possible. Merging
+      lines into sentence groups before translating works for Spanish, which has punctuation, but Whisper's Japanese
+      lines have none. The on-device language model leaked neighbouring lines into the translation of one, so it isn't
+      used. Plan: translate per line, optionally merging lines that visibly continue.), per sentence, with Apple's on-device Translation framework. Stored
       in a new table (derived data, not backed up). Hidden by default, shown on request for a line, with "always
       show" as an option, because an always-visible translation encourages reading over listening. Needs the
       language pair installed once (Settings guides this). Quality varies, especially for Japanese; check the pair
       is supported before offering it.
-- [ ] **Explain this sentence** (on request, on-device only): a short grammar and meaning note for a line. First
-      check that the on-device model in macOS 26 handles Spanish and Japanese well enough; if it doesn't, drop it
-      rather than send text off the Mac.
+- [x] **Explain this sentence**: tested on 27 Oct 2026 and **dropped for now**. The on-device language model in macOS 26
+      is available on this Mac, but on real transcript lines it gave a wrong translation of a Spanish line, called
+      "qué tipo de" an "adjective phrase", and for a Japanese line explained a different line's ending as a "polite
+      negative suggestion". A wrong grammar note is worse than none for a learner. Revisit when the model improves, or
+      with a checked, fixed set of grammar notes instead of generated ones.
 - [ ] **Subtitle modes**: target language only, target plus translation, none (listening practice), and a
       reveal-on-click mode.
 - [x] **Pause after each line** (P) and **loop this line** (R), with a 1×, 0.75× or 0.5× speed for loops.
