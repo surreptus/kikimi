@@ -12,9 +12,10 @@
 // AVFoundation's own queue, and the two pumps (video, audio) run concurrently. Cancelling is where it bites:
 // AVAssetWriterInput raises an uncaught exception if it is touched after `cancelWriting()`, and after that call
 // AVFoundation never invokes the "ready for more data" block again, so anything waiting on it would hang.
-// `Gate` solves both: every writer call goes through it under a lock, and cancelling wakes the waiters.
-// A cancel only resumes the caller once no pump is mid-call (`Gate.whenIdle`), so the reader and writer are never
-// freed under a running pump; that ordering is what a rare crash under load came from.
+// `Gate` solves both: every writer call goes through it under a lock, and cancelling wakes the waiters. Cancelling
+// only raises a flag; the reader and writer are cancelled afterwards, once no pump block is inside them
+// (`Gate.waitUntilIdle`). Cancelling the reader while a block sat in `copyNextSampleBuffer` crashed about half the
+// time, and so did freeing it there, so neither ever happens under a running pump.
 // `Once` makes sure each pump's continuation is resumed exactly one time, whichever of "finished" or
 // "cancelled" happens first. The `nonisolated(unsafe)` lets are safe for the same reason: the gate, not the
 // compiler, guarantees one thread touches an AVFoundation object at a time.
@@ -196,17 +197,25 @@ public struct AVFoundationTranscoder: MediaTranscoder {
         private var running = 0
         private var idleWaiters: [() -> Void] = []
 
-        /// Cancels once: runs `body` (the AVFoundation cancel calls), then wakes everything waiting on the writer,
-        /// because after `cancelWriting()` AVFoundation never calls the "ready for more data" blocks again.
-        func cancel(_ body: () -> Void) {
+        /// Cancels once: no pump block will go into the reader or writer from now on, and everything waiting on the
+        /// writer is woken (AVFoundation stops calling the "ready for more data" blocks once cancelled). This does not
+        /// touch the reader or writer itself: a block may be inside `copyNextSampleBuffer` right now, and cancelling the
+        /// reader under it is what crashed. The caller cancels them after `waitUntilIdle()`.
+        func cancel() {
             lock.lock()
             guard !cancelled else { lock.unlock(); return }
             cancelled = true
-            body()
             let pending = wakeups
             wakeups = []
             lock.unlock()
             pending.forEach { $0() }
+        }
+
+        /// Returns once no pump block is inside the reader or writer.
+        func waitUntilIdle() async {
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                whenIdle { continuation.resume() }
+            }
         }
 
         /// Runs `body` only if not cancelled; returns whether it ran.
@@ -336,13 +345,15 @@ public struct AVFoundationTranscoder: MediaTranscoder {
             async let a: Void = Self.pumpAudio(audioPairU, gate: gate)
             _ = await (v, a)
         } onCancel: {
-            gate.cancel {
-                reader.cancelReading()
-                writer.cancelWriting()
-            }
+            gate.cancel()
         }
+        // A pump block may still be inside the reader (it finishes its sample and leaves), so wait for the last one
+        // before the reader or writer is cancelled or freed.
+        await gate.waitUntilIdle()
 
         if gate.isCancelled || Task.isCancelled {
+            reader.cancelReading()
+            writer.cancelWriting()
             try? FileManager.default.removeItem(at: destination)
             throw CancellationError()
         }
@@ -387,7 +398,7 @@ public struct AVFoundationTranscoder: MediaTranscoder {
                         }
                     }
                 }
-            }, wakeup: { [unowned gate] in gate.whenIdle { once.run { done.resume() } } })
+            }, wakeup: { once.run { done.resume() } })
             if !registered { once.run { done.resume() } }
         }
     }
