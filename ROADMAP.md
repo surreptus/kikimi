@@ -20,14 +20,14 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       the privacy policy needs), and have a lawyer review them. They were not written by one, and what they can
       limit depends on where your users live.
 - [ ] **Privacy policy contact line.** Needs an email or page before the policy can be published.
-- [ ] **Name "Kikimi": a trademark conflict to resolve before the GitHub Release is published** (27 Oct 2026). You found, and
-      a Justia record shows, a US application for KIKIMI (serial 90109328, KKLT Enterprises, LLC, filed 12 Aug 2020) for
-      downloadable software to share photos, securely exchange information, store data and reach social networks, and
-      for related online services. The last status I could see is a Notice of Allowance on 17 Aug 2021; whether it went
-      on to registration or was abandoned is not known (confirm at tmsearch.uspto.gov). Also checked: no app of the name on
-      the US or Japan App Store; `kikimi.com`, `.io`, `.net`, `.org`, `.co`, `.dev` registered by others; `kikimi.app`
-      had no DNS records. Decide: keep it if the mark is dead, take a trademark lawyer's view if it is live, or rename
-      (cheapest before anything is published; the tag `v0.9.0` is pushed, the Release is not).
+- [ ] **Name "Kikimi": a live registered trademark, so plan to rename before publishing** (27 Oct 2026, from the USPTO record
+      you saved). KIKIMI, a standard-character mark (so any styling), US registration 7139558, registered 15 Aug 2023 on the
+      Principal Register, owner KKLT Enterprises, LLC of San Francisco, represented by a law firm. Class 9: downloadable
+      software to share photos, securely exchange information, store electronic data and access social networks; first
+      use in commerce 11 Mar 2022. An identical mark for downloadable software is the setup that draws demand letters.
+      Not yet done: the GitHub Release stays unpublished; the name is already public in the repo, the `v0.9.0` tag and the
+      website. Next: pick a new name and run the same checks (USPTO, App Store, domain, GitHub) before renaming once.
+      Also checked for Kikimi: no App Store app of the name; `kikimi.app` had no DNS records.
 - [ ] Confirm licences listed in the [release checklist](Release/CHECKLIST.md) (Whisper model card, JMdict and
       Wiktionary attribution, no use of the name "WaniKani"). Audited 25 Oct 2026: notices are complete, the
       model card says MIT, the stage names are renamed, and the dictionaries are credited as adaptations.
