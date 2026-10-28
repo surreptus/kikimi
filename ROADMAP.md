@@ -20,10 +20,14 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       the privacy policy needs), and have a lawyer review them. They were not written by one, and what they can
       limit depends on where your users live.
 - [ ] **Privacy policy contact line.** Needs an email or page before the policy can be published.
-- [x] **Name "Kikimi" checked** (27 Oct 2026): no app of that name on the US or Japan App Store; `kikimi.com`, `.io`, `.net`,
-      `.org`, `.co` and `.dev` are registered by others, and `kikimi.app` had no DNS records, so it may be free (confirm at
-      a registrar; it would also give a proper contact address for the legal pages). Other people's GitHub repos use the
-      word, which doesn't clash with `surreptus/kikimi`. **No trademark search was done**: skipped by choice.
+- [ ] **Name "Kikimi": a trademark conflict to resolve before the GitHub Release is published** (27 Oct 2026). You found, and
+      a Justia record shows, a US application for KIKIMI (serial 90109328, KKLT Enterprises, LLC, filed 12 Aug 2020) for
+      downloadable software to share photos, securely exchange information, store data and reach social networks, and
+      for related online services. The last status I could see is a Notice of Allowance on 17 Aug 2021; whether it went
+      on to registration or was abandoned is not known (confirm at tmsearch.uspto.gov). Also checked: no app of the name on
+      the US or Japan App Store; `kikimi.com`, `.io`, `.net`, `.org`, `.co`, `.dev` registered by others; `kikimi.app`
+      had no DNS records. Decide: keep it if the mark is dead, take a trademark lawyer's view if it is live, or rename
+      (cheapest before anything is published; the tag `v0.9.0` is pushed, the Release is not).
 - [ ] Confirm licences listed in the [release checklist](Release/CHECKLIST.md) (Whisper model card, JMdict and
       Wiktionary attribution, no use of the name "WaniKani"). Audited 25 Oct 2026: notices are complete, the
       model card says MIT, the stage names are renamed, and the dictionaries are credited as adaptations.
