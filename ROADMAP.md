@@ -20,7 +20,10 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       the privacy policy needs), and have a lawyer review them. They were not written by one, and what they can
       limit depends on where your users live.
 - [ ] **Privacy policy contact line.** Needs an email or page before the policy can be published.
-- [ ] **Check the name "Kikimi"** is free to use (App Store, trademark search) before anything is public.
+- [x] **Name "Kikimi" checked** (27 Oct 2026): no app of that name on the US or Japan App Store; `kikimi.com`, `.io`, `.net`,
+      `.org`, `.co` and `.dev` are registered by others, and `kikimi.app` had no DNS records, so it may be free (confirm at
+      a registrar; it would also give a proper contact address for the legal pages). Other people's GitHub repos use the
+      word, which doesn't clash with `surreptus/kikimi`. **No trademark search was done**: skipped by choice.
 - [ ] Confirm licences listed in the [release checklist](Release/CHECKLIST.md) (Whisper model card, JMdict and
       Wiktionary attribution, no use of the name "WaniKani"). Audited 25 Oct 2026: notices are complete, the
       model card says MIT, the stage names are renamed, and the dictionaries are credited as adaptations.
