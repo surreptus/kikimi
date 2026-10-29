@@ -1,4 +1,4 @@
-# Kikimi
+# Aomame
 
 A native macOS app for learning a language from videos you already own.
 
@@ -18,7 +18,7 @@ your own videos. Spanish and Japanese work today; the design makes adding anothe
 | **Videos** | Drag and drop videos. Each is transcribed with timestamps, and words (nouns, verbs, adjectives, adverbs) are extracted into a shared SQLite database. The spoken language is checked first, so a Japanese video can't silently be imported as Spanish. Your videos are listed below it with size, location and date added, and the way to delete the app's copy. Play a video with clickable, synced subtitles (for Japanese verbs and adjectives the word bar names the form and links to the matching page of [Tsumiki](https://surreptus.github.io/tsumiki/), a grammar guide); hover a line for furigana and a word for its meaning; pause after each line to think, or loop a line (slower if you like); fix a line's text or timing when the transcript got it wrong. Export audio or video clips of any line, or of every example of a word. Each video shows how much of it you already know (and whether that is Hard, A stretch, Comfortable or Easy); sort by best fit, and one button starts learning the commonest words that would take it to about 90%. |
 | **Words** | A sortable, searchable table with multi-select; export the selected words, or the ones you are learning, to an Anki import file. Start learning, mark known, or reset many words at once. Each word shows its dictionary entry and example lines from your videos, with audio you can hear in place. |
 | **Review** | (Cards can ask for the word from its meaning, as a fill-in-the-blank sentence from your videos, or by ear with only the sentence's audio; Settings > Languages. "Check my known words" quizzes a sample of words you marked known and sends back any you miss.) An overview first (reviews ready, the next seven days, how many words sit at each stage, and your progress: listening time, review accuracy, words started per week, words looked up most), then nine-stage spaced repetition (intervals 4h, 8h, 23h, 47h, 7d, 14d, 30d, 120d, then retired). A card shows a sentence from one of your videos, can speak it, and picks a different example each visit. |
-| **Settings** | A standard Mac settings window (⌘,) with icon tabs: appearance; the speech model and sentence audio for each language; and Data, which saves your progress to a `.kikimi` file (or, with videos and transcripts included, a folder) and restores it (never overwriting progress you already have, with a preview first). |
+| **Settings** | A standard Mac settings window (⌘,) with icon tabs: appearance; the speech model and sentence audio for each language; and Data, which saves your progress to a `.aomame` file (or, with videos and transcripts included, a folder) and restores it (never overwriting progress you already have, with a preview first). |
 
 ## Requirements
 
@@ -36,13 +36,13 @@ Scripts/build_ipadic.sh         # Japanese tokenizer dictionary (clones MeCab at
 Scripts/build_dictionaries.sh   # JMdict (~10 MB download) and the Spanish extract (~1 GB download)
 ```
 
-Then open `Kikimi.xcodeproj` in Xcode, pick the **Kikimi** scheme and **My Mac**, and press ⌘R. The app reads the
+Then open `Aomame.xcodeproj` in Xcode, pick the **Aomame** scheme and **My Mac**, and press ⌘R. The app reads the
 bundled dictionaries in place (they are never copied into its database); on the **Import** tab, download a speech
 model, then drop in a video.
 Defaults are `medium` for Spanish and `large-v3` for Japanese (about 3 GB), and you can pick another per language.
 
 The app is sandboxed. Its database, models and library live in its container,
-`~/Library/Containers/<bundle id>/Data/Library/Application Support/Kikimi/`.
+`~/Library/Containers/<bundle id>/Data/Library/Application Support/Aomame/`.
 
 ## Tests
 
@@ -75,10 +75,10 @@ Three parts in one repository:
 
 - **`LangCore/`**, a Swift package with no UI, and all the logic: language profiles, SRS, database (GRDB with
   migrations), tokenizing, the import pipeline, playback, clip export, and review sessions.
-- **`Kikimi.xcodeproj`** with **`Kikimi/`**: the SwiftUI interface, app lifecycle, assets, entitlements and
+- **`Aomame.xcodeproj`** with **`Aomame/`**: the SwiftUI interface, app lifecycle, assets, entitlements and
   `Info.plist`. It contains no logic of its own; views call into `LangCore`.
 - **`site/`**, the website, built with [Astro](https://astro.build) as static pages in the app's colours. Its privacy
-  and terms pages are the app's own `Kikimi/Privacy.md` and `Terms.md`, so they can't differ. Run it with
+  and terms pages are the app's own `Aomame/Privacy.md` and `Terms.md`, so they can't differ. Run it with
   `cd site && npm install && npm run dev`; `npm run build` writes `site/dist`. A workflow
   (`.github/workflows/site.yml`) publishes it to GitHub Pages once Pages is switched on for the repository
   (Settings > Pages > Source: GitHub Actions).
@@ -123,14 +123,14 @@ not committed; only the scripts that build them are. Japanese tokenizing uses a 
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) lists every component and its licence. The licence texts are in `LangCore/Sources/LangCore/Resources/Licenses/` and are shown in the app under
 **Acknowledgements**. The app's own code is under the [MIT licence](LICENSE); the dictionary data and the other components keep the licences above.
 
-The privacy policy is [`Kikimi/Privacy.md`](Kikimi/Privacy.md) and the terms of use are [`Kikimi/Terms.md`](Kikimi/Terms.md).
+The privacy policy is [`Aomame/Privacy.md`](Aomame/Privacy.md) and the terms of use are [`Aomame/Terms.md`](Aomame/Terms.md).
 The app shows the same files (Help menu, and Settings > About), and the website publishes them at `/privacy/` and `/terms/`.
 
 ## Release
 
 `Release/CHECKLIST.md` lists what to do before shipping, and `Scripts/release.sh` builds, exports and (optionally)
 notarizes a release; use `--dry-run` to see the commands. Nothing in the repository is signed. The bundle identifier
-is `com.surreptus.Kikimi`.
+is `com.surreptus.Aomame`.
 
 ## Status and known limits
 

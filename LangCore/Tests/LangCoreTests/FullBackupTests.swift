@@ -43,7 +43,7 @@ final class FullBackupTests: XCTestCase {
         XCTAssertEqual(summary.videos, 1)
         XCTAssertGreaterThan(summary.bytes, 0)
         XCTAssertTrue(LangEnvironment.isFullBackup(summary.folder))
-        for file in ["progress.kikimi", "library.json"] {
+        for file in ["progress.aomame", "library.json"] {
             XCTAssertTrue(FileManager.default.fileExists(atPath: summary.folder.appending(path: file).path), file)
         }
         let library = try FileManager.default.contentsOfDirectory(atPath: summary.folder.appending(path: "Library").path)

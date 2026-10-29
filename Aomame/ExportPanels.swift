@@ -12,7 +12,7 @@ enum ExportPanels {
         return panel.runModal() == .OK ? panel.url : nil
     }
 
-    /// Choose one file with this extension (a `.kikimi` backup).
+    /// Choose one file with this extension (a `.aomame` backup).
     static func openFile(fileExtension: String) -> URL? {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
@@ -21,13 +21,13 @@ enum ExportPanels {
         return panel.runModal() == .OK ? panel.url : nil
     }
 
-    /// Choose a `.kikimi` file, or a full backup folder.
+    /// Choose a `.aomame` file, or a full backup folder.
     static func openBackup() -> URL? {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
         panel.canChooseFiles = true
         panel.canChooseDirectories = true
-        panel.allowedContentTypes = UTType(filenameExtension: "kikimi").map { [$0] } ?? []
+        panel.allowedContentTypes = UTType(filenameExtension: "aomame").map { [$0] } ?? []
         panel.message = String(localized: "Choose a backup file, or a backup folder")
         return panel.runModal() == .OK ? panel.url : nil
     }

@@ -1,6 +1,6 @@
 # Third-party notices
 
-Kikimi is released under the [MIT licence](LICENSE). It uses the software, models and data below, each under its own
+Aomame is released under the [MIT licence](LICENSE). It uses the software, models and data below, each under its own
 licence. The full texts are in [`LangCore/Sources/LangCore/Resources/Licenses/`](LangCore/Sources/LangCore/Resources/Licenses/),
 are shown in the app under Help > Acknowledgements, and are on the website at `/acknowledgements/`.
 
@@ -22,7 +22,7 @@ The player links to [Tsumiki](https://surreptus.github.io/tsumiki/) (the author'
 
 The website (`site/`) is built with [Astro](https://astro.build) (MIT). The built pages do not include Astro's code.
 
-Names such as Apple, macOS, Anki, OpenAI, Whisper, Hugging Face and WaniKani belong to their owners. Kikimi is not
+Names such as Apple, macOS, Anki, OpenAI, Whisper, Hugging Face and WaniKani belong to their owners. Aomame is not
 affiliated with or endorsed by them, and its review stages use no name from WaniKani.
 
 When a package is added or updated, check `Package.resolved` against this file and the Acknowledgements.

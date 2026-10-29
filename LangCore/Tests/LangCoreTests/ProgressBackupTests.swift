@@ -36,17 +36,17 @@ final class ProgressBackupTests: XCTestCase {
         XCTAssertEqual(backup.words.map(\.lemma), ["abrir", "casa", "ventana", "友達"], "language, then lemma; no new words")
         XCTAssertEqual(backup.words.first { $0.lemma == "casa" }?.stage, SRSStage.stage5.rawValue)
         XCTAssertNil(backup.words.first { $0.lemma == "abrir" }?.stage)
-        XCTAssertEqual(backup.format, "kikimi-progress")
+        XCTAssertEqual(backup.format, "aomame-progress")
         XCTAssertEqual(backup.version, 1)
     }
 
     func testTheFileIsReadablePlainJSON() async throws {
         let data = try await sampleSource().exportProgress(now: now).encoded()
         let text = String(decoding: data, as: UTF8.self)
-        XCTAssertTrue(text.contains("\"format\" : \"kikimi-progress\""))
+        XCTAssertTrue(text.contains("\"format\" : \"aomame-progress\""))
         XCTAssertTrue(text.contains("\"lemma\" : \"casa\""))
         XCTAssertNotNil(try JSONSerialization.jsonObject(with: data))
-        XCTAssertEqual(ProgressBackup.fileExtension, "kikimi")
+        XCTAssertEqual(ProgressBackup.fileExtension, "aomame")
     }
 
     // MARK: Round trip
@@ -146,10 +146,10 @@ final class ProgressBackupTests: XCTestCase {
         XCTAssertThrowsError(try ProgressBackup.decode(Data("{\"format\":\"something-else\",\"version\":1}".utf8))) {
             XCTAssertEqual($0 as? BackupError, .notABackup)
         }
-        XCTAssertThrowsError(try ProgressBackup.decode(Data("{\"format\":\"kikimi-progress\",\"version\":99}".utf8))) {
+        XCTAssertThrowsError(try ProgressBackup.decode(Data("{\"format\":\"aomame-progress\",\"version\":99}".utf8))) {
             XCTAssertEqual($0 as? BackupError, .newerVersion(99))
         }
-        XCTAssertThrowsError(try ProgressBackup.decode(Data("{\"format\":\"kikimi-progress\",\"version\":1,\"words\":5}".utf8))) {
+        XCTAssertThrowsError(try ProgressBackup.decode(Data("{\"format\":\"aomame-progress\",\"version\":1,\"words\":5}".utf8))) {
             XCTAssertEqual($0 as? BackupError, .damaged)
         }
         for error in [BackupError.notABackup, .newerVersion(2), .damaged] { XCTAssertNotNil(error.errorDescription) }

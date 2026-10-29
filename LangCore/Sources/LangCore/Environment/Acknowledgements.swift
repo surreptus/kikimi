@@ -9,7 +9,7 @@ public struct Acknowledgement: Sendable, Identifiable {
 /// Licence and attribution texts for bundled software and data.
 public enum Acknowledgements {
     private static let titles = [
-        "Kikimi-MIT": "Kikimi (this app)",
+        "Aomame-MIT": "Aomame (this app)",
         "JMdict-EDRDG": "JMdict dictionary data",
         "Wiktionary-kaikki": "Spanish dictionary data (Wiktionary)",
         "IPADIC-COPYING": "IPADIC dictionary (NAIST, ICOT)",

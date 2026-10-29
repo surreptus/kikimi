@@ -227,7 +227,7 @@ final class AppSupportTests: XCTestCase {
     func testAcknowledgementsAreBundled() {
         let items = Acknowledgements.all()
         XCTAssertEqual(items.count, 9)
-        XCTAssertTrue(items.contains { $0.title.contains("Kikimi") && $0.text.contains("MIT License") })
+        XCTAssertTrue(items.contains { $0.title.contains("Aomame") && $0.text.contains("MIT License") })
         // WhisperKit ships code from swift-transformers under the Apache licence, which has to travel with the app.
         XCTAssertTrue(items.contains { $0.title.contains("swift-transformers") && $0.text.contains("Apache License") && $0.text.contains("Hugging Face") })
         XCTAssertTrue(items.contains { $0.title.contains("IPADIC") && $0.text.contains("Nara Institute") })
@@ -246,7 +246,7 @@ final class AppSupportTests: XCTestCase {
         let repoRoot = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent()
         let license = try String(contentsOf: repoRoot.appending(path: "LICENSE"), encoding: .utf8)
-        let bundled = try XCTUnwrap(Acknowledgements.all().first { $0.title.contains("Kikimi") })
+        let bundled = try XCTUnwrap(Acknowledgements.all().first { $0.title.contains("Aomame") })
         XCTAssertEqual(bundled.text, license)
     }
 

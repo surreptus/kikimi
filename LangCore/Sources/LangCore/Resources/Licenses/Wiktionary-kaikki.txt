@@ -9,4 +9,4 @@ Authors: the Wiktionary contributors, see the page history of each entry on en.w
 Changes: the extract was filtered to the entries for Spanish words and converted to a SQLite database for fast
 look-up, keeping each word's part of speech and condensed English definitions. The database in this app is an
 adaptation of that data and is made available under the same licence, CC BY-SA 4.0. The scripts that build it are in
-the project's Scripts/dictionaries folder: https://github.com/surreptus/kikimi
+the project's Scripts/dictionaries folder: https://github.com/surreptus/aomame

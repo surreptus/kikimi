@@ -1,11 +1,11 @@
-// Draws the Kikimi app icon: a single asanoha (hemp leaf) star, a traditional Japanese pattern of growth, in white
+// Draws the Aomame app icon: a single asanoha (hemp leaf) star, a traditional Japanese pattern of growth, in white
 // line on dark green, and a light version (dark line on pale green) the app shows in the Dock in Light appearance.
 //
 // Run from the repository root (needs Xcode):
 //   swiftc -O -swift-version 5 Scripts/icon/make_icon.swift -o /tmp/make_icon && mkdir -p /tmp/icon-out && /tmp/make_icon /tmp/icon-out
 // It writes final.png (dark) and light.png (1024 px). Then make the sizes for the asset catalog:
-//   for n in 16 32 64 128 256 512 1024; do sips -z $n $n /tmp/icon-out/final.png --out Kikimi/Assets.xcassets/AppIcon.appiconset/icon_$n.png; done
-//   cp /tmp/icon-out/light.png Kikimi/Assets.xcassets/IconLight.imageset/icon_light.png
+//   for n in 16 32 64 128 256 512 1024; do sips -z $n $n /tmp/icon-out/final.png --out Aomame/Assets.xcassets/AppIcon.appiconset/icon_$n.png; done
+//   cp /tmp/icon-out/light.png Aomame/Assets.xcassets/IconLight.imageset/icon_light.png
 //
 // The look is set by `radius` (how large the star is) and `lineWidth`. The line is heavier than a drawing would
 // have, so it still reads at 16 and 32 px.

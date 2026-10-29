@@ -1,6 +1,6 @@
 # Working agreements
 
-How we build Kikimi. Read this before changing anything; update it when we agree on a new way of working.
+How we build Aomame. Read this before changing anything; update it when we agree on a new way of working.
 [ARCHITECTURE.md](ARCHITECTURE.md) says where things live, [ROADMAP.md](ROADMAP.md) says what comes next.
 
 ## What every change is measured against
@@ -11,9 +11,9 @@ How we build Kikimi. Read this before changing anything; update it when we agree
    compatibility shims. Sandbox and hardened runtime stay on.
 2. **Dieter Rams.** Less, but better. Good design is useful, unobtrusive, honest, thorough and long-lasting. Remove
    embellishment; if a control isn't needed, it goes. This applies to the UI, to the code, and to how we report.
-3. **Our promises.** The app must always match its [privacy policy](Kikimi/Privacy.md) and its terms of use. A
+3. **Our promises.** The app must always match its [privacy policy](Aomame/Privacy.md) and its terms of use. A
    feature that would change what data leaves the Mac, or what we say about it, changes the policy first.
-4. **Comprehensible input.** Kikimi exists to help a learner apply comprehensible-input methodology as effectively
+4. **Comprehensible input.** Aomame exists to help a learner apply comprehensible-input methodology as effectively
    as possible: lots of understandable material, slightly above their level, with the words they meet turning
    into words they know. A feature should make that loop faster or clearer. If it works against it (for example,
    a translation that is always showing), it is hidden until asked for.
@@ -59,7 +59,7 @@ How we build Kikimi. Read this before changing anything; update it when we agree
   `String` is needed), lists use `listed(...)`, and the names of enum values shown to the user get a `title`
   property instead of showing a raw value (a stored value is a save format, not text). Dates, numbers and sizes use
   the system formatters. Layouts must survive text that is longer, so avoid fixed widths for text. Strings are kept in
-  `Kikimi/Localizable.xcstrings` and `LangCore/Sources/LangCore/Resources/Localizable.xcstrings`; Xcode adds new
+  `Aomame/Localizable.xcstrings` and `LangCore/Sources/LangCore/Resources/Localizable.xcstrings`; Xcode adds new
   keys when it builds in the IDE.
 - **Buttons in a row match.** Pill buttons of one size are the same height whether they hold text or an icon
   (`PillButtonStyle` sets a minimum height), and icon-only pills use `.labelStyle(.pillIcon)` for the same width.
@@ -72,7 +72,7 @@ The shell needs Xcode's toolchain, and builds that touch the network or the sand
 
 ```bash
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
-xcodebuild -project Kikimi.xcodeproj -scheme Kikimi -destination 'platform=macOS' build
+xcodebuild -project Aomame.xcodeproj -scheme Aomame -destination 'platform=macOS' build
 (cd LangCore && swift test)                                  # about 230 tests, 9 opt-in ones skipped
 python3 Scripts/dictionaries/test_builders.py                # dictionary builder tests
 Scripts/check_leaks.sh                                       # LangCore tests under `leaks`

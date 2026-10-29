@@ -1,8 +1,8 @@
 #!/bin/bash
-# Builds a release archive of Kikimi and exports it. Nothing runs until you choose a mode.
+# Builds a release archive of Aomame and exports it. Nothing runs until you choose a mode.
 #
 #   TEAM_ID=ABCDE12345 Scripts/release.sh developer-id            archive + export for direct download
-#   TEAM_ID=ABCDE12345 NOTARY_PROFILE=kikimi Scripts/release.sh developer-id --notarize
+#   TEAM_ID=ABCDE12345 NOTARY_PROFILE=aomame Scripts/release.sh developer-id --notarize
 #                                                                 ... then notarize, staple, make a DMG
 #   TEAM_ID=ABCDE12345 Scripts/release.sh app-store               archive + export a .pkg for App Store Connect
 #   Scripts/release.sh developer-id --dry-run                     print every command, change nothing
@@ -46,7 +46,7 @@ missing=0
 for f in LangCore/Sources/LangCore/Resources/ipadic/sys.dic \
          LangCore/Sources/LangCore/Resources/dictionaries/dictionary-ja.sqlite \
          LangCore/Sources/LangCore/Resources/dictionaries/dictionary-es.sqlite \
-         Kikimi/PrivacyInfo.xcprivacy; do
+         Aomame/PrivacyInfo.xcprivacy; do
   [ -e "$f" ] || { echo "missing: $f" >&2; missing=1; }
 done
 if [ "$missing" -eq 1 ]; then
@@ -54,7 +54,7 @@ if [ "$missing" -eq 1 ]; then
   else fail "run Scripts/build_ipadic.sh and Scripts/build_dictionaries.sh first"; fi
 fi
 
-if ! ls Kikimi/Assets.xcassets/AppIcon.appiconset/*.png >/dev/null 2>&1; then
+if ! ls Aomame/Assets.xcassets/AppIcon.appiconset/*.png >/dev/null 2>&1; then
   if [ "$MODE" = "app-store" ] && [ "$DRY" -eq 0 ]; then fail "the App Store requires an app icon: add PNGs to Assets.xcassets/AppIcon"; fi
   warn "no app icon images in Assets.xcassets/AppIcon"
 fi
@@ -65,7 +65,7 @@ fi
 
 # ---------- Build ----------
 BUILD="$ROOT/build/release"
-ARCHIVE="$BUILD/Kikimi.xcarchive"
+ARCHIVE="$BUILD/Aomame.xcarchive"
 EXPORT="$BUILD/export-$MODE"
 OPTIONS_SRC="$ROOT/Release/ExportOptions-$([ "$MODE" = developer-id ] && echo DeveloperID || echo AppStore).plist"
 OPTIONS="$BUILD/ExportOptions-$MODE.plist"
@@ -78,7 +78,7 @@ fi
 echo "== Archive ($MODE, team $TEAM_ID)"
 run mkdir -p "$BUILD"
 run rm -rf "$ARCHIVE" "$EXPORT"
-run xcodebuild -project Kikimi.xcodeproj -scheme Kikimi -configuration Release \
+run xcodebuild -project Aomame.xcodeproj -scheme Aomame -configuration Release \
   -destination 'generic/platform=macOS' -archivePath "$ARCHIVE" \
   -allowProvisioningUpdates DEVELOPMENT_TEAM="$TEAM_ID" archive
 
@@ -92,16 +92,16 @@ if [ "$MODE" = "app-store" ]; then
   exit 0
 fi
 
-APP="$EXPORT/Kikimi.app"
+APP="$EXPORT/Aomame.app"
 if [ "$NOTARIZE" -eq 1 ]; then
   echo "== Notarize"
-  run ditto -c -k --keepParent "$APP" "$BUILD/Kikimi-notarize.zip"
-  run xcrun notarytool submit "$BUILD/Kikimi-notarize.zip" --keychain-profile "${NOTARY_PROFILE:-PROFILE}" --wait
+  run ditto -c -k --keepParent "$APP" "$BUILD/Aomame-notarize.zip"
+  run xcrun notarytool submit "$BUILD/Aomame-notarize.zip" --keychain-profile "${NOTARY_PROFILE:-PROFILE}" --wait
   run xcrun stapler staple "$APP"
   run spctl --assess --type execute --verbose "$APP"
   echo "== DMG"
-  run hdiutil create -volname Kikimi -srcfolder "$APP" -ov -format UDZO "$BUILD/Kikimi.dmg"
-  echo "== Done: $BUILD/Kikimi.dmg"
+  run hdiutil create -volname Aomame -srcfolder "$APP" -ov -format UDZO "$BUILD/Aomame.dmg"
+  echo "== Done: $BUILD/Aomame.dmg"
 else
   echo "== Done: $APP (signed, NOT notarized: add --notarize before sharing it)"
 fi

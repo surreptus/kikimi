@@ -5,7 +5,7 @@ name: Site
 on:
   push:
     branches: [main]
-    paths: ['site/**', 'Kikimi/Privacy.md', 'Kikimi/Terms.md', '.github/workflows/site.yml']
+    paths: ['site/**', 'Aomame/Privacy.md', 'Aomame/Terms.md', '.github/workflows/site.yml']
   workflow_dispatch:
 
 permissions:

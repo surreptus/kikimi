@@ -1,13 +1,13 @@
 import SwiftUI
 
 @main
-struct KikimiApp: App {
+struct AomameApp: App {
     @State private var app = AppState()
     @AppStorage(Appearance.key) private var appearance = Appearance.system
 
     var body: some Scene {
         // One window: there is one library, so a second window would only show the same thing.
-        Window("Kikimi", id: "main") {
+        Window("Aomame", id: "main") {
             RootView()
                 .environment(app)
                 .task { await app.start() }

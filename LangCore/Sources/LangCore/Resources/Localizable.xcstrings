@@ -90,7 +90,7 @@
     "This backup file is damaged, so nothing was changed." : {
 
     },
-    "This backup was made by a newer version of Kikimi. Update the app, then try again." : {
+    "This backup was made by a newer version of Aomame. Update the app, then try again." : {
 
     },
     "This file has no audio track." : {
@@ -99,7 +99,7 @@
     "This file has no video track." : {
 
     },
-    "This file isn't a Kikimi backup." : {
+    "This file isn't a Aomame backup." : {
 
     },
     "This Mac can't export with %@." : {

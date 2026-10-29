@@ -15,19 +15,18 @@ machine, release plumbing, and a few promises we have made but not kept (below).
 ## Needed for 1.0
 
 ### Promises and paperwork
-- [x] **Terms of use** drafted (`Kikimi/Terms.md`, shown in the app beside the privacy policy).
+- [x] **Terms of use** drafted (`Aomame/Terms.md`, shown in the app beside the privacy policy).
 - [ ] **Finish the terms**: governing law is set to California; fill in the contact placeholder (the same contact
       the privacy policy needs), and have a lawyer review them. They were not written by one, and what they can
       limit depends on where your users live.
 - [ ] **Privacy policy contact line.** Needs an email or page before the policy can be published.
-- [ ] **Name "Kikimi": a live registered trademark, so plan to rename before publishing** (27 Oct 2026, from the USPTO record
-      you saved). KIKIMI, a standard-character mark (so any styling), US registration 7139558, registered 15 Aug 2023 on the
-      Principal Register, owner KKLT Enterprises, LLC of San Francisco, represented by a law firm. Class 9: downloadable
-      software to share photos, securely exchange information, store electronic data and access social networks; first
-      use in commerce 11 Mar 2022. An identical mark for downloadable software is the setup that draws demand letters.
-      Not yet done: the GitHub Release stays unpublished; the name is already public in the repo, the `v0.9.0` tag and the
-      website. Next: pick a new name and run the same checks (USPTO, App Store, domain, GitHub) before renaming once.
-      Also checked for Kikimi: no App Store app of the name; `kikimi.app` had no DNS records.
+- [x] **Name: renamed to Aomame** (28 Oct 2026). The app was first Reprise (too common a word), then Kikimi, which turned out to
+      be a live registered US trademark (KIKIMI, reg. 7139558, KKLT Enterprises, LLC, Class 9 downloadable software), so it was
+      dropped before anything was published. Candidates checked on the way: Kikimimi (an existing Japanese-learning app
+      uses it, and it contains the registered word), Pitapita (a live registration in Class 28 toys and games only), Jimoku,
+      Mikiki, Kenbun, Shicho, Kotsukotsu, Surasura, Zawazawa. **Aomame** (青豆, green bean; also the heroine of *1Q84*) had no App
+      Store app, no GitHub account clash, `.app`, `.io`, `.dev` free by DNS, and **no result in the USPTO search** (you ran it).
+      Still to do: register `aomame.app` (free by DNS only; confirm at a registrar), and rename the GitHub repo.
 - [ ] Confirm licences listed in the [release checklist](Release/CHECKLIST.md) (Whisper model card, JMdict and
       Wiktionary attribution, no use of the name "WaniKani"). Audited 25 Oct 2026: notices are complete, the
       model card says MIT, the stage names are renamed, and the dictionaries are credited as adaptations.
@@ -124,7 +123,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
       the log stays on the Mac and is left out of nothing the privacy policy promises.
 - [x] **Anki export** (Words page > Export to Anki…): a local text file Anki imports (word, meaning, example sentence), with
       optional sentence audio in a media folder. Checked against Anki 25.09's own importer: notes land in a
-      "Kikimi Spanish" deck, and exporting again updates them instead of duplicating.
+      "Aomame Spanish" deck, and exporting again updates them instead of duplicating.
 
 ### Keeping the numbers honest
 - [x] **Check what you marked known** (Review page > Check my known words): a quiz of up to 10 random known words; any you
