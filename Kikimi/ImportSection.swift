@@ -5,6 +5,8 @@ import UniformTypeIdentifiers
 /// Adding videos: the speech model, the drop area and the progress of each import. It sits at the top of the Videos page.
 struct ImportSection: View {
     let env: LangEnvironment
+    /// Once the library has videos the drop area shrinks to one row, so the list is what the page opens on.
+    var compact = false
     @Environment(AppState.self) private var app
 
     @State private var model = ""
@@ -15,6 +17,7 @@ struct ImportSection: View {
     @State private var showImporter = false
     /// The model choice is set once and then stays out of the way; this opens it again.
     @State private var changingModel = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var queue: ImportQueue { app.importQueue! }
     private var canImport: Bool { modelInstalled == true }
@@ -22,7 +25,7 @@ struct ImportSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             modelSection
-            dropZone
+            if compact { compactDropZone } else { dropZone }
             if !queue.jobs.isEmpty { jobList }
         }
         .task(id: app.languageCode) { await loadModel() }
@@ -88,7 +91,7 @@ struct ImportSection: View {
                         Text("\(Int(progress * 100))%").font(Theme.small.weight(.medium)).foregroundStyle(Theme.muted)
                     }
                 } else if modelInstalled == false {
-                    Button("Download model") { Task { await download() } }.buttonStyle(.pill(compact: true))
+                    Button("Download model\(downloadSize)") { Task { await download() } }.buttonStyle(.pill(compact: true))
                 } else if modelInstalled == true {
                     Button("Done") { changingModel = false }.buttonStyle(.pill(.secondary, compact: true))
                 }
@@ -101,6 +104,12 @@ struct ImportSection: View {
             }
         }
         .panel()
+    }
+
+    /// " (1.5 GB)": what the download costs, said on the button that starts it.
+    private var downloadSize: String {
+        ModelCatalog.info(for: env.preferences.model(for: app.profile))
+            .map { " (" + ByteCountFormatter.string(fromByteCount: $0.downloadBytes, countStyle: .file) + ")" } ?? ""
     }
 
     private var modelChoices: [String] {
@@ -154,8 +163,11 @@ struct ImportSection: View {
         VStack(spacing: 12) {
             Text(canImport ? String(localized: "Drop \(app.profile.displayName) videos here") : String(localized: "Download the speech model to start importing"))
                 .font(Theme.title(20))
-            Text("Importing as \(app.profile.displayName). Change the language in the sidebar.")
-                .font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.ink)
+            // Only worth saying when there is a choice of language to import as.
+            if app.learning.count > 1 {
+                Text("Importing as \(app.profile.displayName). Change the language in the sidebar.")
+                    .font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.ink)
+            }
             Text("Your original files are never changed or deleted.")
                 .font(.callout).foregroundStyle(Theme.muted)
             Button("Choose files") { showImporter = true }
@@ -164,16 +176,27 @@ struct ImportSection: View {
                 .padding(.top, 4)
         }
         .frame(maxWidth: .infinity, minHeight: 230)
-        .background(RoundedRectangle(cornerRadius: 26).fill(isTargeted ? Theme.soft : Theme.soft.opacity(0.45)))
-        .overlay(RoundedRectangle(cornerRadius: 26)
-            .strokeBorder(Theme.ink.opacity(isTargeted ? 0.7 : 0.35), style: StrokeStyle(lineWidth: 1.5, dash: [8, 7])))
-        .scaleEffect(isTargeted ? 1.01 : 1)
-        .animation(.easeOut(duration: 0.12), value: isTargeted)
-        .dropDestination(for: URL.self) { urls, _ in
-            guard canImport else { return false }
-            start(urls)
-            return true
-        } isTargeted: { isTargeted = $0 }
+        .droppable(radius: 26, targeted: isTargeted, reduceMotion: reduceMotion, onDrop: drop, isTargeted: $isTargeted)
+    }
+
+    /// The same drop target as one row, for a library that already has videos.
+    private var compactDropZone: some View {
+        HStack(spacing: 12) {
+            Text(canImport ? String(localized: "Drop \(app.profile.displayName) videos here, or") : String(localized: "Download the speech model to start importing"))
+                .foregroundStyle(Theme.muted)
+            Spacer()
+            Button("Add videos…") { showImporter = true }
+                .buttonStyle(.pill(.secondary, compact: true))
+                .disabled(!canImport)
+        }
+        .padding(.horizontal, 16).padding(.vertical, 10)
+        .droppable(radius: 18, targeted: isTargeted, reduceMotion: reduceMotion, onDrop: drop, isTargeted: $isTargeted)
+    }
+
+    private func drop(_ urls: [URL]) -> Bool {
+        guard canImport else { return false }
+        start(urls)
+        return true
     }
 
     private func start(_ urls: [URL]) {
@@ -304,5 +327,19 @@ struct ImportSection: View {
         case .verifying: String(localized: "Verifying")
         case .saving: String(localized: "Saving")
         }
+    }
+}
+
+private extension View {
+    /// A dashed, tinted area that accepts dropped files and lifts slightly while one is over it (not with Reduce Motion).
+    func droppable(radius: CGFloat, targeted: Bool, reduceMotion: Bool, onDrop: @escaping ([URL]) -> Bool,
+                   isTargeted: Binding<Bool>) -> some View {
+        self
+            .background(RoundedRectangle(cornerRadius: radius).fill(targeted ? Theme.soft : Theme.soft.opacity(0.45)))
+            .overlay(RoundedRectangle(cornerRadius: radius)
+                .strokeBorder(Theme.ink.opacity(targeted ? 0.7 : 0.35), style: StrokeStyle(lineWidth: 1.5, dash: [8, 7])))
+            .scaleEffect(targeted && !reduceMotion ? 1.01 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.12), value: targeted)
+            .dropDestination(for: URL.self) { urls, _ in onDrop(urls) } isTargeted: { isTargeted.wrappedValue = $0 }
     }
 }

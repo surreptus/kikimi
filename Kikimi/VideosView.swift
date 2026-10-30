@@ -10,7 +10,6 @@ struct VideosView: View {
     let env: LangEnvironment
     @Environment(AppState.self) private var app
     @State private var items: [LibraryEntry] = []
-    @State private var sizes: [Int64: Int64] = [:]
     @State private var totalBytes: Int64 = 0
     @State private var coverages: [Int64: VideoCoverage] = [:]
     /// "newest" or "fit": how the list is ordered. Best fit puts the videos you can most comfortably follow first.
@@ -61,17 +60,8 @@ struct VideosView: View {
                     text: "Videos",
                     subtitle: items.isEmpty ? String(localized: "Drop videos you own. They never leave this Mac.")
                         : inflected("^[\(items.count) video](inflect: true) · \(formatBytes(totalBytes)) on this Mac"))
-                ImportSection(env: env)
-                if items.isEmpty {
-                    VStack(spacing: 8) {
-                        EmptyState(title: "No videos yet", message: "Drop one above and its words will appear on the Words page.",
-                                   illustration: .clapperboard)
-                        Button("How Kikimi works") { app.showAbout = true }.buttonStyle(.pill(.secondary, compact: true))
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 200)
-                } else {
-                    sortMenu
-                }
+                ImportSection(env: env, compact: !items.isEmpty)
+                if !items.isEmpty { sortMenu }
                 ForEach(orderedItems) { item in
                     row(item)
                 }
@@ -89,14 +79,14 @@ struct VideosView: View {
             Menu {
                 Picker("Order", selection: $sort) {
                     Text("Newest first").tag("newest")
-                    Text("Best fit first").tag("fit")
+                    Text("Closest to my level").tag("fit")
                 }
                 .pickerStyle(.inline)
             } label: {
-                Label(sort == "fit" ? String(localized: "Best fit first") : String(localized: "Newest first"), systemImage: "arrow.up.arrow.down")
+                Label(sort == "fit" ? String(localized: "Closest to my level") : String(localized: "Newest first"), systemImage: "arrow.up.arrow.down")
             }
             .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
-            .help("Best fit puts the videos you already know most of, but not all, first")
+            .help("Puts first the videos where you know most of the words, but not all")
         }
         .padding(.top, 8)
     }
@@ -106,7 +96,7 @@ struct VideosView: View {
             VideoThumbnailView(url: env.fileURL(for: item.video), duration: item.video.duration)
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.video.title).font(.system(.headline, design: .rounded)).lineLimit(2)
-                Text("\(duration(item.video.duration)) · ^[\(item.subtitleCount) line](inflect: true) · \(sizes[item.id].map(formatBytes) ?? "…") · added \(item.video.importedAt.formatted(date: .abbreviated, time: .omitted))")
+                Text("\(duration(item.video.duration)) · added \(item.video.importedAt.formatted(date: .abbreviated, time: .omitted))")
                     .font(Theme.small).foregroundStyle(Theme.muted)
                 CoverageBadge(coverage: coverages[item.id]).padding(.top, 2)
             }
@@ -160,7 +150,6 @@ struct VideosView: View {
 
     private func reload() async {
         items = (try? await env.database.libraryVideos(language: app.languageCode)) ?? []
-        sizes = Dictionary(uniqueKeysWithValues: items.map { ($0.id, env.bytesOnDisk(for: $0.video)) })
         totalBytes = env.libraryBytes()
         coverages = (try? await env.database.videoCoverage(language: app.languageCode)) ?? [:]
     }
