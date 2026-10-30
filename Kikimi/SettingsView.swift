@@ -137,7 +137,13 @@ private struct LanguagesTab: View {
 
     var body: some View {
         Form {
-            ForEach(LanguageProfiles.all, id: \.code) { profile in
+            Section("I'm learning") {
+                ForEach(LanguageProfiles.all, id: \.code) { profile in
+                    Toggle(profile.displayName, isOn: learningBinding(profile))
+                        .disabled(app.learning.count == 1 && app.learning[0].code == profile.code)
+                }
+            }
+            ForEach(app.learning, id: \.code) { profile in
                 Section(profile.displayName) {
                     Picker("Speech model", selection: modelBinding(profile)) {
                         ForEach(choices(for: profile), id: \.self) { Text(label(for: $0, profile: profile)).tag($0) }
@@ -158,7 +164,17 @@ private struct LanguagesTab: View {
         }
         .formStyle(.grouped)
         .id(refresh)
-        .frame(width: 520, height: 520)
+        .frame(width: 520, height: 560)
+    }
+
+    /// Dropping a language only hides it; its words and videos stay, and ticking it again brings them back.
+    private func learningBinding(_ profile: any LanguageProfile) -> Binding<Bool> {
+        Binding(
+            get: { app.learning.contains { $0.code == profile.code } },
+            set: { on in
+                let codes = app.learning.map(\.code).filter { $0 != profile.code } + (on ? [profile.code] : [])
+                app.setLearning(codes)
+            })
     }
 
     private func modelBinding(_ profile: any LanguageProfile) -> Binding<String> {

@@ -52,6 +52,9 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       (a dependency, so ask first). Recommendation: the manual check.
 
 ### Quality
+- [x] **First-launch welcome** (30 Oct 2026): languages you are learning, the language you read, a speech model download per
+      language (or later). Not seen on screen yet (the sandbox here could not capture it). Not done: asking macOS to download
+      the translation language during setup (needs the system's own sheet), and a link to run the welcome again.
 - [x] **Release the speech model when idle.** It is let go after 2 minutes unused (never mid-import); the next
       import reloads it.
 - [ ] **Transcript performance.** It felt slow in Debug. A 20-second sample of the Debug build showed the main

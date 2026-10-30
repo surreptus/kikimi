@@ -22,7 +22,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 
 | Folder | What it holds |
 |---|---|
-| `Profiles/` | `LanguageProfile` and the Spanish, French, German and Japanese profiles; `LanguageProfiles.all` is the registry. |
+| `Profiles/` | `LanguageProfile` and the Spanish, French, German and Japanese profiles; `LanguageProfiles.all` is the registry; `LearningLanguages` is the subset the person chose. |
 | `Tokenizing/` | Turns a line of text into content words (lemma and part of speech). Spanish, French and German use Apple's `NaturalLanguage`; Japanese uses the vendored MeCab (`Sources/CMeCab`). |
 | `Dictionary/` | `DictionaryStore` reads the bundled dictionary files in place, read-only. They are never copied into the database. |
 | `Database/` | GRDB records, migrations (`LangMigrations`) and queries. Schema changes are new migrations only. |
@@ -70,6 +70,7 @@ the Words screen's search, filter and selection, so they survive switching scree
 | `VideosView`, `ImportSection` | Add videos (drop zone, model choice and download, import progress), then your videos: details, delete |
 | `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
 | `StorageView` | Downloaded models and videos, with removal |
+| `OnboardingView` | First launch only (a library with videos skips it): the languages you are learning, the language you read, and a speech model download for each. Settings > Languages changes the first two later. |
 | `SettingsView`, `BackupModel` | The ⌘, window: a standard Mac settings window with icon tabs General, Languages, Data (save and restore progress, via LangCore's `ProgressBackup`), About |
 | `AppCommands` | The menu bar: Add Videos, Storage, the Go menu (pages and Find Words), Help pages; Export and Import Progress open Settings on the Data tab |
 

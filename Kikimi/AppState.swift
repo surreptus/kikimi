@@ -58,6 +58,18 @@ final class AppState {
         }
     }
 
+    /// The languages being learned; nil until chosen on first launch.
+    private(set) var learningCodes: [String]?
+
+    /// Shown instead of the app until the person has said what they are learning.
+    var needsOnboarding: Bool { isReady && learningCodes == nil }
+
+    /// What the sidebar and Settings offer.
+    var learning: [any LanguageProfile] {
+        guard let learningCodes else { return LanguageProfiles.all }
+        return LanguageProfiles.all.filter { learningCodes.contains($0.code) }
+    }
+
     var profile: any LanguageProfile {
         LanguageProfiles.profile(for: languageCode) ?? LanguageProfiles.all[0]
     }
@@ -72,6 +84,12 @@ final class AppState {
             let env = try LangEnvironment.standard()
             try await env.prepare()
             importQueue = ImportQueue(pipeline: env.pipeline)
+            // A library from before this choice existed is already in use, so it skips the welcome.
+            if env.learning.codes == nil, try await !env.database.libraryVideos().isEmpty {
+                env.learning.codes = LanguageProfiles.all.map(\.code)
+            }
+            learningCodes = env.learning.codes
+            if let learningCodes, !learningCodes.contains(languageCode) { languageCode = learningCodes[0] }
             phase = .ready(env)
             await refreshDue()
             if let url = fileWaitingForLibrary {
@@ -81,6 +99,14 @@ final class AppState {
         } catch {
             phase = .failed(error.localizedDescription)
         }
+    }
+
+    /// Saves the languages being learned, and moves to one of them if the current one was dropped.
+    func setLearning(_ codes: [String]) {
+        guard case .ready(let env) = phase else { return }
+        env.learning.codes = codes
+        learningCodes = env.learning.codes
+        if let learningCodes, !learningCodes.contains(languageCode) { languageCode = learningCodes[0] }
     }
 
     /// Opens the Settings window on a tab.

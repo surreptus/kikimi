@@ -18,7 +18,7 @@ struct RootView: View {
             case .failed(let message):
                 ContentUnavailableView("Couldn't start", systemImage: "exclamationmark.triangle", description: Text(message))
             case .ready(let env):
-                layout(env)
+                if app.needsOnboarding { OnboardingView(env: env) } else { layout(env) }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -38,7 +38,7 @@ struct RootView: View {
 
     /// The window is the sidebar's colour once the library is open, with the page in a card on it; while it opens,
     /// or if it can't, there is no card, so the page colour fills the window.
-    private var windowColor: Color { app.isReady ? Theme.chrome : Theme.field }
+    private var windowColor: Color { app.isReady && !app.needsOnboarding ? Theme.chrome : Theme.field }
 
     /// The sidebar sits directly on the window; the current page is a rounded card beside it.
     private func layout(_ env: LangEnvironment) -> some View {
@@ -49,7 +49,7 @@ struct RootView: View {
         return HStack(spacing: 0) {
             SideNav(
                 selection: selection, dueCount: app.dueCount,
-                languages: LanguageProfiles.all.map { ($0.code, $0.displayName) },
+                languages: app.learning.map { ($0.code, $0.displayName) },
                 language: $app.languageCode, showAbout: { app.showAbout = true },
                 showSettings: { app.openSettings(app.settingsTab) })
             ZStack {
