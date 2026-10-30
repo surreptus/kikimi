@@ -12,7 +12,6 @@ struct WordDetail: View {
     @State private var exportMessage: String?
     @State private var audio: SentenceAudioPlayer?
     @State private var showsAllExamples = false
-    @AppStorage("showsKanjiBreakdown") private var showsKanji = false
     @State private var seen = WordSeen()
     private let examplesShownFirst = 5
 
@@ -22,6 +21,8 @@ struct WordDetail: View {
                 header
                 if let exportMessage { Text(exportMessage).font(Theme.small).foregroundStyle(Theme.muted) }
 
+                if !kanji.isEmpty { kanjiSection }
+
                 Text("Dictionary").font(Theme.title(17))
                 if entries.isEmpty {
                     Text("No entry found.").foregroundStyle(Theme.muted)
@@ -29,7 +30,6 @@ struct WordDetail: View {
                     ForEach(entries) { EntryView(entry: $0, showsReading: app.profile.display.showsReadings) }
                 }
 
-                // The word in use is what this app is for, so it comes before the kanji breakdown.
                 Text("From your videos").font(Theme.title(17))
                 ForEach(showsAllExamples ? examples : Array(examples.prefix(examplesShownFirst))) { line in exampleRow(line) }
                 if examples.count > examplesShownFirst {
@@ -38,8 +38,6 @@ struct WordDetail: View {
                     }
                     .buttonStyle(.plain).font(Theme.small).foregroundStyle(Theme.muted)
                 }
-
-                if !kanji.isEmpty { kanjiSection }
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -65,7 +63,8 @@ struct WordDetail: View {
     /// Each kanji in the word with its meaning and readings. On'yomi (from Chinese) are in katakana and kun'yomi
     /// (native) in hiragana, and each is labelled too, so the difference never depends on telling scripts apart.
     private var kanjiSection: some View {
-        DisclosureGroup(isExpanded: $showsKanji) {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Kanji").font(Theme.title(17))
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(kanji) { info in
                     HStack(alignment: .firstTextBaseline, spacing: 14) {
@@ -97,9 +96,6 @@ struct WordDetail: View {
                     .accessibilityLabel(kanjiLabel(info))
                 }
             }
-            .padding(.top, 8)
-        } label: {
-            Text("Kanji").font(Theme.title(17))
         }
         .help("On'yomi: reading from Chinese. Kun'yomi: native reading; the dot marks where the ending begins.")
     }
