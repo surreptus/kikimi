@@ -98,7 +98,7 @@ struct ReviewView: View {
 
                 if revealed {
                     VStack(spacing: 10) {
-                        if app.profile.display.showsReadings, let reading = card.entries.first?.reading {
+                        if app.profile.display.showsReadings, let reading = readings(of: card) {
                             Text(reading).font(Theme.title(22)).foregroundStyle(Theme.ink)
                         }
                         Text(card.entries.first?.gloss ?? "No dictionary entry")
@@ -166,6 +166,12 @@ struct ReviewView: View {
     }
 
     /// The fill-in version of a card, when that is the chosen style and the word has a sentence to blank.
+    /// "つき・がつ": every reading the word has, so a word read two ways is learned both ways.
+    private func readings(of card: ReviewCard) -> String? {
+        let all = card.entries.readings(of: card.word.lemma, first: card.entries.first?.reading)
+        return all.isEmpty ? nil : all.joined(separator: "・")
+    }
+
     private func cloze(for card: ReviewCard) -> ClozeCard? {
         style == .cloze ? ClozeCard.make(from: card, showsReading: app.profile.display.showsReadings) : nil
     }
@@ -184,7 +190,7 @@ struct ReviewView: View {
             }
             VStack(spacing: 8) {
                 Text(card.word.lemma).font(Theme.title(22))
-                if app.profile.display.showsReadings, let reading = card.entries.first?.reading {
+                if app.profile.display.showsReadings, let reading = readings(of: card) {
                     Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
                 }
                 Text(card.entries.first?.gloss ?? "No dictionary entry")
@@ -212,7 +218,7 @@ struct ReviewView: View {
             Text(filled(cloze)).font(.system(size: 28, design: .rounded)).multilineTextAlignment(.center)
             VStack(spacing: 8) {
                 Text(card.word.lemma).font(Theme.title(22))
-                if app.profile.display.showsReadings, let reading = card.entries.first?.reading {
+                if app.profile.display.showsReadings, let reading = readings(of: card) {
                     Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
                 }
                 Text(card.entries.first?.gloss ?? "No dictionary entry")

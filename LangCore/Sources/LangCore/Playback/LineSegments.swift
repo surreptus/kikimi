@@ -41,6 +41,21 @@ public struct WordHint: Sendable, Equatable {
     public let status: WordStatus?
     /// Where it is in the review stages, for a word being learned.
     public let stage: SRSStage?
+    /// The word's other readings (月 is つき, and also がつ), after `reading`.
+    public var otherReadings: [String] = []
+}
+
+extension [DictionaryEntry] {
+    /// The distinct readings of the entries spelled `headword`, in dictionary order (the commoner first), with
+    /// `first` leading when given. A spelling can have several (月: つき, がつ, げつ); `limit` keeps a kanji with
+    /// a dozen from filling the line.
+    public func readings(of headword: String, first: String? = nil, limit: Int = 4) -> [String] {
+        var seen = Set<String>(), result: [String] = []
+        for reading in [first] + filter({ $0.headword == headword }).map(\.reading) {
+            if let reading, seen.insert(reading).inserted { result.append(reading) }
+        }
+        return [String](result.prefix(limit))
+    }
 }
 
 extension DictionaryEntry {
@@ -61,8 +76,10 @@ extension LangEnvironment {
             try Word.filter(Column("language") == language && Column("lemma") == token.lemma && Column("pos") == token.pos.rawValue)
                 .fetchOne(db)
         }
-        return WordHint(wordID: word?.id, lemma: token.lemma, pos: token.pos, reading: entry?.reading ?? token.reading,
-                        gloss: entry?.shortGloss, status: word?.status, stage: word?.stage)
+        let reading = entry?.reading ?? token.reading
+        return WordHint(wordID: word?.id, lemma: token.lemma, pos: token.pos, reading: reading,
+                        gloss: entry?.shortGloss, status: word?.status, stage: word?.stage,
+                        otherReadings: entries.readings(of: token.lemma, first: reading).filter { $0 != reading })
     }
 }
 

@@ -13,6 +13,23 @@ final class HomographHintTests: XCTestCase {
         XCTAssertEqual(hint?.gloss, "autumn; fall", "and the meaning that goes with that reading")
     }
 
+    func testTheHintListsTheOtherReadingsToo() async throws {
+        let env = try makeEnvironment(entries: [("月", "つき", "moon"), ("月", "がつ", "month"), ("月", "げつ", "Monday"), ("付き", "つき", "attached")])
+        defer { try? FileManager.default.removeItem(at: env.root) }
+        let gatsu = Token(surface: "月", lemma: "月", pos: .noun, reading: "がつ")
+        let hint = await env.hint(for: gatsu, language: "ja")
+        XCTAssertEqual(hint?.reading, "がつ")
+        XCTAssertEqual(hint?.otherReadings, ["つき", "げつ"], "the others, commoner first, without the one shown or other spellings' readings")
+    }
+
+    func testReadingsAreDistinctLimitedAndLeadWithTheGivenOne() {
+        let entries = ["a", "b", "a", "c", "d", "e"].map { DictionaryEntry(language: "ja", headword: "x", reading: $0, gloss: "") }
+            + [DictionaryEntry(language: "ja", headword: "y", reading: "z", gloss: ""), DictionaryEntry(language: "es", headword: "x", gloss: "")]
+        XCTAssertEqual(entries.readings(of: "x"), ["a", "b", "c", "d"])
+        XCTAssertEqual(entries.readings(of: "x", first: "c"), ["c", "a", "b", "d"])
+        XCTAssertEqual(entries.readings(of: "q"), [])
+    }
+
     func testWithNoMatchingReadingItFallsBackToTheFirstEntry() async throws {
         let env = try makeEnvironment(entries: [("秋", "とき", "time"), ("秋", "あき", "autumn")])
         defer { try? FileManager.default.removeItem(at: env.root) }

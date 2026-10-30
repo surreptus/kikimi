@@ -393,6 +393,10 @@ struct PlayerView: View {
                     if let reading = hint?.reading ?? token.reading {
                         Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
                     }
+                    if let others = hint?.otherReadings, !others.isEmpty {
+                        Text(others.joined(separator: "・")).font(.system(.callout, design: .rounded)).foregroundStyle(Theme.muted)
+                            .accessibilityLabel("Also read \(listed(others))")
+                    }
                     StatusPill(text: token.pos.title)
                     // Japanese verbs and adjectives show the form they are in; the link opens the page on how it is built.
                     if let stem = TsumikiStem.stem(for: token) {
