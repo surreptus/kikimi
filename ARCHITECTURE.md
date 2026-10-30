@@ -50,6 +50,11 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 The original is only read. Any failure removes only what this import created. Tests inject a failure at each step
 and check the original is unchanged. `ImportQueue` runs imports one at a time for the UI and reports status.
 
+The library copy: small HEVC is kept as is, otherwise low-bitrate HEVC with the short side at most 480 px (the
+original streams are copied if re-encoding isn't smaller). Its sound is AAC, copied when already small, otherwise
+about 64 kbps (48 for mono). Sentence audio and audio clips play from this copy; there is no separate audio file.
+Settings > General > Video quality can keep the user's file as it is instead.
+
 The two hardest files are `AVFoundationTranscoder.swift` (it starts with a reading guide) and `ImportPipeline.swift`.
 
 ## The website
@@ -84,9 +89,24 @@ audio, one folder per content hash), `Staging/` (temporary), `models/` (speech m
 ## Tests
 
 `cd LangCore && swift test`. The tests are the best examples of how each part is used. Anything needing a real
-model or file is opt-in through environment variables listed in the README. There are no UI tests; the views are
+model or file is opt-in through environment variables and skipped by default. There are no UI tests; the views are
 checked by building and by rendered previews.
+
+| Variable | Runs |
+|---|---|
+| `LANGCORE_INTEGRATION=1` | Real WhisperKit transcription and language detection with the tiny model (downloads ~73 MB) |
+| `LANGCORE_BENCHMARK=1` | Accuracy and speed on synthesized speech; set `LANGCORE_MODEL` and `LANGCORE_MODELS_DIR` to choose the model |
+| `LANGCORE_FILE=<media>` | With the benchmark: transcribe or detect the language of one file (read-only) |
+| `LANGCORE_COMPACT_FILE=<video>` | Report what video compaction does to one file (read-only) |
+
+If `xcode-select` points at the Command Line Tools, prefix with `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`
+(XCTest needs Xcode's toolchain). The dictionary builders have their own tests:
+`python3 Scripts/dictionaries/test_builders.py`. `Scripts/check_leaks.sh` runs the `LangCore` tests under macOS's
+`leaks` tool and fails if anything leaked; it doesn't cover the SwiftUI app.
 
 ## Adding a language
 
-Write a profile, add it to `LanguageProfiles.all`, add a dictionary build script. See the README.
+Write a profile, add it to `LanguageProfiles.all`, and add a script that builds its dictionary. The `words` and
+`dictionary` tables are keyed by language, so there is no schema change. Check the tokenizer first: Apple's
+`NaturalLanguage` gives good lemmas for Spanish, French and German, but none for Japanese, which is why Japanese
+uses MeCab.
