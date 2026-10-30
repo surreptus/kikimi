@@ -46,6 +46,9 @@ missing=0
 for f in LangCore/Sources/LangCore/Resources/ipadic/sys.dic \
          LangCore/Sources/LangCore/Resources/dictionaries/dictionary-ja.sqlite \
          LangCore/Sources/LangCore/Resources/dictionaries/dictionary-es.sqlite \
+         LangCore/Sources/LangCore/Resources/dictionaries/dictionary-fr.sqlite \
+         LangCore/Sources/LangCore/Resources/dictionaries/dictionary-de.sqlite \
+         LangCore/Sources/LangCore/Resources/dictionaries/kanji-ja.sqlite \
          Kikimi/PrivacyInfo.xcprivacy; do
   [ -e "$f" ] || { echo "missing: $f" >&2; missing=1; }
 done

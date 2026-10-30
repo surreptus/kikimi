@@ -375,6 +375,9 @@
     "Already in library" : {
 
     },
+    "Also read %@" : {
+
+    },
     "Also restore the settings in this file" : {
 
     },
@@ -543,8 +546,15 @@
     "Download model" : {
 
     },
-    "Download the %@ speech model" : {
-
+    "Download the %@ speech model for %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Download the %1$@ speech model for %2$@"
+          }
+        }
+      }
     },
     "Download the speech model to start importing" : {
 
@@ -763,6 +773,9 @@
     "Jump to this line" : {
 
     },
+    "Kanji" : {
+
+    },
     "Keeping your progress safe" : {
 
     },
@@ -785,6 +798,12 @@
 
     },
     "Known words shown" : {
+
+    },
+    "Kun" : {
+
+    },
+    "Kun reading: %@" : {
 
     },
     "Language" : {
@@ -919,6 +938,9 @@
     "Match system follows your Mac's Light or Dark setting." : {
 
     },
+    "Meaning: %@" : {
+
+    },
     "Missed it" : {
 
     },
@@ -998,6 +1020,12 @@
 
     },
     "On" : {
+
+    },
+    "On is the reading from Chinese, in katakana. Kun is the native reading, in hiragana; the dot marks where the ending begins." : {
+
+    },
+    "On reading: %@" : {
 
     },
     "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. In Settings > Languages, Review cards can be set to Fill in the word (the sentence appears with the word blanked and a short hint, and you recall it before showing the answer) or to Listen to the sentence (only the sound plays, and you show the answer to read it). On the Review page, Check my known words tests a few words you marked known; any you miss go back to your reviews. Below the word stages, Your progress shows how long you have listened, how many reviews you got right, the words you started learning each week, and the words you looked up most; it starts counting from when it was added and stays on this Mac. Come back whenever the number beside Review is above zero." : {
