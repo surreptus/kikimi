@@ -77,13 +77,13 @@ struct WordDetail: View {
                             Grid(alignment: .topLeading, horizontalSpacing: 8, verticalSpacing: 2) {
                                 if !info.onReadings.isEmpty {
                                     GridRow {
-                                        Text("On").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                                        Text("On'yomi").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
                                         Text(info.onReadings.joined(separator: "、"))
                                     }
                                 }
                                 if !info.kunReadings.isEmpty {
                                     GridRow {
-                                        Text("Kun").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                                        Text("Kun'yomi").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
                                         Text(info.kunReadings.joined(separator: "、"))
                                     }
                                 }
@@ -101,7 +101,7 @@ struct WordDetail: View {
         } label: {
             Text("Kanji").font(Theme.title(17))
         }
-        .help("On: reading from Chinese. Kun: native reading; the dot marks where the ending begins.")
+        .help("On'yomi: reading from Chinese. Kun'yomi: native reading; the dot marks where the ending begins.")
     }
 
     private func kanjiLabel(_ info: KanjiInfo) -> String {
@@ -112,26 +112,12 @@ struct WordDetail: View {
         return parts.joined(separator: ". ")
     }
 
-    /// The word gets a line to itself, so even a long one isn't squeezed; its status and actions share the line below.
+    /// The word, with its audio and clip menu beside it; its status and actions share the line below.
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.7).textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            if seen.lines > 0 {
-                Text("Seen in ^[\(seen.lines) line](inflect: true) across ^[\(seen.videos) video](inflect: true)")
-                    .font(Theme.small).foregroundStyle(Theme.muted)
-            }
             HStack(spacing: 10) {
-                StatusBadge(status: row.word.status, stage: row.word.stage)
-                Spacer(minLength: 8)
-                if row.word.status != .learning && row.word.status != .finished {
-                    Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
-                        .help("Start learning this word")
-                }
-                if row.word.status != .known {
-                    Button("Known") { setStatus(.known) }.buttonStyle(.pill(.secondary, compact: true))
-                        .help("Mark this word as known")
-                }
+                Text(row.word.lemma).font(Theme.title(32)).lineLimit(2).minimumScaleFactor(0.7).textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 SpeakButton(
                     text: (app.profile.display.showsReadings ? entries.first?.reading : nil) ?? row.word.lemma,
                     languageCode: LanguageProfiles.profile(for: row.word.language)?.whisperCode ?? row.word.language)
@@ -146,6 +132,22 @@ struct WordDetail: View {
                     }
                     .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
                     .help("Export this word's example sentences as clips")
+                }
+            }
+            if seen.lines > 0 {
+                Text("Seen in ^[\(seen.lines) line](inflect: true) across ^[\(seen.videos) video](inflect: true)")
+                    .font(Theme.small).foregroundStyle(Theme.muted)
+            }
+            HStack(spacing: 10) {
+                StatusBadge(status: row.word.status, stage: row.word.stage)
+                Spacer(minLength: 8)
+                if row.word.status == .new {
+                    Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
+                        .help("Start learning this word")
+                }
+                if row.word.status != .known {
+                    Button("Known") { setStatus(.known) }.buttonStyle(.pill(.secondary, compact: true))
+                        .help("Mark this word as known")
                 }
             }
         }
