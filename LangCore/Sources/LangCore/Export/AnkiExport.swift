@@ -48,8 +48,8 @@ public enum AnkiExport {
             if let audioFile { back.append("[sound:\(audioFile)]") }
         }
         return AnkiCard(
-            guid: "aomame:\(word.language):\(word.lemma):\(word.pos.rawValue)",
-            front: html(word.lemma), back: back.joined(separator: "<br>"), tags: ["aomame", "aomame_\(word.language)"])
+            guid: "kikimi:\(word.language):\(word.lemma):\(word.pos.rawValue)",
+            front: html(word.lemma), back: back.joined(separator: "<br>"), tags: ["kikimi", "kikimi_\(word.language)"])
     }
 
     /// The text of the import file. Fields can't contain tabs or line breaks, so they are turned into spaces and <br>.
@@ -109,7 +109,7 @@ extension LangEnvironment {
             var audioFile: String?
             if includeAudio, let example, let video = try await database.video(id: example.videoID) {
                 try FileManager.default.createDirectory(at: mediaFolder, withIntermediateDirectories: true)
-                let name = "aomame-\(ClipExporter.sanitized(word.lemma))-\(example.id).m4a"
+                let name = "kikimi-\(ClipExporter.sanitized(word.lemma))-\(example.id).m4a"
                 do {
                     try await clips.export(video: video, start: example.startTime, end: example.endTime, kind: .audio,
                                            to: mediaFolder.appending(path: name))
@@ -122,8 +122,8 @@ extension LangEnvironment {
                 gloss: entry?.gloss, example: example, audioFile: audioFile))
         }
 
-        let deck = "Aomame \(profile?.displayName ?? language)"
-        let file = ClipExporter.uniqueURL(in: folder, base: "aomame-anki-\(language)", ext: "txt")
+        let deck = "Kikimi \(profile?.displayName ?? language)"
+        let file = ClipExporter.uniqueURL(in: folder, base: "kikimi-anki-\(language)", ext: "txt")
         try AnkiExport.importFile(cards: cards, deck: deck).write(to: file, atomically: true, encoding: .utf8)
         return AnkiExportResult(file: file, cards: cards.count, audioFiles: audioCount, mediaFolder: audioCount > 0 ? mediaFolder : nil)
     }

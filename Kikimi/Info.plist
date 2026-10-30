@@ -24,14 +24,14 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Aomame backup</string>
+			<string>Kikimi backup</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
 			<string>Owner</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.surreptus.aomame.backup</string>
+				<string>com.surreptus.kikimi.backup</string>
 			</array>
 		</dict>
 	</array>
@@ -39,9 +39,9 @@
 	<array>
 		<dict>
 			<key>UTTypeIdentifier</key>
-			<string>com.surreptus.aomame.backup</string>
+			<string>com.surreptus.kikimi.backup</string>
 			<key>UTTypeDescription</key>
-			<string>Aomame backup</string>
+			<string>Kikimi backup</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.json</string>
@@ -50,7 +50,7 @@
 			<dict>
 				<key>public.filename-extension</key>
 				<array>
-					<string>aomame</string>
+					<string>kikimi</string>
 				</array>
 			</dict>
 		</dict>

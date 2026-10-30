@@ -4,7 +4,7 @@ import GRDB
 /// The videos in a full backup: what each is, and its transcript. The compressed video files sit beside this file in
 /// `Library/<hash>/`. Words are not stored here: they are found again from the transcript, as when a video is added.
 public struct LibraryBackup: Codable, Equatable, Sendable {
-    public static let format = "aomame-library"
+    public static let format = "kikimi-library"
     public static let currentVersion = 1
 
     public var format = LibraryBackup.format

@@ -1,7 +1,7 @@
 import LangCore
 import SwiftUI
 
-/// How Aomame works: the first-time steps, what each import step does and how long it takes, how reviews are
+/// How Kikimi works: the first-time steps, what each import step does and how long it takes, how reviews are
 /// scheduled, and the keyboard shortcuts. The review intervals are read from `SRS`, so this page can't drift from it.
 struct AboutView: View {
     @Environment(\.dismissModal) private var dismiss
@@ -14,7 +14,7 @@ struct AboutView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("How Aomame works").font(Theme.title(22))
+                Text("How Kikimi works").font(Theme.title(22))
                 Spacer()
                 Button("Done") { dismiss() }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
             }
@@ -55,7 +55,7 @@ struct AboutView: View {
         section("The first time") {
             VStack(alignment: .leading, spacing: 12) {
                 step(1, "Add a video", "On Videos, drop a video file you own. The first time, pick a speech model and let it download once; the sizes are shown next to each choice.")
-                step(2, "Let it transcribe", "Aomame listens to the video on this Mac and writes out what is said, with times. This is the long step. In our tests the medium model took about 3 minutes for a 10 minute video on an Apple silicon Mac; larger models are slower.")
+                step(2, "Let it transcribe", "Kikimi listens to the video on this Mac and writes out what is said, with times. This is the long step. In our tests the medium model took about 3 minutes for a 10 minute video on an Apple silicon Mac; larger models are slower.")
                 step(3, "Choose your words", "On Words, the words from your videos are listed by how often they appear. Select the ones you want to learn and press Start learning, or mark the ones you already know.")
                 step(4, "Practise", "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. In Settings > Languages, Review cards can be set to Fill in the word (the sentence appears with the word blanked and a short hint, and you recall it before showing the answer) or to Listen to the sentence (only the sound plays, and you show the answer to read it). On the Review page, Check my known words tests a few words you marked known; any you miss go back to your reviews. Below the word stages, Your progress shows how long you have listened, how many reviews you got right, the words you started learning each week, and the words you looked up most; it starts counting from when it was added and stays on this Mac. Come back whenever the number beside Review is above zero.")
             }
@@ -78,7 +78,7 @@ struct AboutView: View {
 
     private var importSteps: some View {
         section("What happens when you add a video") {
-            paragraph("Your original file is only ever read, never changed or deleted. Aomame works on a copy and keeps a smaller one for playback. While a video is being added, its row says which step it is on, such as 4 of 7 · Transcribing. If you chose to go ahead despite a language warning, the language check is skipped and there are 6 steps.")
+            paragraph("Your original file is only ever read, never changed or deleted. Kikimi works on a copy and keeps a smaller one for playback. While a video is being added, its row says which step it is on, such as 4 of 7 · Transcribing. If you chose to go ahead despite a language warning, the language check is skipped and there are 6 steps.")
             VStack(alignment: .leading, spacing: 8) {
                 row("Reading file", "Checks whether you've already added this video, by its contents rather than its name.")
                 row("Copying", "Makes a working copy. Seconds.")
@@ -102,7 +102,7 @@ struct AboutView: View {
 
     private var reviews: some View {
         section("How reviews are scheduled") {
-            paragraph("Aomame uses spaced repetition: a word you get right comes back after a longer wait each time, and one you miss comes back sooner. A word you are learning moves through these stages:")
+            paragraph("Kikimi uses spaced repetition: a word you get right comes back after a longer wait each time, and one you miss comes back sooner. A word you are learning moves through these stages:")
             Grid(alignment: .leading, horizontalSpacing: 24, verticalSpacing: 6) {
                 GridRow {
                     Text("").frame(width: 18)
@@ -156,7 +156,7 @@ struct AboutView: View {
 
     private var backups: some View {
         section("Keeping your progress safe") {
-            paragraph("In Settings, under Data, Save backup writes the words you are learning and the ones you know, with their stages and review dates, to a file ending in .aomame. Turn on Include my videos and transcripts to save a folder instead, with each video's compressed copy and transcript, so a new Mac needs no re-transcribing. To restore, choose the file or folder; what you already have is never overwritten. Speech models are never included.")
+            paragraph("In Settings, under Data, Save backup writes the words you are learning and the ones you know, with their stages and review dates, to a file ending in .kikimi. Turn on Include my videos and transcripts to save a folder instead, with each video's compressed copy and transcript, so a new Mac needs no re-transcribing. To restore, choose the file or folder; what you already have is never overwritten. Speech models are never included.")
             paragraph("To restore, choose the file in the same place, drop it there, or double-click it. You'll see what would change first, and progress you already have is never overwritten. Words from a backup join their sentences when you add the videos again.")
         }
     }

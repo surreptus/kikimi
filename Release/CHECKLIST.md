@@ -1,18 +1,18 @@
-# Release checklist (Aomame)
+# Release checklist (Kikimi)
 
 Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 
 ## One-time setup
 - [ ] Apple Developer Program membership (paid). Note your **team ID** (developer.apple.com > Membership).
-- [x] **Bundle ID** is `com.surreptus.Aomame` (set in the Aomame target). Changing it later moves the app's data
+- [x] **Bundle ID** is `com.surreptus.Kikimi` (set in the Kikimi target). Changing it later moves the app's data
       container, so do that before anyone has data.
 - [ ] Choose your team in the target (Signing & Capabilities). Keep "Automatically manage signing" on.
-- [x] **App icon**: an asanoha (hemp leaf) star in white line on dark green, drawn for Aomame (the Dock shows a light version in Light appearance) (`Scripts/icon/make_icon.swift` regenerates it) (PNGs in `Aomame/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
+- [x] **App icon**: an asanoha (hemp leaf) star in white line on dark green, drawn for Kikimi (the Dock shows a light version in Light appearance) (`Scripts/icon/make_icon.swift` regenerates it) (PNGs in `Kikimi/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
 - [ ] Open a video in the **Release** build, not only the Debug one: Release links differently (the AVKit link is set in the target's `OTHER_LDFLAGS` because SwiftUI's `VideoPlayer` never names it).
 - [x] Version: `MARKETING_VERSION` is `0.9.0` (a public beta; the first release is 0.9.0, and 1.0.0 follows once the 1.0 list in the roadmap is done), build `1`.
       Raise `CURRENT_PROJECT_VERSION` (a plain integer) for every release handed to anyone. After that: `0.9.x` fixes, `0.10.0` or `1.0.0` features. Tag the release commit `v0.9.0` and attach the notarized zip to a GitHub Release.
 - [ ] Direct download only: create a notarization profile once:
-      `xcrun notarytool store-credentials aomame --apple-id <you> --team-id <TEAM_ID>`
+      `xcrun notarytool store-credentials kikimi --apple-id <you> --team-id <TEAM_ID>`
       (uses an app-specific password from appleid.apple.com).
 
 ## Every release
@@ -25,7 +25,7 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       Note the word error rate and speed in the release notes; a result far worse than the README's figures (about 23% on a
       long Spanish passage with `medium`) is a reason to stop and look.
 - [ ] Open the project in Xcode once and check **Product > Archive > Generate Privacy Report**. Every API listed
-      must be covered by `Aomame/PrivacyInfo.xcprivacy` (it currently declares UserDefaults only; this was not
+      must be covered by `Kikimi/PrivacyInfo.xcprivacy` (it currently declares UserDefaults only; this was not
       checked against third-party packages).
 - [ ] Build: `TEAM_ID=... Scripts/release.sh developer-id --notarize` (direct) or `... app-store`.
 
@@ -38,8 +38,8 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 
 ## Mac App Store extras
 - [ ] App record in App Store Connect with the same bundle ID.
-- [ ] Privacy policy URL: publish `Aomame/Privacy.md` (the app shows the same file) and add a contact line to it first.
-- [ ] Terms of use: fill in the `[Contact email]` placeholder in `Aomame/Terms.md` (governing law is California), and
+- [ ] Privacy policy URL: publish `Kikimi/Privacy.md` (the app shows the same file) and add a contact line to it first.
+- [ ] Terms of use: fill in the `[Contact email]` placeholder in `Kikimi/Terms.md` (governing law is California), and
       have a lawyer read it, before publishing or shipping.
       Privacy "nutrition label": data not collected.
 - [ ] Export compliance: only standard HTTPS (model downloads) is used.

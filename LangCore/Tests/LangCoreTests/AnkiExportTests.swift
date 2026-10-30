@@ -15,11 +15,11 @@ final class AnkiExportTests: XCTestCase {
     func testACardHasTheWordMeaningAndASentenceWithTheWordInBold() throws {
         let card = AnkiExport.card(
             word: word(), reading: nil, gloss: "1. (noun) house\n2. (noun) home",
-            example: try example("La casa es grande.", surface: "casa"), audioFile: "aomame-casa-7.m4a")
-        XCTAssertEqual(card.guid, "aomame:es:casa:noun")
+            example: try example("La casa es grande.", surface: "casa"), audioFile: "kikimi-casa-7.m4a")
+        XCTAssertEqual(card.guid, "kikimi:es:casa:noun")
         XCTAssertEqual(card.front, "casa")
-        XCTAssertEqual(card.back, "1. (noun) house<br>2. (noun) home<br><br><i>La <b>casa</b> es grande.</i><br><small>Un día</small><br>[sound:aomame-casa-7.m4a]")
-        XCTAssertEqual(card.tags, ["aomame", "aomame_es"])
+        XCTAssertEqual(card.back, "1. (noun) house<br>2. (noun) home<br><br><i>La <b>casa</b> es grande.</i><br><small>Un día</small><br>[sound:kikimi-casa-7.m4a]")
+        XCTAssertEqual(card.tags, ["kikimi", "kikimi_es"])
     }
 
     func testTheReadingComesFirstOnTheBackAndIsLeftOutWhenItIsTheWord() throws {
@@ -40,15 +40,15 @@ final class AnkiExportTests: XCTestCase {
 
     func testTheFileHasTheHeaderLinesAndOneTabSeparatedRowPerCard() {
         let cards = [
-            AnkiCard(guid: "g1", front: "casa", back: "house\nwith a\ttab", tags: ["aomame", "aomame_es"]),
-            AnkiCard(guid: "g2", front: "perro", back: "dog", tags: ["aomame"]),
+            AnkiCard(guid: "g1", front: "casa", back: "house\nwith a\ttab", tags: ["kikimi", "kikimi_es"]),
+            AnkiCard(guid: "g2", front: "perro", back: "dog", tags: ["kikimi"]),
         ]
-        let text = AnkiExport.importFile(cards: cards, deck: "Aomame Spanish")
+        let text = AnkiExport.importFile(cards: cards, deck: "Kikimi Spanish")
         let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
         XCTAssertEqual(Array(lines.prefix(6)), ["#separator:tab", "#html:true", "#guid column:1", "#notetype:Basic",
-                                                "#deck:Aomame Spanish", "#tags column:4"])
-        XCTAssertEqual(lines[6], "g1\tcasa\thouse<br>with a tab\taomame aomame_es", "no raw tab or line break inside a field")
-        XCTAssertEqual(lines[7], "g2\tperro\tdog\taomame")
+                                                "#deck:Kikimi Spanish", "#tags column:4"])
+        XCTAssertEqual(lines[6], "g1\tcasa\thouse<br>with a tab\tkikimi kikimi_es", "no raw tab or line break inside a field")
+        XCTAssertEqual(lines[7], "g2\tperro\tdog\tkikimi")
         XCTAssertEqual(lines[6].filter { $0 == "\t" }.count, 3, "four columns")
         XCTAssertTrue(text.hasSuffix("\n"))
     }
@@ -97,8 +97,8 @@ final class AnkiExportTests: XCTestCase {
         XCTAssertEqual(result.audioFiles, 1)
         let text = try String(contentsOf: result.file, encoding: .utf8)
         XCTAssertTrue(text.hasPrefix("#separator:tab"))
-        XCTAssertTrue(text.contains("#deck:Aomame Spanish"))
-        XCTAssertTrue(text.contains("aomame:es:casa:noun\tcasa\t"))
+        XCTAssertTrue(text.contains("#deck:Kikimi Spanish"))
+        XCTAssertTrue(text.contains("kikimi:es:casa:noun\tcasa\t"))
         let media = try FileManager.default.contentsOfDirectory(atPath: result.mediaFolder!.path)
         XCTAssertEqual(media.count, 1)
         XCTAssertTrue(text.contains("[sound:\(media[0])]"), "the card points at the clip that was written")

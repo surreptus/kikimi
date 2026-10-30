@@ -96,7 +96,7 @@ private struct GeneralTab: View {
                     Text("Original quality").tag(VideoQuality.original.rawValue)
                 }
             } footer: {
-                Text("The copy Aomame keeps of each video you add. Smallest compresses it (in our tests a 161 MB video became 29 MB), which is plenty to follow along and study from. Original quality keeps your file exactly as it is: the best picture and sound, but the same size. Your own files are never changed either way, and this applies to videos you add from now on.")
+                Text("The copy Kikimi keeps of each video you add. Smallest compresses it (in our tests a 161 MB video became 29 MB), which is plenty to follow along and study from. Original quality keeps your file exactly as it is: the best picture and sound, but the same size. Your own files are never changed either way, and this applies to videos you add from now on.")
             }
         }
         .formStyle(.grouped)
@@ -433,23 +433,23 @@ private struct AboutTab: View {
     var body: some View {
         Form {
             Section {
-                LabeledContent("Aomame", value: "Version \(version)")
+                LabeledContent("Kikimi", value: "Version \(version)")
                 Text("Learn Spanish or Japanese from videos you own, on your Mac.").foregroundStyle(.secondary)
             }
             Section("Read more") {
-                Button("How Aomame works") { inMainWindow { app.showAbout = true } }
+                Button("How Kikimi works") { inMainWindow { app.showAbout = true } }
                 Button("Privacy policy") { inMainWindow { app.showPrivacy = true } }
                 Button("Terms of use") { inMainWindow { app.showTerms = true } }
                 Button("Acknowledgements") { inMainWindow { app.showAcknowledgements = true } }
             }
             Section {
-                if let url = URL(string: "https://github.com/surreptus/aomame") {
-                    Link("github.com/surreptus/aomame", destination: url)
+                if let url = URL(string: "https://github.com/surreptus/kikimi") {
+                    Link("github.com/surreptus/kikimi", destination: url)
                 }
             } header: {
                 Text("Open source")
             } footer: {
-                Text("Aomame is free software under the MIT licence.")
+                Text("Kikimi is free software under the MIT licence.")
             }
         }
         .formStyle(.grouped)

@@ -35,7 +35,7 @@ struct AppCommands: Commands {
         }
 
         CommandGroup(replacing: .help) {
-            Button("How Aomame Works") { app.showAbout = true }
+            Button("How Kikimi Works") { app.showAbout = true }
                 .disabled(!app.isReady)
             Button("Privacy Policy") { app.showPrivacy = true }
                 .disabled(!app.isReady)

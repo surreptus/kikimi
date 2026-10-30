@@ -89,7 +89,7 @@ final class AppState {
         settingsRequest += 1   // the main window sees this and opens it (only a view can, through `openSettings`)
     }
 
-    /// A `.aomame` file opened from Finder or dropped on the Dock icon: show what it would restore.
+    /// A `.kikimi` file opened from Finder or dropped on the Dock icon: show what it would restore.
     /// On a cold start the file arrives before the library has opened, so it waits until it has.
     func handleOpen(_ url: URL) {
         guard url.pathExtension == ProgressBackup.fileExtension else { return }

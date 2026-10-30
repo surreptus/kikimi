@@ -39,7 +39,7 @@ struct SideNav: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Aomame").font(Theme.title(20)).foregroundStyle(Theme.ink)
+            Text("Kikimi").font(Theme.title(20)).foregroundStyle(Theme.ink)
                 .padding(.bottom, 14)
                 .padding(.horizontal, 12)
                 .padding(.top, 30)   // clears the window's traffic-light buttons

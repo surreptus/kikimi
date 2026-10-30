@@ -66,7 +66,7 @@ struct VideosView: View {
                     VStack(spacing: 8) {
                         EmptyState(title: "No videos yet", message: "Drop one above and its words will appear on the Words page.",
                                    illustration: .clapperboard)
-                        Button("How Aomame works") { app.showAbout = true }.buttonStyle(.pill(.secondary, compact: true))
+                        Button("How Kikimi works") { app.showAbout = true }.buttonStyle(.pill(.secondary, compact: true))
                     }
                     .frame(maxWidth: .infinity, minHeight: 200)
                 } else {

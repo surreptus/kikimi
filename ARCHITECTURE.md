@@ -4,7 +4,7 @@ A map for finding your way around. The [README](README.md) says what the app doe
 
 ## The one rule
 
-All logic lives in `LangCore/` (a Swift package with no UI). `Aomame/` holds SwiftUI views only and calls into
+All logic lives in `LangCore/` (a Swift package with no UI). `Kikimi/` holds SwiftUI views only and calls into
 `LangCore` through one object, `LangEnvironment`. If you are adding behaviour, it almost certainly belongs in
 `LangCore`, with a test.
 
@@ -16,7 +16,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
    dictionaries, the model manager and the import queue, and is what the views hold.
 2. `Profiles/LanguageProfile.swift`: everything that differs between languages.
 3. `Import/ImportPipeline.swift`: the most important flow. `importVideo` reads as a list of steps.
-4. `Aomame/RootView.swift`, then the view for the screen you care about.
+4. `Kikimi/RootView.swift`, then the view for the screen you care about.
 
 ## LangCore, by folder
 
@@ -31,13 +31,13 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `SRS/`, `Review/` | The nine review stages and their intervals; review sessions and sentence audio; the overview (ready, coming up, words per stage). |
 | `Playback/` | The player controller, subtitle timeline and word hints. |
 | `Export/` | Audio and video clip export. |
-| `Resources/Localizable.xcstrings` | Strings shown to the user from this package (errors, titles). The app's own are in `Aomame/Localizable.xcstrings`. |
+| `Resources/Localizable.xcstrings` | Strings shown to the user from this package (errors, titles). The app's own are in `Kikimi/Localizable.xcstrings`. |
 | `Database/LangDatabase+EditLine.swift` | Editing a subtitle line and re-finding its words. |
 | `Export/AnkiExport.swift` | The Anki import file (tab-separated text with header lines) and the export of a set of words, with optional sentence audio. |
 | `Review/ClozeCard.swift` | The fill-in-the-blank card (the sentence with the word blanked, and its hint) and the per-language choice of review style (meaning, fill in, listening). `KnownCheck.swift`: a sample of known words for the quick check. |
 | `Database/LangDatabase+Activity.swift` | The daily tally (`activity` table: listening seconds, lookups, words started or marked known, reviews) and the stats the Review page shows. |
 | `Coverage/` | How much of a video you know (`VideoCoverage`, `LevelFit`), the shortest word list that reaches a target (`wordsToReach`), and marking a list of known words. |
-| `Backup/` | `ProgressBackup`: the `.aomame` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. `LibraryBackup`: the full-backup folder (progress file, `library.json` of transcripts, and the compressed videos), restored by adding the videos that aren't here yet. |
+| `Backup/` | `ProgressBackup`: the `.kikimi` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. `LibraryBackup`: the full-backup folder (progress file, `library.json` of transcripts, and the compressed videos), restored by adding the videos that aren't here yet. |
 | `Environment/` | `LangEnvironment` and where videos live on disk. |
 
 ## The import pipeline
@@ -54,12 +54,12 @@ The two hardest files are `AVFoundationTranscoder.swift` (it starts with a readi
 ## The website
 
 `site/` is an [Astro](https://astro.build) project of static pages (home, privacy, terms) in the app's colours, with no client
-script. The privacy and terms pages import `Aomame/Privacy.md` and `Aomame/Terms.md` directly, so there is one copy
+script. The privacy and terms pages import `Kikimi/Privacy.md` and `Kikimi/Terms.md` directly, so there is one copy
 of each. `.github/workflows/site.yml` builds it and deploys to GitHub Pages.
 
 ## The app
 
-`AomameApp` → `RootView` (floating nav plus the current section). `AppState` holds which section is showing and
+`KikimiApp` → `RootView` (floating nav plus the current section). `AppState` holds which section is showing and
 the Words screen's search, filter and selection, so they survive switching screens.
 
 | View | Screen |
@@ -76,7 +76,7 @@ the Words screen's search, filter and selection, so they survive switching scree
 
 ## Data on disk
 
-Everything is in the app container, never the repo: `Application Support/Aomame/` holds `Library/` (videos and
+Everything is in the app container, never the repo: `Application Support/Kikimi/` holds `Library/` (videos and
 audio, one folder per content hash), `Staging/` (temporary), `models/` (speech models) and the SQLite database.
 
 ## Tests

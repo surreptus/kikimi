@@ -2,7 +2,7 @@ import AppKit
 import LangCore
 import SwiftUI
 
-/// Saving your progress to a `.aomame` file and restoring it, and where that has got to, for the Data settings.
+/// Saving your progress to a `.kikimi` file and restoring it, and where that has got to, for the Data settings.
 /// The work is in LangCore; this holds the steps a person sees: choose, preview, confirm, done.
 @MainActor @Observable
 final class BackupModel {
@@ -41,7 +41,7 @@ final class BackupModel {
 
     func export(env: LangEnvironment) async {
         if includeVideos { await exportFolder(env: env); return }
-        let name = "Aomame progress \(Date().formatted(.iso8601.year().month().day()))"
+        let name = "Kikimi progress \(Date().formatted(.iso8601.year().month().day()))"
         guard let url = ExportPanels.saveFile(suggestedName: name, fileExtension: ProgressBackup.fileExtension) else { return }
         state = .working
         do {
@@ -58,7 +58,7 @@ final class BackupModel {
         guard let parent = ExportPanels.chooseFolder(message: String(localized: "Choose where to save the backup folder")) else { return }
         state = .working
         do {
-            let name = "Aomame backup \(Date().formatted(.iso8601.year().month().day()))"
+            let name = "Kikimi backup \(Date().formatted(.iso8601.year().month().day()))"
             let summary = try await env.writeFullBackup(in: parent, name: name, extraSettings: Self.currentAppSettings())
             state = .exported(summary.folder, words: summary.words, videos: summary.videos)
         } catch {

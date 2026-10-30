@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 // The licence texts are the app's own files, so the website and the app show the same notices.
 const files = import.meta.glob('../../../LangCore/Sources/LangCore/Resources/Licenses/*.txt', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const titles: Record<string, string> = {
-  'Aomame-MIT': 'Aomame (this app)',
+  'Kikimi-MIT': 'Kikimi (this app)',
   'JMdict-EDRDG': 'JMdict dictionary data',
   'Wiktionary-kaikki': 'Spanish dictionary data (Wiktionary)',
   'IPADIC-COPYING': 'IPADIC dictionary (NAIST, ICOT)',
@@ -17,10 +17,10 @@ const items = Object.entries(files)
   .map(([path, text]) => { const key = path.split('/').pop()!.replace('.txt', ''); return { title: titles[key] ?? key, text }; })
   .sort((a, b) => a.title.localeCompare(b.title));
 ---
-<Base title="Acknowledgements · Aomame">
+<Base title="Acknowledgements · Kikimi">
   <article class="doc">
     <h1>Acknowledgements</h1>
-    <p>Aomame is free software under the MIT licence. It uses the software, models and data below, each under its own licence.</p>
+    <p>Kikimi is free software under the MIT licence. It uses the software, models and data below, each under its own licence.</p>
     {items.map((item) => (
       <details>
         <summary>{item.title}</summary>

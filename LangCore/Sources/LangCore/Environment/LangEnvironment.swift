@@ -12,7 +12,7 @@ public final class LangEnvironment: Sendable {
     public let reviewAudio: ReviewAudioPreferences
     public let pipeline: ImportPipeline
 
-    private static let log = Logger(subsystem: "com.surreptus.Aomame", category: "dictionary")
+    private static let log = Logger(subsystem: "com.surreptus.Kikimi", category: "dictionary")
 
     /// `dictionaries` defaults to the ones bundled in the app; tests pass small fixture files.
     public init(
@@ -32,8 +32,8 @@ public final class LangEnvironment: Sendable {
             database: database, root: root, transcriber: transcriber ?? WhisperKitTranscriber(models: models))
     }
 
-    static let folderName = "Aomame"
-    static let databaseName = "aomame.sqlite"
+    static let folderName = "Kikimi"
+    static let databaseName = "kikimi.sqlite"
 
     /// The app's own folder inside its sandbox container.
     public static func standard() throws -> LangEnvironment {

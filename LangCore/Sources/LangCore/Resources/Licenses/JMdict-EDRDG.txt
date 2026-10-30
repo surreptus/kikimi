@@ -11,4 +11,4 @@ Changes: the data was converted to a SQLite database for fast look-up. Each head
 English glosses of its senses (condensed), and common spellings are ranked first by their priority marks. The
 database in this app is an adaptation of JMdict and is made available under the same licence, CC BY-SA 4.0. The
 scripts that build it are in the project's Scripts/dictionaries folder, so it can be rebuilt from the original data:
-https://github.com/surreptus/aomame
+https://github.com/surreptus/kikimi
