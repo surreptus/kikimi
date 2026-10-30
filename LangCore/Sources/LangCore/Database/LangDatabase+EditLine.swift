@@ -24,6 +24,7 @@ extension LangDatabase {
             subtitle.text = trimmed
             try subtitle.update(db)
             try db.execute(sql: "DELETE FROM occurrences WHERE subtitle_id = ?", arguments: [id])
+            try db.execute(sql: "DELETE FROM translations WHERE subtitle_id = ?", arguments: [id])   // it was of the old text
             var cache: [WordKey: Int64] = [:]
             for token in tokens {
                 let wordID = try Self.wordID(for: token, language: profile.code, cache: &cache, in: db)

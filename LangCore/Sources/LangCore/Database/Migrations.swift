@@ -80,6 +80,17 @@ public enum LangMigrations {
                 t.primaryKey(["day", "kind", "subject"])
             }
         }
+
+        // Machine translations of subtitle lines, kept so each is made once. Derived data: it can be made again, is
+        // left out of backups, and goes with its line (deleted when the line or its video is).
+        migrator.registerMigration("v6-translations") { db in
+            try db.create(table: "translations") { t in
+                t.column("subtitle_id", .integer).notNull().references("subtitles", onDelete: .cascade)
+                t.column("target", .text).notNull()          // the language it was translated into, such as "en"
+                t.column("text", .text).notNull()
+                t.primaryKey(["subtitle_id", "target"])
+            }
+        }
     }
 
     // The dictionaries are now read straight from their built files, so the copy in this database is dropped

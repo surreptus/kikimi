@@ -9,6 +9,7 @@ public final class LangEnvironment: Sendable {
     public let preferences: ModelPreferences
     public let videoQuality: VideoQualityPreference
     public let reviewStyle: ReviewStylePreference
+    public let translation: TranslationPreferences
     public let reviewAudio: ReviewAudioPreferences
     public let pipeline: ImportPipeline
 
@@ -28,6 +29,7 @@ public final class LangEnvironment: Sendable {
         reviewAudio = ReviewAudioPreferences(defaults: defaults)
         videoQuality = VideoQualityPreference(defaults: defaults)
         reviewStyle = ReviewStylePreference(defaults: defaults)
+        translation = TranslationPreferences(defaults: defaults)
         pipeline = ImportPipeline(
             database: database, root: root, transcriber: transcriber ?? WhisperKitTranscriber(models: models))
     }
@@ -51,6 +53,16 @@ public final class LangEnvironment: Sendable {
             guard count > 0 else { throw DictionaryError.missingResource("dictionary-\(language) is empty") }
             Self.log.notice("dictionary \(language, privacy: .public): \(count) entries, read in place from the app bundle")
         }
+    }
+
+    /// Translates a video's lines into the chosen language, or nil if the video is already in it. `translator`
+    /// defaults to macOS's own; tests pass a stand-in.
+    public func translationService(for profile: any LanguageProfile, translator: (any LineTranslator)? = nil) -> TranslationService? {
+        let target = translation.target
+        let source = profile.whisperCode
+        guard Locale.Language(identifier: target).languageCode != Locale.Language(identifier: source).languageCode else { return nil }
+        return TranslationService(
+            database: database, translator: translator ?? AppleLineTranslator(source: source, target: target), target: target)
     }
 
     public var libraryURL: URL { root.appending(path: "Library", directoryHint: .isDirectory) }
