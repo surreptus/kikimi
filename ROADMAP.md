@@ -79,16 +79,15 @@ review overview (ready now, next 7 days, words per stage); transcript text size;
 Ordered by how much each helps comprehensible input per unit of effort.
 
 ### Understanding the material
-- [ ] **Translations in your native language** (findings, 27 Oct 2026: Apple's Translation framework translates each line
-      of a multi-line request separately, so a window of lines gives the same result as one at a time, and it returns no
-      alignment (no attributed result), so mapping a context-aware translation back to one line isn't possible. Merging
-      lines into sentence groups before translating works for Spanish, which has punctuation, but Whisper's Japanese
-      lines have none. The on-device language model leaked neighbouring lines into the translation of one, so it isn't
-      used. Plan: translate per line, optionally merging lines that visibly continue.), per sentence, with Apple's on-device Translation framework. Stored
-      in a new table (derived data, not backed up). Hidden by default, shown on request for a line, with "always
-      show" as an option, because an always-visible translation encourages reading over listening. Needs the
-      language pair installed once (Settings guides this). Quality varies, especially for Japanese; check the pair
-      is supported before offering it.
+- [x] **Translations in your native language** (30 Oct 2026): macOS's on-device Translation framework, one line at a time, kept in a
+      `translations` table (derived data, not backed up). Settings > General: Off, When I ask (default: hidden until you press
+      a line's translate button or T, so you listen first) or Always, and the language to translate into (default: the
+      Mac's). Needs the language pair installed; if not, the status line says where to add it. Not done: an in-app
+      download prompt for a missing language (it needs the system's own sheet), and context-aware translation (a language
+      model such as TranslateGemma was researched: it needs a ~2.5 GB download, a new dependency and Gemma's licence terms,
+      so it waits until per-line translation has been used and found wanting). Findings behind the design (27 Oct 2026):
+      Apple's framework translates each line of a batch separately and returns no alignment; its default and high-fidelity
+      strategies gave identical results on 18 real lines, so the default is used.
 - [x] **Explain this sentence**: tested on 27 Oct 2026 and **dropped for now**. The on-device language model in macOS 26
       is available on this Mac, but on real transcript lines it gave a wrong translation of a Spanish line, called
       "qué tipo de" an "adjective phrase", and for a Japanese line explained a different line's ending as a "polite

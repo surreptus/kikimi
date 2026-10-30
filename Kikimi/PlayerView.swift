@@ -34,12 +34,18 @@ struct PlayerView: View {
     @AppStorage("pauseAfterLine") private var pauseAfterLine = false
     /// How fast a looped line plays (1 is normal).
     @AppStorage("loopSpeed") private var loopSpeed = 1.0
+    @AppStorage(TranslationPreferences.displayKey) private var translationDisplayRaw = TranslationDisplay.onRequest.rawValue
+    /// This video's translations (nil when they are off, or the video is already in the chosen language).
+    @State private var translations: LineTranslations?
+    /// The lines whose translation is on screen, in "when I ask" mode.
+    @State private var shownTranslations: Set<Int64> = []
     /// The line being corrected, with its place in the transcript.
     @State private var editing: (index: Int, line: Subtitle)?
     @Environment(AppState.self) private var app
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var profile: (any LanguageProfile)? { LanguageProfiles.profile(for: video.language) }
+    private var translationMode: TranslationDisplay { TranslationDisplay(rawValue: translationDisplayRaw) ?? .onRequest }
     /// The word the hint bar describes: the pinned one, else the one under the pointer or the keyboard.
     private var shownToken: Token? { pinnedToken ?? hoveredToken ?? lingerToken }
 
@@ -67,6 +73,8 @@ struct PlayerView: View {
         .task(id: shownToken?.lemma) { await refreshHint(announce: pinnedToken != nil) }
         .task(id: controller != nil) { await keepPlace() }
         .onChange(of: pauseAfterLine) { _, on in controller?.pausesAfterLines = on }
+        .onChange(of: translationDisplayRaw) { _, _ in Task { await setUpTranslations() } }
+        .onChange(of: translations?.problem) { _, text in if let text { message = text } }
         .onChange(of: loopSpeed) { _, speed in controller?.loopSpeed = Float(speed) }
         .sheet(isPresented: Binding(get: { editing != nil }, set: { if !$0 { editing = nil } })) {
             if let editing, let controller {
@@ -75,6 +83,10 @@ struct PlayerView: View {
                     preview: { start, end in Task { await controller.playRange(from: start, to: end) } },
                     saved: { saved in
                         controller.replaceLine(at: editing.index, with: saved)
+                        if let id = saved.id {   // what was translated was the old text
+                            translations?.forget(id)
+                            if translationMode == .always || shownTranslations.contains(id) { translations?.need(saved) }
+                        }
                         app.dataChanged()
                         self.editing = nil
                     }, cancel: { controller.pause(); self.editing = nil })
@@ -160,6 +172,7 @@ struct PlayerView: View {
                 new.onListened = { seconds in Task { try? await database.record(.listen, subject: videoID, amount: seconds) } }
             }
             controller = new
+            await setUpTranslations()
             if let startAt {
                 await new.seek(to: startAt, play: true)
             } else if let id = video.id, let spot = try? await env.database.video(id: id)?.resumePosition {
@@ -170,6 +183,21 @@ struct PlayerView: View {
         } catch {
             failure = error.localizedDescription
         }
+    }
+
+    /// Starts translating this video's lines when translations are on and a translation is wanted.
+    private func setUpTranslations() async {
+        guard translations == nil, translationMode != .off, let id = video.id, let profile,
+              let service = env.translationService(for: profile) else { return }
+        let model = LineTranslations(service: service, videoID: id, source: profile.whisperCode, target: service.target)
+        translations = model
+        await model.load()
+    }
+
+    private func toggleTranslation(of line: Subtitle) {
+        guard let id = line.id else { return }
+        if shownTranslations.contains(id) { shownTranslations.remove(id) }
+        else { shownTranslations.insert(id); translations?.need(line) }
     }
 
     // MARK: Layout
@@ -338,7 +366,13 @@ struct PlayerView: View {
                             seek: { Task { await controller.seek(toLine: index) } },
                             exportAudio: { export(line, kind: .audio) },
                             exportVideo: { export(line, kind: .video) },
-                            edit: { editing = (index, line) })
+                            edit: { editing = (index, line) },
+                            translationMode: translations == nil ? .off : translationMode,
+                            translation: line.id.flatMap { translations?.texts[$0] },
+                            translationShown: translationMode == .always || (line.id.map(shownTranslations.contains) ?? false),
+                            translationWaiting: line.id.map { translations?.waiting.contains($0) ?? false } ?? false,
+                            toggleTranslation: { toggleTranslation(of: line) },
+                            wantTranslation: { translations?.need(line) })
                         .id(index)
                     }
                 }

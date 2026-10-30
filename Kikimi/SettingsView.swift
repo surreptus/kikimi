@@ -69,6 +69,9 @@ private struct GeneralTab: View {
     @AppStorage(Appearance.key) private var appearance = Appearance.system
     @AppStorage(TranscriptSize.key) private var transcriptSize = TranscriptSize.standard
     @AppStorage(VideoQualityPreference.key) private var videoQuality = VideoQuality.smallest.rawValue
+    @AppStorage(TranslationPreferences.displayKey) private var translationDisplay = TranslationDisplay.onRequest.rawValue
+    @AppStorage(TranslationPreferences.targetKey) private var translationTarget = TranslationPreferences.systemLanguage
+    @State private var translationLanguages: [TranslationLanguage] = []
 
     var body: some View {
         Form {
@@ -91,6 +94,18 @@ private struct GeneralTab: View {
                 Text("The size of the subtitle lines beside the video.")
             }
             Section {
+                Picker("Show translations", selection: $translationDisplay) {
+                    Text("Off").tag(TranslationDisplay.off.rawValue)
+                    Text("When I ask").tag(TranslationDisplay.onRequest.rawValue)
+                    Text("Always").tag(TranslationDisplay.always.rawValue)
+                }
+                Picker("Translate into", selection: $translationTarget) {
+                    ForEach(translationChoices) { Text($0.name).tag($0.id) }
+                }
+            } footer: {
+                Text("Made on this Mac by macOS, so they can be wrong. \"When I ask\" keeps each hidden until you press the translate button on a line, or T, so you listen first. A video already in this language isn't translated. macOS may ask you to download a language once, in System Settings > General > Language & Region > Translation Languages.")
+            }
+            Section {
                 Picker("Video quality", selection: $videoQuality) {
                     Text("Smallest size (recommended)").tag(VideoQuality.smallest.rawValue)
                     Text("Original quality").tag(VideoQuality.original.rawValue)
@@ -100,7 +115,15 @@ private struct GeneralTab: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 520, height: 470)
+        .frame(width: 520, height: 650)
+        .task { translationLanguages = await TranslationLanguage.supported() }
+    }
+
+    /// The languages macOS can translate, with the one chosen kept in the list even before the list has loaded.
+    private var translationChoices: [TranslationLanguage] {
+        translationLanguages.contains { $0.id == translationTarget }
+            ? translationLanguages
+            : [TranslationLanguage(id: translationTarget, name: Locale.current.localizedString(forIdentifier: translationTarget) ?? translationTarget)] + translationLanguages
     }
 }
 

@@ -24,7 +24,8 @@ How we build Kikimi. Read this before changing anything; update it when we agree
    excepted), contrast stays at 4.5:1 or better, colour is never the only signal, and Increase Contrast and
    Reduce Motion are honoured. The first-time experience should need no explanation.
 7. **Local and private.** Local files only; nothing is downloaded from video sites. No accounts, analytics or
-   tracking. The only network use is downloading a speech model.
+   tracking. The only network use is downloading a speech model (macOS may also download a translation language if
+   you use translations; that is the system's, and nothing of ours is sent).
 8. **Never harm the user's data.** Originals are never modified or deleted. Imports are idempotent and clean up
    after failure. Restores never overwrite existing progress. We never permanently delete the user's data
    ourselves; we show them where it is and let them.

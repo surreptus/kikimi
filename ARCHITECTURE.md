@@ -36,6 +36,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `Export/AnkiExport.swift` | The Anki import file (tab-separated text with header lines) and the export of a set of words, with optional sentence audio. |
 | `Review/ClozeCard.swift` | The fill-in-the-blank card (the sentence with the word blanked, and its hint) and the per-language choice of review style (meaning, fill in, listening). `KnownCheck.swift`: a sample of known words for the quick check. |
 | `Database/LangDatabase+Activity.swift` | The daily tally (`activity` table: listening seconds, lookups, words started or marked known, reviews) and the stats the Review page shows. |
+| `Translation/` | Translating a video's lines with macOS's on-device Translation framework: the translator (behind a protocol, so tests use a stand-in), the service that translates only what isn't kept yet, and the display and language preferences. Kept in the `translations` table. |
 | `Coverage/` | How much of a video you know (`VideoCoverage`, `LevelFit`), the shortest word list that reaches a target (`wordsToReach`), and marking a list of known words. |
 | `Backup/` | `ProgressBackup`: the `.kikimi` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. `LibraryBackup`: the full-backup folder (progress file, `library.json` of transcripts, and the compressed videos), restored by adding the videos that aren't here yet. |
 | `Environment/` | `LangEnvironment` and where videos live on disk. |

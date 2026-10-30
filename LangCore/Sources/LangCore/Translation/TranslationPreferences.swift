@@ -36,6 +36,8 @@ public struct TranslationLanguage: Identifiable, Equatable, Sendable {
     public let id: String       // such as "en" or "zh-Hans"
     public let name: String     // in the reader's language
 
+    public init(id: String, name: String) { self.id = id; self.name = name }
+
     /// The languages macOS can translate, sorted by name.
     public static func supported() async -> [TranslationLanguage] {
         let ids = await LanguageAvailability().supportedLanguages.map(\.minimalIdentifier)

@@ -2,7 +2,7 @@
 
 These are the terms for using Kikimi, a free app for learning a language from videos you already have.
 
-_Last updated: 25 October 2026._
+_Last updated: 30 October 2026._
 
 ## The short version
 
@@ -36,7 +36,7 @@ Kikimi's source code is also published under the MIT licence, in the LICENSE fil
 
 > Kikimi can make mistakes, so treat it as a study aid and not as an authority.
 
-Transcripts, language detection, word lists, readings, dictionary entries, sentence audio and the fit of a video to your level are produced by software, from models and data made by others. They can be wrong. Kikimi is a study aid and makes no promise about what you will learn, or how fast. Do not rely on it for anything where a mistake could cause harm, such as legal, medical or safety matters.
+Transcripts, translations, language detection, word lists, readings, dictionary entries, sentence audio and the fit of a video to your level are produced by software, from models and data made by others. They can be wrong. Kikimi is a study aid and makes no promise about what you will learn, or how fast. Do not rely on it for anything where a mistake could cause harm, such as legal, medical or safety matters.
 
 ## Your data and backups
 

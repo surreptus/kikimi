@@ -2,7 +2,7 @@
 
 Kikimi is built so that your videos, and what you learn from them, stay on your Mac.
 
-_Last updated: 27 October 2026._
+_Last updated: 30 October 2026._
 
 ## The short version
 
@@ -20,6 +20,7 @@ Everything Kikimi works with is stored on your Mac, in the app's own folder:
 - A copy of each video you add: smaller than the original by default, or exactly your file if you choose Original quality in Settings.
 - The transcript of each video, and the words found in it.
 - Which words you are learning, which you know, and your review history.
+- Translations of the subtitle lines you have asked to see, so each is made once.
 - A daily tally of your activity: how long you have watched, which words you looked up, and how many reviews you answered. It is only counts, kept to show your progress.
 - The speech models you have downloaded.
 - Your settings, such as the language you chose.
@@ -41,6 +42,8 @@ A few links open a web page in your browser, such as a Japanese grammar guide. T
 The first time you need a speech model, Kikimi downloads it from Hugging Face (huggingface.co), a service that hosts it. When it does, Hugging Face can see your internet address and which model files you asked for, as any website would, and handles that under its own privacy policy. Kikimi sends nothing else: not your videos, transcripts, words or how you use the app.
 
 Once a model is downloaded, Kikimi works without an internet connection.
+
+Translations are made on your Mac by the translation built into macOS, and your subtitles are sent nowhere. If you turn translations on and a language is not on your Mac yet, macOS may download it. That is the system doing it, not Kikimi.
 
 ## Backups
 

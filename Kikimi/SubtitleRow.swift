@@ -21,6 +21,13 @@ struct SubtitleRow: View {
     let exportAudio: () -> Void
     let exportVideo: () -> Void
     let edit: () -> Void
+    /// Translations: how they are offered, this line's (once back), whether it is on screen, and how to ask.
+    let translationMode: TranslationDisplay
+    let translation: String?
+    let translationShown: Bool
+    let translationWaiting: Bool
+    let toggleTranslation: () -> Void
+    let wantTranslation: () -> Void
 
     @AppStorage(TranscriptSize.key) private var size = TranscriptSize.standard
     @State private var segments: [LineSegment] = []
@@ -79,17 +86,23 @@ struct SubtitleRow: View {
             Text(stamp(line.startTime))
                 .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(active ? Theme.ink : Theme.muted)
-            if segments.isEmpty {
-                Text(line.text).font(textFont)
+            VStack(alignment: .leading, spacing: 3) {
+                if segments.isEmpty {
+                    Text(line.text).font(textFont)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    FlowLayout {
+                        ForEach(chunks) { chunk in chunkView(chunk) }
+                    }
                     .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                FlowLayout {
-                    ForEach(chunks) { chunk in chunkView(chunk) }
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel("Line at \(stamp(line.startTime))")
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityElement(children: .contain)
-                .accessibilityLabel("Line at \(stamp(line.startTime))")
+                if translationShown { translationText }
             }
+            // Room for the translate button, so a long line never runs under it.
+            .padding(.trailing, translationMode == .onRequest ? 22 : 0)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 10).padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -97,11 +110,16 @@ struct SubtitleRow: View {
         .background(RoundedRectangle(cornerRadius: 14).fill(active ? Theme.softStrong : .clear))
         .overlay(RoundedRectangle(cornerRadius: 14)
             .strokeBorder((rowHovered || isFocused) ? Theme.ink.opacity(0.45) : .clear, lineWidth: 1))
+        .overlay(alignment: .topTrailing) { translateButton }
         .contentShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture { focusedLine.wrappedValue = index; seek() }
         .onHover { rowHovered = $0 }
         .animation(.easeOut(duration: 0.12), value: rowHovered)
         .contextMenu {
+            if translationMode == .onRequest {
+                Button(translationShown ? "Hide translation" : "Show translation", action: toggleTranslation)
+                Divider()
+            }
             Button("Edit line…", action: edit)
             Divider()
             Button("Save audio clip…", action: exportAudio)
@@ -109,6 +127,12 @@ struct SubtitleRow: View {
         }
         .accessibilityAction(named: "Jump to this line", seek)
         .accessibilityAction(named: "Edit line", edit)
+        .accessibilityActions {
+            if translationMode == .onRequest {
+                Button(translationShown ? "Hide translation" : "Show translation", action: toggleTranslation)
+            }
+        }
+        .task(id: translationShown) { if translationShown { wantTranslation() } }
         .focusable()
         .focused(focusedLine, equals: index)
         .focusEffectDisabled()
@@ -117,6 +141,11 @@ struct SubtitleRow: View {
         .onKeyPress(.upArrow) { moveFocus(-1); return .handled }
         .onKeyPress(.downArrow) { moveFocus(1); return .handled }
         .onKeyPress(.return) { pinCaret() }
+        .onKeyPress("t") {
+            guard translationMode == .onRequest else { return .ignored }
+            toggleTranslation()
+            return .handled
+        }
         .onKeyPress(.escape) {
             guard pinned != nil else { return .ignored }
             pinned = nil
@@ -134,6 +163,38 @@ struct SubtitleRow: View {
             guard let profile else { return }
             let text = line.text
             segments = await Task.detached { profile.lineSegments(in: text) }.value
+        }
+    }
+
+    // MARK: Translation
+
+    /// Smaller and quieter than the line, in the reader's language, set under it.
+    @ViewBuilder
+    private var translationText: some View {
+        if let translation {
+            Text(translation)
+                .font(.system(size: max(12, size.points * 0.72), design: .rounded))
+                .foregroundStyle(Theme.muted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityLabel("Translation: \(translation)")
+        } else if translationWaiting {
+            Text("Translating…")
+                .font(.system(size: 12, design: .rounded)).foregroundStyle(Theme.faint)
+        }
+    }
+
+    /// Appears when you point at or tab to a line, and stays while its translation is showing.
+    @ViewBuilder
+    private var translateButton: some View {
+        if translationMode == .onRequest, rowHovered || isFocused || translationShown {
+            Button(action: toggleTranslation) {
+                Image(systemName: translationShown ? "character.bubble.fill" : "character.bubble")
+                    .font(.system(size: 13)).frame(width: 22, height: 22)
+            }
+            .buttonStyle(.plain).foregroundStyle(Theme.muted)
+            .help(translationShown ? "Hide the translation (T)" : "Show the translation (T)")
+            .accessibilityLabel(translationShown ? "Hide translation" : "Show translation")
+            .padding(.top, 2).padding(.trailing, 4)
         }
     }
 
