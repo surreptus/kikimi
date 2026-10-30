@@ -457,7 +457,7 @@ private struct AboutTab: View {
         Form {
             Section {
                 LabeledContent("Kikimi", value: "Version \(version)")
-                Text("Learn Spanish or Japanese from videos you own, on your Mac.").foregroundStyle(.secondary)
+                Text("Learn a language from videos you own, on your Mac.").foregroundStyle(.secondary)
             }
             Section("Read more") {
                 Button("How Kikimi works") { inMainWindow { app.showAbout = true } }

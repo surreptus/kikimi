@@ -139,11 +139,15 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Smarter review timing** (FSRS-style scheduling): low priority; the evidence is benchmark data, not trials.
 
 ### More languages
-- [ ] **Romance languages next** (decided): French, Italian and Portuguese, one at a time. The `medium` Whisper
-      model covers them, and Spanish already shows the way: the system tokenizer, a Wiktionary extract per
-      language (`Scripts/dictionaries`, a large one-off download each), and a profile. Suggested order: French
-      (most learners), then Portuguese, then Italian. Check each tokenizer's lemmas and parts of speech on real
-      transcripts before committing, as we did for Japanese.
+- [x] **French and German** (30 Oct 2026): each is a profile plus a Wiktionary dictionary (about 9 MB each), with the
+      `medium` Whisper model and Apple's tokenizer. Checked on spoken-style sentences: German lemmas and word types
+      were good (one fix: the tagger answered `koennen`, `muessen`, `duerfen` for "kann", "musst", "darf"); French has more
+      mistakes (`restaurant` as a verb, `faut` as `faillir`, `commence` as a noun). Known gaps: a German separable verb
+      ("ruf ... an") is learned as `rufen` and the particle is lost, and compound nouns missing from Wiktionary have no
+      meaning. Not yet tried on a real French or German video, and `medium` is not benchmarked for either.
+- [ ] **More languages**: Italian next (Apple's tagger handles it), then Portuguese and Dutch, whose lemmas macOS
+      does not give (tested 30 Oct 2026: no lemma or part of speech), so each needs a lemma source, a dependency to
+      ask about first.
 
 ### Housekeeping
 - [ ] Cache video thumbnails on disk if scrolling a large library feels slow (they are now made once per launch).
@@ -158,7 +162,7 @@ Made:
 1. **Direct download** for 1.0, not the Mac App Store. Needs a Developer ID, notarization and a download page; no
    review, screenshots or App Store listing. The App Store can come later.
 2. **Free.** The terms of use can say so plainly (no payment, provided as is). A donation link is optional.
-3. **Third language: Romance languages**, starting with French (see After 1.0).
+3. **More languages after Spanish and Japanese**: French and German are done; Italian, Portuguese and Dutch are next (see After 1.0).
 
 Open:
 1. How people get updates (see Release readiness).

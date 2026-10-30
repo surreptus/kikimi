@@ -49,7 +49,7 @@ extension LanguageProfile {
 
 /// The only place profiles are listed. Adding a language = a new type + one line here.
 public enum LanguageProfiles {
-    public static let all: [any LanguageProfile] = [SpanishProfile(), JapaneseProfile()]
+    public static let all: [any LanguageProfile] = [SpanishProfile(), FrenchProfile(), GermanProfile(), JapaneseProfile()]
 
     public static func profile(for code: String) -> (any LanguageProfile)? {
         all.first { $0.code == code }

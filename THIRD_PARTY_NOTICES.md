@@ -13,7 +13,7 @@ are shown in the app under Help > Acknowledgements, and are on the website at `/
 | [MeCab](https://taku910.github.io/mecab/) (vendored) | Splits Japanese into words | BSD (one of its licence options) |
 | IPADIC (NAIST, ICOT) | Japanese word and reading data for MeCab | IPADIC licence (permissive, notice must be kept) |
 | [JMdict](https://www.edrdg.org/jmdict/j_jmdict.html) (EDRDG) | Japanese dictionary data, adapted into the app's dictionary | CC BY-SA 4.0 |
-| English Wiktionary via [kaikki.org](https://kaikki.org) (wiktextract) | Spanish dictionary data, adapted into the app's dictionary | CC BY-SA 4.0 and GFDL |
+| English Wiktionary via [kaikki.org](https://kaikki.org) (wiktextract) | Spanish, French and German dictionary data, adapted into the app's dictionary | CC BY-SA 4.0 and GFDL |
 
 The dictionary files in the app are adaptations of JMdict and Wiktionary and are shared under the same licence
 (CC BY-SA 4.0). The scripts that build them are in `Scripts/dictionaries/`, so they can be rebuilt from the original data.

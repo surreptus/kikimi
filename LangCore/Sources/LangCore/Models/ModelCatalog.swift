@@ -21,7 +21,7 @@ public enum ModelCatalog {
         ModelInfo(variant: "openai_whisper-small", name: "small", downloadBytes: 486_000_000,
                   note: "A middle size. Not tested here."),
         ModelInfo(variant: "openai_whisper-medium", name: "medium", downloadBytes: 1_530_000_000,
-                  note: "Good for Spanish: few mistakes on clear speech, and 3 to 5 times faster than real time in our tests on one Apple silicon Mac."),
+                  note: "Good for Spanish: few mistakes on clear speech, and 3 to 5 times faster than real time in our tests on one Apple silicon Mac. Not tested here for French or German."),
         ModelInfo(variant: "openai_whisper-large-v3", name: "large-v3", downloadBytes: 3_090_000_000,
                   note: "The most accurate and the usual choice for Japanese, which smaller models handle noticeably worse. Largest and slowest; not benchmarked here."),
     ]

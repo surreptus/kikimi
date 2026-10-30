@@ -4,7 +4,7 @@ A native macOS app for learning a language from videos you already own.
 
 Drop in a video file and the app transcribes it on your Mac, pulls out the words you'll meet, and lets you
 look them up, mark the ones you know, and review the rest with spaced repetition, using real sentences from
-your own videos. Spanish and Japanese work today; the design makes adding another language a small, contained job.
+your own videos. Spanish, French, German and Japanese work today; the design makes adding another language a small, contained job.
 
 - **Local files only.** Nothing is downloaded from video sites, ever.
 - **On-device.** Transcription runs on your Mac with [WhisperKit](https://github.com/argmaxinc/WhisperKit).
@@ -33,13 +33,13 @@ The built dictionaries are large generated files, so they are not in the reposit
 
 ```bash
 Scripts/build_ipadic.sh         # Japanese tokenizer dictionary (clones MeCab at a pinned commit, ~50 MB)
-Scripts/build_dictionaries.sh   # JMdict (~10 MB download) and the Spanish extract (~1 GB download)
+Scripts/build_dictionaries.sh   # JMdict (~10 MB download) and the Spanish, French and German extracts (~2.5 GB download in all)
 ```
 
 Then open `Kikimi.xcodeproj` in Xcode, pick the **Kikimi** scheme and **My Mac**, and press ⌘R. The app reads the
 bundled dictionaries in place (they are never copied into its database); on the **Import** tab, download a speech
 model, then drop in a video.
-Defaults are `medium` for Spanish and `large-v3` for Japanese (about 3 GB), and you can pick another per language.
+Defaults are `medium` for Spanish, French and German and `large-v3` for Japanese (about 3 GB), and you can pick another per language.
 
 The app is sandboxed. Its database, models and library live in its container,
 `~/Library/Containers/<bundle id>/Data/Library/Application Support/Kikimi/`.
@@ -140,6 +140,6 @@ is `com.surreptus.Kikimi`.
   can start or end slightly off.
 - IPADIC dates from 2007: modern loanwords and slang are sometimes split or missed. Japanese lemmas are good
   for everyday text.
-- Spanish dictionary entries are for dictionary forms; typing an inflected form into search won't find it directly.
+- Spanish, French and German dictionary entries are for dictionary forms; typing an inflected form into search won't find it directly.
 - Audio-only files aren't supported; the pipeline needs a video track.
 - The UI has had limited hands-on testing; much of it was verified through builds, tests and rendered previews.

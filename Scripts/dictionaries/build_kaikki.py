@@ -1,7 +1,7 @@
-"""Builds dictionary-es.sqlite from kaikki.org's extract of English Wiktionary's Spanish entries
-(Spanish words, English definitions).
+"""Builds dictionary-<code>.sqlite from kaikki.org's extract of English Wiktionary's entries for one language
+(that language's words, English definitions).
 
-Usage: python3 -I build_kaikki_es.py kaikki.org-dictionary-Spanish.jsonl dictionary-es.sqlite
+Usage: python3 -I build_kaikki.py kaikki.org-dictionary-Spanish.jsonl dictionary-es.sqlite es Spanish
 Wiktionary content is CC BY-SA 4.0 (and GFDL); extraction by Tatu Ylonen's wiktextract.
 """
 import json
@@ -48,12 +48,12 @@ def pos_block(entry):
     return entry.get("pos", ""), glosses[:MAX_GLOSSES_PER_POS]
 
 
-def build(input_path, output_path):
+def build(input_path, output_path, code, name):
     by_word = {}  # insertion-ordered
     with open(input_path, encoding="utf-8") as f:
         for line in f:
             entry = json.loads(line)
-            if entry.get("lang_code") != "es" or not entry.get("word"):
+            if entry.get("lang_code") != code or not entry.get("word"):
                 continue
             pos, glosses = pos_block(entry)
             if glosses:
@@ -61,14 +61,14 @@ def build(input_path, output_path):
 
     rows = [(word, None, dictbuild.format_senses(blocks)) for word, blocks in by_word.items()]
     meta = {
-        "source": "kaikki.org English Wiktionary extract, Spanish",
-        "source_url": "https://kaikki.org/dictionary/Spanish/kaikki.org-dictionary-Spanish.jsonl",
+        "source": f"kaikki.org English Wiktionary extract, {name}",
+        "source_url": f"https://kaikki.org/dictionary/{name}/kaikki.org-dictionary-{name}.jsonl",
         "license": "CC BY-SA 4.0 and GFDL, Wiktionary contributors",
     }
     return dictbuild.write_database(output_path, rows, meta)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 5:
         sys.exit(__doc__)
-    print(f"{build(sys.argv[1], sys.argv[2])} entries")
+    print(f"{build(*sys.argv[1:])} entries")

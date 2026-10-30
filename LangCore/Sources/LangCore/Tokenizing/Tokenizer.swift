@@ -40,8 +40,13 @@ extension WordTokenizer {
 /// Quality varies by language and must be checked per profile.
 public struct NLTaggerTokenizer: WordTokenizer {
     public let language: NLLanguage
+    /// Lemmas the tagger gets wrong in a known, systematic way, mapped to the right one.
+    private let lemmaFixes: [String: String]
 
-    public init(language: NLLanguage) { self.language = language }
+    public init(language: NLLanguage, lemmaFixes: [String: String] = [:]) {
+        self.language = language
+        self.lemmaFixes = lemmaFixes
+    }
 
     public func tokens(in text: String) -> [Token] {
         let tagger = NLTagger(tagSchemes: [.lexicalClass, .lemma])
@@ -53,10 +58,10 @@ public struct NLTaggerTokenizer: WordTokenizer {
             options: [.omitWhitespace, .omitPunctuation, .omitOther]
         ) { tag, range in
             let surface = String(text[range])
-            let lemma = tagger.tag(at: range.lowerBound, unit: .word, scheme: .lemma).0?.rawValue
+            let lemma = (tagger.tag(at: range.lowerBound, unit: .word, scheme: .lemma).0?.rawValue ?? surface).lowercased()
             result.append(Token(
                 surface: surface,
-                lemma: (lemma ?? surface).lowercased(),
+                lemma: lemmaFixes[lemma] ?? lemma,
                 pos: Self.map(tag)))
             return true
         }
