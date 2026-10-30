@@ -75,6 +75,12 @@
     "The %@ model is downloading right now. Wait for it to finish." : {
 
     },
+    "the adjective stem" : {
+
+    },
+    "the command form" : {
+
+    },
     "The re-encoded video failed verification (%@). Your original is untouched." : {
 
     },
@@ -85,6 +91,24 @@
 
     },
     "The video was removed from the app but its files couldn't be deleted: %@" : {
+
+    },
+    "the う-stem" : {
+
+    },
+    "the た-form" : {
+
+    },
+    "the て-form" : {
+
+    },
+    "the ない-stem" : {
+
+    },
+    "the ば-stem" : {
+
+    },
+    "the ます-stem" : {
 
     },
     "This backup file is damaged, so nothing was changed." : {

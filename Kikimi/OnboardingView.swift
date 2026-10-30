@@ -13,6 +13,19 @@ struct OnboardingView: View {
 
     private var chosenProfiles: [any LanguageProfile] { LanguageProfiles.all.filter { chosen.contains($0.code) } }
 
+    /// One entry per model, with the chosen languages that use it: Spanish, French and German share `medium`, so it is
+    /// shown and downloaded once, and Japanese's `large-v3` is the only download if it is the only language chosen.
+    private var models: [(variant: String, languages: [String])] {
+        var order: [String] = []
+        var users: [String: [String]] = [:]
+        for profile in chosenProfiles {
+            let variant = env.preferences.model(for: profile)
+            if users[variant] == nil { order.append(variant) }
+            users[variant, default: []].append(profile.displayName)
+        }
+        return order.map { ($0, users[$0] ?? []) }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -47,8 +60,8 @@ struct OnboardingView: View {
                         Text("Speech models").font(Theme.title(16))
                         Text("A speech model listens to your videos and writes the subtitles. It is downloaded once and stays on this Mac. You can download it now or later, when you add your first video.")
                             .font(Theme.small).foregroundStyle(Theme.muted)
-                        ForEach(chosenProfiles, id: \.code) { profile in
-                            OnboardingModelRow(env: env, profile: profile)
+                        ForEach(models, id: \.variant) { model in
+                            OnboardingModelRow(env: env, variant: model.variant, languages: model.languages)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -87,32 +100,31 @@ struct OnboardingView: View {
 /// One language's speech model: its size, and a button to download it now.
 private struct OnboardingModelRow: View {
     let env: LangEnvironment
-    let profile: any LanguageProfile
+    let variant: String
+    let languages: [String]
 
     @State private var installed: Bool?
     @State private var progress: Double?
     @State private var error: String?
 
-    private var variant: String { env.preferences.model(for: profile) }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(profile.displayName).font(.system(.headline, design: .rounded))
+                    Text(listed(languages)).font(.system(.headline, design: .rounded))
                     Text(detail).font(Theme.small).foregroundStyle(Theme.muted)
                 }
                 Spacer()
                 if let progress {
                     ProgressView(value: progress).progressViewStyle(ThinProgressStyle()).frame(width: 120)
-                        .accessibilityLabel("Downloading the \(profile.displayName) speech model")
+                        .accessibilityLabel("Downloading the \(ModelCatalog.name(for: variant)) speech model")
                         .accessibilityValue(progress.formatted(.percent.precision(.fractionLength(0))))
                 } else if installed == true {
                     Label("Ready", systemImage: "checkmark").font(.callout).foregroundStyle(Theme.muted)
                 } else if installed == false {
                     Button("Download") { Task { await download() } }
                         .buttonStyle(.pill(.secondary, compact: true))
-                        .accessibilityLabel("Download the \(profile.displayName) speech model")
+                        .accessibilityLabel("Download the \(ModelCatalog.name(for: variant)) speech model for \(listed(languages))")
                 }
             }
             if let error { Text(error).font(Theme.small).foregroundStyle(Theme.red) }

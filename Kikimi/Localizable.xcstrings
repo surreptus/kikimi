@@ -33,6 +33,9 @@
         }
       }
     },
+    "%@ ↗" : {
+
+    },
     "%@ imports use it, so you'll need to download a model before importing again. %@" : {
       "localizations" : {
         "en" : {
@@ -309,10 +312,16 @@
     "8h" : {
 
     },
+    "A line's translation shows only when you ask for it, so you listen first." : {
+
+    },
     "A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. \"Fill in the word\" shows a sentence from your videos with the word blanked, for you to recall. \"Listen to the sentence\" plays only the sound of the sentence, and you show the answer to read it. A word with no sentence is asked the usual way, and in both styles the sentence audio plays only when it wouldn't give the answer away." : {
 
     },
     "A quick test of a few words you marked known. Any you miss go back to your reviews, so the numbers stay honest." : {
+
+    },
+    "A speech model listens to your videos and writes the subtitles. It is downloaded once and stays on this Mac. You can download it now or later, when you add your first video." : {
 
     },
     "A word counts as known if you marked it known, it is finished, or you are learning it and its reviews are a week or more apart (Stage 5 and above)." : {
@@ -367,6 +376,9 @@
 
     },
     "Also restore the settings in this file" : {
+
+    },
+    "Always" : {
 
     },
     "An import is running, so models can't be removed right now." : {
@@ -501,6 +513,9 @@
     "Couldn't start" : {
 
     },
+    "Couldn't translate: %@" : {
+
+    },
     "Dark" : {
 
     },
@@ -522,10 +537,19 @@
     "Done" : {
 
     },
+    "Download" : {
+
+    },
     "Download model" : {
 
     },
+    "Download the %@ speech model" : {
+
+    },
     "Download the speech model to start importing" : {
+
+    },
+    "Downloading the %@ speech model" : {
 
     },
     "Drop %@ videos here" : {
@@ -645,6 +669,16 @@
     "Got it moves a word up one stage. Missed it moves it down one, never below Stage 1." : {
 
     },
+    "Grammar: %@, %@. Opens a web page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Grammar: %1$@, %2$@. Opens a web page."
+          }
+        }
+      }
+    },
     "Hard is under 80%, A stretch is 80 to 88%, Comfortable is 88 to 98%, and Easy is 98% or more." : {
 
     },
@@ -654,10 +688,19 @@
     "Hear the sentence" : {
 
     },
+    "Hide the translation (T)" : {
+
+    },
+    "Hide translation" : {
+
+    },
     "Highlight" : {
 
     },
     "Hover a word to see what it means. Click it to keep it here, and click anywhere else to let go." : {
+
+    },
+    "How %@ is built (opens Tsumiki, a Japanese grammar guide, in your browser)" : {
 
     },
     "How fast the looped line plays" : {
@@ -673,6 +716,9 @@
 
     },
     "How reviews are scheduled" : {
+
+    },
+    "I'm learning" : {
 
     },
     "Import as %@" : {
@@ -759,6 +805,9 @@
     "Learn a language from videos you own, on your Mac." : {
 
     },
+    "Learn a language from videos you own. Everything stays on this Mac." : {
+
+    },
     "Learn the %lld most common words you don't know yet and this video goes from %@ to about %@." : {
       "localizations" : {
         "en" : {
@@ -827,6 +876,19 @@
     "Looping this line (R). Press again to stop." : {
 
     },
+    "macOS can't translate from %@ to %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "macOS can't translate from %1$@ to %2$@."
+          }
+        }
+      }
+    },
+    "Made on this Mac by macOS, so they can be wrong. \"When I ask\" keeps each hidden until you press the translate button on a line, or T, so you listen first. A video already in this language isn't translated. macOS may ask you to download a language once, in System Settings > General > Language & Region > Translation Languages." : {
+
+    },
     "Make a file Anki can import (File > Import), from the selected words or the ones you are learning" : {
 
     },
@@ -858,6 +920,9 @@
 
     },
     "Missed it" : {
+
+    },
+    "My language" : {
 
     },
     "New" : {
@@ -1034,6 +1099,9 @@
     "Reading file" : {
 
     },
+    "Ready" : {
+
+    },
     "Remove" : {
 
     },
@@ -1192,6 +1260,15 @@
     "Show in Finder" : {
 
     },
+    "Show the translation (T)" : {
+
+    },
+    "Show translation" : {
+
+    },
+    "Show translations" : {
+
+    },
     "Shows what it means" : {
 
     },
@@ -1213,7 +1290,7 @@
     "Sort by Best fit to put the videos worth watching next at the top: mostly understood, with a little new." : {
 
     },
-    "Space plays and pauses. Click a word to keep its meaning; arrow keys move between words and Return keeps one. L starts learning it and K marks it known. P turns on pausing after each line, and R repeats the line you are on (the 1×, 0.75× and 0.5× button sets how fast). Right-click a line and choose Edit line to fix its text or its timing. Click anywhere outside the transcript, or press Esc, to let go." : {
+    "Space plays and pauses. Click a word to keep its meaning; arrow keys move between words and Return keeps one. L starts learning it and K marks it known. P turns on pausing after each line, and T shows or hides the line's translation, and R repeats the line you are on (the 1×, 0.75× and 0.5× button sets how fast). Right-click a line and choose Edit line to fix its text or its timing. For a Japanese verb or adjective, the word bar names the form it is in, such as 未然形, with a link to Tsumiki, a Japanese grammar guide, on how that form is built. Click anywhere outside the transcript, or press Esc, to let go." : {
 
     },
     "Space shows the answer. → is Got it, ← is Missed it. W says the word, R plays the sentence." : {
@@ -1223,6 +1300,9 @@
 
     },
     "Speech model ready: %@" : {
+
+    },
+    "Speech models" : {
 
     },
     "Speech models and your saved videos are kept on this Mac." : {
@@ -1272,6 +1352,9 @@
 
     },
     "Standard" : {
+
+    },
+    "Start" : {
 
     },
     "Start learning" : {
@@ -1387,6 +1470,25 @@
     "Transcript text" : {
 
     },
+    "Translate into" : {
+
+    },
+    "Translating from %@ to %@ needs a language download. Add it in System Settings > General > Language & Region > Translation Languages." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Translating from %1$@ to %2$@ needs a language download. Add it in System Settings > General > Language & Region > Translation Languages."
+          }
+        }
+      }
+    },
+    "Translating…" : {
+
+    },
+    "Translation: %@" : {
+
+    },
     "Try a different search or status." : {
 
     },
@@ -1430,10 +1532,16 @@
         }
       }
     },
+    "Welcome to Kikimi" : {
+
+    },
     "What does the sentence say? Play it as often as you like, then show the answer." : {
 
     },
     "What happens when you add a video" : {
+
+    },
+    "When I ask" : {
 
     },
     "When to play the sentence audio" : {
