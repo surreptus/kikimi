@@ -28,6 +28,25 @@ your own videos. Spanish, French, German and Japanese work today; the design mak
 - Python 3 (standard library only), to build the dictionary files once
 - Network access for the builds below and for the first speech-model download
 
+## Installing a build that isn't notarized
+
+Releases are not signed with an Apple Developer ID or notarized yet, so macOS blocks a downloaded copy the first
+time. This is Gatekeeper, not damage to the file. If someone has given you a `Kikimi.zip`:
+
+1. Unzip it and drag **Kikimi** into Applications.
+2. Open it. macOS says it can't verify the app. Click **Done**.
+3. Open **System Settings > Privacy & Security**, scroll to the message about Kikimi, click **Open Anyway** and confirm.
+
+Or, in Terminal, remove the download flag once and open it normally:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Kikimi.app
+```
+
+Only do this for a copy you trust: it skips macOS's check. Building from source (below) avoids it entirely, and
+the code is all here to read. A notarized download will come when there is enough use to justify Apple's yearly
+fee.
+
 ## Build and run
 
 The built dictionaries are large generated files, so they are not in the repository. Build them once:
