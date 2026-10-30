@@ -2,24 +2,37 @@
 
 A native macOS app for learning a language from videos you already own.
 
-Drop in a video file and the app transcribes it on your Mac, pulls out the words you'll meet, and lets you
-look them up, mark the ones you know, and review the rest with spaced repetition, using real sentences from
-your own videos. Spanish, French, German and Japanese work today; the design makes adding another language a small, contained job.
+Drop in a video. Kikimi transcribes it on your Mac, finds the words you'll meet, and helps you learn them with
+spaced repetition, using real sentences from your own videos. Spanish, French, German and Japanese work today.
 
 - **Local files only.** Nothing is downloaded from video sites, ever.
-- **On-device.** Transcription runs on your Mac with [WhisperKit](https://github.com/argmaxinc/WhisperKit).
-  The only network use is downloading a speech model the first time you need it.
+- **On-device.** Transcription runs on your Mac with [WhisperKit](https://github.com/argmaxinc/WhisperKit). The
+  only network use is downloading a speech model the first time you need it.
 - **Your originals are never modified or deleted.** See [Import pipeline](#import-pipeline).
 
 ## What it does
 
-| | |
-|---|---|
-| **Videos** | Drag and drop videos. Each is transcribed with timestamps, and words (nouns, verbs, adjectives, adverbs) are extracted into a shared SQLite database. The spoken language is checked first, so a Japanese video can't silently be imported as Spanish. Your videos are listed below it with size, location and date added, and the way to delete the app's copy. Play a video with clickable, synced subtitles (for Japanese verbs and adjectives the word bar names the form and links to the matching page of [Tsumiki](https://surreptus.github.io/tsumiki/), a grammar guide); hover a line for furigana and a word for its meaning; pause after each line to think, or loop a line (slower if you like); show a line's translation when you ask (made on your Mac by macOS); fix a line's text or timing when the transcript got it wrong. Export audio or video clips of any line, or of every example of a word. Each video shows how much of it you already know (and whether that is Hard, A stretch, Comfortable or Easy); sort by best fit, and one button starts learning the commonest words that would take it to about 90%. |
-| **Words** | (For Japanese, a word's page also lists each kanji in it with its meaning and its on'yomi and kun'yomi readings, from KANJIDIC2, and the player's word bar and review cards give every reading a word has: 月 is つき, がつ and げつ.) A sortable, searchable table with multi-select; export the selected words, or the ones you are learning, to an Anki import file. Start learning, mark known, or reset many words at once. Each word shows its dictionary entry and example lines from your videos, with audio you can hear in place. |
-| **First launch** | A welcome page asks which languages you are learning, which language you read (the Mac's by default), and offers to download each speech model now or later. Settings > Languages changes the languages afterwards; a language you drop is only hidden, and its words and videos are kept. |
-| **Review** | (Cards can ask for the word from its meaning, as a fill-in-the-blank sentence from your videos, or by ear with only the sentence's audio; Settings > Languages. "Check my known words" quizzes a sample of words you marked known and sends back any you miss.) An overview first (reviews ready, the next seven days, how many words sit at each stage, and your progress: listening time, review accuracy, words started per week, words looked up most), then nine-stage spaced repetition (intervals 4h, 8h, 23h, 47h, 7d, 14d, 30d, 120d, then retired). A card shows a sentence from one of your videos, can speak it, and picks a different example each visit. |
-| **Settings** | A standard Mac settings window (⌘,) with icon tabs: appearance; the speech model and sentence audio for each language; and Data, which saves your progress to a `.kikimi` file (or, with videos and transcripts included, a folder) and restores it (never overwriting progress you already have, with a preview first). |
+- **Videos.** Drag in videos; each is transcribed with timestamps and its nouns, verbs, adjectives and adverbs are
+  extracted. The spoken language is checked first, so a Japanese video can't be imported as Spanish. Each video shows
+  how much of it you already know (Hard, A stretch, Comfortable or Easy); sort by best fit, and one button starts
+  learning the commonest words that would take it to about 90%.
+- **Player.** Clickable, synced subtitles: hover a word for its meaning, a line for furigana. Pause after each line
+  or loop it (slower if you like), show its translation when you ask (made on your Mac by macOS), fix a line's text
+  or timing, and export audio or video clips. For Japanese verbs and adjectives the word bar names the form and links
+  to the matching page of [Tsumiki](https://surreptus.github.io/tsumiki/), a grammar guide.
+- **Words.** A sortable, searchable table: start learning, mark known or reset many at once, and export to an Anki
+  import file. Each word has its dictionary entry and example lines with audio. For Japanese it also lists every
+  reading of the word (月: つき, がつ, げつ) and each kanji with its meaning and on'yomi/kun'yomi readings.
+- **Review.** An overview (reviews ready, the next seven days, words at each stage, your progress), then nine-stage
+  spaced repetition (4h, 8h, 23h, 47h, 7d, 14d, 30d, 120d, then retired). Cards ask for the word from its meaning,
+  as a fill-in-the-blank sentence, or by ear; choose in Settings > Languages. "Check my known words" quizzes a
+  sample of what you marked known and sends back any you miss.
+- **First launch.** A welcome page asks which languages you are learning and which language you read, and offers to
+  download each speech model now or later. Settings > Languages changes the choice; a dropped language is only
+  hidden, and its words and videos are kept.
+- **Settings (⌘,).** Appearance, the speech model and review options per language, and Data: save your progress to
+  a `.kikimi` file (or a folder that includes videos and transcripts) and restore it. Restoring previews first and
+  never overwrites progress you already have.
 
 ## Requirements
 
@@ -31,37 +44,36 @@ your own videos. Spanish, French, German and Japanese work today; the design mak
 ## Installing a build that isn't notarized
 
 Releases are not signed with an Apple Developer ID or notarized yet, so macOS blocks a downloaded copy the first
-time. This is Gatekeeper, not damage to the file. If someone has given you a `Kikimi.zip`:
+time. This is Gatekeeper, not a damaged file. With a `Kikimi.zip`:
 
 1. Unzip it and drag **Kikimi** into Applications.
 2. Open it. macOS says it can't verify the app. Click **Done**.
-3. Open **System Settings > Privacy & Security**, scroll to the message about Kikimi, click **Open Anyway** and confirm.
+3. Open **System Settings > Privacy & Security**, scroll to the message about Kikimi, click **Open Anyway** and
+   confirm.
 
-Or, in Terminal, remove the download flag once and open it normally:
+Or remove the download flag once in Terminal, then open it normally:
 
 ```bash
 xattr -dr com.apple.quarantine /Applications/Kikimi.app
 ```
 
-Only do this for a copy you trust: it skips macOS's check. Building from source (below) avoids it entirely, and
-the code is all here to read. A notarized download will come when there is enough use to justify Apple's yearly
-fee.
+Do this only for a copy you trust, since it skips macOS's check. Building from source avoids it, and the code is
+here to read. A notarized download will come when there is enough use to justify Apple's yearly fee.
 
 ## Build and run
 
-The built dictionaries are large generated files, so they are not in the repository. Build them once:
+The dictionaries are large generated files, so they are not in the repository. Build them once:
 
 ```bash
 Scripts/build_ipadic.sh         # Japanese tokenizer dictionary (clones MeCab at a pinned commit, ~50 MB)
-Scripts/build_dictionaries.sh   # JMdict (~10 MB download), KANJIDIC2 (~1.5 MB) and the Spanish, French and German extracts (~2.5 GB download in all)
+Scripts/build_dictionaries.sh   # JMdict, KANJIDIC2, and the Spanish, French and German extracts (~2.5 GB download)
 ```
 
-Then open `Kikimi.xcodeproj` in Xcode, pick the **Kikimi** scheme and **My Mac**, and press ⌘R. The app reads the
-bundled dictionaries in place (they are never copied into its database); on the **Import** tab, download a speech
-model, then drop in a video.
-Defaults are `medium` for Spanish, French and German and `large-v3` for Japanese (about 3 GB), and you can pick another per language.
+Then open `Kikimi.xcodeproj` in Xcode, pick the **Kikimi** scheme and **My Mac**, and press ⌘R. On the Videos
+page, download a speech model, then drop in a video. The default is `medium` for Spanish, French and German and
+`large-v3` (about 3 GB) for Japanese; you can pick another per language.
 
-The app is sandboxed. Its database, models and library live in its container,
+The app is sandboxed. Its database, models and library live in
 `~/Library/Containers/<bundle id>/Data/Library/Application Support/Kikimi/`.
 
 ## Tests
@@ -70,96 +82,93 @@ The app is sandboxed. Its database, models and library live in its container,
 cd LangCore && swift test
 ```
 
-If `xcode-select` points at the Command Line Tools, prefix with
-`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` (XCTest needs Xcode's toolchain). The dictionary builders have
-their own tests: `cd Scripts/dictionaries && python3 test_builders.py`.
+If `xcode-select` points at the Command Line Tools, prefix with `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`
+(XCTest needs Xcode's toolchain). The dictionary builders have their own tests:
+`python3 Scripts/dictionaries/test_builders.py`. `Scripts/check_leaks.sh` runs the `LangCore` tests under macOS's
+`leaks` tool and fails if anything leaked; it doesn't cover the SwiftUI app.
 
-`Scripts/check_leaks.sh` runs the same tests under macOS's `leaks` tool and fails if anything leaked. It covers `LangCore`, not the
-SwiftUI app.
-
-Some tests need real models or files, so they are opt-in and skipped by default:
+Tests that need real models or files are opt-in and skipped by default:
 
 | Variable | Runs |
 |---|---|
 | `LANGCORE_INTEGRATION=1` | Real WhisperKit transcription and language detection with the tiny model (downloads ~73 MB) |
-| `LANGCORE_BENCHMARK=1` | Accuracy and speed on synthesized speech; with `LANGCORE_MODEL` and `LANGCORE_MODELS_DIR` to choose the model |
+| `LANGCORE_BENCHMARK=1` | Accuracy and speed on synthesized speech; set `LANGCORE_MODEL` and `LANGCORE_MODELS_DIR` to choose the model |
 | `LANGCORE_FILE=<media>` | With the benchmark: transcribe or detect the language of one file (read-only) |
-| `LANGCORE_COMPACT_FILE=<video>` | Report what the video compaction does to one file (read-only) |
-
-The library copy of each video is the smallest HEVC by default; Settings > General > Video quality can keep your file as it is
-instead (no compression, so the same size).
+| `LANGCORE_COMPACT_FILE=<video>` | Report what video compaction does to one file (read-only) |
 
 ## How it is organised
 
 Three parts in one repository:
 
-- **`LangCore/`**, a Swift package with no UI, and all the logic: language profiles, SRS, database (GRDB with
-  migrations), tokenizing, the import pipeline, playback, clip export, and review sessions.
-- **`Kikimi.xcodeproj`** with **`Kikimi/`**: the SwiftUI interface, app lifecycle, assets, entitlements and
-  `Info.plist`. It contains no logic of its own; views call into `LangCore`.
-- **`site/`**, the website, built with [Astro](https://astro.build) as static pages in the app's colours. Its privacy
-  and terms pages are the app's own `Kikimi/Privacy.md` and `Terms.md`, so they can't differ. Run it with
-  `cd site && npm install && npm run dev`; `npm run build` writes `site/dist`. A workflow
-  (`.github/workflows/site.yml`) publishes it to GitHub Pages once Pages is switched on for the repository
-  (Settings > Pages > Source: GitHub Actions).
+- **`LangCore/`**: a Swift package with no UI and all the logic: language profiles, SRS, the database (GRDB with
+  migrations), tokenizing, the import pipeline, playback, clip export and review sessions.
+- **`Kikimi.xcodeproj`** with **`Kikimi/`**: the SwiftUI interface, app lifecycle, assets and entitlements. It has
+  no logic of its own; views call into `LangCore`.
+- **`site/`**: the website, static pages built with [Astro](https://astro.build). Its privacy and terms pages are
+  the app's own `Kikimi/Privacy.md` and `Terms.md`, so they can't differ. Run it with
+  `cd site && npm install && npm run dev`. A workflow (`.github/workflows/site.yml`) publishes it to GitHub Pages
+  once Pages is switched on (Settings > Pages > Source: GitHub Actions).
+
+[`ARCHITECTURE.md`](ARCHITECTURE.md) says where things live in more detail.
 
 ### Language profiles
 
-Everything language-specific sits behind the `LanguageProfile` protocol: language code, the code and default model
-WhisperKit uses, a tokenizer (lemma and part of speech), which parts of speech count as content words, the dictionary
-source, and display options. Shared code never checks a language code; it asks the profile.
+Everything language-specific sits behind the `LanguageProfile` protocol: language code, the WhisperKit code and
+default model, a tokenizer (lemma and part of speech), which parts of speech count as content words, the dictionary
+source and display options. Shared code never checks a language code; it asks the profile.
 
-To add a language: write a new profile type, add it to `LanguageProfiles.all`, and add a script that builds its
-dictionary file. The `words` and `dictionary` tables are already keyed by language, so there is no schema change.
-Check the tokenizer first: Apple's `NaturalLanguage` was fine for Spanish but returned no part of speech or lemma for
-Japanese, which is why Japanese uses MeCab.
+To add a language: write a profile, add it to `LanguageProfiles.all`, and add a script that builds its dictionary.
+The `words` and `dictionary` tables are keyed by language, so there is no schema change. Check the tokenizer first:
+Apple's `NaturalLanguage` gives good lemmas for Spanish, French and German, but none for Japanese, which is why
+Japanese uses MeCab.
 
 ### Import pipeline
 
-The original file is only ever read. Steps, in order:
+The original file is only ever read. In order:
 
-1. Hash the file (duplicates are detected by content, not name) and copy it to a staging folder.
+1. Hash the file (duplicates are found by content, not name) and copy it to a staging folder.
 2. Check the spoken language against the chosen one. Failing here changes nothing.
-3. Transcribe with WhisperKit (Whisper sound tags are removed).
+3. Transcribe with WhisperKit (Whisper's sound tags are removed).
 4. Make the library copy: small HEVC is kept as is; otherwise low-bitrate HEVC with the short side at most 480 px.
-   If re-encoding isn't smaller than the source, the original streams are copied instead.
-5. Verify the output (opens, has a video track, duration matches). Its sound is AAC: copied when already small, otherwise
-   recompressed to about 64 kbps (48 for mono), which is plenty for speech. There is no separate audio file; sentence
-   audio and audio clips play from the video copy. (Videos added by earlier versions keep theirs until deleted.)
-6. Atomically move both into the library, then write all database rows in one transaction.
+   If re-encoding isn't smaller than the source, the original streams are copied.
+5. Verify the output (it opens, has a video track, duration matches). Its sound is AAC: copied when already small,
+   otherwise about 64 kbps (48 for mono), plenty for speech. Sentence audio and audio clips play from this copy.
+6. Atomically move it into the library, then write all database rows in one transaction.
 7. Only then delete the staged copy.
 
-Any failure removes only the staging and temporary files. This is covered by tests that inject a failure at each step
-and check the original is byte-identical.
+Any failure removes only staging and temporary files. Tests inject a failure at each step and check the original is
+byte-identical. Settings > General > Video quality can keep your file as it is instead of compressing it.
 
 ## Data and licences
 
-Transcription uses OpenAI Whisper models converted for Core ML by Argmax, downloaded at runtime.
-Dictionary data is built from JMdict and KANJIDIC2 (EDRDG) and the English Wiktionary via kaikki.org, both **CC BY-SA 4.0**. The
-built dictionary files are adaptations of that data and must stay under that licence with attribution, so they are
-not committed; only the scripts that build them are. Japanese tokenizing uses a vendored copy of
-[MeCab](https://taku910.github.io/mecab/) (BSD licence) with the IPADIC dictionary.
+Transcription uses OpenAI Whisper models converted for Core ML by Argmax, downloaded at runtime. Dictionary data is
+built from JMdict and KANJIDIC2 (EDRDG) and from English Wiktionary via kaikki.org, all **CC BY-SA 4.0**. The built
+dictionary files are adaptations of that data and stay under that licence with attribution, so they are not
+committed; only the scripts that build them are. Japanese tokenizing uses a vendored copy of
+[MeCab](https://taku910.github.io/mecab/) (BSD) with the IPADIC dictionary.
 
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) lists every component and its licence. The licence texts are in `LangCore/Sources/LangCore/Resources/Licenses/` and are shown in the app under
-**Acknowledgements**. The app's own code is under the [MIT licence](LICENSE); the dictionary data and the other components keep the licences above.
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) lists every component and its licence; the texts are in
+`LangCore/Sources/LangCore/Resources/Licenses/` and shown in the app under Acknowledgements. The app's own code is
+under the [MIT licence](LICENSE).
 
-The privacy policy is [`Kikimi/Privacy.md`](Kikimi/Privacy.md) and the terms of use are [`Kikimi/Terms.md`](Kikimi/Terms.md).
-The app shows the same files (Help menu, and Settings > About), and the website publishes them at `/privacy/` and `/terms/`.
+The privacy policy is [`Kikimi/Privacy.md`](Kikimi/Privacy.md) and the terms of use are
+[`Kikimi/Terms.md`](Kikimi/Terms.md). The app shows both (Help menu, and Settings > About), and the website
+publishes them at `/privacy/` and `/terms/`.
 
 ## Release
 
-`Release/CHECKLIST.md` lists what to do before shipping, and `Scripts/release.sh` builds, exports and (optionally)
-notarizes a release; use `--dry-run` to see the commands. Nothing in the repository is signed. The bundle identifier
-is `com.surreptus.Kikimi`.
+[`Release/CHECKLIST.md`](Release/CHECKLIST.md) lists what to do before shipping. `Scripts/release.sh` builds,
+exports and optionally notarizes a release (`--dry-run` prints the commands). Nothing in the repository is signed.
+The bundle identifier is `com.surreptus.Kikimi`.
 
 ## Status and known limits
 
 - Accuracy depends on the model. On synthesized Spanish, `medium` scored about 23% word error rate on a long passage
-  and 2% on a short one; the `tiny` model is poor. Real-world results vary with audio quality.
-- Whisper's timestamps are coarse in some stretches (for example fast overlapping dialogue), so sentence clips there
-  can start or end slightly off.
-- IPADIC dates from 2007: modern loanwords and slang are sometimes split or missed. Japanese lemmas are good
-  for everyday text.
-- Spanish, French and German dictionary entries are for dictionary forms; typing an inflected form into search won't find it directly.
+  and 2% on a short one; `tiny` is poor. Real audio varies. `medium` hasn't been benchmarked for French or German.
+- Whisper's timestamps are coarse in some stretches (fast, overlapping speech), so sentence clips there can start
+  or end slightly off.
+- IPADIC dates from 2007, so modern loanwords and slang are sometimes split or missed.
+- French lemmas are noisier than German ones, and a German separable verb ("ruf ... an") is learned as `rufen`.
+- Dictionary entries are for dictionary forms; typing an inflected form into search won't find it directly.
 - Audio-only files aren't supported; the pipeline needs a video track.
-- The UI has had limited hands-on testing; much of it was verified through builds, tests and rendered previews.
+- The UI has had limited hands-on testing; much of it was checked through builds, tests and rendered previews.
