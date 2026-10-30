@@ -18,7 +18,7 @@ struct RootView: View {
             case .failed(let message):
                 ContentUnavailableView("Couldn't start", systemImage: "exclamationmark.triangle", description: Text(message))
             case .ready(let env):
-                if app.needsOnboarding { OnboardingView(env: env) } else { layout(env) }
+                if app.needsOnboarding { card { OnboardingView(env: env) } } else { layout(env) }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -38,7 +38,7 @@ struct RootView: View {
 
     /// The window is the sidebar's colour once the library is open, with the page in a card on it; while it opens,
     /// or if it can't, there is no card, so the page colour fills the window.
-    private var windowColor: Color { app.isReady && !app.needsOnboarding ? Theme.chrome : Theme.field }
+    private var windowColor: Color { app.isReady ? Theme.chrome : Theme.field }
 
     /// The sidebar sits directly on the window; the current page is a rounded card beside it.
     private func layout(_ env: LangEnvironment) -> some View {
@@ -62,15 +62,17 @@ struct RootView: View {
             }
             .animation(Theme.screenChange(reduceMotion), value: app.section)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Theme.card)   // the card is plain; only the window around it has grain
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))   // a page sliding in stays inside the card
-            .padding(.top, 10).padding(.trailing, 10).padding(.bottom, 10)
-            .ignoresSafeArea(.container, edges: .top)   // the card starts 10 points from the window's top edge
+            .card()
         }
         .modal(isPresented: $app.showStorage) { StorageView(env: env) }
         .modal(isPresented: $app.showAbout) { AboutView() }
         .modal(isPresented: $app.showPrivacy) { DocumentView(title: "Privacy policy", resource: "Privacy") }
         .modal(isPresented: $app.showTerms) { DocumentView(title: "Terms of use", resource: "Terms") }
+    }
+
+    /// A page on its own, with no sidebar, in the same card.
+    private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        content().frame(maxWidth: .infinity, maxHeight: .infinity).card(leading: 10)
     }
 
     @ViewBuilder
@@ -80,5 +82,15 @@ struct RootView: View {
         case .words: WordsView(env: env)
         case .review: ReviewView(env: env)
         }
+    }
+}
+
+private extension View {
+    /// The page card: plain, with the window's grain only around it, rounded so a page sliding in stays inside it.
+    func card(leading: CGFloat = 0) -> some View {
+        self.background(Theme.card)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .padding(.top, 10).padding(.trailing, 10).padding(.bottom, 10).padding(.leading, leading)
+            .ignoresSafeArea(.container, edges: .top)   // the card starts 10 points from the window's top edge
     }
 }
