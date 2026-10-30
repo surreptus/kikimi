@@ -65,7 +65,7 @@ struct WordDetail: View {
     private var kanjiSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Kanji").font(Theme.title(17))
-            Text("On is the reading from Chinese, in katakana. Kun is the native reading, in hiragana; the dot marks where the ending begins.")
+            Text("On: reading from Chinese (katakana). Kun: native reading (hiragana); the dot marks where the ending begins.")
                 .font(Theme.small).foregroundStyle(Theme.muted)
             ForEach(kanji) { info in
                 HStack(alignment: .firstTextBaseline, spacing: 14) {

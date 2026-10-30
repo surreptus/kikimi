@@ -45,7 +45,7 @@ struct OnboardingView: View {
                 .panel()
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("My language").font(Theme.title(16))
+                    Text("Translate into").font(Theme.title(16))
                     Picker("Translate into", selection: $translationTarget) {
                         ForEach(translationChoices) { Text($0.name).tag($0.id) }
                     }
@@ -58,7 +58,7 @@ struct OnboardingView: View {
                 if !chosenProfiles.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Speech models").font(Theme.title(16))
-                        Text("A speech model listens to your videos and writes the subtitles. It is downloaded once and stays on this Mac. You can download it now or later, when you add your first video.")
+                        Text("A speech model writes the subtitles for your videos. It downloads once and stays on this Mac. Download it now, or when you add your first video.")
                             .font(Theme.small).foregroundStyle(Theme.muted)
                         ForEach(models, id: \.variant) { model in
                             OnboardingModelRow(env: env, variant: model.variant, languages: model.languages)
@@ -69,6 +69,7 @@ struct OnboardingView: View {
                 }
 
                 HStack {
+                    if chosen.isEmpty { Text("Choose at least one language.").font(Theme.small).foregroundStyle(Theme.muted) }
                     Spacer()
                     Button("Start") { app.setLearning(Array(chosen)) }
                         .buttonStyle(.pill)
