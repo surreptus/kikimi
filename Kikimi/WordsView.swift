@@ -61,6 +61,12 @@ struct WordsView: View {
     private var selectionBinding: Binding<Set<Int64>> { Binding(get: { app.wordsSelection }, set: { app.wordsSelection = $0 }) }
 
     private var sortedRows: [WordRow] { rows.sorted(using: sort.comparators) }
+    /// Offered until you have started anything: the most frequent words are the ones that make the next video easier.
+    private var showsStartHere: Bool {
+        trimmedSearch.isEmpty && filter == nil && typeFilter == nil && selection.isEmpty
+            && rows.contains { $0.word.status == .new }
+            && !rows.contains { $0.word.status == .learning || $0.word.status == .finished }
+    }
     private var selectedRows: [WordRow] { rows.filter { selection.contains($0.id) } }
     private var trimmedSearch: String { search.trimmingCharacters(in: .whitespaces) }
 
@@ -129,6 +135,11 @@ struct WordsView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
             ScreenTitle(text: "Words", subtitle: "Pick words to learn, or mark the ones you already know.")
+            if showsStartHere {
+                Button("Start with the 25 words you hear most") { selectMostSeenNew(25); apply(.learn) }
+                    .buttonStyle(.pill(compact: true))
+                    .help("Starts learning the 25 new words that come up most often in your videos")
+            }
             HStack(spacing: 10) {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass").foregroundStyle(Theme.ink).font(.system(size: 14, weight: .bold))
@@ -222,8 +233,8 @@ struct WordsView: View {
                     }
                 }
                 .buttonStyle(.pill(.secondary, compact: true))
-                Button("Mark known") { apply(.known) }.buttonStyle(.pill(.secondary, compact: true))
-                Button("Start learning") { apply(.learn) }.buttonStyle(.pill(compact: true))
+                Button("Known") { apply(.known) }.buttonStyle(.pill(.secondary, compact: true))
+                Button("Learn") { apply(.learn) }.buttonStyle(.pill(compact: true))
             }
             .disabled(selection.isEmpty)
         }
@@ -306,7 +317,7 @@ struct WordsView: View {
                     let count = selectedRows.filter { $0.word.status == status }.count
                     if count > 0 { HStack { StatusPill(text: status.title, color: summaryColor(status)); Text("\(count)") } }
                 }
-                Text("Use the buttons below the list to start learning, mark known, or reset them all at once.")
+                Text("Use the buttons below the list to learn, mark as known, or reset them all at once.")
                     .font(.callout).foregroundStyle(Theme.muted)
                 Spacer()
             }

@@ -12,6 +12,7 @@ struct WordDetail: View {
     @State private var exportMessage: String?
     @State private var audio: SentenceAudioPlayer?
     @State private var showsAllExamples = false
+    @AppStorage("showsKanjiBreakdown") private var showsKanji = false
     @State private var seen = WordSeen()
     private let examplesShownFirst = 5
 
@@ -28,8 +29,7 @@ struct WordDetail: View {
                     ForEach(entries) { EntryView(entry: $0, showsReading: app.profile.display.showsReadings) }
                 }
 
-                if !kanji.isEmpty { kanjiSection }
-
+                // The word in use is what this app is for, so it comes before the kanji breakdown.
                 Text("From your videos").font(Theme.title(17))
                 ForEach(showsAllExamples ? examples : Array(examples.prefix(examplesShownFirst))) { line in exampleRow(line) }
                 if examples.count > examplesShownFirst {
@@ -38,6 +38,8 @@ struct WordDetail: View {
                     }
                     .buttonStyle(.plain).font(Theme.small).foregroundStyle(Theme.muted)
                 }
+
+                if !kanji.isEmpty { kanjiSection }
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -63,40 +65,43 @@ struct WordDetail: View {
     /// Each kanji in the word with its meaning and readings. On'yomi (from Chinese) are in katakana and kun'yomi
     /// (native) in hiragana, and each is labelled too, so the difference never depends on telling scripts apart.
     private var kanjiSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Kanji").font(Theme.title(17))
-            Text("On: reading from Chinese (katakana). Kun: native reading (hiragana); the dot marks where the ending begins.")
-                .font(Theme.small).foregroundStyle(Theme.muted)
-            ForEach(kanji) { info in
-                HStack(alignment: .firstTextBaseline, spacing: 14) {
-                    Text(info.literal).font(.system(size: 34, design: .rounded))
-                    VStack(alignment: .leading, spacing: 4) {
-                        if !info.meanings.isEmpty {
-                            Text(info.meanings.joined(separator: "; ")).font(.callout)
-                        }
-                        Grid(alignment: .topLeading, horizontalSpacing: 8, verticalSpacing: 2) {
-                            if !info.onReadings.isEmpty {
-                                GridRow {
-                                    Text("On").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
-                                    Text(info.onReadings.joined(separator: "、"))
+        DisclosureGroup(isExpanded: $showsKanji) {
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(kanji) { info in
+                    HStack(alignment: .firstTextBaseline, spacing: 14) {
+                        Text(info.literal).font(.system(size: 34, design: .rounded))
+                        VStack(alignment: .leading, spacing: 4) {
+                            if !info.meanings.isEmpty {
+                                Text(info.meanings.joined(separator: "; ")).font(.callout)
+                            }
+                            Grid(alignment: .topLeading, horizontalSpacing: 8, verticalSpacing: 2) {
+                                if !info.onReadings.isEmpty {
+                                    GridRow {
+                                        Text("On").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                                        Text(info.onReadings.joined(separator: "、"))
+                                    }
+                                }
+                                if !info.kunReadings.isEmpty {
+                                    GridRow {
+                                        Text("Kun").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                                        Text(info.kunReadings.joined(separator: "、"))
+                                    }
                                 }
                             }
-                            if !info.kunReadings.isEmpty {
-                                GridRow {
-                                    Text("Kun").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
-                                    Text(info.kunReadings.joined(separator: "、"))
-                                }
-                            }
+                            .font(.callout)
                         }
-                        .font(.callout)
+                        Spacer(minLength: 0)
                     }
-                    Spacer(minLength: 0)
+                    .textSelection(.enabled)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(kanjiLabel(info))
                 }
-                .textSelection(.enabled)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(kanjiLabel(info))
             }
+            .padding(.top, 8)
+        } label: {
+            Text("Kanji").font(Theme.title(17))
         }
+        .help("On: reading from Chinese. Kun: native reading; the dot marks where the ending begins.")
     }
 
     private func kanjiLabel(_ info: KanjiInfo) -> String {
@@ -119,6 +124,14 @@ struct WordDetail: View {
             HStack(spacing: 10) {
                 StatusBadge(status: row.word.status, stage: row.word.stage)
                 Spacer(minLength: 8)
+                if row.word.status != .learning && row.word.status != .finished {
+                    Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
+                        .help("Start learning this word")
+                }
+                if row.word.status != .known {
+                    Button("Known") { setStatus(.known) }.buttonStyle(.pill(.secondary, compact: true))
+                        .help("Mark this word as known")
+                }
                 SpeakButton(
                     text: (app.profile.display.showsReadings ? entries.first?.reading : nil) ?? row.word.lemma,
                     languageCode: LanguageProfiles.profile(for: row.word.language)?.whisperCode ?? row.word.language)
@@ -135,6 +148,14 @@ struct WordDetail: View {
                     .help("Export this word's example sentences as clips")
                 }
             }
+        }
+    }
+
+    private func setStatus(_ status: WordStatus) {
+        Task {
+            if status == .learning { try? await env.database.startLearning(wordID: row.id) }
+            else { try? await env.database.markKnown(wordID: row.id) }
+            app.dataChanged()
         }
     }
 
