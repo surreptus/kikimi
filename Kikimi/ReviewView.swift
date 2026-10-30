@@ -34,7 +34,7 @@ struct ReviewView: View {
                 }
             } else if let overview {
                 if overview.isEmpty {
-                    EmptyState(title: "Nothing to review yet", message: "Start learning words from the Words tab, then come back.")
+                    EmptyState(title: "Nothing to review yet", message: "Choose words to learn on the Words page, then come back.")
                 } else {
                     ReviewOverviewView(overview: overview, stats: stats, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) })
                 }
@@ -96,6 +96,13 @@ struct ReviewView: View {
                 Text(card.word.lemma).font(.system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
                 StatusPill(text: card.word.pos.title)
 
+                // The word as it was said in your video: the context is part of the question, the translation is not.
+                if let example = card.example {
+                    Text(highlighted(example)).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 4)
+                }
+
                 if revealed {
                     VStack(spacing: 10) {
                         if app.profile.display.showsReadings, let reading = readings(of: card) {
@@ -106,9 +113,6 @@ struct ReviewView: View {
                             .multilineTextAlignment(.center)
                             .textSelection(.enabled)
                         if let example = card.example {
-                            Divider().padding(.horizontal, 60).padding(.vertical, 4)
-                            Text(highlighted(example)).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
-                                .multilineTextAlignment(.center)
                             Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint)
                         }
                     }

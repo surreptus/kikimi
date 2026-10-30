@@ -141,7 +141,7 @@ struct ReviewOverviewView: View {
                         .fill(index == counts.count - 1 ? Theme.ink : Theme.ink.opacity(0.35))
                         .frame(maxWidth: 40)
                         .frame(height: max(4, 48 * CGFloat(count) / CGFloat(tallest)))
-                    Text(label).font(.system(size: 11, design: .rounded)).foregroundStyle(Theme.muted)
+                    Text(label).font(Theme.small).foregroundStyle(Theme.muted)
                 }
                 .frame(maxWidth: .infinity)
                 .accessibilityElement(children: .ignore)
@@ -166,7 +166,7 @@ struct ReviewOverviewView: View {
         (String(localized: "4h"), String(localized: "4 hours")), (String(localized: "8h"), String(localized: "8 hours")),
         (String(localized: "1d"), String(localized: "1 day")), (String(localized: "2d"), String(localized: "2 days")),
         (String(localized: "1w"), String(localized: "1 week")), (String(localized: "2w"), String(localized: "2 weeks")),
-        (String(localized: "1m"), String(localized: "1 month")), (String(localized: "4m"), String(localized: "4 months")),
+        (String(localized: "1mo"), String(localized: "1 month")), (String(localized: "4mo"), String(localized: "4 months")),
     ]
 
     private var stages: some View {
