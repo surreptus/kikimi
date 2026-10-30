@@ -147,7 +147,7 @@ struct AboutView: View {
             VStack(alignment: .leading, spacing: 6) {
                 bullet("Hard is under 80%, A stretch is 80 to 88%, Comfortable is 88 to 98%, and Easy is 98% or more.")
                 bullet("A word counts as known if you marked it known, it is finished, or you are learning it and its reviews are a week or more apart (Stage 5 and above).")
-                bullet("Sort by Best fit to put the videos worth watching next at the top: mostly understood, with a little new.")
+                bullet("Sort by Closest to my level to put the videos worth watching next at the top: mostly understood, with a little new.")
                 bullet("Open a video's Info to see the commonest words you don't know yet, and start learning them all at once.")
                 bullet("In Settings, under Data, you can mark a list of words you already know (one per line, or the first column of a CSV), so these numbers start out honest.")
             }

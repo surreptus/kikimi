@@ -37,7 +37,7 @@ struct StorageView: View {
             }
 
             section("Videos", bytes: videoBytes) {
-                Text("\(videoCount) video\(videoCount == 1 ? "" : "s"). Delete them from the Videos page.")
+                Text("^[\(videoCount) video](inflect: true). Delete them from the Videos page.")
                     .foregroundStyle(Theme.muted)
             }
 
