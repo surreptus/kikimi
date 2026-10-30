@@ -16,7 +16,7 @@ your own videos. Spanish, French, German and Japanese work today; the design mak
 | | |
 |---|---|
 | **Videos** | Drag and drop videos. Each is transcribed with timestamps, and words (nouns, verbs, adjectives, adverbs) are extracted into a shared SQLite database. The spoken language is checked first, so a Japanese video can't silently be imported as Spanish. Your videos are listed below it with size, location and date added, and the way to delete the app's copy. Play a video with clickable, synced subtitles (for Japanese verbs and adjectives the word bar names the form and links to the matching page of [Tsumiki](https://surreptus.github.io/tsumiki/), a grammar guide); hover a line for furigana and a word for its meaning; pause after each line to think, or loop a line (slower if you like); show a line's translation when you ask (made on your Mac by macOS); fix a line's text or timing when the transcript got it wrong. Export audio or video clips of any line, or of every example of a word. Each video shows how much of it you already know (and whether that is Hard, A stretch, Comfortable or Easy); sort by best fit, and one button starts learning the commonest words that would take it to about 90%. |
-| **Words** | A sortable, searchable table with multi-select; export the selected words, or the ones you are learning, to an Anki import file. Start learning, mark known, or reset many words at once. Each word shows its dictionary entry and example lines from your videos, with audio you can hear in place. |
+| **Words** | (For Japanese, a word's page also lists each kanji in it with its meaning and its on'yomi and kun'yomi readings, from KANJIDIC2, and the player's word bar and review cards give every reading a word has: 月 is つき, がつ and げつ.) A sortable, searchable table with multi-select; export the selected words, or the ones you are learning, to an Anki import file. Start learning, mark known, or reset many words at once. Each word shows its dictionary entry and example lines from your videos, with audio you can hear in place. |
 | **First launch** | A welcome page asks which languages you are learning, which language you read (the Mac's by default), and offers to download each speech model now or later. Settings > Languages changes the languages afterwards; a language you drop is only hidden, and its words and videos are kept. |
 | **Review** | (Cards can ask for the word from its meaning, as a fill-in-the-blank sentence from your videos, or by ear with only the sentence's audio; Settings > Languages. "Check my known words" quizzes a sample of words you marked known and sends back any you miss.) An overview first (reviews ready, the next seven days, how many words sit at each stage, and your progress: listening time, review accuracy, words started per week, words looked up most), then nine-stage spaced repetition (intervals 4h, 8h, 23h, 47h, 7d, 14d, 30d, 120d, then retired). A card shows a sentence from one of your videos, can speak it, and picks a different example each visit. |
 | **Settings** | A standard Mac settings window (⌘,) with icon tabs: appearance; the speech model and sentence audio for each language; and Data, which saves your progress to a `.kikimi` file (or, with videos and transcripts included, a folder) and restores it (never overwriting progress you already have, with a preview first). |
@@ -34,7 +34,7 @@ The built dictionaries are large generated files, so they are not in the reposit
 
 ```bash
 Scripts/build_ipadic.sh         # Japanese tokenizer dictionary (clones MeCab at a pinned commit, ~50 MB)
-Scripts/build_dictionaries.sh   # JMdict (~10 MB download) and the Spanish, French and German extracts (~2.5 GB download in all)
+Scripts/build_dictionaries.sh   # JMdict (~10 MB download), KANJIDIC2 (~1.5 MB) and the Spanish, French and German extracts (~2.5 GB download in all)
 ```
 
 Then open `Kikimi.xcodeproj` in Xcode, pick the **Kikimi** scheme and **My Mac**, and press ⌘R. The app reads the
@@ -116,7 +116,7 @@ and check the original is byte-identical.
 ## Data and licences
 
 Transcription uses OpenAI Whisper models converted for Core ML by Argmax, downloaded at runtime.
-Dictionary data is built from JMdict (EDRDG) and the English Wiktionary via kaikki.org, both **CC BY-SA 4.0**. The
+Dictionary data is built from JMdict and KANJIDIC2 (EDRDG) and the English Wiktionary via kaikki.org, both **CC BY-SA 4.0**. The
 built dictionary files are adaptations of that data and must stay under that licence with attribution, so they are
 not committed; only the scripts that build them are. Japanese tokenizing uses a vendored copy of
 [MeCab](https://taku910.github.io/mecab/) (BSD licence) with the IPADIC dictionary.

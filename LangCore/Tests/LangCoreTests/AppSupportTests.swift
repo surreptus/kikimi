@@ -226,7 +226,8 @@ final class AppSupportTests: XCTestCase {
 
     func testAcknowledgementsAreBundled() {
         let items = Acknowledgements.all()
-        XCTAssertEqual(items.count, 9)
+        XCTAssertEqual(items.count, 10)
+        XCTAssertTrue(items.contains { $0.title.contains("KANJIDIC2") && $0.text.contains("CC BY-SA 4.0") })
         XCTAssertTrue(items.contains { $0.title.contains("Kikimi") && $0.text.contains("MIT License") })
         // WhisperKit ships code from swift-transformers under the Apache licence, which has to travel with the app.
         XCTAssertTrue(items.contains { $0.title.contains("swift-transformers") && $0.text.contains("Apache License") && $0.text.contains("Hugging Face") })

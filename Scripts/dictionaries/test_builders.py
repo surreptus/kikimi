@@ -8,6 +8,7 @@ import unittest
 
 import build_jmdict
 import build_kaikki
+import build_kanjidic
 
 JMDICT = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JMdict [
@@ -170,6 +171,31 @@ class KaikkiTests(unittest.TestCase):
             build_kaikki.meanings('to contain; to hold (e.g. "the key"; "a clue", etc.); to keep'),
             ["to contain", 'to hold (e.g. "the key"; "a clue", etc.)', "to keep"])
         self.assertEqual(build_kaikki.meanings(""), [])
+
+
+class KanjidicTests(unittest.TestCase):
+    XML = """<?xml version="1.0" encoding="UTF-8"?>
+<kanjidic2><header><date_of_creation>2026-01-01</date_of_creation></header>
+<character><literal>月</literal><reading_meaning><rmgroup>
+<reading r_type="pinyin">yue4</reading><reading r_type="ja_on">ゲツ</reading><reading r_type="ja_on">ガツ</reading>
+<reading r_type="ja_kun">つき</reading><meaning>month</meaning><meaning>moon</meaning>
+<meaning m_lang="fr">lune</meaning></rmgroup><nanori>おと</nanori></reading_meaning></character>
+<character><literal>食</literal><reading_meaning><rmgroup>
+<reading r_type="ja_on">ショク</reading><reading r_type="ja_kun">た.べる</reading><reading r_type="ja_kun">く.う</reading>
+<meaning>eat</meaning><meaning>food</meaning></rmgroup></reading_meaning></character>
+<character><literal>〆</literal></character>
+</kanjidic2>"""
+
+    def test_keeps_on_and_kun_readings_apart_and_only_english_meanings(self):
+        with tempfile.TemporaryDirectory() as d:
+            src, out = os.path.join(d, "k.xml"), os.path.join(d, "kanji.sqlite")
+            with open(src, "w", encoding="utf-8") as f:
+                f.write(self.XML)
+            self.assertEqual(build_kanjidic.build(src, out), 2, "a kanji with no reading or meaning is left out")
+            db = sqlite3.connect(out)
+            self.assertEqual(db.execute("SELECT * FROM kanji WHERE literal = '月'").fetchone(),
+                             ("月", "ゲツ、ガツ", "つき", "month; moon"))
+            self.assertEqual(db.execute("SELECT kun_yomi FROM kanji WHERE literal = '食'").fetchone(), ("た.べる、く.う",))
 
 
 if __name__ == "__main__":

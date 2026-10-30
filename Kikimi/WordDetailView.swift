@@ -7,6 +7,7 @@ struct WordDetail: View {
     let row: WordRow
     @Environment(AppState.self) private var app
     @State private var entries: [DictionaryEntry] = []
+    @State private var kanji: [KanjiInfo] = []
     @State private var examples: [ExampleLine] = []
     @State private var exportMessage: String?
     @State private var audio: SentenceAudioPlayer?
@@ -26,6 +27,8 @@ struct WordDetail: View {
                 } else {
                     ForEach(entries) { EntryView(entry: $0, showsReading: app.profile.display.showsReadings) }
                 }
+
+                if !kanji.isEmpty { kanjiSection }
 
                 Text("From your videos").font(Theme.title(17))
                 ForEach(showsAllExamples ? examples : Array(examples.prefix(examplesShownFirst))) { line in exampleRow(line) }
@@ -47,6 +50,7 @@ struct WordDetail: View {
         .task {
             audio = SentenceAudioPlayer(libraryRoot: env.libraryURL)
             entries = (try? await env.database.lookup(language: row.word.language, term: row.word.lemma, limit: 5)) ?? []
+            kanji = await env.kanjiInfo(in: row.word.lemma, language: row.word.language)
             examples = (try? await env.database.examples(wordID: row.id)) ?? []
             seen = (try? await env.database.seen(wordID: row.id)) ?? WordSeen()
         }
@@ -54,6 +58,53 @@ struct WordDetail: View {
         .onChange(of: exportMessage) { _, text in
             if let text { AccessibilityNotification.Announcement(text).post() }
         }
+    }
+
+    /// Each kanji in the word with its meaning and readings. On'yomi (from Chinese) are in katakana and kun'yomi
+    /// (native) in hiragana, and each is labelled too, so the difference never depends on telling scripts apart.
+    private var kanjiSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Kanji").font(Theme.title(17))
+            Text("On is the reading from Chinese, in katakana. Kun is the native reading, in hiragana; the dot marks where the ending begins.")
+                .font(Theme.small).foregroundStyle(Theme.muted)
+            ForEach(kanji) { info in
+                HStack(alignment: .firstTextBaseline, spacing: 14) {
+                    Text(info.literal).font(.system(size: 34, design: .rounded))
+                    VStack(alignment: .leading, spacing: 4) {
+                        if !info.meanings.isEmpty {
+                            Text(info.meanings.joined(separator: "; ")).font(.callout)
+                        }
+                        Grid(alignment: .topLeading, horizontalSpacing: 8, verticalSpacing: 2) {
+                            if !info.onReadings.isEmpty {
+                                GridRow {
+                                    Text("On").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                                    Text(info.onReadings.joined(separator: "、"))
+                                }
+                            }
+                            if !info.kunReadings.isEmpty {
+                                GridRow {
+                                    Text("Kun").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                                    Text(info.kunReadings.joined(separator: "、"))
+                                }
+                            }
+                        }
+                        .font(.callout)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .textSelection(.enabled)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(kanjiLabel(info))
+            }
+        }
+    }
+
+    private func kanjiLabel(_ info: KanjiInfo) -> String {
+        var parts = [info.literal]
+        if !info.meanings.isEmpty { parts.append(String(localized: "Meaning: \(listed(info.meanings))")) }
+        if !info.onReadings.isEmpty { parts.append(String(localized: "On reading: \(listed(info.onReadings))")) }
+        if !info.kunReadings.isEmpty { parts.append(String(localized: "Kun reading: \(listed(info.kunReadings))")) }
+        return parts.joined(separator: ". ")
     }
 
     /// The word gets a line to itself, so even a long one isn't squeezed; its status and actions share the line below.

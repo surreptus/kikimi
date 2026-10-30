@@ -5,6 +5,7 @@ import os
 public final class LangEnvironment: Sendable {
     public let root: URL
     public let database: LangDatabase
+    public let kanji: KanjiStore
     public let models: ModelManager
     public let preferences: ModelPreferences
     public let videoQuality: VideoQualityPreference
@@ -19,12 +20,13 @@ public final class LangEnvironment: Sendable {
     /// `dictionaries` defaults to the ones bundled in the app; tests pass small fixture files.
     public init(
         root: URL, defaults: UserDefaults = .standard, transcriber: (any Transcriber)? = nil,
-        dictionaries: DictionaryStore? = nil
+        dictionaries: DictionaryStore? = nil, kanji: KanjiStore? = nil
     ) throws {
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         self.root = root
         let store = try dictionaries ?? DictionaryStore.bundled(for: LanguageProfiles.all)
         database = try LangDatabase(path: root.appending(path: Self.databaseName).path, dictionaries: store)
+        self.kanji = try kanji ?? KanjiStore.bundled(for: LanguageProfiles.all)
         models = ModelManager(directory: root.appending(path: "Models", directoryHint: .isDirectory))
         preferences = ModelPreferences(defaults: defaults)
         reviewAudio = ReviewAudioPreferences(defaults: defaults)
@@ -65,6 +67,11 @@ public final class LangEnvironment: Sendable {
         guard Locale.Language(identifier: target).languageCode != Locale.Language(identifier: source).languageCode else { return nil }
         return TranslationService(
             database: database, translator: translator ?? AppleLineTranslator(source: source, target: target), target: target)
+    }
+
+    /// The kanji in a word with their readings and meanings, or none for a language that has no kanji data.
+    public func kanjiInfo(in word: String, language: String) async -> [KanjiInfo] {
+        (try? await kanji.kanji(in: word, language: language)) ?? []
     }
 
     public var libraryURL: URL { root.appending(path: "Library", directoryHint: .isDirectory) }

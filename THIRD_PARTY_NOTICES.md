@@ -13,9 +13,10 @@ are shown in the app under Help > Acknowledgements, and are on the website at `/
 | [MeCab](https://taku910.github.io/mecab/) (vendored) | Splits Japanese into words | BSD (one of its licence options) |
 | IPADIC (NAIST, ICOT) | Japanese word and reading data for MeCab | IPADIC licence (permissive, notice must be kept) |
 | [JMdict](https://www.edrdg.org/jmdict/j_jmdict.html) (EDRDG) | Japanese dictionary data, adapted into the app's dictionary | CC BY-SA 4.0 |
+| [KANJIDIC2](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) (EDRDG) | Kanji readings and meanings, adapted into the app's kanji file | CC BY-SA 4.0 |
 | English Wiktionary via [kaikki.org](https://kaikki.org) (wiktextract) | Spanish, French and German dictionary data, adapted into the app's dictionary | CC BY-SA 4.0 and GFDL |
 
-The dictionary files in the app are adaptations of JMdict and Wiktionary and are shared under the same licence
+The dictionary files in the app are adaptations of JMdict, KANJIDIC2 and Wiktionary and are shared under the same licence
 (CC BY-SA 4.0). The scripts that build them are in `Scripts/dictionaries/`, so they can be rebuilt from the original data.
 
 The player links to [Tsumiki](https://surreptus.github.io/tsumiki/) (the author's own Japanese grammar guide, CC BY-SA 4.0); it only opens its pages in the browser and no content is copied into the app.

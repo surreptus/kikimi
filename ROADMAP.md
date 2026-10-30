@@ -52,6 +52,10 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       (a dependency, so ask first). Recommendation: the manual check.
 
 ### Quality
+- [x] **Readings and kanji for Japanese** (30 Oct 2026): a word with several readings (月: つき, がつ, げつ) lists them in the word bar
+      and on review cards, and a word's page lists each kanji with its meaning and its on'yomi and kun'yomi (KANJIDIC2,
+      EDRDG, CC BY-SA 4.0, 12,633 kanji, 0.7 MB). Not done: showing which reading a given sentence used on the review card,
+      and naming the on'yomi or kun'yomi of the kanji as it is read in the word.
 - [x] **First-launch welcome** (30 Oct 2026): languages you are learning, the language you read, a speech model download per
       language (or later). Not seen on screen yet (the sandbox here could not capture it). Not done: asking macOS to download
       the translation language during setup (needs the system's own sheet), and a link to run the welcome again.

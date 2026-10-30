@@ -1,0 +1,14 @@
+KANJIDIC2 (kanji readings and meanings)
+
+This application uses the KANJIDIC2 kanji file. The file is the property of the Electronic Dictionary Research and
+Development Group, and is used in conformance with the Group's licence:
+https://www.edrdg.org/edrdg/licence.html
+
+KANJIDIC2 is licensed under the Creative Commons Attribution-ShareAlike 4.0 International licence (CC BY-SA 4.0):
+https://creativecommons.org/licenses/by-sa/4.0/
+
+Changes: the data was converted to a SQLite database for fast look-up. Each kanji keeps its on'yomi and kun'yomi
+readings and its English meanings (the first six); name readings, other languages' meanings, stroke counts and index
+numbers were left out. The database in this app is an adaptation of KANJIDIC2 and is made available under the same
+licence, CC BY-SA 4.0. The script that builds it, Scripts/dictionaries/build_kanjidic.py, is in the project, so it can
+be rebuilt from the original data: https://github.com/surreptus/kikimi

@@ -11,6 +11,7 @@ public struct JapaneseProfile: LanguageProfile {
     public let dictionarySource = DictionarySource(
         resourceName: "dictionary-ja",
         attribution: "JMdict, EDRDG (CC BY-SA 4.0)")
+    public let kanjiResourceName: String? = "kanji-ja"
     public let display = DisplaySettings(showsReadings: true)
 
     /// Loaded once; the model is large and immutable. A missing dictionary is a packaging error, so fail loudly.

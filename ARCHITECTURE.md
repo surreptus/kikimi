@@ -24,7 +24,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 |---|---|
 | `Profiles/` | `LanguageProfile` and the Spanish, French, German and Japanese profiles; `LanguageProfiles.all` is the registry; `LearningLanguages` is the subset the person chose. |
 | `Tokenizing/` | Turns a line of text into content words (lemma and part of speech). Spanish, French and German use Apple's `NaturalLanguage`; Japanese uses the vendored MeCab (`Sources/CMeCab`). |
-| `Dictionary/` | `DictionaryStore` reads the bundled dictionary files in place, read-only. They are never copied into the database. |
+| `Dictionary/` | `DictionaryStore` and `KanjiStore` read the bundled dictionary and kanji files in place, read-only. They are never copied into the database. |
 | `Database/` | GRDB records, migrations (`LangMigrations`) and queries. Schema changes are new migrations only. |
 | `Import/` | The import pipeline, queue, transcription, video compaction and the language check. |
 | `Models/` | Speech-model download, listing and removal (`ModelManager`), plus `ModelCatalog` (sizes and notes). |

@@ -35,11 +35,14 @@ public protocol LanguageProfile: Sendable {
     var tokenizer: any WordTokenizer { get }
     var contentPOS: Set<PartOfSpeech> { get }
     var dictionarySource: DictionarySource { get }
+    /// The built file of per-character data (kanji), for a language whose words are written with them. nil if none.
+    var kanjiResourceName: String? { get }
     var display: DisplaySettings { get }
 }
 
 extension LanguageProfile {
     public var contentPOS: Set<PartOfSpeech> { [.noun, .verb, .adjective, .adverb] }
+    public var kanjiResourceName: String? { nil }
     public var display: DisplaySettings { DisplaySettings() }
 
     public func contentWords(in text: String) -> [Token] {

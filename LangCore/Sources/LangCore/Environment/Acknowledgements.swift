@@ -11,6 +11,7 @@ public enum Acknowledgements {
     private static let titles = [
         "Kikimi-MIT": "Kikimi (this app)",
         "JMdict-EDRDG": "JMdict dictionary data",
+        "KANJIDIC-EDRDG": "KANJIDIC2 kanji data",
         "Wiktionary-kaikki": "Spanish, French and German dictionary data (Wiktionary)",
         "IPADIC-COPYING": "IPADIC dictionary (NAIST, ICOT)",
         "MeCab-BSD": "MeCab morphological analyzer",
