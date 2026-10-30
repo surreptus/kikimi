@@ -273,9 +273,9 @@ struct SubtitleRow: View {
         if isContent(chunk), let token = chunk.token {
             view
                 .onTapGesture {
+                    // Looking a word up must not move the video: you may be reading ahead of what is playing.
                     focusedLine.wrappedValue = index
                     togglePin(token)
-                    seek()
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(chunk.text + (token.reading.map { ", read \($0)" } ?? ""))

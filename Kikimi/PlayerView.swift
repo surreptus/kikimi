@@ -211,6 +211,7 @@ struct PlayerView: View {
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(Theme.line, lineWidth: 1))
                 if let resumeOffer { resumeBar(resumeOffer, controller) }
                 controls(controller)
+                ShortcutHints(items: shortcutHints)
             }
             .padding(20)
             .frame(minWidth: 380)
@@ -275,6 +276,8 @@ struct PlayerView: View {
         HStack(spacing: 12) {
             Button("Previous line", systemImage: "backward.fill") { Task { await controller.previousLine() } }
                 .buttonStyle(.pill(.secondary, compact: true))
+                .keyboardShortcut(.leftArrow, modifiers: .command)
+                .help("Previous line (⌘←)")
             Button(controller.isPlaying ? String(localized: "Pause") : String(localized: "Play"), systemImage: controller.isPlaying ? "pause.fill" : "play.fill") {
                 controller.togglePlayback()
             }
@@ -282,6 +285,8 @@ struct PlayerView: View {
             .keyboardShortcut(.space, modifiers: [])
             Button("Next line", systemImage: "forward.fill") { Task { await controller.nextLine() } }
                 .buttonStyle(.pill(.secondary, compact: true))
+                .keyboardShortcut(.rightArrow, modifiers: .command)
+                .help("Next line (⌘→)")
             Button("Pause after each line", systemImage: "pause.rectangle") { pauseAfterLine.toggle() }
                 .buttonStyle(.pill(pauseAfterLine ? .primary : .secondary, compact: true))
                 .keyboardShortcut("p", modifiers: [])
@@ -312,6 +317,22 @@ struct PlayerView: View {
         }
         .labelStyle(.pillIcon)
         .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: controller.loopingIndex != nil)
+        .background {
+            // Moves the keyboard into the transcript without Full Keyboard Access; a menu-less shortcut, so it has no face.
+            Button("Focus transcript") { focusedLine = controller.activeIndex ?? 0 }
+                .keyboardShortcut(.downArrow, modifiers: .command)
+                .frame(width: 0, height: 0).opacity(0)
+        }
+    }
+
+    /// The keys that work in the player, so none of them has to be found by hovering.
+    private var shortcutHints: [(key: String, action: String)] {
+        var hints: [(key: String, action: String)] = [
+            ("Space", String(localized: "Play or pause")), ("⌘← ⌘→", String(localized: "Line")), ("R", String(localized: "Repeat")),
+            ("⌘↓", String(localized: "Transcript")), ("← →", String(localized: "Word")), ("L", String(localized: "Learn")), ("K", String(localized: "Known")),
+        ]
+        if translations != nil, translationMode == .onRequest { hints.append(("T", String(localized: "Translation"))) }
+        return hints
     }
 
     /// The video's title, at the top of the transcript panel, left-aligned.
@@ -428,7 +449,7 @@ struct PlayerView: View {
                 Text(hint?.gloss ?? "No dictionary entry").font(.system(.callout, design: .rounded)).lineLimit(2)
                     .foregroundStyle(hint?.gloss == nil ? Theme.muted : Theme.ink)
             } else {
-                Text("Hover a word to see what it means. Click it to keep it here, and click anywhere else to let go.")
+                Text("Point at a word, or use ← → on a line, to see what it means. Click it or press Return to keep it here.")
                     .font(.system(.callout, design: .rounded)).foregroundStyle(Theme.faint)
             }
         }
