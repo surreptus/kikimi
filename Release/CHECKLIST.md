@@ -9,8 +9,8 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 - [ ] Choose your team in the target (Signing & Capabilities). Keep "Automatically manage signing" on.
 - [x] **App icon**: an asanoha (hemp leaf) star in white line on dark green, drawn for Kikimi (the Dock shows a light version in Light appearance) (`Scripts/icon/make_icon.swift` regenerates it) (PNGs in `Kikimi/Assets.xcassets/AppIcon.appiconset`). Replace it if you commission a different one.
 - [ ] Open a video in the **Release** build, not only the Debug one: Release links differently (the AVKit link is set in the target's `OTHER_LDFLAGS` because SwiftUI's `VideoPlayer` never names it).
-- [x] Version: `MARKETING_VERSION` is `0.9.1` (a public beta; the first release was 0.9.0, and 1.0.0 follows once the 1.0 list in the roadmap is done), build `2`.
-      Raise `CURRENT_PROJECT_VERSION` (a plain integer) for every release handed to anyone. After that: `0.9.x` fixes, `0.10.0` or `1.0.0` features. Tag the release commit `v0.9.1` and attach the notarized zip to a GitHub Release.
+- [x] Version: `MARKETING_VERSION` is `0.9.2` (a public beta; the first release was 0.9.0, and 1.0.0 follows once the 1.0 list in the roadmap is done), build `3`.
+      Raise `CURRENT_PROJECT_VERSION` (a plain integer) for every release handed to anyone. After that: `0.9.x` fixes, `0.10.0` or `1.0.0` features. Tag the release commit `v0.9.2` and attach the notarized zip to a GitHub Release.
 - [ ] Direct download only: create a notarization profile once:
       `xcrun notarytool store-credentials kikimi --apple-id <you> --team-id <TEAM_ID>`
       (uses an app-specific password from appleid.apple.com).
