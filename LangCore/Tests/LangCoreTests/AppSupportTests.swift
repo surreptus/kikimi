@@ -427,11 +427,18 @@ final class SentenceAudioTests: XCTestCase {
 }
 
 final class BulkActionTests: XCTestCase {
+    /// Words that appear in a line, as words found in a video do (a reset removes a word that is in no line).
     private func words(_ db: LangDatabase, count: Int) async throws -> [Int64] {
         try await db.writer.write { d in
-            try (0..<count).map { i in
+            var video = Video(language: "es", title: "v", contentHash: "bulk", videoPath: "bulk/v", duration: 5)
+            try video.insert(d)
+            var line = Subtitle(videoId: video.id!, idx: 0, startTime: 0, endTime: 1, text: "w")
+            try line.insert(d)
+            return try (0..<count).map { i in
                 var w = Word(language: "es", lemma: "w\(i)", pos: .noun)
                 try w.insert(d)
+                var occurrence = Occurrence(wordId: w.id!, subtitleId: line.id!, surface: "w\(i)")
+                try occurrence.insert(d)
                 return w.id!
             }
         }

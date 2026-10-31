@@ -29,6 +29,27 @@ final class WordStatusesTests: XCTestCase {
         XCTAssertNil(statuses[WordKey(lemma: "perro", pos: .noun)], "words from other videos are not")
     }
 
+    /// Whisper wrote 初 for 発 in a lesson about that kanji, and the wrong word was being learned.
+    func testResettingAWordThatAppearsInNoLineRemovesItAndKeepsOthers() async throws {
+        let db = try LangDatabase()
+        let video = try await importVideo(db, hash: "a", text: "La casa es grande.")
+        let casa = try await id(db, "casa"), grande = try await id(db, "grande")
+        try await db.startLearning(wordID: casa)
+        try await db.startLearning(wordID: grande)
+        // The line is corrected so that "casa" is in no line any more.
+        let line = try await db.writer.read { try Subtitle.filter(Column("video_id") == video.id!).fetchOne($0)! }
+        try await db.editSubtitle(id: line.id!, text: "El perro es grande.", profile: SpanishProfile())
+        let stillThere = try await db.word(id: casa)
+        XCTAssertEqual(stillThere?.status, .learning, "editing keeps a word you had started")
+
+        let reset = try await db.markNew(wordIDs: [casa, grande])
+        XCTAssertEqual(reset, 2)
+        let gone = try await db.word(id: casa)
+        XCTAssertNil(gone, "no line has it, so it goes")
+        let kept = try await db.word(id: grande)
+        XCTAssertEqual(kept?.status, .new, "a word still in a line is only reset")
+    }
+
     func testAWordCanBeReadAgainByIdToSeeItsCurrentStatus() async throws {
         let db = try LangDatabase()
         _ = try await importVideo(db, hash: "a", text: "La casa es grande.")

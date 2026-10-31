@@ -177,14 +177,22 @@ extension LangDatabase {
         }
     }
 
-    /// Back to untouched: out of the queue, no stage, not known.
+    /// Back to untouched: out of the queue, no stage, not known. A word that then appears in no line (a transcript
+    /// mistake you have since edited away) is removed, as when a video is deleted; the rest stay as new words.
+    /// Returns how many were reset.
     @discardableResult
     public func markNew(wordIDs: [Int64]) async throws -> Int {
         try await writer.write { [chunks] db in
             try chunks(wordIDs).reduce(0) { total, ids in
-                total + (try Word.filter(keys: ids).updateAll(
+                let reset = try Word.filter(keys: ids).updateAll(
                     db, Column("status").set(to: WordStatus.new.rawValue),
-                    Column("stage").set(to: nil), Column("next_review").set(to: nil)))
+                    Column("stage").set(to: nil), Column("next_review").set(to: nil))
+                try db.execute(sql: """
+                    DELETE FROM words
+                    WHERE id IN (\(databaseQuestionMarks(count: ids.count))) AND status = 'new'
+                      AND NOT EXISTS (SELECT 1 FROM occurrences WHERE occurrences.word_id = words.id)
+                    """, arguments: StatementArguments(ids))
+                return total + reset
             }
         }
     }

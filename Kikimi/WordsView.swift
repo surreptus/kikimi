@@ -102,7 +102,7 @@ struct WordsView: View {
         .confirmationDialog("Reset \(selection.count) words?", isPresented: $confirmReset) {
             Button("Reset", role: .destructive) { apply(.reset) }
         } message: {
-            Text("Words being learned or finished lose their review progress and go back to new.")
+            Text("Words being learned or finished lose their review progress and go back to new. A word that is in none of your videos' lines is removed.")
         }
     }
 
