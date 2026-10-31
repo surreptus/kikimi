@@ -71,21 +71,12 @@ struct WordsView: View {
     private var trimmedSearch: String { search.trimmingCharacters(in: .whitespaces) }
 
     var body: some View {
-        HStack(spacing: 0) {
-            VStack(spacing: 0) {
-                header
-                table
-                bulkBar
-            }
-            if inspectorShown.wrappedValue {
-                Rectangle().fill(Theme.line).frame(width: 1)
-                inspector
-                    .frame(width: 380)
-                    .frame(maxHeight: .infinity)
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
-            }
+        VStack(spacing: 0) {
+            header
+            table
+            bulkBar
         }
-        .animation(.easeOut(duration: 0.18), value: inspectorShown.wrappedValue)
+        .sidePanel(isPresented: inspectorShown.wrappedValue) { inspector }
         .task(id: LoadKey(language: app.languageCode, search: search, filter: filter, type: typeFilter, version: app.dataVersion)) {
             await load()
         }

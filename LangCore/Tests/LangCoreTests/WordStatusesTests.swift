@@ -29,6 +29,19 @@ final class WordStatusesTests: XCTestCase {
         XCTAssertNil(statuses[WordKey(lemma: "perro", pos: .noun)], "words from other videos are not")
     }
 
+    func testAWordCanBeReadAgainByIdToSeeItsCurrentStatus() async throws {
+        let db = try LangDatabase()
+        _ = try await importVideo(db, hash: "a", text: "La casa es grande.")
+        let casa = try await id(db, "casa")
+        let before = try await db.word(id: casa)
+        XCTAssertEqual(before?.status, .new)
+        try await db.startLearning(wordID: casa)
+        let after = try await db.word(id: casa)
+        XCTAssertEqual(after?.status, .learning)
+        let missing = try await db.word(id: 999_999)
+        XCTAssertNil(missing)
+    }
+
     func testAWordSharedByTwoVideosShowsTheSameStatusInBoth() async throws {
         let db = try LangDatabase()
         let a = try await importVideo(db, hash: "a", text: "La casa es grande.")

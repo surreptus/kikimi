@@ -22,6 +22,11 @@ public struct WordRow: Sendable, FetchableRecord, Identifiable {
         word = try Word(row: row)
         occurrenceCount = row["occurrence_count"]
     }
+
+    public init(word: Word, occurrenceCount: Int = 0) {
+        self.word = word
+        self.occurrenceCount = occurrenceCount
+    }
 }
 
 public struct ExampleLine: Sendable, FetchableRecord, Identifiable {
@@ -56,6 +61,11 @@ extension LangDatabase {
                 ORDER BY imported_at DESC, id DESC
                 """, arguments: [language, language])
         }
+    }
+
+    /// One word as it is now, for a view that holds an older copy of it.
+    public func word(id: Int64) async throws -> Word? {
+        try await writer.read { try Word.fetchOne($0, key: id) }
     }
 
     /// Words of one language, most frequent in your videos first. `search` matches anywhere in the lemma; `status`

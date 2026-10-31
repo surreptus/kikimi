@@ -20,13 +20,16 @@ struct ReviewView: View {
     /// A check of words marked known: the summary says what was missed and sent back to learning.
     @State private var checking = false
     @State private var returned = 0
+    /// The word's own page beside the card, opened from the revealed answer (never before: it would show the meaning).
+    @State private var showsWord = false
+    @State private var wordNow: Word?
 
     var body: some View {
         Group {
             if let error {
                 ContentUnavailableView("Review failed", systemImage: "exclamationmark.triangle", description: Text(error))
             } else if let card {
-                cardView(card)
+                cardWithWord(card)
             } else if let summary {
                 VStack(spacing: 0) {
                     finished(summary).padding(.top, 28)
@@ -63,6 +66,33 @@ struct ReviewView: View {
         }
     }
 
+    /// The card, with the word's page beside it once asked for.
+    private func cardWithWord(_ card: ReviewCard) -> some View {
+        cardView(card)
+        .sidePanel(isPresented: showsWord && revealed) {
+            WordDetail(env: env, row: WordRow(word: wordNow ?? card.word)).id(card.id)
+        }
+        .onChange(of: app.dataVersion) {
+            // Learn or Known in the page changes the word; show it as it is now.
+            guard showsWord, let id = card.word.id else { return }
+            Task { wordNow = try? await env.database.word(id: id) }
+        }
+    }
+
+    /// The word, which opens its page once the answer is showing.
+    @ViewBuilder
+    private func lemmaText(_ card: ReviewCard, font: Font) -> some View {
+        if revealed {
+            Button { showsWord.toggle() } label: { Text(card.word.lemma).font(font) }
+                .buttonStyle(.plain)
+                .keyboardShortcut("i", modifiers: [])
+                .help(showsWord ? "Hide this word's page (I)" : "Show everything about this word (I)")
+                .accessibilityHint("Shows this word's page")
+        } else {
+            Text(card.word.lemma).font(font)
+        }
+    }
+
     private func cardView(_ card: ReviewCard) -> some View {
         VStack(spacing: 20) {
             HStack(spacing: 14) {
@@ -93,7 +123,7 @@ struct ReviewView: View {
                 } else if listening(for: card) {
                     listenFace(card)
                 } else {
-                Text(card.word.lemma).font(.system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
+                lemmaText(card, font: .system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
                 StatusPill(text: card.word.pos.title)
 
                 // The word as it was said in your video: the context is part of the question, the translation is not.
@@ -193,7 +223,7 @@ struct ReviewView: View {
                 Text(highlighted(example)).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
             }
             VStack(spacing: 8) {
-                Text(card.word.lemma).font(Theme.title(22))
+                lemmaText(card, font: Theme.title(22))
                 if app.profile.display.showsReadings, let reading = readings(of: card) {
                     Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
                 }
@@ -221,7 +251,7 @@ struct ReviewView: View {
         if revealed {
             Text(filled(cloze)).font(.system(size: 28, design: .rounded)).multilineTextAlignment(.center)
             VStack(spacing: 8) {
-                Text(card.word.lemma).font(Theme.title(22))
+                lemmaText(card, font: Theme.title(22))
                 if app.profile.display.showsReadings, let reading = readings(of: card) {
                     Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
                 }
@@ -255,7 +285,7 @@ struct ReviewView: View {
     /// The keys that work right now: they change once the answer is showing.
     private var shortcutHints: [(key: String, action: String)] {
         guard revealed else { return listening(for: card) ? [("Space", "Show answer"), ("R", "Play again")] : [("Space", "Show answer")] }
-        var hints: [(key: String, action: String)] = [("←", "Missed it"), ("→", "Got it"), ("W", "Say word")]
+        var hints: [(key: String, action: String)] = [("←", "Missed it"), ("→", "Got it"), ("W", "Say word"), ("I", "Word page")]
         if card?.example != nil { hints.append(("R", "Play sentence")) }
         return hints
     }
@@ -287,7 +317,7 @@ struct ReviewView: View {
 
     private func endSession() {
         audio?.stop()
-        session = nil; card = nil; summary = nil; revealed = false; checking = false
+        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; checking = false
         Task { await loadOverview() }
     }
 
@@ -322,7 +352,7 @@ struct ReviewView: View {
     }
 
     private func advance(_ session: ReviewSession) async {
-        revealed = false
+        revealed = false; showsWord = false; wordNow = nil
         do {
             let next = try await session.currentCard()
             // Update the counts before the card, so the bar never shows a card with a stale count.
