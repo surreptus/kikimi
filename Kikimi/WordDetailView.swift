@@ -67,7 +67,7 @@ struct WordDetail: View {
             Text("Kanji").font(Theme.title(17))
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(kanji) { info in
-                    HStack(alignment: .firstTextBaseline, spacing: 14) {
+                    HStack(alignment: .top, spacing: 14) {
                         Text(info.literal).font(.system(size: 34, design: .rounded))
                         VStack(alignment: .leading, spacing: 4) {
                             if !info.meanings.isEmpty {
