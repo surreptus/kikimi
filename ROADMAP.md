@@ -134,6 +134,19 @@ Ordered by how much each helps comprehensible input per unit of effort.
       optional sentence audio in a media folder. Checked against Anki 25.09's own importer: notes land in a
       "Kikimi Spanish" deck, and exporting again updates them instead of duplicating.
 
+- [ ] **Conversation practice** (researched 31 Oct 2026, **waiting**): a partner that talks with you in the language you
+      are learning, mostly in your own words. Apple's on-device model (macOS 27, M3) holds a short beginner dialogue in
+      Spanish, French, German and Japanese in about 0.7 s a reply. A check of each reply against your word list with the
+      profile's tokenizer, retrying up to twice, kept replies mostly inside it (14/15 Spanish, 12/15 French, 15/15 German
+      on a 130-word list; Japanese not measured). **It cannot be trusted to correct you**: given 12 sentences with one
+      error each, it fixed 6, passed 5 as "Correct" and wrongly changed 1, the same failure that ended "Explain this
+      sentence". Smallest useful version: typing only, about five exchanges, no correction, 100 to 200 sampled lemmas, new
+      words from your own videos, hidden without Apple Intelligence (`LangCore/Conversation/`, one view). Not measured:
+      voice in and out (the on-device recognisers aren't installed here), a real vocabulary of thousands, Japanese
+      word-keeping, battery, VoiceOver. A larger downloaded model (Gemma class, 2.5 GB or more, custom terms, a new
+      runtime) might correct better but is untested and changes the "only a speech model downloads" promise, so it needs the
+      policy first. Revisit when the built-in model improves or when correction can be checked.
+
 ### Keeping the numbers honest
 - [x] **Check what you marked known** (Review page > Check my known words): a quiz of up to 10 random known words; any you
       miss go back to learning, so coverage stops counting them. Self-marked words and imported lists can inflate it otherwise.
