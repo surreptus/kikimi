@@ -50,6 +50,18 @@ public struct ExampleLine: Sendable, FetchableRecord, Identifiable {
         videoTitle = row["video_title"]
         mediaPath = row["media_path"]
     }
+
+    public init(id: Int64, surface: String, text: String, startTime: Double, endTime: Double,
+                videoID: Int64, videoTitle: String, mediaPath: String) {
+        self.id = id; self.surface = surface; self.text = text; self.startTime = startTime; self.endTime = endTime
+        self.videoID = videoID; self.videoTitle = videoTitle; self.mediaPath = mediaPath
+    }
+
+    /// This line with a corrected text or timing, for a screen that holds it after the transcript line was edited.
+    public func edited(text: String? = nil, start: Double? = nil, end: Double? = nil) -> ExampleLine {
+        ExampleLine(id: id, surface: surface, text: text ?? self.text, startTime: start ?? startTime, endTime: end ?? endTime,
+                    videoID: videoID, videoTitle: videoTitle, mediaPath: mediaPath)
+    }
 }
 
 extension LangDatabase {

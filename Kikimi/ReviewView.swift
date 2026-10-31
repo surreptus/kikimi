@@ -23,6 +23,9 @@ struct ReviewView: View {
     /// The word's own page beside the card, opened from the revealed answer (never before: it would show the meaning).
     @State private var showsWord = false
     @State private var wordNow: Word?
+    /// The sentence being corrected, and how long its video is (the editor's limit for the end time).
+    @State private var editingExample: ExampleLine?
+    @State private var editingDuration = 0.0
 
     var body: some View {
         Group {
@@ -69,6 +72,18 @@ struct ReviewView: View {
     /// The card, with the word's page beside it once asked for.
     private func cardWithWord(_ card: ReviewCard) -> some View {
         cardView(card)
+        .sheet(item: $editingExample) { example in
+            EditLineSheet(
+                line: Subtitle(id: example.id, videoId: example.videoID, idx: 0, startTime: example.startTime,
+                               endTime: example.endTime, text: example.text),
+                duration: editingDuration, profile: app.profile, env: env,
+                preview: { start, end in Task { await audio?.play(example.edited(start: start, end: end)) } },
+                saved: { saved in
+                    self.card = card.showing(example.edited(text: saved.text, start: saved.startTime, end: saved.endTime))
+                    editingExample = nil
+                    app.dataChanged()
+                }, cancel: { audio?.stop(); editingExample = nil })
+        }
         .sidePanel(isPresented: showsWord && revealed) {
             WordDetail(env: env, row: WordRow(word: wordNow ?? card.word)).id(card.id)
         }
@@ -162,6 +177,10 @@ struct ReviewView: View {
                                 .buttonStyle(.pill(.secondary, compact: true))
                                 .keyboardShortcut("r", modifiers: [])
                                 .help("Play this sentence from your video (R)")
+                            Button("Edit sentence", systemImage: "pencil") { editSentence() }
+                                .buttonStyle(.pill(.secondary, compact: true))
+                                .keyboardShortcut("e", modifiers: [])
+                                .help("Fix what the transcript got wrong in this sentence (E)")
                         }
                     }
                     .padding(.top, 6)
@@ -286,8 +305,18 @@ struct ReviewView: View {
     private var shortcutHints: [(key: String, action: String)] {
         guard revealed else { return listening(for: card) ? [("Space", "Show answer"), ("R", "Play again")] : [("Space", "Show answer")] }
         var hints: [(key: String, action: String)] = [("←", "Missed it"), ("→", "Got it"), ("W", "Say word"), ("I", "Word page")]
-        if card?.example != nil { hints.append(("R", "Play sentence")) }
+        if card?.example != nil { hints.append(("R", "Play sentence")); hints.append(("E", "Edit sentence")) }
         return hints
+    }
+
+    private func editSentence() {
+        guard let example = card?.example else { return }
+        audio?.stop()
+        Task {
+            let videos = (try? await env.database.libraryVideos()) ?? []
+            editingDuration = videos.first { $0.id == example.videoID }?.video.duration ?? example.endTime + 30
+            editingExample = example
+        }
     }
 
     private func playSentence() {

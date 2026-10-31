@@ -330,6 +330,7 @@ struct PlayerView: View {
         var hints: [(key: String, action: String)] = [
             ("Space", String(localized: "Play or pause")), ("⌘← ⌘→", String(localized: "Line")), ("R", String(localized: "Repeat")),
             ("⌘↓", String(localized: "Transcript")), ("← →", String(localized: "Word")), ("L", String(localized: "Learn")), ("K", String(localized: "Known")),
+            ("E", String(localized: "Edit line")),
         ]
         if translations != nil, translationMode == .onRequest { hints.append(("T", String(localized: "Translation"))) }
         return hints

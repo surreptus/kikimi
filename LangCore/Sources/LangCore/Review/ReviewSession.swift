@@ -5,6 +5,15 @@ public struct ReviewCard: Sendable, Identifiable {
     public let entries: [DictionaryEntry]
     public let example: ExampleLine?
     public var id: Int64 { word.id! }
+
+    public init(word: Word, entries: [DictionaryEntry], example: ExampleLine?) {
+        self.word = word; self.entries = entries; self.example = example
+    }
+
+    /// The same card showing a different example (a line whose text was corrected).
+    public func showing(_ example: ExampleLine?) -> ReviewCard {
+        ReviewCard(word: word, entries: entries, example: example)
+    }
 }
 
 /// Chooses which example line a card shows (and plays).

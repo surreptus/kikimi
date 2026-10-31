@@ -141,6 +141,10 @@ struct SubtitleRow: View {
         .onKeyPress(.upArrow) { moveFocus(-1); return .handled }
         .onKeyPress(.downArrow) { moveFocus(1); return .handled }
         .onKeyPress(.return) { pinCaret() }
+        .onKeyPress("e") {
+            edit()
+            return .handled
+        }
         .onKeyPress("t") {
             guard translationMode == .onRequest else { return .ignored }
             toggleTranslation()

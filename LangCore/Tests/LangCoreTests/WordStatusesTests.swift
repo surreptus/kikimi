@@ -50,6 +50,20 @@ final class WordStatusesTests: XCTestCase {
         XCTAssertEqual(kept?.status, .new, "a word still in a line is only reset")
     }
 
+    func testACorrectedExampleKeepsEverythingButTheCorrection() {
+        let line = ExampleLine(id: 7, surface: "初", text: "「初」という漢字", startTime: 31.6, endTime: 34.0,
+                               videoID: 3, videoTitle: "漢字", mediaPath: "3/a.m4a")
+        let fixed = line.edited(text: "「発」という漢字", end: 34.5)
+        XCTAssertEqual(fixed.text, "「発」という漢字")
+        XCTAssertEqual(fixed.endTime, 34.5)
+        XCTAssertEqual(fixed.startTime, 31.6, "what was not corrected stays")
+        XCTAssertEqual([fixed.id, fixed.videoID], [7, 3])
+        XCTAssertEqual(fixed.mediaPath, "3/a.m4a")
+        let card = ReviewCard(word: Word(id: 1, language: "ja", lemma: "発", pos: .noun), entries: [], example: line)
+        XCTAssertEqual(card.showing(fixed).example?.text, "「発」という漢字")
+        XCTAssertEqual(card.showing(fixed).word.lemma, "発")
+    }
+
     func testAWordCanBeReadAgainByIdToSeeItsCurrentStatus() async throws {
         let db = try LangDatabase()
         _ = try await importVideo(db, hash: "a", text: "La casa es grande.")
