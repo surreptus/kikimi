@@ -100,8 +100,8 @@ struct SubtitleRow: View {
                 }
                 if translationShown { translationText }
             }
-            // Room for the translate button, so a long line never runs under it.
-            .padding(.trailing, translationMode == .onRequest ? 22 : 0)
+            // Room for the menu button, so a long line never runs under it.
+            .padding(.trailing, 22)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 10).padding(.vertical, 4)
@@ -110,21 +110,12 @@ struct SubtitleRow: View {
         .background(RoundedRectangle(cornerRadius: 14).fill(active ? Theme.softStrong : .clear))
         .overlay(RoundedRectangle(cornerRadius: 14)
             .strokeBorder((rowHovered || isFocused) ? Theme.ink.opacity(0.45) : .clear, lineWidth: 1))
-        .overlay(alignment: .topTrailing) { translateButton }
+        .overlay(alignment: .topTrailing) { lineMenu }
         .contentShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture { focusedLine.wrappedValue = index; seek() }
         .onHover { rowHovered = $0 }
         .animation(.easeOut(duration: 0.12), value: rowHovered)
-        .contextMenu {
-            if translationMode == .onRequest {
-                Button(translationShown ? "Hide translation" : "Show translation", action: toggleTranslation)
-                Divider()
-            }
-            Button("Edit line…", action: edit)
-            Divider()
-            Button("Save audio clip…", action: exportAudio)
-            Button("Save video clip…", action: exportVideo)
-        }
+        .contextMenu { lineActions }
         .accessibilityAction(named: "Jump to this line", seek)
         .accessibilityAction(named: "Edit line", edit)
         .accessibilityActions {
@@ -187,17 +178,30 @@ struct SubtitleRow: View {
         }
     }
 
-    /// Appears when you point at or tab to a line, and stays while its translation is showing.
+    /// What can be done with a line: the same list in its menu button and when you right-click it.
     @ViewBuilder
-    private var translateButton: some View {
-        if translationMode == .onRequest, rowHovered || isFocused || translationShown {
-            Button(action: toggleTranslation) {
-                Image(systemName: translationShown ? "character.bubble.fill" : "character.bubble")
-                    .font(.system(size: 13)).frame(width: 22, height: 22)
+    private var lineActions: some View {
+        if translationMode == .onRequest {
+            Button(translationShown ? "Hide translation" : "Show translation", action: toggleTranslation)
+            Divider()
+        }
+        Button("Edit line…", action: edit)
+        Divider()
+        Button("Save audio clip…", action: exportAudio)
+        Button("Save video clip…", action: exportVideo)
+    }
+
+    /// Appears when you point at or tab to a line.
+    @ViewBuilder
+    private var lineMenu: some View {
+        if rowHovered || isFocused {
+            Menu { lineActions } label: {
+                Image(systemName: "ellipsis").font(.system(size: 13, weight: .semibold)).frame(width: 22, height: 22)
             }
-            .buttonStyle(.plain).foregroundStyle(Theme.muted)
-            .help(translationShown ? "Hide the translation (T)" : "Show the translation (T)")
-            .accessibilityLabel(translationShown ? "Hide translation" : "Show translation")
+            .menuStyle(.button).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
+            .foregroundStyle(Theme.muted)
+            .help("Translate, edit or save this line")
+            .accessibilityLabel("More actions for this line")
             .padding(.top, 2).padding(.trailing, 4)
         }
     }

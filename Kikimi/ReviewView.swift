@@ -26,6 +26,10 @@ struct ReviewView: View {
     /// The sentence being corrected, and how long its video is (the editor's limit for the end time).
     @State private var editingExample: ExampleLine?
     @State private var editingDuration = 0.0
+    /// The sentence's translation, shown on the answer when asked for (or always, in Settings).
+    @State private var translationOn = false
+    @State private var translations: LineTranslations?
+    @State private var translationsVideo: Int64?
 
     var body: some View {
         Group {
@@ -72,6 +76,7 @@ struct ReviewView: View {
     /// The card, with the word's page beside it once asked for.
     private func cardWithWord(_ card: ReviewCard) -> some View {
         cardView(card)
+        .task(id: "\(card.id)-\(translationVisible)-\(card.example?.text ?? "")") { await loadTranslation() }
         .sheet(item: $editingExample) { example in
             EditLineSheet(
                 line: Subtitle(id: example.id, videoId: example.videoID, idx: 0, startTime: example.startTime,
@@ -79,6 +84,7 @@ struct ReviewView: View {
                 duration: editingDuration, profile: app.profile, env: env,
                 preview: { start, end in Task { await audio?.play(example.edited(start: start, end: end)) } },
                 saved: { saved in
+                    translations?.forget(example.id)   // it was of the old text
                     self.card = card.showing(example.edited(text: saved.text, start: saved.startTime, end: saved.endTime))
                     editingExample = nil
                     app.dataChanged()
@@ -166,6 +172,8 @@ struct ReviewView: View {
                 }
                 }
 
+                if translationVisible, card.example != nil { translationLine(card) }
+
                 // Hearing the word or its sentence would give the answer away, so these wait for the reveal.
                 if revealed {
                     HStack(spacing: 10) {
@@ -177,10 +185,25 @@ struct ReviewView: View {
                                 .buttonStyle(.pill(.secondary, compact: true))
                                 .keyboardShortcut("r", modifiers: [])
                                 .help("Play this sentence from your video (R)")
-                            Button("Edit sentence", systemImage: "pencil") { editSentence() }
-                                .buttonStyle(.pill(.secondary, compact: true))
-                                .keyboardShortcut("e", modifiers: [])
-                                .help("Fix what the transcript got wrong in this sentence (E)")
+                            Menu {
+                                if canTranslate {
+                                    Button(translationVisible ? "Hide translation" : "Show translation", action: toggleTranslation)
+                                }
+                                Button("Edit sentence…", action: editSentence)
+                            } label: {
+                                Image(systemName: "ellipsis").font(.system(size: 13, weight: .medium)).frame(width: PillIconStyle.width)
+                            }
+                            .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+                            .help("Translate or fix this sentence")
+                            .accessibilityLabel("More actions for this sentence")
+                            .background {
+                                // The menu's items have no keys of their own; these give T and E.
+                                Group {
+                                    Button("Edit sentence", action: editSentence).keyboardShortcut("e", modifiers: [])
+                                    if canTranslate { Button("Translate sentence", action: toggleTranslation).keyboardShortcut("t", modifiers: []) }
+                                }
+                                .frame(width: 0, height: 0).opacity(0).accessibilityHidden(true)
+                            }
                         }
                     }
                     .padding(.top, 6)
@@ -306,7 +329,45 @@ struct ReviewView: View {
         guard revealed else { return listening(for: card) ? [("Space", "Show answer"), ("R", "Play again")] : [("Space", "Show answer")] }
         var hints: [(key: String, action: String)] = [("←", "Missed it"), ("→", "Got it"), ("W", "Say word"), ("I", "Word page")]
         if card?.example != nil { hints.append(("R", "Play sentence")); hints.append(("E", "Edit sentence")) }
+        if canTranslate, card?.example != nil { hints.append(("T", "Translation")) }
         return hints
+    }
+
+    private var translationMode: TranslationDisplay { env.translation.display }
+    private var canTranslate: Bool { translationMode != .off && env.translation.translates(from: app.profile.whisperCode) }
+    private var translationVisible: Bool { revealed && canTranslate && (translationOn || translationMode == .always) }
+
+    private func toggleTranslation() {
+        guard canTranslate, card?.example != nil, revealed else { return }
+        translationOn.toggle()
+    }
+
+    /// Only after the answer: the translation of the sentence would give the word's meaning away.
+    @ViewBuilder
+    private func translationLine(_ card: ReviewCard) -> some View {
+        if let example = card.example, let text = translations?.texts[example.id] {
+            Text(text).font(.system(.callout, design: .rounded)).foregroundStyle(Theme.muted)
+                .multilineTextAlignment(.center).textSelection(.enabled)
+                .accessibilityLabel("Translation: \(text)")
+        } else if let problem = translations?.problem {
+            Text(problem).font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+        } else {
+            Text("Translating…").font(Theme.small).foregroundStyle(Theme.faint)
+        }
+    }
+
+    /// Fetches the sentence's translation once it is asked for, from the video it belongs to.
+    private func loadTranslation() async {
+        guard translationVisible, let example = card?.example else { return }
+        if translationsVideo != example.videoID || translations == nil {
+            guard let service = env.translationService(for: app.profile) else { return }
+            let model = LineTranslations(service: service, videoID: example.videoID, source: app.profile.whisperCode, target: service.target)
+            translations = model
+            translationsVideo = example.videoID
+            await model.load()
+        }
+        translations?.need(Subtitle(id: example.id, videoId: example.videoID, idx: 0, startTime: example.startTime,
+                                    endTime: example.endTime, text: example.text))
     }
 
     private func editSentence() {
@@ -346,7 +407,7 @@ struct ReviewView: View {
 
     private func endSession() {
         audio?.stop()
-        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; checking = false
+        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationOn = false; checking = false
         Task { await loadOverview() }
     }
 
@@ -381,7 +442,7 @@ struct ReviewView: View {
     }
 
     private func advance(_ session: ReviewSession) async {
-        revealed = false; showsWord = false; wordNow = nil
+        revealed = false; showsWord = false; wordNow = nil; translationOn = false
         do {
             let next = try await session.currentCard()
             // Update the counts before the card, so the bar never shows a card with a stale count.

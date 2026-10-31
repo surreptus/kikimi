@@ -86,6 +86,15 @@ final class TranslationTests: XCTestCase {
         XCTAssertEqual(count, 0, "they go with their video")
     }
 
+    func testTranslatesOnlyBetweenDifferentLanguages() {
+        let prefs = TranslationPreferences(defaults: UserDefaults(suiteName: "tr-\(UUID().uuidString)")!)
+        prefs.target = "en"
+        XCTAssertTrue(prefs.translates(from: "es"))
+        XCTAssertFalse(prefs.translates(from: "en"))
+        prefs.target = "es"
+        XCTAssertFalse(prefs.translates(from: "es"))
+    }
+
     func testThePreferencesDefaultToOnRequestAndTheMacsLanguage() {
         let defaults = UserDefaults(suiteName: "tp-\(UUID().uuidString)")!
         let prefs = TranslationPreferences(defaults: defaults)

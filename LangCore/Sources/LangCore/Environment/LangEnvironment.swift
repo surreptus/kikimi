@@ -64,7 +64,7 @@ public final class LangEnvironment: Sendable {
     public func translationService(for profile: any LanguageProfile, translator: (any LineTranslator)? = nil) -> TranslationService? {
         let target = translation.target
         let source = profile.whisperCode
-        guard Locale.Language(identifier: target).languageCode != Locale.Language(identifier: source).languageCode else { return nil }
+        guard translation.translates(from: source) else { return nil }
         return TranslationService(
             database: database, translator: translator ?? AppleLineTranslator(source: source, target: target), target: target)
     }

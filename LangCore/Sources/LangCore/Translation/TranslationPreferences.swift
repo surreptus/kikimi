@@ -29,6 +29,11 @@ public struct TranslationPreferences: @unchecked Sendable {
     }
 
     public static var systemLanguage: String { Locale.current.language.minimalIdentifier }
+
+    /// Whether a line in `source` has anything to translate into the chosen language.
+    public func translates(from source: String) -> Bool {
+        Locale.Language(identifier: target).languageCode != Locale.Language(identifier: source).languageCode
+    }
 }
 
 /// A language the system can translate between, for choosing a target.
