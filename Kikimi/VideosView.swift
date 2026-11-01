@@ -209,7 +209,6 @@ private struct VideoInfoSheet: View {
 
     @State private var details: VideoDetails?
     @State private var goal: CoverageGoal?
-    @State private var goalMessage: String?
     @State private var confirmDelete = false
     @State private var error: String?
 
@@ -219,7 +218,7 @@ private struct VideoInfoSheet: View {
             Text(video.title).font(Theme.title(22)).lineLimit(2)
 
             if let goal, goal.current.totalWords > 0 {
-                CoverageGoalView(goal: goal, startLearning: startLearning, message: goalMessage)
+                CoverageGoalView(goal: goal, startLearning: startLearning)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .panel()
             }
@@ -313,7 +312,7 @@ private struct VideoInfoSheet: View {
                 let added = try await env.database.startLearning(wordIDs: entries.map(\.wordID))
                 app.dataChanged()
                 await loadGoal()
-                goalMessage = inflected("Added ^[\(added) word](inflect: true) to your reviews.")
+                app.showToast(inflected("Added ^[\(added) word](inflect: true) to your reviews."))
             } catch {
                 self.error = error.localizedDescription
             }

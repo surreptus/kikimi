@@ -9,7 +9,6 @@ struct WordDetail: View {
     @State private var entries: [DictionaryEntry] = []
     @State private var kanji: [KanjiInfo] = []
     @State private var examples: [ExampleLine] = []
-    @State private var exportMessage: String?
     @State private var audio: SentenceAudioPlayer?
     @State private var showsAllExamples = false
     @State private var seen = WordSeen()
@@ -19,8 +18,6 @@ struct WordDetail: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 header
-                if let exportMessage { Text(exportMessage).font(Theme.small).foregroundStyle(Theme.muted) }
-
                 if !kanji.isEmpty { kanjiSection }
 
                 Text("Dictionary").font(Theme.title(17))
@@ -55,9 +52,6 @@ struct WordDetail: View {
             seen = (try? await env.database.seen(wordID: row.id)) ?? WordSeen()
         }
         .onDisappear { audio?.stop() }
-        .onChange(of: exportMessage) { _, text in
-            if let text { AccessibilityNotification.Announcement(text).post() }
-        }
     }
 
     /// Each kanji in the word with its meaning and readings. On'yomi (from Chinese) are in katakana and kun'yomi
@@ -196,21 +190,21 @@ struct WordDetail: View {
         }
         Task {
             if await !audio.play(line), !FileManager.default.fileExists(atPath: env.libraryURL.appending(path: line.mediaPath).path) {
-                exportMessage = String(localized: "That audio file is missing from the library.")
+                app.showToast(String(localized: "That audio file is missing from the library."), isError: true)
             }
         }
     }
 
     private func exportExamples(_ kind: ClipKind) {
         guard let folder = ExportPanels.chooseFolder(message: String(localized: "Choose a folder for the \(row.word.lemma) clips")) else { return }
-        exportMessage = String(localized: "Exporting…")
+        app.showToast(String(localized: "Exporting…"))
         Task {
             do {
                 let files = try await env.exportClips(forWord: row.id, kind: kind, into: folder)
-                exportMessage = inflected("Saved ^[\(files.count) clip](inflect: true) to \(folder.lastPathComponent)")
+                app.showToast(inflected("Saved ^[\(files.count) clip](inflect: true) to \(folder.lastPathComponent)"))
                 NSWorkspace.shared.activateFileViewerSelecting(files)
             } catch {
-                exportMessage = String(localized: "Export failed: \(error.localizedDescription)")
+                app.showToast(String(localized: "Export failed: \(error.localizedDescription)"), isError: true)
             }
         }
     }

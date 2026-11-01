@@ -22,6 +22,7 @@ struct RootView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay { ToastHost() }
         .background { ZStack { windowColor; NoiseOverlay() } }
         .containerBackground(for: .window) { ZStack { windowColor; NoiseOverlay() } }
         .onChange(of: colorScheme, initial: true) { _, scheme in DockIcon.show(for: scheme) }

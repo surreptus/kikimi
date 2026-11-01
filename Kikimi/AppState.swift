@@ -51,6 +51,35 @@ final class AppState {
     /// Bumped when the database changes under the views (imports, status changes) so they reload.
     private(set) var dataVersion = 0
 
+    /// The message over the window, if there is one. Errors stay longer.
+    private(set) var toast: Toast?
+    @ObservationIgnored private var toastTimer: Task<Void, Never>?
+
+    func showToast(_ text: String, isError: Bool = false) {
+        toast = Toast(text: text, isError: isError)
+        AccessibilityNotification.Announcement(text).post()   // VoiceOver can't see it appear
+        dismissToast(after: isError ? 8 : 4)
+    }
+
+    func dismissToast() {
+        toastTimer?.cancel()
+        toast = nil
+    }
+
+    /// Pointing at a toast holds it; looking away gives it two more seconds.
+    func holdToast(_ hold: Bool) {
+        guard toast != nil else { return }
+        if hold { toastTimer?.cancel() } else { dismissToast(after: 2) }
+    }
+
+    private func dismissToast(after seconds: Double) {
+        toastTimer?.cancel()
+        toastTimer = Task {
+            try? await Task.sleep(for: .seconds(seconds))
+            if !Task.isCancelled { toast = nil }
+        }
+    }
+
     var languageCode: String {
         didSet {
             UserDefaults.standard.set(languageCode, forKey: "language")

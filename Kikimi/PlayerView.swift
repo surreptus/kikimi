@@ -10,7 +10,6 @@ struct PlayerView: View {
     let close: () -> Void
 
     @State private var controller: PlaybackController?
-    @State private var message: String?
     /// Where you stopped last time, while the choice to continue from there or start over is on offer.
     @State private var resumeOffer: Double?
     @State private var failure: String?
@@ -74,7 +73,7 @@ struct PlayerView: View {
         .task(id: controller != nil) { await keepPlace() }
         .onChange(of: pauseAfterLine) { _, on in controller?.pausesAfterLines = on }
         .onChange(of: translationDisplayRaw) { _, _ in Task { await setUpTranslations() } }
-        .onChange(of: translations?.problem) { _, text in if let text { message = text } }
+        .onChange(of: translations?.problem) { _, text in if let text { app.showToast(text, isError: true) } }
         .onChange(of: loopSpeed) { _, speed in controller?.loopSpeed = Float(speed) }
         .sheet(isPresented: Binding(get: { editing != nil }, set: { if !$0 { editing = nil } })) {
             if let editing, let controller {
@@ -91,9 +90,6 @@ struct PlayerView: View {
                         self.editing = nil
                     }, cancel: { controller.pause(); self.editing = nil })
             }
-        }
-        .onChange(of: message) { _, text in
-            if let text { AccessibilityNotification.Announcement(text).post() }   // VoiceOver can't see the status line change
         }
         .onChange(of: controller?.isPlaying) { _, playing in if playing == true { resumeOffer = nil } }
         .task(id: app.dataVersion) {
@@ -223,10 +219,6 @@ struct PlayerView: View {
                 legendBar
                 subtitleList(controller)
                 hintBar
-                if let message {
-                    Text(message).font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .padding(8).frame(maxWidth: .infinity).background(Theme.soft)
-                }
             }
             .frame(minWidth: 320, idealWidth: 400, maxWidth: 480)
             .background(WindowFrameReader { panelFrame = $0 })
@@ -477,13 +469,13 @@ struct PlayerView: View {
     private func export(_ line: Subtitle, kind: ClipKind) {
         let name = "\(ClipExporter.sanitized(video.title)) \(stamp(line.startTime).replacingOccurrences(of: ":", with: "-"))"
         guard let url = ExportPanels.saveFile(suggestedName: name, fileExtension: kind.fileExtension) else { return }
-        message = String(localized: "Exporting…")
+        app.showToast(String(localized: "Exporting…"))
         Task {
             do {
                 try await env.clips.export(video: video, start: line.startTime, end: line.endTime, kind: kind, to: url)
-                message = String(localized: "Saved \(url.lastPathComponent)")
+                app.showToast(String(localized: "Saved \(url.lastPathComponent)"))
             } catch {
-                message = String(localized: "Export failed: \(error.localizedDescription)")
+                app.showToast(String(localized: "Export failed: \(error.localizedDescription)"), isError: true)
             }
         }
     }

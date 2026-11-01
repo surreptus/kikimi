@@ -25,7 +25,6 @@ struct WordsView: View {
     @State private var chooseAnki = false
     @State private var ankiResult: AnkiExportResult?
     @FocusState private var searchFocused: Bool
-    @State private var message: String?
 
     private struct LoadKey: Equatable {
         let language: String, search: String, filter: WordStatus?, type: PartOfSpeech?, version: Int
@@ -209,7 +208,6 @@ struct WordsView: View {
         HStack(spacing: 10) {
             Text(selection.isEmpty ? "\(rows.count) words" : "\(selection.count) of \(rows.count) selected")
                 .foregroundStyle(Theme.muted)
-            if let message { Text(message).font(Theme.small).foregroundStyle(Theme.muted).lineLimit(1) }
             Spacer()
             // Works with nothing selected too: it then exports the words you are learning.
             Button("Export to Anki…") { chooseAnki = true }
@@ -236,17 +234,17 @@ struct WordsView: View {
 
     private func exportAnki(includeAudio: Bool) {
         guard let folder = ExportPanels.chooseFolder(message: String(localized: "Choose a folder for the Anki file")) else { return }
-        message = String(localized: "Exporting…")
+        app.showToast(String(localized: "Exporting…"))
         Task {
             do {
                 let ids = selection.isEmpty
                     ? try await env.database.learningWordIDs(language: app.languageCode)
                     : sortedRows.filter { selection.contains($0.id) }.map(\.id)
-                guard !ids.isEmpty else { message = String(localized: "No words to export."); return }
+                guard !ids.isEmpty else { app.showToast(String(localized: "No words to export.")); return }
                 ankiResult = try await env.exportAnki(wordIDs: ids, language: app.languageCode, includeAudio: includeAudio, into: folder)
-                message = nil
+                app.dismissToast()   // the saved-file alert takes over
             } catch {
-                message = String(localized: "Export failed: \(error.localizedDescription)")
+                app.showToast(String(localized: "Export failed: \(error.localizedDescription)"), isError: true)
             }
         }
     }
@@ -273,18 +271,18 @@ struct WordsView: View {
                 case .learn:
                     let started = try await env.database.startLearning(wordIDs: ids)
                     let skipped = ids.count - started
-                    message = inflected("Started learning ^[\(started) word](inflect: true)")
-                        + (skipped > 0 ? " (\(skipped) already in progress)" : "")
+                    app.showToast(inflected("Started learning ^[\(started) word](inflect: true)")
+                        + (skipped > 0 ? " (\(skipped) already in progress)" : ""))
                 case .known:
                     let n = try await env.database.markKnown(wordIDs: ids)
-                    message = inflected("Marked ^[\(n) word](inflect: true) as known")
+                    app.showToast(inflected("Marked ^[\(n) word](inflect: true) as known"))
                 case .reset:
                     let n = try await env.database.markNew(wordIDs: ids)
-                    message = inflected("Reset ^[\(n) word](inflect: true)")
+                    app.showToast(inflected("Reset ^[\(n) word](inflect: true)"))
                 }
                 app.dataChanged()
             } catch {
-                message = String(localized: "Failed: \(error.localizedDescription)")
+                app.showToast(String(localized: "Failed: \(error.localizedDescription)"), isError: true)
             }
         }
     }

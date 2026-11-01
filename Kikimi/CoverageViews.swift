@@ -32,7 +32,6 @@ struct CoverageBadge: View {
 struct CoverageGoalView: View {
     let goal: CoverageGoal
     let startLearning: ([CoverageGoal.Entry]) -> Void
-    let message: String?
 
     private var targetPercent: String { "\(Int((goal.target * 100).rounded()))%" }
     private var currentPercent: String { "\(Int((goal.current.fraction * 100).rounded()))%" }
@@ -64,7 +63,6 @@ struct CoverageGoalView: View {
                         .buttonStyle(.pill(compact: true))
                 }
             }
-            if let message { Text(message).font(Theme.small).foregroundStyle(Theme.ink) }
         }
     }
 }
