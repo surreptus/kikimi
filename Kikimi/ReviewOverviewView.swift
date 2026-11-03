@@ -26,29 +26,37 @@ struct ReviewOverviewView: View {
 
     // MARK: Ready now
 
-    /// What is ready, the kind of card, and Start, together. The kind of card also decides Check my known words.
+    /// What is ready (the title and its count), Start, and the kind of card, together. The kind of card also decides
+    /// the review of known words.
     private var ready: some View {
         VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(overview.dueNow)").font(.system(size: 44, weight: .semibold, design: .rounded))
-                Text(overview.dueNow == 0 ? nextText : inflected("^[\(overview.dueNow) review](inflect: true) ready"))
-                    .font(Theme.small).foregroundStyle(Theme.muted)
-            }
-            .accessibilityElement(children: .combine)
-
-            HStack(spacing: 12) {
-                IconSegmentedPicker(
-                    options: ReviewStyle.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
-                    selection: $style)
-                    .accessibilityLabel("Card type")
-                    .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
+            HStack(spacing: 10) {
+                HStack(spacing: 10) {
+                    Text("Reviews").font(Theme.title(24))
+                    Text("\(overview.dueNow)")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(overview.dueNow == 0 ? Theme.ink : Theme.onAccent)
+                        .padding(.horizontal, 10).padding(.vertical, 2)
+                        .background(Capsule().fill(overview.dueNow == 0 ? Theme.ink.opacity(0.12) : Theme.accent))
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Reviews")
+                .accessibilityValue(inflected("^[\(overview.dueNow) review](inflect: true) ready"))
+                Spacer()
                 Button("Start") { start() }
                     .buttonStyle(.pill(.primary, compact: true))
                     .keyboardShortcut(.space, modifiers: [])
                     .disabled(overview.dueNow == 0)
             }
+            if overview.dueNow == 0 { Text(nextText).font(Theme.small).foregroundStyle(Theme.muted) }
+
+            IconSegmentedPicker(
+                options: ReviewStyle.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
+                selection: $style)
+                .accessibilityLabel("Card type")
+                .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
-            Text("Also used for Check my known words.").font(Theme.small).foregroundStyle(Theme.muted)
+            Text("Also used when you review words you know.").font(Theme.small).foregroundStyle(Theme.muted)
         }
         .panel()
         .animation(reduceMotion ? nil : .easeOut(duration: 0.18), value: style)
@@ -203,10 +211,11 @@ struct ReviewOverviewView: View {
                 .font(Theme.small).foregroundStyle(Theme.muted)
             if overview.known >= 3 {
                 HStack(spacing: 12) {
-                    Button("Check my known words") { checkKnown() }
+                    Text("\(overview.known) known").font(.system(size: 14, weight: .semibold, design: .rounded))
+                    Spacer()
+                    Button("Review known") { checkKnown() }
                         .buttonStyle(.pill(.secondary, compact: true))
-                    Text("A quick test of a few words you marked known. Any you miss go back to your reviews, so the numbers stay honest.")
-                        .font(Theme.small).foregroundStyle(Theme.muted)
+                        .help("A quick test of a few words you marked known. Any you miss go back to your reviews, so the numbers stay honest.")
                 }
                 .padding(.top, 4)
             }

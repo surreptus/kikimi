@@ -177,7 +177,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
       blanks, custom review intervals.
 
 ### Keeping the numbers honest
-- [x] **Check what you marked known** (Review page > Check my known words): a quiz of up to 10 random known words; any you
+- [x] **Check what you marked known** (Review page > Review known): a quiz of up to 10 random known words; any you
       miss go back to learning, so coverage stops counting them. Self-marked words and imported lists can inflate it otherwise.
 - [x] **Encounters per word**: the Words table's Seen column, and the word panel's "Seen in N lines across M videos".
 - [x] **Measured the 95% claim** (26 Oct 2026, one Spanish and one Japanese transcript, 918 and 2,459 words): content words
