@@ -23,6 +23,10 @@ struct ReviewView: View {
     /// The word's own page beside the card, opened from the revealed answer (never before: it would show the meaning).
     @State private var showsWord = false
     @State private var wordNow: Word?
+    /// Typing what you hear: what was typed, and how it compared once checked.
+    @State private var typed = ""
+    @State private var dictationResult: DictationCheck?
+    @FocusState private var typingFocused: Bool
     /// The sentence being corrected, and how long its video is (the editor's limit for the end time).
     @State private var editingExample: ExampleLine?
     @State private var editingDuration = 0.0
@@ -106,7 +110,7 @@ struct ReviewView: View {
     @ViewBuilder
     private func lemmaText(_ card: ReviewCard, font: Font) -> some View {
         if revealed {
-            Button { showsWord.toggle() } label: { Text(card.word.lemma).font(font) }
+            Button { showsWord.toggle() } label: { Text(lemmaLabel(card)).font(font) }
                 .buttonStyle(.plain)
                 .keyboardShortcut("i", modifiers: [])
                 .help(showsWord ? "Hide this word's page (I)" : "Show everything about this word (I)")
@@ -114,6 +118,12 @@ struct ReviewView: View {
         } else {
             Text(card.word.lemma).font(font)
         }
+    }
+
+    /// With the answer showing, a noun appears with its article ("das Buch"): the gender is part of what to learn.
+    private func lemmaLabel(_ card: ReviewCard) -> String {
+        guard card.word.pos == .noun else { return card.word.lemma }
+        return card.entries.nounPhrase(using: app.profile) ?? card.word.lemma
     }
 
     private func cardView(_ card: ReviewCard) -> some View {
@@ -145,6 +155,8 @@ struct ReviewView: View {
                     clozeFace(cloze, card)
                 } else if listening(for: card) {
                     listenFace(card)
+                } else if dictation(for: card) {
+                    dictationFace(card)
                 } else {
                 lemmaText(card, font: .system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
                 StatusPill(text: card.word.pos.title)
@@ -231,12 +243,14 @@ struct ReviewView: View {
                 }
             } else {
                 Button("Show answer") {
+                    if dictation(for: card) { checkDictation(); return }
                     revealed = true
                     // In a fill-in card the sentence is the question, so hearing it before the answer would give it away.
                     if !listening(for: card), mode == .onReveal || (mode == .onCardShown && cloze(for: card) != nil) { playSentence() }
                 }
-                .buttonStyle(.pill(.primary))
-                .keyboardShortcut(.space, modifiers: [])
+                .buttonStyle(.pill(dictation(for: card) ? .secondary : .primary))
+                // Space is a letter while typing, so a typed card checks with Return instead.
+                .keyboardShortcut(dictation(for: card) ? nil : KeyboardShortcut(.space, modifiers: []))
             }
             ShortcutHints(items: shortcutHints)
         }
@@ -266,17 +280,7 @@ struct ReviewView: View {
             if let example = card.example {
                 Text(highlighted(example)).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
             }
-            VStack(spacing: 8) {
-                lemmaText(card, font: Theme.title(22))
-                if app.profile.display.showsReadings, let reading = readings(of: card) {
-                    Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
-                }
-                Text(card.entries.first?.gloss ?? "No dictionary entry")
-                    .font(.system(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
-                if let example = card.example { Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint) }
-            }
-            .padding(.top, 6)
-            .transition(.opacity.combined(with: .scale(scale: 0.98)))
+            answerBlock(card)
         } else {
             Image(systemName: "ear").font(.system(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
             Text("Listen").font(Theme.title(26))
@@ -294,19 +298,7 @@ struct ReviewView: View {
     private func clozeFace(_ cloze: ClozeCard, _ card: ReviewCard) -> some View {
         if revealed {
             Text(filled(cloze)).font(.system(size: 28, design: .rounded)).multilineTextAlignment(.center)
-            VStack(spacing: 8) {
-                lemmaText(card, font: Theme.title(22))
-                if app.profile.display.showsReadings, let reading = readings(of: card) {
-                    Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
-                }
-                Text(card.entries.first?.gloss ?? "No dictionary entry")
-                    .font(.system(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
-                if let example = card.example {
-                    Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint)
-                }
-            }
-            .padding(.top, 6)
-            .transition(.opacity.combined(with: .scale(scale: 0.98)))
+            answerBlock(card)
         } else {
             Text(cloze.prompt).font(.system(size: 28, design: .rounded)).multilineTextAlignment(.center)
             if !cloze.hint.isEmpty {
@@ -314,6 +306,101 @@ struct ReviewView: View {
             }
             StatusPill(text: card.word.pos.title)
         }
+    }
+
+    /// The answer under a sentence: the word (a noun with its article), its reading and meaning, and where the line is from.
+    private func answerBlock(_ card: ReviewCard) -> some View {
+        VStack(spacing: 8) {
+            lemmaText(card, font: Theme.title(22))
+            if app.profile.display.showsReadings, let reading = readings(of: card) {
+                Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
+            }
+            Text(card.entries.first?.gloss ?? "No dictionary entry")
+                .font(.system(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
+            if let example = card.example { Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint) }
+        }
+        .padding(.top, 6)
+        .transition(.opacity.combined(with: .scale(scale: 0.98)))
+    }
+
+    /// Whether this card is typed from hearing it: the chosen style, and a sentence short enough to hold in your head.
+    private func dictation(for card: ReviewCard?) -> Bool {
+        style == .dictation && card?.example.map(app.profile.suitsDictation) == true
+    }
+
+    /// Hear the sentence and type it; checked, it shows the sentence with what you missed marked.
+    @ViewBuilder
+    private func dictationFace(_ card: ReviewCard) -> some View {
+        if revealed, let result = dictationResult {
+            Text(dictationSummary(result)).font(Theme.title(20))
+            Text(dictationDiff(result)).multilineTextAlignment(.center)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(dictationSpoken(result))
+            answerBlock(card)
+        } else {
+            Image(systemName: "keyboard").font(.system(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
+            Text("Type what you hear").font(Theme.title(26))
+            Text("Play it as often as you like. Accents count; capitals and punctuation don't.")
+                .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+            TextField("What did you hear?", text: $typed, axis: .vertical)
+                .textFieldStyle(.plain)
+                .lineLimit(1...3)
+                .font(.system(size: 20, design: .rounded))
+                .padding(12)
+                .background(RoundedRectangle(cornerRadius: 14).fill(Theme.soft))
+                .focused($typingFocused)
+                .onSubmit(checkDictation)
+                .onAppear { DispatchQueue.main.async { typingFocused = true } }
+            HStack(spacing: 10) {
+                Button("Play again", systemImage: "speaker.wave.2.fill") { playSentence() }
+                    .buttonStyle(.pill(.secondary, compact: true))
+                    .keyboardShortcut("r", modifiers: .command)
+                    .help("Play the sentence again (⌘R)")
+                Button("Check", action: checkDictation).buttonStyle(.pill(compact: true))
+            }
+        }
+    }
+
+    private func checkDictation() {
+        guard let line = card?.example?.text else { return }
+        dictationResult = DictationCheck.compare(typed: typed, line: line, profile: app.profile)
+        revealed = true
+    }
+
+    private func dictationSummary(_ result: DictationCheck) -> String {
+        if result.isExact { return String(localized: "All right") }
+        return app.profile.dictationSeparator.isEmpty
+            ? inflected("\(result.correct) of ^[\(result.total) character](inflect: true) right")
+            : inflected("\(result.correct) of ^[\(result.total) word](inflect: true) right")
+    }
+
+    /// The sentence, with what was missed in bold and underlined and what was typed in error struck through. The marks
+    /// never carry the meaning alone: the spoken version below names them.
+    private func dictationDiff(_ result: DictationCheck) -> AttributedString {
+        var text = AttributedString()
+        for (index, piece) in result.pieces.enumerated() {
+            var part = AttributedString(piece.text)
+            part.font = .system(size: 26, weight: piece.kind == .missed ? .bold : .regular, design: .rounded)
+            switch piece.kind {
+            case .same: break
+            case .missed: part.underlineStyle = .single
+            case .extra: part.strikethroughStyle = .single; part.foregroundColor = Color(Theme.muted)
+            }
+            if index > 0 { text.append(AttributedString(app.profile.dictationSeparator)) }
+            text.append(part)
+        }
+        return text
+    }
+
+    private func dictationSpoken(_ result: DictationCheck) -> String {
+        let separator = app.profile.dictationSeparator
+        let sentence = result.pieces.filter { $0.kind != .extra }.map(\.text).joined(separator: separator)
+        let missed = result.pieces.filter { $0.kind == .missed }.map(\.text)
+        let extra = result.pieces.filter { $0.kind == .extra }.map(\.text)
+        var parts = [dictationSummary(result), sentence]
+        if !missed.isEmpty { parts.append(String(localized: "Missed: \(listed(missed))")) }
+        if !extra.isEmpty { parts.append(String(localized: "Typed in error: \(listed(extra))")) }
+        return parts.joined(separator: ". ")
     }
 
     private func filled(_ cloze: ClozeCard) -> AttributedString {
@@ -328,7 +415,10 @@ struct ReviewView: View {
 
     /// The keys that work right now: they change once the answer is showing.
     private var shortcutHints: [(key: String, action: String)] {
-        guard revealed else { return listening(for: card) ? [("Space", "Show answer"), ("R", "Play again")] : [("Space", "Show answer")] }
+        guard revealed else {
+            if dictation(for: card) { return [("Return", "Check"), ("⌘R", "Play again")] }
+            return listening(for: card) ? [("Space", "Show answer"), ("R", "Play again")] : [("Space", "Show answer")]
+        }
         var hints: [(key: String, action: String)] = [("←", "Missed it"), ("→", "Got it"), ("W", "Say word"), ("I", "Word page")]
         if card?.example != nil { hints.append(("R", "Play sentence")); hints.append(("E", "Edit sentence")) }
         if canTranslate, card?.example != nil { hints.append(("T", "Translation")) }
@@ -338,7 +428,7 @@ struct ReviewView: View {
     private var translationMode: TranslationDisplay { env.translation.display }
     private var canTranslate: Bool { translationMode != .off && env.translation.translates(from: app.profile.whisperCode) }
     /// A listening card has just been heard and read, so what it meant is the natural next thing to see.
-    private var translationByDefault: Bool { translationMode == .always || (listening(for: card) && translationMode != .off) }
+    private var translationByDefault: Bool { translationMode == .always || ((listening(for: card) || dictation(for: card)) && translationMode != .off) }
     private var translationVisible: Bool { revealed && canTranslate && (translationChoice ?? translationByDefault) }
 
     private func toggleTranslation() {
@@ -411,7 +501,7 @@ struct ReviewView: View {
 
     private func endSession() {
         audio?.stop()
-        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; checking = false
+        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil; checking = false
         Task { await loadOverview() }
     }
 
@@ -431,9 +521,13 @@ struct ReviewView: View {
         mode = env.reviewAudio.mode(for: app.profile)
         style = env.reviewStyle.style(for: app.profile)
         do {
+            // Typing needs a short line, so a word with one gets that one and not a long one.
+            let profile = app.profile
+            var short: (@Sendable (ExampleLine) -> Bool)?
+            if style == .dictation { short = { profile.suitsDictation($0) } }
             let new = checkingKnown
                 ? try await ReviewSession(checkingKnown: env.database, language: app.languageCode)
-                : try await ReviewSession(database: env.database, language: app.languageCode)
+                : try await ReviewSession(database: env.database, language: app.languageCode, preferring: short)
             checking = checkingKnown
             session = new
             total = await new.remaining
@@ -453,7 +547,7 @@ struct ReviewView: View {
     }
 
     private func advance(_ session: ReviewSession) async {
-        revealed = false; showsWord = false; wordNow = nil; translationChoice = nil
+        revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil
         do {
             let next = try await session.currentCard()
             // Update the counts before the card, so the bar never shows a card with a stale count.
@@ -461,7 +555,7 @@ struct ReviewView: View {
             total = max(total, remaining)   // a missed word re-enters the queue, so the total can grow
             card = next
             if let next {
-                if listening(for: next) { playSentence() }   // the sentence is the question: it plays whatever the audio setting
+                if listening(for: next) || dictation(for: next) { playSentence() }   // the sentence is the question: it plays whatever the audio setting
                 else if mode == .onCardShown, cloze(for: next) == nil { playSentence() }
             }
             if card == nil, await session.answered > 0 {

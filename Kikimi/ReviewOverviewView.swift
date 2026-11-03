@@ -31,10 +31,10 @@ struct ReviewOverviewView: View {
             Picker("Cards", selection: $style) {
                 ForEach(ReviewStyle.allCases, id: \.self) { Text($0.title).tag($0) }
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+            .pickerStyle(.menu)
+            .fixedSize()
             .accessibilityLabel("Card type")
-            .help("A word with no sentence from your videos is asked as word and meaning.")
+            .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted)
         }
         .panel()

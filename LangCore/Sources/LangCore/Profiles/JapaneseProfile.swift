@@ -12,6 +12,14 @@ public struct JapaneseProfile: LanguageProfile {
         resourceName: "dictionary-ja",
         attribution: "JMdict, EDRDG (CC BY-SA 4.0)")
     public let kanjiResourceName: String? = "kanji-ja"
+
+    /// Japanese has no spaces, so a typed copy is compared a character at a time, and a line is short when it has few.
+    public func dictationUnits(in text: String) -> [String] {
+        text.filter { !DictationCheck.key(String($0)).isEmpty }.map(String.init)
+    }
+
+    public var dictationLimit: Int { 25 }
+    public var dictationSeparator: String { "" }
     public let display = DisplaySettings(showsReadings: true)
 
     /// Loaded once; the model is large and immutable. A missing dictionary is a packaging error, so fail loudly.

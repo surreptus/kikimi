@@ -43,6 +43,15 @@ public struct WordHint: Sendable, Equatable {
     public let stage: SRSStage?
     /// The word's other readings (月 is つき, and also がつ), after `reading`.
     public var otherReadings: [String] = []
+    /// A noun with its article, "das Buch", when the dictionary gives its gender.
+    public var nounPhrase: String?
+}
+
+extension [DictionaryEntry] {
+    /// The first entry with a gender, as a learner should meet the noun: "das Buch", "l'eau (f)". nil if there is none.
+    public func nounPhrase(using profile: any LanguageProfile) -> String? {
+        first { $0.gender != nil }.flatMap { profile.nounPhrase(headword: $0.headword, gender: $0.gender) }
+    }
 }
 
 extension [DictionaryEntry] {
@@ -79,7 +88,8 @@ extension LangEnvironment {
         let reading = entry?.reading ?? token.reading
         return WordHint(wordID: word?.id, lemma: token.lemma, pos: token.pos, reading: reading,
                         gloss: entry?.shortGloss, status: word?.status, stage: word?.stage,
-                        otherReadings: entries.readings(of: token.lemma, first: reading).filter { $0 != reading })
+                        otherReadings: entries.readings(of: token.lemma, first: reading).filter { $0 != reading },
+                        nounPhrase: token.pos == .noun ? LanguageProfiles.profile(for: language).flatMap { entries.nounPhrase(using: $0) } : nil)
     }
 }
 

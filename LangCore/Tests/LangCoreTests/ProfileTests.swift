@@ -43,6 +43,30 @@ final class ProfileTests: XCTestCase {
         }
     }
 
+    func testArticlesFollowTheGender() {
+        XCTAssertEqual(GermanProfile().article(forGender: "n"), "das")
+        XCTAssertEqual(GermanProfile().article(forGender: "m,f"), "der / die")
+        XCTAssertEqual(FrenchProfile().article(forGender: "f"), "la")
+        XCTAssertEqual(SpanishProfile().article(forGender: "m"), "el")
+        XCTAssertNil(SpanishProfile().article(forGender: "n"), "Spanish has no neuter")
+        XCTAssertNil(SpanishProfile().article(forGender: nil))
+        XCTAssertNil(JapaneseProfile().article(forGender: "f"), "a language without articles gives none")
+    }
+
+    func testNounPhrasesKeepTheGenderWhereAnArticleWouldBeWrong() {
+        XCTAssertEqual(GermanProfile().nounPhrase(headword: "Buch", gender: "n"), "das Buch")
+        XCTAssertEqual(FrenchProfile().nounPhrase(headword: "livre", gender: "m"), "le livre")
+        XCTAssertEqual(FrenchProfile().nounPhrase(headword: "eau", gender: "f"), "l'eau (f)", "l' would hide the gender")
+        XCTAssertEqual(FrenchProfile().nounPhrase(headword: "homme", gender: "m"), "l'homme (m)")
+        XCTAssertEqual(FrenchProfile().nounPhrase(headword: "école", gender: "f"), "l'école (f)")
+        XCTAssertEqual(SpanishProfile().nounPhrase(headword: "casa", gender: "f"), "la casa")
+        XCTAssertEqual(SpanishProfile().nounPhrase(headword: "agua", gender: "f"), "agua (f)", "el agua, so no article is claimed")
+        XCTAssertEqual(SpanishProfile().nounPhrase(headword: "árbol", gender: "m"), "el árbol")
+        XCTAssertEqual(SpanishProfile().nounPhrase(headword: "artista", gender: "m,f"), "el / la artista", "a word with both genders keeps both")
+        XCTAssertNil(JapaneseProfile().nounPhrase(headword: "月", gender: "f"))
+        XCTAssertNil(GermanProfile().nounPhrase(headword: "gehen", gender: nil))
+    }
+
     func testCodesAreUnique() {
         let codes = LanguageProfiles.all.map(\.code)
         XCTAssertEqual(Set(codes).count, codes.count)

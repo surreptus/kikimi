@@ -30,6 +30,18 @@ final class HomographHintTests: XCTestCase {
         XCTAssertEqual(entries.readings(of: "q"), [])
     }
 
+    func testTheHintCarriesANounsGenderButNotAVerbs() async throws {
+        let env = try LangEnvironment(
+            root: FileManager.default.temporaryDirectory.appending(path: "hg-\(UUID().uuidString)"),
+            defaults: UserDefaults(suiteName: "hg-\(UUID().uuidString)")!,
+            dictionaries: try TestDictionaries.store(["de": [("Buch", nil, "book"), ("gehen", nil, "to go")]], genders: ["Buch": "n"]))
+        defer { try? FileManager.default.removeItem(at: env.root) }
+        let noun = await env.hint(for: Token(surface: "Buch", lemma: "buch", pos: .noun), language: "de")
+        XCTAssertEqual(noun?.nounPhrase, "das Buch", "with the dictionary's capital letter, not the lemma's")
+        let verb = await env.hint(for: Token(surface: "geht", lemma: "gehen", pos: .verb), language: "de")
+        XCTAssertNil(verb?.nounPhrase)
+    }
+
     func testWithNoMatchingReadingItFallsBackToTheFirstEntry() async throws {
         let env = try makeEnvironment(entries: [("秋", "とき", "time"), ("秋", "あき", "autumn")])
         defer { try? FileManager.default.removeItem(at: env.root) }

@@ -64,7 +64,9 @@ final class ClozeCardTests: XCTestCase {
         XCTAssertFalse(ReviewStyle.cloze.suits(wordNotInIt, showsReading: false))
         XCTAssertTrue(ReviewStyle.listening.suits(wordNotInIt, showsReading: false), "listening only needs the audio")
         XCTAssertFalse(ReviewStyle.listening.suits(noSentence, showsReading: false))
-        XCTAssertEqual(ReviewStyle.allCases.map(\.rawValue), ["meaning", "cloze", "listening"])
+        XCTAssertTrue(ReviewStyle.dictation.suits(withSentence, showsReading: false, profile: SpanishProfile()), "a short line")
+        XCTAssertFalse(ReviewStyle.dictation.suits(noSentence, showsReading: false, profile: SpanishProfile()))
+        XCTAssertEqual(ReviewStyle.allCases.map(\.rawValue), ["meaning", "cloze", "listening", "dictation"])
     }
 
     func testTheStyleDefaultsToMeaningPerLanguageAndIsRemembered() {

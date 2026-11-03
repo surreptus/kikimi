@@ -6,14 +6,17 @@ public enum ReviewStyle: String, CaseIterable, Sendable {
     case meaning
     case cloze
     case listening
+    /// Hear the sentence and type it; offered only for short lines.
+    case dictation
 
     /// Whether `card` can be asked in this style. Cloze and listening need a sentence from your videos (cloze also
     /// needs the word to be found in it); a card that can't is asked the usual way.
-    public func suits(_ card: ReviewCard, showsReading: Bool) -> Bool {
+    public func suits(_ card: ReviewCard, showsReading: Bool, profile: (any LanguageProfile)? = nil) -> Bool {
         switch self {
         case .meaning: true
         case .cloze: ClozeCard.make(from: card, showsReading: showsReading) != nil
         case .listening: card.example != nil
+        case .dictation: card.example.map { profile?.suitsDictation($0) ?? true } ?? false
         }
     }
 }

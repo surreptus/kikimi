@@ -403,7 +403,7 @@ struct PlayerView: View {
         VStack(alignment: .leading, spacing: 3) {
             if let token = shownToken {
                 HStack(spacing: 8) {
-                    Text(hint?.lemma ?? token.lemma).font(Theme.title(17))
+                    Text(hint?.nounPhrase ?? hint?.lemma ?? token.lemma).font(Theme.title(17))
                     if let reading = hint?.reading ?? token.reading {
                         Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
                     }

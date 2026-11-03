@@ -173,6 +173,65 @@ class KaikkiTests(unittest.TestCase):
         self.assertEqual(build_kaikki.meanings(""), [])
 
 
+class GenderTests(unittest.TestCase):
+    def build(self, lines):
+        with tempfile.TemporaryDirectory() as d:
+            src, out = os.path.join(d, "k.jsonl"), os.path.join(d, "x.sqlite")
+            with open(src, "w", encoding="utf-8") as f:
+                f.write("\n".join(json.dumps(x) for x in lines))
+            build_kaikki.build(src, out, "fr", "French")
+            return dict((r[0], r[1]) for r in sqlite3.connect(out).execute("SELECT headword, gender FROM entries"))
+
+    def test_a_noun_gets_its_gender_from_the_sense_tags_or_the_headword_line(self):
+        genders = self.build([
+            {"word": "maison", "lang_code": "fr", "pos": "noun", "senses": [{"glosses": ["house"], "tags": ["feminine"]}]},
+            {"word": "Buch", "lang_code": "fr", "pos": "noun", "senses": [{"glosses": ["book"]}],
+             "head_templates": [{"expansion": "Buch n (strong, genitive Buches, plural Bücher)"}]},
+            {"word": "grand", "lang_code": "fr", "pos": "adj", "senses": [{"glosses": ["big"], "tags": ["masculine"]}]},
+        ])
+        self.assertEqual(genders, {"maison": "f", "Buch": "n", "grand": None})
+
+    def test_a_word_with_two_genders_keeps_both_in_a_fixed_order(self):
+        genders = self.build([
+            {"word": "livre", "lang_code": "fr", "pos": "noun", "senses": [{"glosses": ["pound"], "tags": ["feminine"]}]},
+            {"word": "livre", "lang_code": "fr", "pos": "noun", "senses": [{"glosses": ["book"], "tags": ["masculine"]}]},
+            {"word": "artiste", "lang_code": "fr", "pos": "noun", "senses": [{"glosses": ["artist"]}],
+             "head_templates": [{"expansion": "artiste m or f by sense (plural artistes)"}]},
+        ])
+        self.assertEqual(genders, {"livre": "m,f", "artiste": "m,f"})
+
+    def test_a_regional_or_slang_sense_does_not_add_a_gender(self):
+        genders = self.build([
+            {"word": "mano", "lang_code": "fr", "pos": "noun", "senses": [
+                {"glosses": ["hand"], "tags": ["feminine"]},
+                {"glosses": ["bro"], "tags": ["Mexico", "colloquial", "masculine"]}]},
+            {"word": "livre", "lang_code": "fr", "pos": "noun", "senses": [
+                {"glosses": ["pound"], "tags": ["Europe", "feminine", "historical"]}]},
+            {"word": "radio", "lang_code": "fr", "pos": "noun", "senses": [
+                {"glosses": ["radius"], "tags": ["masculine"]}, {"glosses": ["radio"], "tags": ["feminine"]}]},
+        ])
+        self.assertEqual(genders["mano"], "f", "the slang sense is left out")
+        self.assertEqual(genders["livre"], "f", "if every sense is uncommon, they are all used")
+        self.assertEqual(genders["radio"], "m,f", "two ordinary senses keep both")
+
+    def test_an_entry_of_only_uncommon_senses_does_not_add_to_another_entrys_gender(self):
+        genders = self.build([
+            {"word": "mano", "lang_code": "fr", "pos": "noun", "senses": [{"glosses": ["hand"], "tags": ["feminine"]}]},
+            {"word": "mano", "lang_code": "fr", "pos": "noun", "senses": [{"glosses": ["bro"], "tags": ["Mexico", "slang", "masculine"]}]},
+            {"word": "rara", "lang_code": "fr", "pos": "noun", "senses": [{"glosses": ["x"], "tags": ["Mexico", "masculine"]}]},
+        ])
+        self.assertEqual(genders["mano"], "f", "separate entries, one of them slang")
+        self.assertEqual(genders["rara"], "m", "with nothing else, the uncommon gender is still better than none")
+
+    def test_a_form_of_sense_does_not_decide_the_gender(self):
+        genders = self.build([
+            {"word": "casa", "lang_code": "fr", "pos": "noun", "senses": [
+                {"glosses": ["house"], "tags": ["feminine"]},
+                {"glosses": ["plural of caso"], "form_of": [{"word": "caso"}], "tags": ["masculine"]}]},
+        ])
+        self.assertEqual(genders, {"casa": "f"})
+
+
 class KanjidicTests(unittest.TestCase):
     XML = """<?xml version="1.0" encoding="UTF-8"?>
 <kanjidic2><header><date_of_creation>2026-01-01</date_of_creation></header>

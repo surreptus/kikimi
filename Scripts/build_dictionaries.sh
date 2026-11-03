@@ -5,14 +5,27 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT="$ROOT/LangCore/Sources/LangCore/Resources/dictionaries"
-WORK="$(mktemp -d)"   # downloads are untrusted data: keep them away from the scripts and the repo
-trap 'rm -rf "$WORK"' EXIT
+# Downloads are untrusted data: keep them away from the scripts and the repo. Set DICTIONARY_DOWNLOADS to a folder to keep
+# them between runs, so a dropped connection resumes where it stopped instead of starting over.
+if [ -n "${DICTIONARY_DOWNLOADS:-}" ]; then
+    WORK="$DICTIONARY_DOWNLOADS"; mkdir -p "$WORK"
+else
+    WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
+fi
 mkdir -p "$OUT"
 
-curl -fSL --retry 3 -o "$WORK/JMdict_e.gz" https://www.edrdg.org/pub/Nihongo/JMdict_e.gz
-curl -fSL --retry 3 -o "$WORK/kanjidic2.xml.gz" https://www.edrdg.org/kanjidic/kanjidic2.xml.gz
+# fetch URL FILE: skips a file that is already whole, and resumes one that stopped part-way.
+fetch() {
+    local want
+    want=$(curl -sIL --retry 3 "$1" | tr -d '\r' | awk 'tolower($1)=="content-length:" {n=$2} END {print n}')
+    if [ -n "$want" ] && [ -f "$2" ] && [ "$(wc -c < "$2" | tr -d ' ')" = "$want" ]; then return; fi
+    curl -fSL --retry 5 --retry-all-errors -C - -o "$2" "$1"
+}
+
+fetch https://www.edrdg.org/pub/Nihongo/JMdict_e.gz "$WORK/JMdict_e.gz"
+fetch https://www.edrdg.org/kanjidic/kanjidic2.xml.gz "$WORK/kanjidic2.xml.gz"
 for language in Spanish French German; do
-    curl -fSL --retry 3 -o "$WORK/$language.jsonl" "https://kaikki.org/dictionary/$language/kaikki.org-dictionary-$language.jsonl"
+    fetch "https://kaikki.org/dictionary/$language/kaikki.org-dictionary-$language.jsonl" "$WORK/$language.jsonl"
 done
 
 cd "$ROOT"

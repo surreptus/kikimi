@@ -30,6 +30,7 @@ extension ReviewStyle {
         case .meaning: String(localized: "Word and meaning")
         case .cloze: String(localized: "Fill in the word")
         case .listening: String(localized: "Listen to the sentence")
+        case .dictation: String(localized: "Type what you hear")
         }
     }
 
@@ -39,6 +40,7 @@ extension ReviewStyle {
         case .meaning: String(localized: "See the word and recall its meaning.")
         case .cloze: String(localized: "Recall the missing word in a sentence from your videos.")
         case .listening: String(localized: "Hear a sentence from your videos, then check what it said.")
+        case .dictation: String(localized: "Hear a short sentence from your videos and type it. You see what you missed.")
         }
     }
 }

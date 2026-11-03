@@ -41,6 +41,9 @@ public actor ReviewSession {
     private var missed: Set<Int64> = []
     private var lastExample: [Int64: Int64] = [:]   // word id -> subtitle id shown last
     private var cached: ReviewCard?
+    /// Lines to choose among when the card's kind needs a certain sort of line (a short one to type); any line when
+    /// the word has none that qualify.
+    private let preferring: (@Sendable (ExampleLine) -> Bool)?
     /// A check of words marked known, not a review: answers don't move any stage.
     public let isKnownCheck: Bool
     public private(set) var answered = 0
@@ -48,9 +51,10 @@ public actor ReviewSession {
     /// In a known-words check: how many were missed, and so went back to being learned.
     public private(set) var returnedToLearning = 0
 
-    public init(database: LangDatabase, language: String, now: Date = Date()) async throws {
+    public init(database: LangDatabase, language: String, preferring: (@Sendable (ExampleLine) -> Bool)? = nil, now: Date = Date()) async throws {
         self.database = database
         self.language = language
+        self.preferring = preferring
         isKnownCheck = false
         queue = try await database.dueWords(language: language, now: now).compactMap(\.id)
     }
@@ -60,6 +64,7 @@ public actor ReviewSession {
     public init(checkingKnown database: LangDatabase, language: String, count: Int = 10) async throws {
         self.database = database
         self.language = language
+        preferring = nil
         isKnownCheck = true
         queue = try await database.knownSample(language: language, count: count)
     }
@@ -74,7 +79,8 @@ public actor ReviewSession {
         guard let word else { queue.removeFirst(); return try await currentCard() }
         let entries = try await database.lookup(language: language, term: word.lemma, limit: 3)
         let examples = try await database.examples(wordID: id, limit: 50)
-        let example = ExamplePicker.pick(from: examples, avoiding: lastExample[id])
+        let liked = preferring.map { examples.filter($0) } ?? []
+        let example = ExamplePicker.pick(from: liked.isEmpty ? examples : liked, avoiding: lastExample[id])
         lastExample[id] = example?.id
         let card = ReviewCard(word: word, entries: entries, example: example)
         cached = card

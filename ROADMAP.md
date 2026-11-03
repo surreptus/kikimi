@@ -150,20 +150,28 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Shadowing**: hear a line from your own video, record yourself saying it, and play both to compare. No AI, and the
       recording stays on the Mac. Needs the microphone (a sandbox entitlement and a usage string), so the privacy policy
       says so first. (From a look at JIVX's features, 3 Nov 2026.)
-- [ ] **Type what you hear**: a variant of the listening card. Hear the sentence (slower if you like), type it, and see
-      the differences from the transcript line. A plain comparison, no AI, no new permission; it is only as right as the
-      transcript, which Edit sentence can fix.
+- [x] **Type what you hear** (3 Nov 2026): a card type on the Review page. Hear a sentence and type it; the sentence then
+      shows with what you missed underlined and what you typed in error struck through, and says so for VoiceOver. A plain
+      comparison of spelling (case, width and punctuation ignored, accents count), no AI and no new permission; it is only as
+      right as the transcript, which Edit sentence can fix. Only short lines are offered: at most 6.5 seconds and 10 words
+      (25 characters for Japanese; in the library it was written for, 91% of Japanese lines and about 75% of Spanish ones
+      qualify). A word with no short line is asked as word and meaning, and a session prefers a short line when a word has
+      one. Not done: slowing the audio on this card, and judging kana against kanji (a correct reading in kana counts as
+      different from the kanji line).
 - [ ] **Review ahead**: practise words that are not due yet without changing their stages ("cram").
 - [ ] Small: show a kanji's JLPT level and school grade in the word panel (KANJIDIC2 has both; the kanji file leaves
       them out today). Not wanted from that comparison: AI grading of what you write or say (the on-device model passed 5 of
       12 mistakes; a cloud one breaks "local and private"), gardens and other gamification, pasting video links, a
       sentence bank. Maybe later: a hands-free listening playlist of your learning words' sentences (see below).
 
-- [ ] **Noun gender and articles** (from a look at Clozemaster, 3 Nov 2026): show a noun's gender (el/la, le/la,
-      der/die/das) in the word panel and on cards, and maybe a gender drill on the words you are learning. Gender is among
-      the hardest things to pick up in Spanish, French and German, and the dictionary shows none today because the builder
-      keeps only the part of speech and the meanings. Wiktionary normally records it, but the extracts have not been checked
-      for this; it needs a dictionary rebuild.
+- [x] **Noun gender and articles** (3 Nov 2026, from a look at Clozemaster): a noun shows with its article (el/la, le/la,
+      der/die/das) in the word panel, the player's word bar and, once the answer is showing, on review cards. The Spanish,
+      French and German dictionaries now carry each noun's gender from Wiktionary (new `gender` column; a file built before
+      it still opens, with none). A word with two genders shows both ("le / la"). Where an article would be wrong the gender
+      is shown instead: French before a vowel or silent h (l'eau (f)) and Spanish feminine nouns starting with a or ha (agua
+      (f), because the data does not say which take el). Not done: a gender drill, German plural forms (the data has them),
+      and German nouns still keep a lower-case lemma in the word list (the tokenizer lower-cases every lemma), which is why the
+      phrase uses the dictionary's spelling.
 - [ ] **Hands-free listening** (Clozemaster has "Radio"): the sentences of your learning words play on their own with a pause,
       and a translation only if you ask. Not wanted from that comparison: AI explanations, graded texts, rarity-chosen
       blanks, custom review intervals.

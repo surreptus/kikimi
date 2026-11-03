@@ -13,10 +13,17 @@ public struct DictionaryEntry: Sendable, Equatable, Identifiable {
     public var headword: String
     public var reading: String?
     public var gloss: String
+    /// A noun's gender as letters, "m", "f" or "n", or a mix such as "m,f" for a word with two. nil for other words and
+    /// for languages without it.
+    public var gender: String?
 
-    public init(id: Int64? = nil, language: String, headword: String, reading: String? = nil, gloss: String) {
+    /// Whether the first meaning listed is a noun, so that a gender belongs to the word as it is first read. Dictionary
+    /// text numbers each sense and labels its part of speech: "1. (noun) house".
+    public var startsAsNoun: Bool { gloss.hasPrefix("1. (noun") }
+
+    public init(id: Int64? = nil, language: String, headword: String, reading: String? = nil, gloss: String, gender: String? = nil) {
         self.id = id; self.language = language; self.headword = headword
-        self.reading = reading; self.gloss = gloss
+        self.reading = reading; self.gloss = gloss; self.gender = gender
     }
 }
 
@@ -26,14 +33,20 @@ public final class DictionaryStore: Sendable {
     public static let empty = DictionaryStore()
 
     private let files: [String: DatabaseQueue]
+    /// Languages whose file has the gender column; a file built before it existed still opens, with no genders.
+    private let withGender: Set<String>
 
-    private init() { files = [:] }
+    private init() { files = [:]; withGender = [] }
 
     /// `files` maps a language code to its built dictionary file.
     public init(files: [String: URL]) throws {
         var configuration = Configuration()
         configuration.readonly = true
-        self.files = try files.mapValues { try DatabaseQueue(path: $0.path, configuration: configuration) }
+        let opened = try files.mapValues { try DatabaseQueue(path: $0.path, configuration: configuration) }
+        self.files = opened
+        withGender = Set(try opened.compactMap { language, queue in
+            try queue.read { try $0.columns(in: "entries").contains { $0.name == "gender" } } ? language : nil
+        })
     }
 
     /// Opens the dictionary each profile names, from the app bundle.
@@ -62,15 +75,16 @@ public final class DictionaryStore: Sendable {
     public func lookup(language: String, term: String, limit: Int) async throws -> [DictionaryEntry] {
         guard let file = files[language] else { return [] }
         let capitalised = term.prefix(1).uppercased() + term.dropFirst()
+        let gender = withGender.contains(language) ? "gender" : "NULL AS gender"
         return try await file.read { db in
             try Row.fetchAll(db, sql: """
-                SELECT id, headword, reading, gloss FROM entries
+                SELECT id, headword, reading, gloss, \(gender) FROM entries
                 WHERE headword IN (?1, ?2, ?3, ?4) OR reading = ?1
                 ORDER BY headword IN (?1, ?2, ?3, ?4) DESC, id
                 LIMIT ?5
                 """, arguments: [term, capitalised, term.lowercased(), term.uppercased(), limit]).map {
                 DictionaryEntry(id: $0["id"], language: language, headword: $0["headword"],
-                                reading: $0["reading"], gloss: $0["gloss"])
+                                reading: $0["reading"], gloss: $0["gloss"], gender: $0["gender"])
             }
         }
     }

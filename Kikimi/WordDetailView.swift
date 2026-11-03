@@ -24,7 +24,7 @@ struct WordDetail: View {
                 if entries.isEmpty {
                     Text("No entry found.").foregroundStyle(Theme.muted)
                 } else {
-                    ForEach(entries) { EntryView(entry: $0, showsReading: app.profile.display.showsReadings) }
+                    ForEach(entries) { EntryView(entry: $0, showsReading: app.profile.display.showsReadings, partOfSpeech: row.word.pos) }
                 }
 
                 Text("From your videos").font(Theme.title(17))
@@ -218,11 +218,20 @@ struct WordDetail: View {
 struct EntryView: View {
     let entry: DictionaryEntry
     let showsReading: Bool
+    /// The part of speech of the word being shown, when a page knows it; otherwise the entry's first meaning decides.
+    var partOfSpeech: PartOfSpeech?
+
+    /// "das Buch" for a noun with a gender, else just the word. A verb that also has a noun sense (aller) gets none.
+    private var title: String {
+        let isNoun = partOfSpeech.map { $0 == .noun } ?? entry.startsAsNoun
+        guard isNoun else { return entry.headword }
+        return LanguageProfiles.profile(for: entry.language)?.nounPhrase(headword: entry.headword, gender: entry.gender) ?? entry.headword
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 6) {
-                Text(entry.headword).font(.headline)
+                Text(title).font(.headline)
                 if showsReading, let reading = entry.reading, reading != entry.headword {
                     Text(reading).foregroundStyle(Theme.muted)
                 }

@@ -168,4 +168,17 @@ final class DropCopiedDictionaryMigrationTests: XCTestCase {
         _ = try LangDatabase(path: path)
         _ = try LangDatabase(path: path)   // reopening runs no migration again and does not fail
     }
+
+    func testAFileWithGenderGivesEachNounItsGenderAndAnOlderFileGivesNone() async throws {
+        let entries: [TestDictionaries.Entry] = [("Buch", nil, "book"), ("gehen", nil, "to go")]
+        let newer = try TestDictionaries.store(["de": entries], genders: ["Buch": "n"])
+        let older = try TestDictionaries.store(["de": entries])
+        let withColumn = try await newer.lookup(language: "de", term: "buch", limit: 5)
+        let without = try await older.lookup(language: "de", term: "buch", limit: 5)
+        XCTAssertEqual(withColumn.first?.gender, "n", "the capitalised noun is found from the lower-case lemma, with its gender")
+        XCTAssertNil(without.first?.gender, "a file built before the column existed still works")
+        XCTAssertEqual(without.first?.gloss, "book")
+        let verb = try await newer.lookup(language: "de", term: "gehen", limit: 5)
+        XCTAssertNil(verb.first?.gender)
+    }
 }

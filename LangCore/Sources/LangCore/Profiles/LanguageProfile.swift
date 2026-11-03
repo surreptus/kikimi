@@ -37,12 +37,33 @@ public protocol LanguageProfile: Sendable {
     var dictionarySource: DictionarySource { get }
     /// The built file of per-character data (kanji), for a language whose words are written with them. nil if none.
     var kanjiResourceName: String? { get }
+    /// The article that goes with each gender letter ("m", "f", "n"), for a language whose nouns have one. Empty if none.
+    var nounArticles: [String: String] { get }
+    /// The pieces a typed copy of a line is compared in, and the most a line may have to be offered for typing.
+    func dictationUnits(in text: String) -> [String]
+    var dictationLimit: Int { get }
+    /// What goes between the pieces when they are shown again: a space, or nothing in a language written without them.
+    var dictationSeparator: String { get }
+    /// A noun as a learner should meet it, with its article ("das Buch"), or nil if there is nothing to add.
+    /// A profile overrides it where the plain article would be wrong (French "l'eau", Spanish "el agua").
+    func nounPhrase(headword: String, gender: String?) -> String?
     var display: DisplaySettings { get }
 }
 
 extension LanguageProfile {
     public var contentPOS: Set<PartOfSpeech> { [.noun, .verb, .adjective, .adverb] }
     public var kanjiResourceName: String? { nil }
+    public var nounArticles: [String: String] { [:] }
+
+    public func nounPhrase(headword: String, gender: String?) -> String? {
+        article(forGender: gender).map { "\($0) \(headword)" }
+    }
+
+    /// "el", "der", or "le / la" for a word with two genders; nil when the word has none or the language has no articles.
+    public func article(forGender gender: String?) -> String? {
+        let articles = (gender ?? "").split(separator: ",").compactMap { nounArticles[String($0)] }
+        return articles.isEmpty ? nil : articles.joined(separator: " / ")
+    }
     public var display: DisplaySettings { DisplaySettings() }
 
     public func contentWords(in text: String) -> [Token] {

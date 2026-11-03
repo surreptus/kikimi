@@ -6,6 +6,7 @@ public struct GermanProfile: LanguageProfile {
     public let code = "de"
     public var displayName: String { Locale.current.localizedString(forLanguageCode: code)?.localizedCapitalized ?? "German" }
     public let whisperCode = "de"
+    public let nounArticles = ["m": "der", "f": "die", "n": "das"]
     public let defaultModel = "openai_whisper-medium"
     public let tokenizer: any WordTokenizer = NLTaggerTokenizer(
         language: .german,
