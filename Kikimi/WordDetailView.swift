@@ -12,46 +12,57 @@ struct WordDetail: View {
     @State private var audio: SentenceAudioPlayer?
     @State private var showsAllExamples = false
     @State private var seen = WordSeen()
+    /// The word the details on show belong to. The panel is kept as you move from word to word and its details are
+    /// swapped in together, so nothing empties out and refills (and "No entry found" never shows while one loads).
+    @State private var loadedFor: Int64?
     private let examplesShownFirst = 5
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                header
-                if !kanji.isEmpty { kanjiSection }
+        ScrollViewReader { scroll in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    header.id("top")
+                    if !kanji.isEmpty { kanjiSection }
 
-                Text("Dictionary").font(Theme.title(17))
-                if entries.isEmpty {
-                    Text("No entry found.").foregroundStyle(Theme.muted)
-                } else {
-                    ForEach(entries) { EntryView(entry: $0, showsReading: app.profile.display.showsReadings, partOfSpeech: row.word.pos) }
-                }
-
-                Text("From your videos").font(Theme.title(17))
-                ForEach(showsAllExamples ? examples : Array(examples.prefix(examplesShownFirst))) { line in exampleRow(line) }
-                if examples.count > examplesShownFirst {
-                    Button(showsAllExamples ? String(localized: "Show fewer") : String(localized: "Show \(examples.count - examplesShownFirst) more")) {
-                        showsAllExamples.toggle()
+                    Text("Dictionary").font(Theme.title(17))
+                    if entries.isEmpty {
+                        if loadedFor == row.id { Text("No entry found.").foregroundStyle(Theme.muted) }
+                    } else {
+                        ForEach(entries) { EntryView(entry: $0, showsReading: app.profile.display.showsReadings, partOfSpeech: row.word.pos) }
                     }
-                    .buttonStyle(.plain).font(Theme.small).foregroundStyle(Theme.muted)
+
+                    Text("From your videos").font(Theme.title(17))
+                    ForEach(showsAllExamples ? examples : Array(examples.prefix(examplesShownFirst))) { line in exampleRow(line) }
+                    if examples.count > examplesShownFirst {
+                        Button(showsAllExamples ? String(localized: "Show fewer") : String(localized: "Show \(examples.count - examplesShownFirst) more")) {
+                            showsAllExamples.toggle()
+                        }
+                        .buttonStyle(.plain).font(Theme.small).foregroundStyle(Theme.muted)
+                    }
                 }
+                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(20)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            // Opened for a moment longer than it takes to arrow past: that is a lookup.
+            .task(id: row.id) {
+                try? await Task.sleep(for: .seconds(1.5))
+                if !Task.isCancelled { try? await env.database.record(.lookup, subject: row.id) }
+            }
+            .task { audio = SentenceAudioPlayer(libraryRoot: env.libraryURL) }
+            .task(id: row.id) {
+                let word = row.word, id = row.id
+                let newEntries = (try? await env.database.lookup(language: word.language, term: word.lemma, limit: 5)) ?? []
+                let newKanji = await env.kanjiInfo(in: word.lemma, language: word.language)
+                let newExamples = (try? await env.database.examples(wordID: id)) ?? []
+                let newSeen = (try? await env.database.seen(wordID: id)) ?? WordSeen()
+                guard !Task.isCancelled else { return }   // you moved on before this one finished
+                audio?.stop()
+                showsAllExamples = false
+                (entries, kanji, examples, seen, loadedFor) = (newEntries, newKanji, newExamples, newSeen, id)
+                scroll.scrollTo("top", anchor: .top)
+            }
+            .onDisappear { audio?.stop() }
         }
-        // Opened for a moment longer than it takes to arrow past: that is a lookup.
-        .task(id: row.id) {
-            try? await Task.sleep(for: .seconds(1.5))
-            if !Task.isCancelled { try? await env.database.record(.lookup, subject: row.id) }
-        }
-        .task {
-            audio = SentenceAudioPlayer(libraryRoot: env.libraryURL)
-            entries = (try? await env.database.lookup(language: row.word.language, term: row.word.lemma, limit: 5)) ?? []
-            kanji = await env.kanjiInfo(in: row.word.lemma, language: row.word.language)
-            examples = (try? await env.database.examples(wordID: row.id)) ?? []
-            seen = (try? await env.database.seen(wordID: row.id)) ?? WordSeen()
-        }
-        .onDisappear { audio?.stop() }
     }
 
     /// Each kanji in the word with its meaning and readings. On'yomi (from Chinese) are in katakana and kun'yomi

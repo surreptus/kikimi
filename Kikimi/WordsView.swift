@@ -298,7 +298,7 @@ struct WordsView: View {
     @ViewBuilder
     private var inspector: some View {
         if selection.count == 1, let row = rows.first(where: { selection.contains($0.id) }) {
-            WordDetail(env: env, row: row).id(row.id)
+            WordDetail(env: env, row: row)
         } else if selection.count > 1 {
             VStack(alignment: .leading, spacing: 10) {
                 Text("\(selection.count) words selected").font(.title2.bold())
