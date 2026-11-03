@@ -147,6 +147,18 @@ Ordered by how much each helps comprehensible input per unit of effort.
       runtime) might correct better but is untested and changes the "only a speech model downloads" promise, so it needs the
       policy first. Revisit when the built-in model improves or when correction can be checked.
 
+- [ ] **Shadowing**: hear a line from your own video, record yourself saying it, and play both to compare. No AI, and the
+      recording stays on the Mac. Needs the microphone (a sandbox entitlement and a usage string), so the privacy policy
+      says so first. (From a look at JIVX's features, 3 Nov 2026.)
+- [ ] **Type what you hear**: a variant of the listening card. Hear the sentence (slower if you like), type it, and see
+      the differences from the transcript line. A plain comparison, no AI, no new permission; it is only as right as the
+      transcript, which Edit sentence can fix.
+- [ ] **Review ahead**: practise words that are not due yet without changing their stages ("cram").
+- [ ] Small: show a kanji's JLPT level and school grade in the word panel (KANJIDIC2 has both; the kanji file leaves
+      them out today). Not wanted from that comparison: AI grading of what you write or say (the on-device model passed 5 of
+      12 mistakes; a cloud one breaks "local and private"), gardens and other gamification, pasting video links, a
+      sentence bank. Maybe later: a hands-free listening playlist of your learning words' sentences.
+
 ### Keeping the numbers honest
 - [x] **Check what you marked known** (Review page > Check my known words): a quiz of up to 10 random known words; any you
       miss go back to learning, so coverage stops counting them. Self-marked words and imported lists can inflate it otherwise.
