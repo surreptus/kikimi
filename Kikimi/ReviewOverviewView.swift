@@ -12,7 +12,6 @@ struct ReviewOverviewView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                cardType
                 ready
                 comingUp
                 stages
@@ -24,38 +23,38 @@ struct ReviewOverviewView: View {
         }
     }
 
-    // MARK: Card type
-
-    /// Above every panel, because it decides the cards of a review and of Check my known words alike.
-    private var cardType: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Picker("Card type", selection: $style) {
-                ForEach(ReviewStyle.allCases, id: \.self) { Text($0.title).tag($0) }
-            }
-            .pickerStyle(.menu)
-            .fixedSize()
-            .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
-            Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted)
-            Text("Used for your reviews and for Check my known words.").font(Theme.small).foregroundStyle(Theme.muted)
-        }
-        .padding(.horizontal, 4)
-    }
-
     // MARK: Ready now
 
+    /// What is ready, the kind of card, and Start, together. The kind of card also decides Check my known words.
     private var ready: some View {
-        HStack(spacing: 18) {
+        VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(overview.dueNow)").font(.system(size: 44, weight: .semibold, design: .rounded))
                 Text(overview.dueNow == 0 ? nextText : inflected("^[\(overview.dueNow) review](inflect: true) ready"))
                     .font(Theme.small).foregroundStyle(Theme.muted)
             }
             .accessibilityElement(children: .combine)
-            Spacer()
-            Button("Start reviewing") { start() }
-                .buttonStyle(.pill(.primary))
-                .keyboardShortcut(.space, modifiers: [])
-                .disabled(overview.dueNow == 0)
+
+            HStack(spacing: 12) {
+                Picker("Card type", selection: $style) {
+                    ForEach(ReviewStyle.allCases, id: \.self) { kind in
+                        Label(kind.shortTitle, systemImage: kind.symbol)
+                            .labelStyle(.titleAndIcon)
+                            .accessibilityLabel(kind.title)
+                            .tag(kind)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .accessibilityLabel("Card type")
+                .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
+                Button("Start") { start() }
+                    .buttonStyle(.pill(.primary, compact: true))
+                    .keyboardShortcut(.space, modifiers: [])
+                    .disabled(overview.dueNow == 0)
+            }
+            Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted)
+            Text("Also used for Check my known words.").font(Theme.small).foregroundStyle(Theme.muted)
         }
         .panel()
     }

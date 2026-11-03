@@ -34,6 +34,25 @@ extension ReviewStyle {
         }
     }
 
+    /// A word or two for a segment of the picker; `title` is the full name, which VoiceOver uses.
+    var shortTitle: String {
+        switch self {
+        case .meaning: String(localized: "Meaning")
+        case .cloze: String(localized: "Fill in")
+        case .listening: String(localized: "Listen")
+        case .dictation: String(localized: "Type")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .meaning: "character.book.closed"
+        case .cloze: "ellipsis.rectangle"
+        case .listening: "ear"
+        case .dictation: "keyboard"
+        }
+    }
+
     /// One line on what the cards ask, shown under the choice.
     var summary: String {
         switch self {
