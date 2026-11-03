@@ -12,6 +12,7 @@ struct ReviewOverviewView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
+                cardType
                 ready
                 comingUp
                 stages
@@ -23,24 +24,26 @@ struct ReviewOverviewView: View {
         }
     }
 
-    // MARK: Ready now
+    // MARK: Card type
 
-    private var ready: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            readyRow
-            Picker("Cards", selection: $style) {
+    /// Above every panel, because it decides the cards of a review and of Check my known words alike.
+    private var cardType: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Picker("Card type", selection: $style) {
                 ForEach(ReviewStyle.allCases, id: \.self) { Text($0.title).tag($0) }
             }
             .pickerStyle(.menu)
             .fixedSize()
-            .accessibilityLabel("Card type")
             .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted)
+            Text("Used for your reviews and for Check my known words.").font(Theme.small).foregroundStyle(Theme.muted)
         }
-        .panel()
+        .padding(.horizontal, 4)
     }
 
-    private var readyRow: some View {
+    // MARK: Ready now
+
+    private var ready: some View {
         HStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(overview.dueNow)").font(.system(size: 44, weight: .semibold, design: .rounded))
@@ -54,6 +57,7 @@ struct ReviewOverviewView: View {
                 .keyboardShortcut(.space, modifiers: [])
                 .disabled(overview.dueNow == 0)
         }
+        .panel()
     }
 
     /// "Next review in 3 hours", or that nothing is scheduled.
