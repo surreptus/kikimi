@@ -157,7 +157,16 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] Small: show a kanji's JLPT level and school grade in the word panel (KANJIDIC2 has both; the kanji file leaves
       them out today). Not wanted from that comparison: AI grading of what you write or say (the on-device model passed 5 of
       12 mistakes; a cloud one breaks "local and private"), gardens and other gamification, pasting video links, a
-      sentence bank. Maybe later: a hands-free listening playlist of your learning words' sentences.
+      sentence bank. Maybe later: a hands-free listening playlist of your learning words' sentences (see below).
+
+- [ ] **Noun gender and articles** (from a look at Clozemaster, 3 Nov 2026): show a noun's gender (el/la, le/la,
+      der/die/das) in the word panel and on cards, and maybe a gender drill on the words you are learning. Gender is among
+      the hardest things to pick up in Spanish, French and German, and the dictionary shows none today because the builder
+      keeps only the part of speech and the meanings. Wiktionary normally records it, but the extracts have not been checked
+      for this; it needs a dictionary rebuild.
+- [ ] **Hands-free listening** (Clozemaster has "Radio"): the sentences of your learning words play on their own with a pause,
+      and a translation only if you ask. Not wanted from that comparison: AI explanations, graded texts, rarity-chosen
+      blanks, custom review intervals.
 
 ### Keeping the numbers honest
 - [x] **Check what you marked known** (Review page > Check my known words): a quiz of up to 10 random known words; any you
