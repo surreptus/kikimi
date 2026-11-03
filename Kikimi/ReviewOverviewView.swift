@@ -5,6 +5,7 @@ import SwiftUI
 struct ReviewOverviewView: View {
     let overview: ReviewOverview
     let stats: LearningStats?
+    @Binding var style: ReviewStyle
     let start: () -> Void
     let checkKnown: () -> Void
 
@@ -25,6 +26,21 @@ struct ReviewOverviewView: View {
     // MARK: Ready now
 
     private var ready: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            readyRow
+            Picker("Cards", selection: $style) {
+                ForEach(ReviewStyle.allCases, id: \.self) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .accessibilityLabel("Card type")
+            .help("A word with no sentence from your videos is asked as word and meaning.")
+            Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted)
+        }
+        .panel()
+    }
+
+    private var readyRow: some View {
         HStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(overview.dueNow)").font(.system(size: 44, weight: .semibold, design: .rounded))
@@ -38,7 +54,6 @@ struct ReviewOverviewView: View {
                 .keyboardShortcut(.space, modifiers: [])
                 .disabled(overview.dueNow == 0)
         }
-        .panel()
     }
 
     /// "Next review in 3 hours", or that nothing is scheduled.

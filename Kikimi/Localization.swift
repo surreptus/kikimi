@@ -24,6 +24,25 @@ extension WordStatus {
     }
 }
 
+extension ReviewStyle {
+    var title: String {
+        switch self {
+        case .meaning: String(localized: "Word and meaning")
+        case .cloze: String(localized: "Fill in the word")
+        case .listening: String(localized: "Listen to the sentence")
+        }
+    }
+
+    /// One line on what the cards ask, shown under the choice.
+    var summary: String {
+        switch self {
+        case .meaning: String(localized: "See the word and recall its meaning.")
+        case .cloze: String(localized: "Recall the missing word in a sentence from your videos.")
+        case .listening: String(localized: "Hear a sentence from your videos, then check what it said.")
+        }
+    }
+}
+
 extension PartOfSpeech {
     var title: String {
         switch self {

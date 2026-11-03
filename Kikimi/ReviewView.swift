@@ -27,7 +27,8 @@ struct ReviewView: View {
     @State private var editingExample: ExampleLine?
     @State private var editingDuration = 0.0
     /// The sentence's translation, shown on the answer when asked for (or always, in Settings).
-    @State private var translationOn = false
+    /// nil is the default for the card (shown in a listening card, or as Settings says); T sets it either way.
+    @State private var translationChoice: Bool?
     @State private var translations: LineTranslations?
     @State private var translationsVideo: Int64?
 
@@ -40,13 +41,13 @@ struct ReviewView: View {
             } else if let summary {
                 VStack(spacing: 0) {
                     finished(summary).padding(.top, 28)
-                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, stats: stats, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) }) }
+                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, stats: stats, style: styleChoice, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) }) }
                 }
             } else if let overview {
                 if overview.isEmpty {
                     EmptyState(title: "Nothing to review yet", message: "Choose words to learn on the Words page, then come back.")
                 } else {
-                    ReviewOverviewView(overview: overview, stats: stats, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) })
+                    ReviewOverviewView(overview: overview, stats: stats, style: styleChoice, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) })
                 }
             } else {
                 ProgressView()
@@ -56,6 +57,7 @@ struct ReviewView: View {
         .onChange(of: mode) { _, new in env.reviewAudio.setMode(new, for: app.profile) }
         .task(id: app.languageCode) { await loadOverview() }
         .task(id: app.dataVersion) { if card == nil { await loadOverview(keepingSummary: true) } }
+        .task(id: app.languageCode) { style = env.reviewStyle.style(for: app.profile) }
         .onDisappear { audio?.stop() }
     }
 
@@ -335,11 +337,13 @@ struct ReviewView: View {
 
     private var translationMode: TranslationDisplay { env.translation.display }
     private var canTranslate: Bool { translationMode != .off && env.translation.translates(from: app.profile.whisperCode) }
-    private var translationVisible: Bool { revealed && canTranslate && (translationOn || translationMode == .always) }
+    /// A listening card has just been heard and read, so what it meant is the natural next thing to see.
+    private var translationByDefault: Bool { translationMode == .always || (listening(for: card) && translationMode != .off) }
+    private var translationVisible: Bool { revealed && canTranslate && (translationChoice ?? translationByDefault) }
 
     private func toggleTranslation() {
         guard canTranslate, card?.example != nil, revealed else { return }
-        translationOn.toggle()
+        translationChoice = !translationVisible
     }
 
     /// Only after the answer: the translation of the sentence would give the word's meaning away.
@@ -407,8 +411,15 @@ struct ReviewView: View {
 
     private func endSession() {
         audio?.stop()
-        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationOn = false; checking = false
+        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; checking = false
         Task { await loadOverview() }
+    }
+
+    /// The card type, chosen where a session is started and remembered for the language.
+    private var styleChoice: Binding<ReviewStyle> {
+        Binding(
+            get: { style },
+            set: { style = $0; env.reviewStyle.setStyle($0, for: app.profile) })
     }
 
     private func startSession(checkingKnown: Bool = false) { Task { await begin(checkingKnown: checkingKnown) } }
@@ -442,7 +453,7 @@ struct ReviewView: View {
     }
 
     private func advance(_ session: ReviewSession) async {
-        revealed = false; showsWord = false; wordNow = nil; translationOn = false
+        revealed = false; showsWord = false; wordNow = nil; translationChoice = nil
         do {
             let next = try await session.currentCard()
             // Update the counts before the card, so the bar never shows a card with a stale count.
