@@ -6,6 +6,7 @@ struct ReviewOverviewView: View {
     let overview: ReviewOverview
     let stats: LearningStats?
     @Binding var style: ReviewStyle
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let start: () -> Void
     let checkKnown: () -> Void
 
@@ -36,27 +37,21 @@ struct ReviewOverviewView: View {
             .accessibilityElement(children: .combine)
 
             HStack(spacing: 12) {
-                Picker("Card type", selection: $style) {
-                    ForEach(ReviewStyle.allCases, id: \.self) { kind in
-                        Label(kind.shortTitle, systemImage: kind.symbol)
-                            .labelStyle(.titleAndIcon)
-                            .accessibilityLabel(kind.title)
-                            .tag(kind)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .accessibilityLabel("Card type")
-                .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
+                IconSegmentedPicker(
+                    options: ReviewStyle.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
+                    selection: $style)
+                    .accessibilityLabel("Card type")
+                    .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
                 Button("Start") { start() }
                     .buttonStyle(.pill(.primary, compact: true))
                     .keyboardShortcut(.space, modifiers: [])
                     .disabled(overview.dueNow == 0)
             }
-            Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted)
+            Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
             Text("Also used for Check my known words.").font(Theme.small).foregroundStyle(Theme.muted)
         }
         .panel()
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.18), value: style)
     }
 
     /// "Next review in 3 hours", or that nothing is scheduled.

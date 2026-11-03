@@ -75,6 +75,7 @@ the Words screen's search, filter and selection, so they survive switching scree
 | `VideosView`, `ImportSection` | Add videos (drop zone, model choice and download, import progress), then your videos: details, delete |
 | `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
 | `StorageView` | Downloaded models and videos, with removal |
+| `IconSegmentedPicker.swift` | A row of choices with an icon and a short name each (the system segmented control on macOS shows only names). VoiceOver sees selectable buttons with their full names. Used for the card type on the Review page. |
 | `Toast.swift`, `AppState.showToast` | The short message over the window for something that just happened (started learning, exported, failed). It goes after four seconds (eight for an error), pointing at it holds it, and VoiceOver is told. Use it instead of a status line in a page. |
 | `OnboardingView` | First launch only (a library with videos skips it): the languages you are learning, the language you read, and a speech model download for each. Settings > Languages changes the first two later. |
 | `SettingsView`, `BackupModel` | The ⌘, window: a standard Mac settings window with icon tabs General, Languages, Data (save and restore progress, via LangCore's `ProgressBackup`), About |
