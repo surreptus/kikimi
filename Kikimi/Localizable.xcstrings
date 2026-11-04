@@ -1952,6 +1952,9 @@
         }
       }
     },
+    "A video with an .srt or .vtt file of the same name can be imported without it." : {
+
+    },
     "A word counts as known if you marked it known, it is finished, or you are learning it and its reviews are a week or more apart (Stage 5 and above)." : {
       "localizations" : {
         "de" : {
@@ -2125,6 +2128,9 @@
           }
         }
       }
+    },
+    "Add an .srt or .vtt file with the same name to use its subtitles instead of transcribing." : {
+
     },
     "Add videos…" : {
       "localizations" : {
@@ -4077,7 +4083,11 @@
         }
       }
     },
+    "Download the speech model to import videos that have no subtitles." : {
+
+    },
     "Download the speech model to start importing" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4104,6 +4114,9 @@
           }
         }
       }
+    },
+    "Download the speech model to transcribe videos" : {
+
     },
     "Drop %@ videos here" : {
       "localizations" : {
@@ -4160,6 +4173,9 @@
           }
         }
       }
+    },
+    "Drop videos with subtitle files here, or" : {
+
     },
     "Drop videos you own. They never leave this Mac." : {
       "localizations" : {
@@ -5732,6 +5748,9 @@
         }
       }
     },
+    "Imported · %@ · from subtitles" : {
+
+    },
     "Importing as %@. Change the language in the sidebar." : {
       "localizations" : {
         "de" : {
@@ -5983,6 +6002,9 @@
           }
         }
       }
+    },
+    "JLPT %@" : {
+
     },
     "Jump to this line" : {
       "localizations" : {
@@ -7759,6 +7781,9 @@
         }
       }
     },
+    "No video to go with %@." : {
+
+    },
     "No words found" : {
       "localizations" : {
         "de" : {
@@ -8211,7 +8236,11 @@
         }
       }
     },
+    "On Videos, drop a video file you own. If it comes with an .srt or .vtt subtitle file of the same name, drop that too: its subtitles are used and nothing is transcribed. Otherwise, the first time, pick a speech model and let it download once; the sizes are shown next to each choice." : {
+
+    },
     "On Videos, drop a video file you own. The first time, pick a speech model and let it download once; the sizes are shown next to each choice." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10239,6 +10268,9 @@
         }
       }
     },
+    "School year %lld" : {
+
+    },
     "Search words" : {
       "localizations" : {
         "de" : {
@@ -10266,6 +10298,9 @@
           }
         }
       }
+    },
+    "Secondary school" : {
+
     },
     "See the word and recall its meaning." : {
 
@@ -12012,6 +12047,9 @@
         }
       }
     },
+    "The JLPT level is KANJIDIC2's, from the exam's older four levels, shown as the matching N levels (N3 and N2 share one). The school year is when Japanese schools teach it." : {
+
+    },
     "The long step: about a quarter of the video's length with the medium model in our tests, longer with larger models." : {
       "localizations" : {
         "de" : {
@@ -12654,6 +12692,9 @@
           }
         }
       }
+    },
+    "Used in names" : {
+
     },
     "Verb" : {
       "localizations" : {

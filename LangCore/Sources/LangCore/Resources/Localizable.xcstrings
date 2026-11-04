@@ -3,6 +3,12 @@
   "strings" : {
     "A stretch" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fordernd"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15,12 +21,6 @@
             "value" : "Un défi"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fordernd"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -31,6 +31,12 @@
     },
     "about %lld h %lld min left" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "noch etwa %lld Std. %lld Min."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -49,12 +55,6 @@
             "value" : "il reste environ %lld h %lld min"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "noch etwa %lld Std. %lld Min."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -65,6 +65,12 @@
     },
     "about %lld h left" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "noch etwa %lld Std."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -77,12 +83,6 @@
             "value" : "il reste environ %lld h"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "noch etwa %lld Std."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -93,6 +93,12 @@
     },
     "about %lld min left" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "noch etwa %lld Min."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -105,12 +111,6 @@
             "value" : "il reste environ %lld min"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "noch etwa %lld Min."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -121,6 +121,12 @@
     },
     "about 1 min left" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "noch etwa 1 Min."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -133,12 +139,6 @@
             "value" : "il reste environ 1 min"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "noch etwa 1 Min."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -149,6 +149,12 @@
     },
     "Already imported." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereits importiert."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -161,12 +167,6 @@
             "value" : "Déjà importé."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bereits importiert."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -177,6 +177,12 @@
     },
     "Comfortable" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angenehm"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -189,12 +195,6 @@
             "value" : "Confortable"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Angenehm"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -205,6 +205,12 @@
     },
     "Couldn't copy the file: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Datei konnte nicht kopiert werden: %@"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -217,12 +223,6 @@
             "value" : "Impossible de copier le fichier : %@"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Datei konnte nicht kopiert werden: %@"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -233,6 +233,12 @@
     },
     "Couldn't re-encode the video: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Video konnte nicht neu codiert werden: %@"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -245,12 +251,6 @@
             "value" : "Impossible de ré-encoder la vidéo : %@"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Video konnte nicht neu codiert werden: %@"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -259,8 +259,17 @@
         }
       }
     },
+    "Couldn't read the subtitles file." : {
+
+    },
     "Couldn't read the video: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Video konnte nicht gelesen werden: %@"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -273,12 +282,6 @@
             "value" : "Impossible de lire la vidéo : %@"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Video konnte nicht gelesen werden: %@"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -289,6 +292,12 @@
     },
     "Couldn't save to the database: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Speichern in der Datenbank ist fehlgeschlagen: %@"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -301,12 +310,6 @@
             "value" : "Impossible d’enregistrer dans la base de données : %@"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Speichern in der Datenbank ist fehlgeschlagen: %@"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -317,6 +320,12 @@
     },
     "Couldn't save to the library: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Speichern in der Bibliothek ist fehlgeschlagen: %@"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -329,12 +338,6 @@
             "value" : "Impossible d’enregistrer dans la bibliothèque : %@"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Speichern in der Bibliothek ist fehlgeschlagen: %@"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -345,6 +348,12 @@
     },
     "Couldn't write the video: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Video konnte nicht geschrieben werden: %@"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -357,12 +366,6 @@
             "value" : "Impossible d’écrire la vidéo : %@"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Video konnte nicht geschrieben werden: %@"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -373,6 +376,12 @@
     },
     "Easy" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leicht"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -385,12 +394,6 @@
             "value" : "Facile"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Leicht"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -401,6 +404,12 @@
     },
     "Hard" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schwer"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -413,12 +422,6 @@
             "value" : "Difficile"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schwer"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -429,6 +432,12 @@
     },
     "less than a minute left" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "weniger als eine Minute übrig"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -441,12 +450,6 @@
             "value" : "il reste moins d’une minute"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "weniger als eine Minute übrig"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -457,6 +460,12 @@
     },
     "Off" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -469,12 +478,6 @@
             "value" : "Désactivé"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aus"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -485,6 +488,12 @@
     },
     "Refusing to delete %@: it isn't inside the library." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wird nicht gelöscht: Es befindet sich nicht in der Bibliothek."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -497,12 +506,6 @@
             "value" : "Suppression de %@ refusée : il n’est pas dans la bibliothèque."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ wird nicht gelöscht: Es befindet sich nicht in der Bibliothek."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -513,6 +516,12 @@
     },
     "The %@ download didn't finish (missing %@). Check your connection and download again." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Download von %@ wurde nicht abgeschlossen (es fehlt %@). Prüfe deine Verbindung und lade erneut."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -531,12 +540,6 @@
             "value" : "Le téléchargement de %@ n’a pas abouti (%@ manquant). Vérifiez votre connexion et téléchargez à nouveau."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Download von %@ wurde nicht abgeschlossen (es fehlt %@). Prüfe deine Verbindung und lade erneut."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -547,6 +550,12 @@
     },
     "The %@ model is downloading right now. Wait for it to finish." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell „%@“ wird gerade geladen. Warte, bis es fertig ist."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -559,12 +568,6 @@
             "value" : "Le modèle %@ est en cours de téléchargement. Attendez qu’il se termine."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Modell „%@“ wird gerade geladen. Warte, bis es fertig ist."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -575,6 +578,12 @@
     },
     "the adjective stem" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "der Adjektivstamm"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -587,12 +596,6 @@
             "value" : "le radical de l’adjectif"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "der Adjektivstamm"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -603,6 +606,12 @@
     },
     "the command form" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "die Befehlsform"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -615,12 +624,6 @@
             "value" : "la forme impérative"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "die Befehlsform"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -631,6 +634,12 @@
     },
     "The re-encoded video failed verification (%@). Your original is untouched." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das neu codierte Video hat die Prüfung nicht bestanden (%@). Dein Original bleibt unberührt."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -643,12 +652,6 @@
             "value" : "La vidéo ré-encodée a échoué à la vérification (%@). Votre original n’est pas touché."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das neu codierte Video hat die Prüfung nicht bestanden (%@). Dein Original bleibt unberührt."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -659,6 +662,12 @@
     },
     "The speech model %@ isn't downloaded yet." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Sprachmodell „%@“ ist noch nicht geladen."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -671,12 +680,6 @@
             "value" : "Le modèle vocal %@ n’est pas encore téléchargé."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Sprachmodell „%@“ ist noch nicht geladen."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -687,6 +690,12 @@
     },
     "The speech model isn't downloaded yet." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Sprachmodell ist noch nicht geladen."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -699,12 +708,6 @@
             "value" : "Le modèle vocal n’est pas encore téléchargé."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Sprachmodell ist noch nicht geladen."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -715,6 +718,12 @@
     },
     "The video was removed from the app but its files couldn't be deleted: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Video wurde aus der App entfernt, aber seine Dateien konnten nicht gelöscht werden: %@"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -727,12 +736,6 @@
             "value" : "La vidéo a été retirée de l’app, mais ses fichiers n’ont pas pu être supprimés : %@"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Video wurde aus der App entfernt, aber seine Dateien konnten nicht gelöscht werden: %@"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -743,6 +746,12 @@
     },
     "the う-stem" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "der う-Stamm"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -755,12 +764,6 @@
             "value" : "le radical en う"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "der う-Stamm"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -771,6 +774,12 @@
     },
     "the た-form" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "die た-Form"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -783,12 +792,6 @@
             "value" : "la forme en た"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "die た-Form"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -799,6 +802,12 @@
     },
     "the て-form" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "die て-Form"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -811,12 +820,6 @@
             "value" : "la forme en て"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "die て-Form"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -827,6 +830,12 @@
     },
     "the ない-stem" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "der ない-Stamm"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -839,12 +848,6 @@
             "value" : "le radical en ない"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "der ない-Stamm"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -855,6 +858,12 @@
     },
     "the ば-stem" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "der ば-Stamm"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -867,12 +876,6 @@
             "value" : "le radical en ば"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "der ば-Stamm"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -883,6 +886,12 @@
     },
     "the ます-stem" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "der ます-Stamm"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -895,12 +904,6 @@
             "value" : "le radical en ます"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "der ます-Stamm"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -909,8 +912,23 @@
         }
       }
     },
+    "There are no subtitles in that file. Kikimi reads .srt and .vtt files." : {
+
+    },
+    "These subtitles are in %@, not the language you chose." : {
+
+    },
+    "These subtitles don't match this video: they all start after it ends." : {
+
+    },
     "This backup file is damaged, so nothing was changed." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Sicherungsdatei ist beschädigt, daher wurde nichts geändert."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -923,12 +941,6 @@
             "value" : "Ce fichier de sauvegarde est endommagé : rien n’a été modifié."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Sicherungsdatei ist beschädigt, daher wurde nichts geändert."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -939,6 +951,12 @@
     },
     "This backup was made by a newer version of Kikimi. Update the app, then try again." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Sicherung wurde von einer neueren Version von Kikimi erstellt. Aktualisiere die App und versuche es erneut."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -951,12 +969,6 @@
             "value" : "Cette sauvegarde a été créée par une version plus récente de Kikimi. Mettez l’app à jour, puis réessayez."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Sicherung wurde von einer neueren Version von Kikimi erstellt. Aktualisiere die App und versuche es erneut."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -967,6 +979,12 @@
     },
     "This file has no audio track." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei hat keine Audiospur."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -979,12 +997,6 @@
             "value" : "Ce fichier n’a pas de piste audio."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Datei hat keine Audiospur."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -995,6 +1007,12 @@
     },
     "This file has no video track." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei hat keine Videospur."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1007,12 +1025,6 @@
             "value" : "Ce fichier n’a pas de piste vidéo."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Datei hat keine Videospur."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1023,6 +1035,12 @@
     },
     "This file isn't a Kikimi backup." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei ist keine Kikimi-Sicherung."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1035,12 +1053,6 @@
             "value" : "Ce fichier n’est pas une sauvegarde Kikimi."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Datei ist keine Kikimi-Sicherung."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1051,6 +1063,12 @@
     },
     "This Mac can't export with %@." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac kann nicht mit %@ exportieren."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1063,12 +1081,6 @@
             "value" : "Ce Mac ne peut pas exporter avec %@."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Mac kann nicht mit %@ exportieren."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1079,6 +1091,12 @@
     },
     "This sounds like %@, not %@." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das klingt nach %@, nicht nach %@."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -1097,12 +1115,6 @@
             "value" : "Cela ressemble à du %@, pas à du %@."
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das klingt nach %@, nicht nach %@."
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1113,6 +1125,12 @@
     },
     "Transcription failed: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transkription fehlgeschlagen: %@"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1125,12 +1143,6 @@
             "value" : "Échec de la transcription : %@"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transkription fehlgeschlagen: %@"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1141,6 +1153,12 @@
     },
     "unknown error" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unbekannter Fehler"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1153,12 +1171,6 @@
             "value" : "erreur inconnue"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "unbekannter Fehler"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1169,6 +1181,12 @@
     },
     "When the answer is shown" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn die Antwort angezeigt wird"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1181,12 +1199,6 @@
             "value" : "Quand la réponse est affichée"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn die Antwort angezeigt wird"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1197,6 +1209,12 @@
     },
     "When the card appears" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn die Karte erscheint"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1207,12 +1225,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quand la carte apparaît"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn die Karte erscheint"
           }
         },
         "ja" : {
