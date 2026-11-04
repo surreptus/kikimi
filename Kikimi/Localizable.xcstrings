@@ -2039,6 +2039,9 @@
         }
       }
     },
+    "About Kikimi" : {
+
+    },
     "Acknowledgements" : {
       "localizations" : {
         "de" : {
@@ -4012,6 +4015,9 @@
         }
       }
     },
+    "Dictionary data from JMdict, KANJIDIC2 and Wiktionary (CC BY-SA 4.0), and speech recognition by OpenAI Whisper. All credits are under Help > Acknowledgements." : {
+
+    },
     "Dismiss" : {
 
     },
@@ -5031,6 +5037,9 @@
           }
         }
       }
+    },
+    "Free and open source under the [MIT licence](https://github.com/surreptus/kikimi/blob/main/LICENSE). [Website](https://surreptus.github.io/kikimi/), [source code](https://github.com/surreptus/kikimi) and [problem reports](https://github.com/surreptus/kikimi/issues)." : {
+
     },
     "From your videos" : {
       "localizations" : {
@@ -6481,6 +6490,9 @@
           }
         }
       }
+    },
+    "Learn a language from videos you own. Everything stays on your Mac." : {
+
     },
     "Learn the %lld most common words you don't know yet and this video goes from %@ to about %@." : {
       "localizations" : {
