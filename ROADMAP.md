@@ -125,6 +125,17 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Audio-only import** (podcasts) for material with no picture.
 
 ### Practising
+- [ ] **A Learn page with three paths** (suggested 4 Nov 2026, in the style of WaniKani's dashboard): the Review page becomes
+      **Learn**, a page of cards, one for each thing you can do now:
+      - **Lessons**, with the count of the day's new words (see Daily lessons below). Start opens the lesson.
+      - **Reviews**, with the count due now. This is today's panel, with the card type and Start.
+      - **Practice**, extra study that does not move any stage: *Review ahead* (words not yet due), *Review known* (the quiz of
+        words you marked known, which exists today) and *Practice finished* (words that have been through every stage and
+        retired, WaniKani's "burned"), each a row with its count and a button, as WaniKani's Extra Study has.
+      "Known" and "finished" differ: known is what you marked yourself, finished is what you earned by passing every review.
+      The card type applies to all three paths. To settle: whether a miss in *Practice finished* sends a word back to
+      learning (it would make it a real check, as *Review known* is) or changes nothing (extra study), and what the sidebar
+      count shows (reviews due, or lessons and reviews). It absorbs the *Review ahead* and *Resurface finished words* items.
 - [ ] **Daily lessons** (like WaniKani's): each day Kikimi queues up the most important words you haven't started, 15 for each
       language by default, and you learn them from a short lesson instead of picking every word yourself. The number is a
       setting (Settings > Languages > New words per day, one for each language you learn; 0 turns it off). Today nothing is
@@ -140,7 +151,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
       - **The lesson.** One word at a time: the word in a sentence from one of your videos with its audio, then its meaning,
         readings, article (nouns), kanji (Japanese) and the translation only when asked; pressing "Learn" puts it at stage 1.
         Not a silent bulk add.
-      - **Where it shows.** A Lessons panel beside Reviews on the Review page, with its count, for the language you are in.
+      - **Where it shows.** The Lessons card on the Learn page (above), with its count, for the language you are in.
       - **Counting the day.** The activity log already records each word started (`learn`), by day, so no new table is needed.
         It counts every start, including words you pick on Words or take from a video's goal; I'd let those use up the day's
         allowance too, since it is the cap on new words per day however they begin.
@@ -185,7 +196,8 @@ Ordered by how much each helps comprehensible input per unit of effort.
       qualify). A word with no short line is asked as word and meaning, and a session prefers a short line when a word has
       one. Not done: slowing the audio on this card, and judging kana against kanji (a correct reading in kana counts as
       different from the kanji line).
-- [ ] **Review ahead**: practise words that are not due yet without changing their stages ("cram").
+- [ ] **Review ahead**: practise words that are not due yet without changing their stages ("cram"). A row in the Learn page's
+      Practice area (see above).
 - [x] **Kanji level and school year** (4 Nov 2026): the word panel's Kanji section shows each kanji's JLPT level and the school
       year that teaches it. KANJIDIC2's level is the exam's older four levels; they are shown as N5, N4, N3–N2 and N1 (the
       counts match: 103, 181, 739 and 1,207 kanji), with a tooltip saying so. A kanji no exam asked for shows only its year.
@@ -213,7 +225,8 @@ Ordered by how much each helps comprehensible input per unit of effort.
       were 58% (es) and 40% (ja) of all words, so knowing 90% of them is about 94% (es) and 96% (ja) of everything,
       assuming the small words are known. The text now says that. A small sample; recount with more videos.
 - [ ] **Resurface finished words** now and then (a sparse, rare review, or a nudge when one appears in a video), since
-      stopping at the last interval can let words fade.
+      stopping at the last interval can let words fade. Practice finished on the Learn page (see Practising) is the way to
+      choose to do this; a sparse automatic nudge would be on top of it.
 - [ ] **Smarter review timing** (FSRS-style scheduling): low priority; the evidence is benchmark data, not trials.
 
 ### More languages
