@@ -9,13 +9,16 @@ public enum ImportStage: String, Sendable, CaseIterable {
 
     /// The steps an import goes through, in order. The language check is left out when it was skipped (an import
     /// the user chose to go ahead with anyway), and compressing when the video is kept as it is, so "3 of 7" is true.
-    public static func steps(checkingLanguage: Bool, compressing: Bool = true) -> [ImportStage] {
-        allCases.filter { (checkingLanguage || $0 != .detectingLanguage) && (compressing || $0 != .transcoding) }
+    public static func steps(checkingLanguage: Bool, compressing: Bool = true, transcribing: Bool = true) -> [ImportStage] {
+        allCases.filter {
+            (checkingLanguage || $0 != .detectingLanguage) && (compressing || $0 != .transcoding)
+                && (transcribing || $0 != .transcribing)
+        }
     }
 
     /// "3 of 7": this step's place in the import.
-    public func position(checkingLanguage: Bool, compressing: Bool = true) -> (number: Int, of: Int) {
-        let steps = Self.steps(checkingLanguage: checkingLanguage, compressing: compressing)
+    public func position(checkingLanguage: Bool, compressing: Bool = true, transcribing: Bool = true) -> (number: Int, of: Int) {
+        let steps = Self.steps(checkingLanguage: checkingLanguage, compressing: compressing, transcribing: transcribing)
         return ((steps.firstIndex(of: self) ?? 0) + 1, steps.count)
     }
 }
@@ -61,6 +64,20 @@ public enum ImportError: Error {
     case verificationFailed(String)
     case libraryMoveFailed(Error)
     case databaseFailed(Error)
+    /// The subtitle file given with the video can't be used.
+    case subtitlesUnusable(SubtitleProblem)
+}
+
+/// Why a subtitle file was not used. The video and the file you dropped are untouched.
+public enum SubtitleProblem: Sendable, Equatable {
+    case unreadable
+    /// Readable, but with no subtitles in it.
+    case noSubtitles
+    /// Every subtitle starts after the video ends, so they are for something else.
+    case outsideVideo
+    /// The text is in another language than the one chosen (and not one Kikimi supports, or the import would have
+    /// offered to switch). `name` is that language's name.
+    case otherLanguage(name: String)
 }
 
 /// The language Whisper thinks is being spoken, as a WhisperKit language code with a 0...1 confidence.

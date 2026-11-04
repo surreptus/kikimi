@@ -13,6 +13,16 @@ extension ImportError: LocalizedError {
         case .verificationFailed(let why): String(localized: "The re-encoded video failed verification (\(why)). Your original is untouched.", bundle: .module)
         case .libraryMoveFailed(let e): String(localized: "Couldn't save to the library: \(e.localizedDescription)", bundle: .module)
         case .databaseFailed(let e): String(localized: "Couldn't save to the database: \(e.localizedDescription)", bundle: .module)
+        case .subtitlesUnusable(let problem): Self.describe(subtitles: problem)
+        }
+    }
+
+    private static func describe(subtitles problem: SubtitleProblem) -> String {
+        switch problem {
+        case .unreadable: String(localized: "Couldn't read the subtitles file.", bundle: .module)
+        case .noSubtitles: String(localized: "There are no subtitles in that file. Kikimi reads .srt and .vtt files.", bundle: .module)
+        case .outsideVideo: String(localized: "These subtitles don't match this video: they all start after it ends.", bundle: .module)
+        case .otherLanguage(let name): String(localized: "These subtitles are in \(name), not the language you chose.", bundle: .module)
         }
     }
 
@@ -44,12 +54,16 @@ public final class ImportQueue {
     public struct Job: Identifiable, Sendable {
         public let id = UUID()
         public let url: URL
+        /// A subtitle file to use instead of transcribing, when one was dropped with the video.
+        public let subtitles: URL?
         public fileprivate(set) var status: Status = .queued
         public fileprivate(set) var profile: any LanguageProfile
         fileprivate(set) var model: String
         public let quality: VideoQuality
         fileprivate var skipsLanguageCheck = false
         public var fileName: String { url.lastPathComponent }
+        /// True when subtitles are read from a file, so there is no transcribing step and no model is needed.
+        public var usesSubtitles: Bool { subtitles != nil }
         /// False for an import the user chose to go ahead with after a language warning.
         public var checksLanguage: Bool { !skipsLanguageCheck }
         /// False when the video is kept as it is, so there is no compressing step to count.
@@ -70,7 +84,12 @@ public final class ImportQueue {
     public init(pipeline: ImportPipeline) { self.pipeline = pipeline }
 
     public func enqueue(_ urls: [URL], profile: any LanguageProfile, model: String, quality: VideoQuality = .smallest) {
-        jobs += urls.map { Job(url: $0, profile: profile, model: model, quality: quality) }
+        enqueue(urls.map { SubtitlePairing.Item(video: $0, subtitles: nil) }, profile: profile, model: model, quality: quality)
+    }
+
+    /// Videos, each with the subtitle file that goes with it if there is one.
+    public func enqueue(_ items: [SubtitlePairing.Item], profile: any LanguageProfile, model: String, quality: VideoQuality = .smallest) {
+        jobs += items.map { Job(url: $0.video, subtitles: $0.subtitles, profile: profile, model: model, quality: quality) }
         kick()
     }
 
@@ -131,7 +150,7 @@ public final class ImportQueue {
             }
             let work = Task { [pipeline] in
                 try await pipeline.importVideo(
-                    from: job.url, profile: job.profile, model: job.model,
+                    from: job.url, subtitles: job.subtitles, profile: job.profile, model: job.model,
                     checkLanguage: !job.skipsLanguageCheck, quality: job.quality, progress: update)
             }
             currentImport = work

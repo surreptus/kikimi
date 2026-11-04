@@ -39,7 +39,7 @@ public actor ImportPipeline {
     /// Runs the steps in order; each is a method below. A cancel is honoured between steps, up to the point where
     /// the video is moved into the library, after which the move and the database write finish as one unit.
     public func importVideo(
-        from original: URL, profile: any LanguageProfile, model: String? = nil, checkLanguage: Bool = true,
+        from original: URL, subtitles: URL? = nil, profile: any LanguageProfile, model: String? = nil, checkLanguage: Bool = true,
         quality: VideoQuality = .smallest, progress: @escaping ProgressHandler = { _ in }
     ) async throws -> Video {
         let scoped = original.startAccessingSecurityScopedResource()
@@ -54,6 +54,8 @@ public actor ImportPipeline {
         }
         guard inFlight.insert(hash).inserted else { throw ImportError.duplicate(existingVideoID: nil) }
         defer { inFlight.remove(hash) }
+        // Subtitles that can't be read are found out before anything is copied.
+        let cues = try subtitles.map { try Self.readSubtitles($0, profile: profile) }
 
         let work = stagingRoot.appending(path: UUID().uuidString, directoryHint: .isDirectory)
         var libraryDir: URL?
@@ -61,10 +63,17 @@ public actor ImportPipeline {
             let staged = try stage(original, in: work, progress: progress)
             try Task.checkCancellation()
 
-            if checkLanguage { try await confirmLanguage(of: staged, profile: profile, model: model, progress: progress) }
-            try Task.checkCancellation()
-
-            let segments = try await transcribe(staged, profile: profile, model: model, progress: progress)
+            let segments: [TranscriptSegment]
+            if let cues {
+                // The subtitles stand in for transcribing: they are fitted to the video and checked for language, and
+                // the speech model is not needed.
+                segments = try await fit(cues, to: staged)
+                if checkLanguage { try confirmSubtitleLanguage(segments, profile: profile) }
+            } else {
+                if checkLanguage { try await confirmLanguage(of: staged, profile: profile, model: model, progress: progress) }
+                try Task.checkCancellation()
+                segments = try await transcribe(staged, profile: profile, model: model, progress: progress)
+            }
             try Task.checkCancellation()
 
             let files = try await makeLibraryFiles(from: staged, in: work, quality: quality, progress: progress)
@@ -107,6 +116,41 @@ public actor ImportPipeline {
             guard sizes[0] == sizes[1] else { throw CocoaError(.fileReadCorruptFile) }
         } catch { throw Self.wrapped(error, ImportError.copyFailed) }
         return staged
+    }
+
+    /// Reads and parses the subtitle file. The file is only read.
+    private static func readSubtitles(_ file: URL, profile: any LanguageProfile) throws -> [TranscriptSegment] {
+        let scoped = file.startAccessingSecurityScopedResource()
+        defer { if scoped { file.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: file), let cues = SubtitleParser.parse(data, lineJoiner: profile.dictationSeparator)
+        else { throw ImportError.subtitlesUnusable(.unreadable) }
+        guard !cues.isEmpty else { throw ImportError.subtitlesUnusable(.noSubtitles) }
+        return cues
+    }
+
+    /// Drops sound descriptions and music marks, and what falls outside the video. Fails if nothing is left.
+    private func fit(_ cues: [TranscriptSegment], to staged: URL) async throws -> [TranscriptSegment] {
+        let duration: Double
+        do { duration = try await MediaVerifier.duration(of: staged) }
+        catch { throw ImportError.verificationFailed("source unreadable: \(error)") }
+        let fitted = TranscriptCleaner.clean(cues, audioDuration: duration)
+        if fitted.isEmpty {
+            // Everything was a sound description, or everything came after the end.
+            let late = TranscriptCleaner.clean(cues, audioDuration: nil).isEmpty
+            throw ImportError.subtitlesUnusable(late ? .noSubtitles : .outsideVideo)
+        }
+        return fitted
+    }
+
+    /// The same check as for audio, made on the text: subtitles in another language would give nonsense words.
+    private func confirmSubtitleLanguage(_ segments: [TranscriptSegment], profile: any LanguageProfile) throws {
+        guard let guess = SubtitleLanguage.guess(segments.map(\.text).joined(separator: " ")),
+              guess.confidence >= Self.languageConfidence, guess.code != profile.whisperCode else { return }
+        if let other = LanguageProfiles.all.first(where: { $0.whisperCode == guess.code }) {
+            throw ImportError.languageMismatch(detected: other.code, chosen: profile.code, confidence: guess.confidence)
+        }
+        let name = Locale.current.localizedString(forLanguageCode: guess.code) ?? guess.code
+        throw ImportError.subtitlesUnusable(.otherLanguage(name: name))
     }
 
     /// Importing a Japanese video as Spanish would produce nonsense words, so check the spoken language first.
