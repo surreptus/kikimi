@@ -1,3 +1,5 @@
+<img src="Kikimi/Assets.xcassets/AppIcon.appiconset/icon_256.png" alt="The Kikimi icon: a white asanoha star on dark green" width="96" height="96">
+
 # Kikimi
 
 A native macOS app for learning a language from videos you already own.
