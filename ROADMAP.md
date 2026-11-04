@@ -125,6 +125,26 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Audio-only import** (podcasts) for material with no picture.
 
 ### Practising
+- [ ] **Daily lessons** (like WaniKani's): each day Kikimi queues up the most important words you haven't started, 15 for each
+      language by default, and you learn them from a short lesson instead of picking every word yourself. The number is a
+      setting (Settings > Languages > New words per day, one for each language you learn; 0 turns it off). Today nothing is
+      learned until you select words, so someone with videos but no habit meets an empty Review page; a steady supply of the
+      words that matter most keeps the loop going. Points to settle before building:
+      - **Which words.** From your own videos, never a generic list. New content words (nouns, verbs, adjectives, adverbs),
+        ranked by how much of your material they cover, either by the lines they appear in (as "Start with the 25 words you
+        hear most" does) or, better, by how much each raises the coverage of the videos you are working through (as the
+        per-video goal does). Skip known, learning and finished words, and any word with no example line from a video. With
+        no videos yet there is nothing to queue (see the frequency-list item).
+      - **No pile-up.** The day's lessons don't accumulate: unused ones lapse at midnight (our choice, to settle), and no new ones
+        are offered while the reviews due are over a limit, as WaniKani does for overload. The limit (say 100) needs measuring.
+      - **The lesson.** One word at a time: the word in a sentence from one of your videos with its audio, then its meaning,
+        readings, article (nouns), kanji (Japanese) and the translation only when asked; pressing "Learn" puts it at stage 1.
+        Not a silent bulk add.
+      - **Where it shows.** A Lessons panel beside Reviews on the Review page, with its count, for the language you are in.
+      - **Counting the day.** The activity log already records each word started (`learn`), by day, so no new table is needed.
+        It counts every start, including words you pick on Words or take from a video's goal; I'd let those use up the day's
+        allowance too, since it is the cap on new words per day however they begin.
+      - It sits beside picking words yourself and the per-video goal, not in place of them. Nothing leaves the Mac.
 - [x] **Cloze cards** (Review page > Fill in the word): the example sentence with the word blanked and a short
       hint of its meaning (and, for Japanese, its reading); you recall the word, then see it filled in with the
       sentence audio. Production in context, which avoids the ambiguity of meaning-to-word cards. **Listening
