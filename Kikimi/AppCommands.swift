@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// The menu bar: adding videos, going to a page, finding words, and the help pages. Everything else is the standard
@@ -6,6 +7,11 @@ struct AppCommands: Commands {
     let app: AppState
 
     var body: some Commands {
+        // The standard About window, with a few lines under the version: what the app is, where to find it, and the credits.
+        CommandGroup(replacing: .appInfo) {
+            Button("About Kikimi") { Self.showAboutPanel() }
+        }
+
         // One window, so there is no "New Window". Adding a video is what "New" means here.
         CommandGroup(replacing: .newItem) {
             Button("Add Videos…") { app.requestAddVideos() }
@@ -44,5 +50,29 @@ struct AppCommands: Commands {
             Button("Acknowledgements") { app.showAcknowledgements = true }
                 .disabled(!app.isReady)
         }
+    }
+
+    /// What the About window says under the name and version. Each paragraph is one whole sentence for a translator,
+    /// with its links written in it.
+    private static func showAboutPanel() {
+        let paragraphs = [
+            String(localized: "Learn a language from videos you own. Everything stays on your Mac."),
+            String(localized: "Free and open source under the [MIT licence](https://github.com/surreptus/kikimi/blob/main/LICENSE). [Website](https://surreptus.github.io/kikimi/), [source code](https://github.com/surreptus/kikimi) and [problem reports](https://github.com/surreptus/kikimi/issues)."),
+            String(localized: "Dictionary data from JMdict, KANJIDIC2 and Wiktionary (CC BY-SA 4.0), and speech recognition by OpenAI Whisper. All credits are under Help > Acknowledgements."),
+        ]
+        let credits = NSMutableAttributedString()
+        for (index, text) in paragraphs.enumerated() {
+            let styled = (try? AttributedString(markdown: text)) ?? AttributedString(text)
+            let line = NSMutableAttributedString(styled)
+            line.addAttributes(
+                [.font: NSFont.systemFont(ofSize: 11), .foregroundColor: NSColor.labelColor],
+                range: NSRange(location: 0, length: line.length))
+            if index > 0 { credits.append(NSAttributedString(string: "\n\n")) }
+            credits.append(line)
+        }
+        let centred = NSMutableParagraphStyle()
+        centred.alignment = .center
+        credits.addAttribute(.paragraphStyle, value: centred, range: NSRange(location: 0, length: credits.length))
+        NSApplication.shared.orderFrontStandardAboutPanel(options: [.credits: credits])
     }
 }
