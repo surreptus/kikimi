@@ -42,9 +42,9 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 
 ## Mac App Store extras
 - [ ] App record in App Store Connect with the same bundle ID.
-- [ ] Privacy policy URL: publish `Kikimi/Privacy.md` (the app shows the same file) and add a contact line to it first.
-- [ ] Terms of use: fill in the `[Contact email]` placeholder in `Kikimi/Terms.md` (governing law is California), and
-      have a lawyer read it, before publishing or shipping.
+- [ ] Privacy policy URL: publish `Kikimi/Privacy.md` (the app shows the same file); its contact is the GitHub issues page.
+- [ ] Terms of use: the contact in `Kikimi/Terms.md` is the GitHub issues page (governing law is California); have a
+      lawyer read it before publishing or shipping.
       Privacy "nutrition label": data not collected.
 - [ ] Export compliance: only standard HTTPS (model downloads) is used.
 - [ ] Screenshots, description, age rating, category (Education).

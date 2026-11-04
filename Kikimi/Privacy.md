@@ -2,7 +2,7 @@
 
 Kikimi is built so that your videos, and what you learn from them, stay on your Mac.
 
-_Last updated: 30 October 2026._
+_Last updated: 4 November 2026._
 
 ## The short version
 
@@ -63,6 +63,10 @@ Your Mac and Apple may collect diagnostic information if you have chosen to shar
 ## Children
 
 Kikimi does not knowingly collect information from anyone, including children.
+
+## Contact
+
+For a question about this policy, open an issue at [https://github.com/surreptus/kikimi/issues](https://github.com/surreptus/kikimi/issues). Issues there are public and are handled by GitHub under its own privacy policy, so please don't put personal details, videos or transcripts in one. Kikimi itself sends nothing to GitHub.
 
 ## Changes
 

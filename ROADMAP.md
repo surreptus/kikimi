@@ -16,10 +16,10 @@ machine, release plumbing, and a few promises we have made but not kept (below).
 
 ### Promises and paperwork
 - [x] **Terms of use** drafted (`Kikimi/Terms.md`, shown in the app beside the privacy policy).
-- [ ] **Finish the terms**: governing law is set to California; fill in the contact placeholder (the same contact
-      the privacy policy needs), and have a lawyer review them. They were not written by one, and what they can
-      limit depends on where your users live.
-- [ ] **Privacy policy contact line.** Needs an email or page before the policy can be published.
+- [ ] **Finish the terms**: governing law is set to California and the contact is the GitHub issues page; have a lawyer
+      review them. They were not written by one, and what they can limit depends on where your users live.
+- [x] **Contact line** (4 Nov 2026): the privacy policy and the terms point to the GitHub issues page
+      (https://github.com/surreptus/kikimi/issues), and say issues there are public. No email address is published.
 - [x] **Name: keeping Kikimi, with the trademark risk known** (decision of 30 Oct 2026). KIKIMI is a live registered US mark (reg.
       7139558, registered 15 Aug 2023, standard characters; owner KKLT Enterprises, LLC of San Francisco, which has a law
       firm; Class 9 downloadable software to share photos, exchange information securely, store data and reach social
@@ -45,7 +45,7 @@ machine, release plumbing, and a few promises we have made but not kept (below).
 - [ ] Rebuild the shareable zip from the final build.
 - [ ] The website (`site/`, Astro, GitHub Pages): scaffolded with the home, privacy and terms pages. To do: switch on
       Pages (Settings > Pages > Source: GitHub Actions), a screenshot, and the Download link once there is a notarized
-      release. The terms page shows `[Contact email]` until you fill it in, so don't publish before then.
+      release. The privacy and terms pages give the GitHub issues page as the contact.
 - [ ] **How people get updates.** Direct download has no App Store to do it. Options: tell people to download again
       (nothing to build), a manual "Check for updates" that reads a small file from the download page (no new
       dependency; a network request to our own page, which the privacy policy must then mention), or Sparkle

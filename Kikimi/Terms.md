@@ -2,7 +2,7 @@
 
 These are the terms for using Kikimi, a free app for learning a language from videos you already have.
 
-_Last updated: 30 October 2026._
+_Last updated: 4 November 2026._
 
 ## The short version
 
@@ -86,4 +86,4 @@ If part of these terms cannot be enforced, the rest still applies. Not enforcing
 
 ## Contact
 
-[Contact email]
+For questions about these terms, or a problem with Kikimi, open an issue at [https://github.com/surreptus/kikimi/issues](https://github.com/surreptus/kikimi/issues). Issues there are public, so please don't put personal details in one.
