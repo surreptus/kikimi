@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "LangCore",
     defaultLocalization: "en",
-    platforms: [.macOS(.v26)],
+    platforms: [.macOS(.v15)],
     products: [.library(name: "LangCore", targets: ["LangCore"])],
     dependencies: [
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "7.11.1"),

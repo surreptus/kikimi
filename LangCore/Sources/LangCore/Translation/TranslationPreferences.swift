@@ -14,11 +14,24 @@ public struct TranslationPreferences: @unchecked Sendable {
     public static let displayKey = "translationDisplay"
     public static let targetKey = "translationTarget"
     private let defaults: UserDefaults
+    private let supported: Bool
 
-    public init(defaults: UserDefaults = .standard) { self.defaults = defaults }
+    /// Translating a line needs a part of the Translation framework that arrived in macOS 26. On macOS 15 to 25 it is
+    /// off, and every screen that offers it hides it, because `display` says so.
+    public static var isSupported: Bool {
+        if #available(macOS 26, *) { true } else { false }
+    }
+
+    public init(defaults: UserDefaults = .standard, supported: Bool = TranslationPreferences.isSupported) {
+        self.defaults = defaults
+        self.supported = supported
+    }
 
     public var display: TranslationDisplay {
-        get { defaults.string(forKey: Self.displayKey).flatMap(TranslationDisplay.init(rawValue:)) ?? .onRequest }
+        get {
+            guard supported else { return .off }
+            return defaults.string(forKey: Self.displayKey).flatMap(TranslationDisplay.init(rawValue:)) ?? .onRequest
+        }
         nonmutating set { defaults.set(newValue == .onRequest ? nil : newValue.rawValue, forKey: Self.displayKey) }
     }
 
@@ -32,7 +45,8 @@ public struct TranslationPreferences: @unchecked Sendable {
 
     /// Whether a line in `source` has anything to translate into the chosen language.
     public func translates(from source: String) -> Bool {
-        Locale.Language(identifier: target).languageCode != Locale.Language(identifier: source).languageCode
+        guard supported else { return false }
+        return Locale.Language(identifier: target).languageCode != Locale.Language(identifier: source).languageCode
     }
 }
 

@@ -86,6 +86,19 @@ final class TranslationTests: XCTestCase {
         XCTAssertEqual(count, 0, "they go with their video")
     }
 
+    /// On macOS 15 to 25 there is no way to translate, so every screen is told translations are off.
+    func testTranslationsAreOffWhereTheSystemCannotDoThem() {
+        let defaults = UserDefaults(suiteName: "tr-\(UUID().uuidString)")!
+        defaults.set(TranslationDisplay.always.rawValue, forKey: TranslationPreferences.displayKey)
+        let older = TranslationPreferences(defaults: defaults, supported: false)
+        XCTAssertEqual(older.display, .off, "whatever was chosen before")
+        older.target = "en"
+        XCTAssertFalse(older.translates(from: "es"))
+        let newer = TranslationPreferences(defaults: defaults, supported: true)
+        XCTAssertEqual(newer.display, .always)
+        XCTAssertTrue(newer.translates(from: "es"))
+    }
+
     func testTranslatesOnlyBetweenDifferentLanguages() {
         let prefs = TranslationPreferences(defaults: UserDefaults(suiteName: "tr-\(UUID().uuidString)")!)
         prefs.target = "en"
@@ -124,6 +137,7 @@ final class TranslationTests: XCTestCase {
 
     /// Needs the Spanish to English language data on this Mac, so it only runs where macOS has it.
     func testMacOSTranslatesARealLineWhenItsLanguageIsInstalled() async throws {
+        guard #available(macOS 26, *) else { throw XCTSkip("translating needs macOS 26") }
         let translator = AppleLineTranslator(source: "es", target: "en")
         let status = await translator.availability()
         try XCTSkipUnless(status == .ready, "Spanish to English isn't installed on this Mac (\(status))")

@@ -7,8 +7,9 @@ How we build Kikimi. Read this before changing anything; update it when we agree
 
 1. **Mac app best practices.** Follow Apple's Human Interface Guidelines and platform conventions: a standard
    Settings window (⌘,), menu-bar commands with shortcuts, system colours and controls where they fit, Light and
-   Dark, full-screen and window restoration, drag and drop, Open With. Target modern macOS only; no backwards
-   compatibility shims. Sandbox and hardened runtime stay on.
+   Dark, full-screen and window restoration, drag and drop, Open With. Target macOS 15 and later, and no
+   further back: a feature that needs a newer system (translations, macOS 26) is hidden on older ones, never emulated, and
+   no code works around a missing API. Sandbox and hardened runtime stay on.
 2. **Dieter Rams.** Less, but better. Good design is useful, unobtrusive, honest, thorough and long-lasting. Remove
    embellishment; if a control isn't needed, it goes. This applies to the UI, to the code, and to how we report.
 3. **Our promises.** The app must always match its [privacy policy](Kikimi/Privacy.md) and its terms of use. A

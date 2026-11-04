@@ -44,7 +44,7 @@ source avoids all of this.
 
 ## Build from source
 
-Needs macOS 26 or later (Apple silicon recommended), Xcode 27, Python 3, and network access. The dictionaries are
+Needs macOS 15 or later (Apple silicon recommended; translations need macOS 26), Xcode 27, Python 3, and network access. The dictionaries are
 large generated files, so they aren't in the repository. Build them once:
 
 ```bash

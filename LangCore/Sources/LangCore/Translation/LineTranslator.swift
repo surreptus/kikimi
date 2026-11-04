@@ -18,6 +18,7 @@ public protocol LineTranslator: Sendable {
 
 /// Translates on this Mac with the system's Translation framework. Nothing is sent anywhere; macOS may download a
 /// language's data once, from the system's own settings.
+@available(macOS 26, *)
 public actor AppleLineTranslator: LineTranslator {
     private let source: Locale.Language
     private let target: Locale.Language

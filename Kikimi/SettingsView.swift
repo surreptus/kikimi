@@ -93,6 +93,7 @@ private struct GeneralTab: View {
             } footer: {
                 Text("The size of the subtitle lines beside the video.")
             }
+            if TranslationPreferences.isSupported {
             Section {
                 Picker("Show translations", selection: $translationDisplay) {
                     Text("Off").tag(TranslationDisplay.off.rawValue)
@@ -104,6 +105,7 @@ private struct GeneralTab: View {
                 }
             } footer: {
                 Text("Made on this Mac by macOS, so they can be wrong. \"When I ask\" keeps each hidden until you press the translate button on a line, or T, so you listen first. A video already in this language isn't translated. macOS may ask you to download a language once, in System Settings > General > Language & Region > Translation Languages.")
+            }
             }
             Section {
                 Picker("Video quality", selection: $videoQuality) {
