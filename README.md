@@ -24,6 +24,23 @@ spaced repetition, using real sentences from your own videos. Spanish, French, G
   word, listen to the sentence, or type a short sentence you hear.
 - **Your progress** saves to a `.kikimi` file you can restore later; it never overwrites what you already have.
 
+## Finding videos to learn from
+
+Kikimi never finds or downloads videos; it works on files you give it. If you have none, some places publish video you
+may download and study, each under its own licence:
+
+- [Internet Archive, Moving Image Archive](https://archive.org/details/movies): many films and clips can be downloaded, and some
+  come with subtitle files (drop the `.srt` with its video and Kikimi uses it instead of transcribing). Each collection has
+  its own terms.
+- [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:Videos): free and public-domain clips, mostly short. Each
+  file's page states its licence.
+- [TED Talks](https://www.ted.com/about/our-organization/our-policies-terms/ted-talks-usage-policy): personal, non-commercial
+  use under a Creative Commons licence. Read TED's policy for what it allows.
+
+"Creative Commons" is not one licence. NonCommercial and NoDerivatives terms limit what you may do, and a subtitle file can
+have a different licence from its video, so check each one you use. This is not legal advice. Kikimi's
+[terms](Kikimi/Terms.md) say to use only videos you own or may copy and study.
+
 ## Install
 
 Releases aren't signed with an Apple Developer ID or notarized yet, so macOS blocks a downloaded copy the first
