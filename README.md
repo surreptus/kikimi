@@ -12,7 +12,8 @@ spaced repetition, using real sentences from your own videos. Spanish, French, G
 
 ## What it does
 
-- **Videos.** Transcribed with timestamps; each shows how much of it you already know, and one button starts
+- **Videos.** Transcribed with timestamps, or imported with their own `.srt` or `.vtt` subtitles, which needs no speech
+  model; each shows how much of it you already know, and one button starts
   learning the words that would take it to about 90%.
 - **Player.** Clickable, synced subtitles with meanings, furigana, line looping, clips, and translations when you
   ask for them (made on your Mac).

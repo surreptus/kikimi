@@ -106,7 +106,14 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Subtitle modes**: target language only, target plus translation, none (listening practice), and a
       reveal-on-click mode.
 - [x] **Pause after each line** (P) and **loop this line** (R), with a 1×, 0.75× or 0.5× speed for loops.
-- [ ] **Import subtitles** (.srt / .vtt) when a video already has good ones, instead of transcribing.
+- [x] **Import subtitles** (.srt / .vtt, 4 Nov 2026): drop a subtitle file with its video (or choose both together) and its cues
+      are used instead of transcribing, so the import needs no speech model and is quick. Files are paired by name (`film.mp4`
+      with `film.srt` or `film.es.srt`; the one tagged with the chosen language wins; a lone video with a lone subtitle file
+      pair whatever they are called). Reads UTF-8, UTF-16 and older Western or Japanese encodings, SubRip and WebVTT, with
+      markup, style codes, notes and sound descriptions removed. The language is checked from the text (a supported
+      other language offers the same switch as for audio; any other, such as English subtitles, is refused), and a file
+      whose cues all start after the video ends is refused before anything is copied. Not done: choosing a subtitle file for
+      a video already in the library, subtitles inside a video file (embedded tracks), and other formats (.ass, .ttml).
 - [x] **Edit a transcript line** (right-click a line > Edit line…): fixes the text and its timing (with a preview), and
       finds its words again.
 - [ ] **Word-level timestamps**, so a single word can be played and clips are tighter.

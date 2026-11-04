@@ -26,7 +26,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `Tokenizing/` | Turns a line of text into content words (lemma and part of speech). Spanish, French and German use Apple's `NaturalLanguage`; Japanese uses the vendored MeCab (`Sources/CMeCab`). |
 | `Dictionary/` | `DictionaryStore` and `KanjiStore` read the bundled dictionary and kanji files in place, read-only. They are never copied into the database. |
 | `Database/` | GRDB records, migrations (`LangMigrations`) and queries. Schema changes are new migrations only. |
-| `Import/` | The import pipeline, queue, transcription, video compaction and the language check. |
+| `Import/` | The import pipeline, queue, transcription, video compaction and the language check. `SubtitleParser.swift` reads .srt and .vtt files (and pairs them with their video by name) so a video with subtitles skips transcribing and the speech model. |
 | `Models/` | Speech-model download, listing and removal (`ModelManager`), plus `ModelCatalog` (sizes and notes). |
 | `SRS/`, `Review/` | The nine review stages and their intervals; review sessions and sentence audio; the overview (ready, coming up, words per stage). |
 | `Playback/` | The player controller, subtitle timeline and word hints. |

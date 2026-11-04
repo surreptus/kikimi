@@ -19,6 +19,9 @@ struct ImportSection: View {
     @State private var changingModel = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// Subtitle files can be chosen with the videos: they are paired by name and used instead of transcribing.
+    private static let subtitleTypes = SubtitleParser.fileExtensions.sorted().compactMap { UTType(filenameExtension: $0, conformingTo: .text) }
+
     private var queue: ImportQueue { app.importQueue! }
     private var canImport: Bool { modelInstalled == true }
 
@@ -35,7 +38,7 @@ struct ImportSection: View {
         .onChange(of: queue.jobs.map(\.status)) { _, statuses in
             if statuses.contains(.imported) { app.dataChanged() }
         }
-        .fileImporter(isPresented: $showImporter, allowedContentTypes: [.movie, .audiovisualContent],
+        .fileImporter(isPresented: $showImporter, allowedContentTypes: [.movie, .audiovisualContent] + Self.subtitleTypes,
                       allowsMultipleSelection: true) { result in
             if case .success(let urls) = result { start(urls) }
         }
@@ -130,10 +133,11 @@ struct ImportSection: View {
         await refreshInstalled()
     }
 
-    /// File > Add Videos…. Without a speech model there is nothing to import into, so the page just shows the model card.
+    /// File > Add Videos…. Without a speech model only videos that come with subtitles can be imported, and the chooser
+    /// still opens for those.
     private func openChooserIfReady() {
         app.addVideosPending = false
-        if canImport { showImporter = true }
+        showImporter = true
     }
 
     private func refreshInstalled() async {
@@ -161,18 +165,21 @@ struct ImportSection: View {
 
     private var dropZone: some View {
         VStack(spacing: 12) {
-            Text(canImport ? String(localized: "Drop \(app.profile.displayName) videos here") : String(localized: "Download the speech model to start importing"))
+            Text(canImport ? String(localized: "Drop \(app.profile.displayName) videos here") : String(localized: "Download the speech model to transcribe videos"))
                 .font(Theme.title(20))
             // Only worth saying when there is a choice of language to import as.
             if app.learning.count > 1 {
                 Text("Importing as \(app.profile.displayName). Change the language in the sidebar.")
                     .font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.ink)
             }
+            Text(canImport
+                 ? String(localized: "Add an .srt or .vtt file with the same name to use its subtitles instead of transcribing.")
+                 : String(localized: "A video with an .srt or .vtt file of the same name can be imported without it."))
+                .font(.callout).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
             Text("Your original files are never changed or deleted.")
                 .font(.callout).foregroundStyle(Theme.muted)
             Button("Choose files") { showImporter = true }
                 .buttonStyle(.pill)
-                .disabled(!canImport)
                 .padding(.top, 4)
         }
         .frame(maxWidth: .infinity, minHeight: 230)
@@ -182,28 +189,35 @@ struct ImportSection: View {
     /// The same drop target as one row, for a library that already has videos.
     private var compactDropZone: some View {
         HStack(spacing: 12) {
-            Text(canImport ? String(localized: "Drop \(app.profile.displayName) videos here, or") : String(localized: "Download the speech model to start importing"))
+            Text(canImport ? String(localized: "Drop \(app.profile.displayName) videos here, or") : String(localized: "Drop videos with subtitle files here, or"))
                 .foregroundStyle(Theme.muted)
             Spacer()
             Button("Add videos…") { showImporter = true }
                 .buttonStyle(.pill(.secondary, compact: true))
-                .disabled(!canImport)
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
         .droppable(radius: 18, targeted: isTargeted, reduceMotion: reduceMotion, onDrop: drop, isTargeted: $isTargeted)
     }
 
     private func drop(_ urls: [URL]) -> Bool {
-        guard canImport else { return false }
         start(urls)
         return true
     }
 
+    /// Videos and the subtitle files dropped with them. A video with subtitles needs no speech model; one without
+    /// is only added when the model is downloaded.
     private func start(_ urls: [URL]) {
-        let media = urls.filter {
-            UTType(filenameExtension: $0.pathExtension)?.conforms(to: .audiovisualContent) ?? false
+        let files = urls.filter {
+            SubtitlePairing.isSubtitle($0) || (UTType(filenameExtension: $0.pathExtension)?.conforms(to: .audiovisualContent) ?? false)
         }
-        queue.enqueue(media, profile: app.profile, model: env.preferences.model(for: app.profile), quality: env.videoQuality.quality)
+        let pairing = SubtitlePairing.pair(files, language: app.profile.whisperCode)
+        let ready = pairing.items.filter { canImport || $0.subtitles != nil }
+        queue.enqueue(ready, profile: app.profile, model: env.preferences.model(for: app.profile), quality: env.videoQuality.quality)
+        if ready.count < pairing.items.count {
+            app.showToast(String(localized: "Download the speech model to import videos that have no subtitles."), isError: true)
+        } else if !pairing.unmatched.isEmpty {
+            app.showToast(String(localized: "No video to go with \(listed(pairing.unmatched.map(\.lastPathComponent)))."), isError: true)
+        }
     }
 
     // MARK: Jobs
@@ -271,7 +285,9 @@ struct ImportSection: View {
         switch job.status {
         case .queued: String(localized: "Waiting")
         case .running(let stage, _): runningText(stage, job)
-        case .imported: String(localized: "Imported · \(job.profile.displayName)")
+        case .imported: job.usesSubtitles
+            ? String(localized: "Imported · \(job.profile.displayName) · from subtitles")
+            : String(localized: "Imported · \(job.profile.displayName)")
         case .duplicate: String(localized: "Already in library")
         case .languageMismatch: String(localized: "Check language")
         case .cancelling: String(localized: "Cancelling…")
@@ -313,7 +329,8 @@ struct ImportSection: View {
 
     /// "3 of 7 · Transcribing": the step's place in the import (out of 6 if the language check was skipped).
     private func runningText(_ stage: ImportStage, _ job: ImportQueue.Job) -> String {
-        let place = stage.position(checkingLanguage: job.checksLanguage, compressing: job.compresses)
+        let place = stage.position(checkingLanguage: job.checksLanguage && !job.usesSubtitles, compressing: job.compresses,
+                                   transcribing: !job.usesSubtitles)
         return String(localized: "\(place.number) of \(place.of) · \(stageName(stage))")
     }
 
