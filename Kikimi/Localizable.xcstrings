@@ -340,6 +340,9 @@
         }
       }
     },
+    "%lld known" : {
+
+    },
     "%lld learning · %lld known · %lld finished" : {
       "localizations" : {
         "de" : {
@@ -2515,7 +2518,7 @@
         }
       }
     },
-    "Also used for Check my known words." : {
+    "Also used when you review words you know." : {
 
     },
     "Always" : {
@@ -3001,6 +3004,7 @@
       }
     },
     "Check my known words" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8160,7 +8164,7 @@
         }
       }
     },
-    "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. Before you press Start, choose the kind of card in the panel at the top of the Review page: Meaning (the word and what it means), Fill in the word (the sentence appears with the word blanked and a short hint, and you recall it before showing the answer), Listen to the sentence (only the sound plays, and you show the answer to read it and its translation) or Type what you hear (a short sentence plays and you type it; you see what you missed, marked in the sentence). In Spanish, French and German a noun shows with its article, such as das Buch, so its gender is learned with it. On the Review page, Check my known words tests a few words you marked known; any you miss go back to your reviews. Below the word stages, Your progress shows how long you have listened, how many reviews you got right, the words you started learning each week, and the words you looked up most; it starts counting from when it was added and stays on this Mac. Come back whenever the number beside Review is above zero." : {
+    "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. Before you press Start, choose the kind of card in the panel at the top of the Review page: Meaning (the word and what it means), Fill in the word (the sentence appears with the word blanked and a short hint, and you recall it before showing the answer), Listen to the sentence (only the sound plays, and you show the answer to read it and its translation) or Type what you hear (a short sentence plays and you type it; you see what you missed, marked in the sentence). In Spanish, French and German a noun shows with its article, such as das Buch, so its gender is learned with it. On the Review page, Review known tests a few words you marked known; any you miss go back to your reviews. Below the word stages, Your progress shows how long you have listened, how many reviews you got right, the words you started learning each week, and the words you looked up most; it starts counting from when it was added and stays on this Mac. Come back whenever the number beside Review is above zero." : {
 
     },
     "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. In Settings > Languages, Review cards can be set to Fill in the word (the sentence appears with the word blanked and a short hint, and you recall it before showing the answer) or to Listen to the sentence (only the sound plays, and you show the answer to read it). On the Review page, Check my known words tests a few words you marked known; any you miss go back to your reviews. Below the word stages, Your progress shows how long you have listened, how many reviews you got right, the words you started learning each week, and the words you looked up most; it starts counting from when it was added and stays on this Mac. Come back whenever the number beside Review is above zero." : {
@@ -9775,6 +9779,12 @@
           }
         }
       }
+    },
+    "Review known" : {
+
+    },
+    "Reviews" : {
+
     },
     "right in reviews, last 30 days" : {
       "localizations" : {
