@@ -29,7 +29,9 @@ struct OnboardingView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .panel()
 
-                Text("Translations stay hidden until you ask for one, so you listen first. Next: add a video you own.")
+                Text(TranslationPreferences.isSupported
+                     ? String(localized: "Translations stay hidden until you ask for one, so you listen first. Next: add a video you own.")
+                     : String(localized: "Next: add a video you own."))
                     .font(Theme.small).foregroundStyle(Theme.muted)
 
                 HStack {
