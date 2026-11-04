@@ -56,6 +56,8 @@ struct ReviewOverviewView: View {
                 .accessibilityLabel("Card type")
                 .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+                .id(style)   // a new line for each choice, which fades in as the panel resizes
+                .transition(.opacity)
             Text("Also used when you review words you know.").font(Theme.small).foregroundStyle(Theme.muted)
         }
         .panel()

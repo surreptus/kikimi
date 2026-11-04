@@ -24,14 +24,14 @@ struct IconSegmentedPicker<Value: Hashable>: View {
         }
         .padding(3)
         .background(Capsule().fill(Theme.ink.opacity(0.08)))
+        // The highlight slides to the new choice and the labels change weight with it.
+        .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: selection)
         .accessibilityElement(children: .contain)
     }
 
     private func segment(_ option: Option) -> some View {
         let selected = option.value == selection
-        return Button {
-            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.15)) { selection = option.value }
-        } label: {
+        return Button { selection = option.value } label: {
             Label(option.title, systemImage: option.symbol)
                 .labelStyle(.titleAndIcon)
                 .font(.system(size: 13, weight: selected ? .semibold : .medium, design: .rounded))
