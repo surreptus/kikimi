@@ -238,7 +238,7 @@ class KanjidicTests(unittest.TestCase):
 <character><literal>月</literal><reading_meaning><rmgroup>
 <reading r_type="pinyin">yue4</reading><reading r_type="ja_on">ゲツ</reading><reading r_type="ja_on">ガツ</reading>
 <reading r_type="ja_kun">つき</reading><meaning>month</meaning><meaning>moon</meaning>
-<meaning m_lang="fr">lune</meaning></rmgroup><nanori>おと</nanori></reading_meaning></character>
+<meaning m_lang="fr">lune</meaning></rmgroup><nanori>おと</nanori></reading_meaning><misc><grade>1</grade><jlpt>4</jlpt></misc></character>
 <character><literal>食</literal><reading_meaning><rmgroup>
 <reading r_type="ja_on">ショク</reading><reading r_type="ja_kun">た.べる</reading><reading r_type="ja_kun">く.う</reading>
 <meaning>eat</meaning><meaning>food</meaning></rmgroup></reading_meaning></character>
@@ -253,7 +253,9 @@ class KanjidicTests(unittest.TestCase):
             self.assertEqual(build_kanjidic.build(src, out), 2, "a kanji with no reading or meaning is left out")
             db = sqlite3.connect(out)
             self.assertEqual(db.execute("SELECT * FROM kanji WHERE literal = '月'").fetchone(),
-                             ("月", "ゲツ、ガツ", "つき", "month; moon"))
+                             ("月", "ゲツ、ガツ", "つき", "month; moon", 4, 1))
+            self.assertEqual(db.execute("SELECT jlpt, grade FROM kanji WHERE literal = '食'").fetchone(), (None, None),
+                             "a kanji with no level or grade has none")
             self.assertEqual(db.execute("SELECT kun_yomi FROM kanji WHERE literal = '食'").fetchone(), ("た.べる、く.う",))
 
 

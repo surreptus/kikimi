@@ -166,8 +166,10 @@ Ordered by how much each helps comprehensible input per unit of effort.
       one. Not done: slowing the audio on this card, and judging kana against kanji (a correct reading in kana counts as
       different from the kanji line).
 - [ ] **Review ahead**: practise words that are not due yet without changing their stages ("cram").
-- [ ] Small: show a kanji's JLPT level and school grade in the word panel (KANJIDIC2 has both; the kanji file leaves
-      them out today). Not wanted from that comparison: AI grading of what you write or say (the on-device model passed 5 of
+- [x] **Kanji level and school year** (4 Nov 2026): the word panel's Kanji section shows each kanji's JLPT level and the school
+      year that teaches it. KANJIDIC2's level is the exam's older four levels; they are shown as N5, N4, N3–N2 and N1 (the
+      counts match: 103, 181, 739 and 1,207 kanji), with a tooltip saying so. A kanji no exam asked for shows only its year.
+      A file built before this still opens, without them. Not wanted from the JIVX comparison: AI grading of what you write or say (the on-device model passed 5 of
       12 mistakes; a cloud one breaks "local and private"), gardens and other gamification, pasting video links, a
       sentence bank. Maybe later: a hands-free listening playlist of your learning words' sentences (see below).
 

@@ -80,6 +80,10 @@ struct WordDetail: View {
                             if !info.meanings.isEmpty {
                                 Text(info.meanings.joined(separator: "; ")).font(.callout)
                             }
+                            if let level = levelLine(info) {
+                                Text(level).font(Theme.small).foregroundStyle(Theme.muted)
+                                    .help("The JLPT level is KANJIDIC2's, from the exam's older four levels, shown as the matching N levels (N3 and N2 share one). The school year is when Japanese schools teach it.")
+                            }
                             Grid(alignment: .topLeading, horizontalSpacing: 8, verticalSpacing: 2) {
                                 if !info.onReadings.isEmpty {
                                     GridRow {
@@ -107,9 +111,23 @@ struct WordDetail: View {
         .help("On'yomi: reading from Chinese. Kun'yomi: native reading; the dot marks where the ending begins.")
     }
 
+    /// "JLPT N5 · School year 1", or whichever of the two the kanji has.
+    private func levelLine(_ info: KanjiInfo) -> String? {
+        var parts: [String] = []
+        if let levels = info.jlptLevels { parts.append(String(localized: "JLPT \(levels)")) }
+        switch info.schoolGrade {
+        case .year(let year): parts.append(String(localized: "School year \(year)"))
+        case .secondary: parts.append(String(localized: "Secondary school"))
+        case .names: parts.append(String(localized: "Used in names"))
+        case nil: break
+        }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
     private func kanjiLabel(_ info: KanjiInfo) -> String {
         var parts = [info.literal]
         if !info.meanings.isEmpty { parts.append(String(localized: "Meaning: \(listed(info.meanings))")) }
+        if let level = levelLine(info) { parts.append(level) }
         if !info.onReadings.isEmpty { parts.append(String(localized: "On reading: \(listed(info.onReadings))")) }
         if !info.kunReadings.isEmpty { parts.append(String(localized: "Kun reading: \(listed(info.kunReadings))")) }
         return parts.joined(separator: ". ")

@@ -20,7 +20,7 @@ spaced repetition, using real sentences from your own videos. Spanish, French, G
 - **Player.** Clickable, synced subtitles with meanings, furigana, line looping, clips, and translations when you
   ask for them (made on your Mac).
 - **Words.** A searchable table with dictionary entries, example lines and Anki export. For Japanese, every reading
-  of a word and each kanji with its on'yomi and kun'yomi. For Spanish, French and German, a noun shows its article
+  of a word and each kanji with its on'yomi and kun'yomi, JLPT level and school year. For Spanish, French and German, a noun shows its article
   (el/la, le/la, der/die/das).
 - **Review.** Nine-stage spaced repetition. Choose the kind of card on the Review page: word and meaning, fill in the
   word, listen to the sentence, or type a short sentence you hear.

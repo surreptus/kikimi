@@ -2,6 +2,8 @@
 
 Usage: python3 -I build_kanjidic.py kanjidic2.xml.gz kanji-ja.sqlite
 KANJIDIC2 is (c) the Electronic Dictionary Research and Development Group, CC BY-SA 4.0.
+Kept besides readings and meanings: the JLPT level (KANJIDIC2's is the exam's older four levels, 4 easiest) and the school
+grade (1 to 6 for the elementary years, 8 for secondary school, 9 and 10 for kanji used in names).
 Left out on purpose: name readings (nanori), other languages' meanings, stroke counts and index numbers.
 """
 import gzip
@@ -13,8 +15,12 @@ import xml.etree.ElementTree as ET
 MAX_MEANINGS = 6
 
 
+def number(text):
+    return int(text) if text and text.strip().isdigit() else None
+
+
 def kanji_rows(root):
-    """(literal, on_yomi, kun_yomi, meanings) for each kanji that has a reading or a meaning. Readings are joined with
+    """(literal, on_yomi, kun_yomi, meanings, jlpt, grade) for each kanji that has a reading or a meaning. Readings are joined with
     '、', meanings with '; '. On'yomi stay in katakana and kun'yomi in hiragana, as KANJIDIC2 has them, which is how
     the two are told apart on the page. A '.' in a kun'yomi marks where the okurigana begins (た.べる)."""
     for character in root.findall("character"):
@@ -26,7 +32,8 @@ def kanji_rows(root):
             # A meaning with no m_lang attribute is English.
             meanings += [m.text for m in group.findall("meaning") if m.get("m_lang") is None and m.text]
         if literal and (on or kun or meanings):
-            yield literal, "、".join(on), "、".join(kun), "; ".join(meanings[:MAX_MEANINGS])
+            yield (literal, "、".join(on), "、".join(kun), "; ".join(meanings[:MAX_MEANINGS]),
+                   number(character.findtext("misc/jlpt")), number(character.findtext("misc/grade")))
 
 
 def build(input_path, output_path):
@@ -38,9 +45,9 @@ def build(input_path, output_path):
         os.remove(output_path)
     db = sqlite3.connect(output_path)
     db.execute("PRAGMA journal_mode = DELETE")
-    db.execute("CREATE TABLE kanji (literal TEXT PRIMARY KEY, on_yomi TEXT NOT NULL, kun_yomi TEXT NOT NULL, meaning TEXT NOT NULL) WITHOUT ROWID")
+    db.execute("CREATE TABLE kanji (literal TEXT PRIMARY KEY, on_yomi TEXT NOT NULL, kun_yomi TEXT NOT NULL, meaning TEXT NOT NULL, jlpt INTEGER, grade INTEGER) WITHOUT ROWID")
     db.execute("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
-    db.executemany("INSERT INTO kanji VALUES (?, ?, ?, ?)", kanji_rows(root))
+    db.executemany("INSERT INTO kanji VALUES (?, ?, ?, ?, ?, ?)", kanji_rows(root))
     db.executemany("INSERT INTO meta VALUES (?, ?)", sorted({
         "source": "KANJIDIC2",
         "source_url": "https://www.edrdg.org/kanjidic/kanjidic2.xml.gz",
