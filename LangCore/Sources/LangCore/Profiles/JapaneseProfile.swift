@@ -35,6 +35,8 @@ public struct JapaneseProfile: LanguageProfile {
     /// IPADIC features: 品詞, 細分類1-3, 活用型, 活用形, 原形, 読み, 発音. Unknown words have 7 fields.
     @Sendable static func interpretIPADIC(surface: String, features f: [String]) -> Token? {
         guard f.count >= 7 else { return nil }
+        // IPADIC calls a plain ASCII "!" or "?" a noun, so a subtitle file's punctuation would become words.
+        guard surface.contains(where: { $0.isLetter || $0.isNumber }) else { return nil }
         let lemma = f[6] == "*" ? surface : f[6]
         let pos: PartOfSpeech
         switch (f[0], f[1]) {

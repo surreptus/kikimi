@@ -91,6 +91,16 @@ public enum LangMigrations {
                 t.primaryKey(["subtitle_id", "target"])
             }
         }
+
+        // Punctuation read as words ("!", "?") by an earlier tokenizer. Only ones never touched are removed, with
+        // their occurrences; a word you chose to learn or know is left.
+        migrator.registerMigration("v7-drop-punctuation-words") { db in
+            let ids = try Row.fetchAll(db, sql: "SELECT id, lemma FROM words WHERE status = 'new'").compactMap { row -> Int64? in
+                let lemma: String = row["lemma"]
+                return lemma.contains(where: { $0.isLetter || $0.isNumber }) ? nil : row["id"]
+            }
+            for id in ids { try db.execute(sql: "DELETE FROM words WHERE id = ?", arguments: [id]) }
+        }
     }
 
     // The dictionaries are now read straight from their built files, so the copy in this database is dropped

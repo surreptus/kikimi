@@ -16,6 +16,12 @@ final class JapaneseTokenizerTests: XCTestCase {
         }
     }
 
+    func testPunctuationIsNeverAWord() {
+        let tokens = ja.tokenizer.tokens(in: "すごい! 本当? いいね...")
+        XCTAssertFalse(tokens.contains { !$0.surface.contains(where: { $0.isLetter || $0.isNumber }) }, "\(tokens.map(\.surface))")
+        XCTAssertNotNil(content("すごい! 本当?")["すごい"])
+    }
+
     func testVerbsReturnDictionaryForm() {
         XCTAssertEqual(content("昨日は友達と一緒に新しいレストランへ行きました。")["行く"], .verb)
         XCTAssertEqual(content("もう食べられないよ。")["食べる"], .verb)
