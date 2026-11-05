@@ -30,6 +30,9 @@ public protocol LanguageProfile: Sendable {
     var displayName: String { get }
     /// The country whose flag stands for the language on the welcome page (ISO 3166, e.g. `ES`), or nil for none.
     var flagRegion: String? { get }
+    /// Words that appear in the name of the Mac keyboards that suit typing this language ("Japanese", "Spanish"), so the
+    /// typing exercise can switch to one the learner has installed. Empty for none.
+    var keyboardKeywords: [String] { get }
     /// Language code WhisperKit expects.
     var whisperCode: String { get }
     /// Default WhisperKit model variant for this language.
@@ -54,6 +57,7 @@ public protocol LanguageProfile: Sendable {
 
 extension LanguageProfile {
     public var flagRegion: String? { nil }
+    public var keyboardKeywords: [String] { [] }
     /// The language's name in itself ("Español"), so a learner can find it whatever language the Mac is set to.
     public var nativeName: String {
         let locale = Locale(identifier: code)

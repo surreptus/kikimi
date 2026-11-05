@@ -6,6 +6,7 @@ public struct SpanishProfile: LanguageProfile {
     public let code = "es"
     public var displayName: String { Locale.current.localizedString(forLanguageCode: code)?.localizedCapitalized ?? "Spanish" }
     public var flagRegion: String? { "ES" }
+    public var keyboardKeywords: [String] { ["Spanish"] }
     public let whisperCode = "es"
     public let nounArticles = ["m": "el", "f": "la"]
 

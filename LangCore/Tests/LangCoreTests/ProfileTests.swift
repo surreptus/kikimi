@@ -82,3 +82,13 @@ final class ProfileTests: XCTestCase {
         XCTAssertTrue(words.allSatisfy { SpanishProfile().contentPOS.contains($0.pos) })
     }
 }
+
+final class KeyboardKeywordTests: XCTestCase {
+    func testEveryLanguageNamesTheKeyboardsThatSuitIt() {
+        let keywords = Dictionary(uniqueKeysWithValues: LanguageProfiles.all.map { ($0.code, $0.keyboardKeywords) })
+        XCTAssertEqual(keywords["ja"], ["Japanese"])
+        XCTAssertEqual(keywords["es"], ["Spanish"])
+        XCTAssertEqual(keywords["fr"], ["French"])
+        XCTAssertEqual(keywords["de"], ["German"])
+    }
+}

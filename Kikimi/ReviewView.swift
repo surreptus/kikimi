@@ -390,6 +390,13 @@ struct ReviewView: View {
                 .focused($typingFocused)
                 .onSubmit(checkDictation)
                 .onAppear { DispatchQueue.main.async { typingFocused = true } }
+                .onChange(of: typingFocused) { _, focused in
+                    guard focused else { KeyboardSwitch.restore(); return }
+                    // The field editor takes over a moment after focus, so the keyboard is chosen just after.
+                    let keywords = app.profile.keyboardKeywords
+                    Task { try? await Task.sleep(for: .milliseconds(100)); KeyboardSwitch.use(keywords: keywords) }
+                }
+                .onDisappear { KeyboardSwitch.restore() }
             HStack(spacing: 10) {
                 Button("Play again", systemImage: "speaker.wave.2.fill") { playSentence() }
                     .buttonStyle(.pill(.secondary, compact: true))
