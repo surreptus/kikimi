@@ -18,7 +18,7 @@ struct RootView: View {
             case .failed(let message):
                 FailureView(title: "Couldn't start", detail: message)
             case .ready(let env):
-                if app.needsOnboarding { card { OnboardingView(env: env) } } else { layout(env) }
+                if app.needsOnboarding { OnboardingView(env: env) } else { layout(env) }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -37,9 +37,9 @@ struct RootView: View {
         .modal(isPresented: Binding(get: { app.showAcknowledgements }, set: { app.showAcknowledgements = $0 })) { AcknowledgementsView() }
     }
 
-    /// The window is the sidebar's colour once the library is open, with the page in a card on it; while it opens,
-    /// or if it can't, there is no card, so the page colour fills the window.
-    private var windowColor: Color { app.isReady ? Theme.chrome : Theme.field }
+    /// The window is the sidebar's colour once the library is open, with the page in a card on it; while it opens, or
+    /// if it can't, or on the welcome page, there is no card, so the page colour fills the window.
+    private var windowColor: Color { app.isReady && !app.needsOnboarding ? Theme.chrome : Theme.field }
 
     /// The sidebar sits directly on the window; the current page is a rounded card beside it.
     private func layout(_ env: LangEnvironment) -> some View {
@@ -69,11 +69,6 @@ struct RootView: View {
         .modal(isPresented: $app.showAbout) { AboutView() }
         .modal(isPresented: $app.showPrivacy) { DocumentView(title: "Privacy policy", resource: "Privacy") }
         .modal(isPresented: $app.showTerms) { DocumentView(title: "Terms of use", resource: "Terms") }
-    }
-
-    /// A page on its own, with no sidebar, in the same card.
-    private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-        content().frame(maxWidth: .infinity, maxHeight: .infinity).card(leading: 10)
     }
 
     @ViewBuilder
