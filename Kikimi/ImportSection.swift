@@ -2,7 +2,15 @@ import LangCore
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Adding videos: the speech model, the drop area and the progress of each import. It sits at the top of the Videos page.
+/// A video waiting to be imported, and the subtitle file to use for it, if there is one.
+struct PendingImport: Identifiable, Equatable {
+    let id = UUID()
+    let video: URL
+    var subtitles: URL?
+}
+
+/// Adding videos: the speech model, the drop area, the videos waiting to start and the progress of each import. It sits
+/// at the top of the Videos page.
 struct ImportSection: View {
     let env: LangEnvironment
     /// Once the library has videos the drop area shrinks to one row, so the list is what the page opens on.
@@ -15,6 +23,9 @@ struct ImportSection: View {
     @State private var downloadError: String?
     @State private var isTargeted = false
     @State private var showImporter = false
+    /// Which waiting video the subtitle chooser is open for.
+    @State private var showSubtitleChooser = false
+    @State private var subtitlesFor: UUID?
     /// The model choice is set once and then stays out of the way; this opens it again.
     @State private var changingModel = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -29,6 +40,7 @@ struct ImportSection: View {
         VStack(alignment: .leading, spacing: 20) {
             modelSection
             if compact { compactDropZone } else { dropZone }
+            if !app.pendingImports.isEmpty { pendingPanel }
             if !queue.jobs.isEmpty { jobList }
         }
         .task(id: app.languageCode) { await loadModel() }
@@ -173,8 +185,8 @@ struct ImportSection: View {
                     .font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.ink)
             }
             Text(canImport
-                 ? String(localized: "Add an .srt or .vtt file with the same name to use its subtitles instead of transcribing.")
-                 : String(localized: "A video with an .srt or .vtt file of the same name can be imported without it."))
+                 ? String(localized: "Then add its subtitles (.srt or .vtt), if it has them, to skip transcribing.")
+                 : String(localized: "A video that comes with subtitles (.srt or .vtt) can be imported without it."))
                 .font(.callout).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
             Text("Your original files are never changed or deleted.")
                 .font(.callout).foregroundStyle(Theme.muted)
@@ -204,20 +216,103 @@ struct ImportSection: View {
         return true
     }
 
-    /// Videos and the subtitle files dropped with them. A video with subtitles needs no speech model; one without
-    /// is only added when the model is downloaded.
+    /// Videos, and any subtitle files dropped with them, join the list of videos waiting to start. A subtitle file dropped
+    /// by itself goes to a waiting video it fits, so it can be added after the video as well as with it.
     private func start(_ urls: [URL]) {
         let files = urls.filter {
             SubtitlePairing.isSubtitle($0) || (UTType(filenameExtension: $0.pathExtension)?.conforms(to: .audiovisualContent) ?? false)
         }
         let pairing = SubtitlePairing.pair(files, language: app.profile.whisperCode)
-        let ready = pairing.items.filter { canImport || $0.subtitles != nil }
-        queue.enqueue(ready, profile: app.profile, model: env.preferences.model(for: app.profile), quality: env.videoQuality.quality)
-        if ready.count < pairing.items.count {
-            app.showToast(String(localized: "Download the speech model to import videos that have no subtitles."), isError: true)
-        } else if !pairing.unmatched.isEmpty {
-            app.showToast(String(localized: "No video to go with \(listed(pairing.unmatched.map(\.lastPathComponent)))."), isError: true)
+        for item in pairing.items where !app.pendingImports.contains(where: { $0.video == item.video }) {
+            app.pendingImports.append(PendingImport(video: item.video, subtitles: item.subtitles))
         }
+        var left = pairing.unmatched
+        if !left.isEmpty {
+            let waiting = app.pendingImports.filter { $0.subtitles == nil }.map(\.video)
+            let fitted = SubtitlePairing.pair(waiting + left, language: app.profile.whisperCode)
+            for item in fitted.items {
+                if let subtitles = item.subtitles, let index = app.pendingImports.firstIndex(where: { $0.video == item.video }) {
+                    app.pendingImports[index].subtitles = subtitles
+                }
+            }
+            left = fitted.unmatched
+        }
+        if !left.isEmpty {
+            app.showToast(String(localized: "No video to go with \(listed(left.map(\.lastPathComponent)))."), isError: true)
+        }
+    }
+
+    // MARK: Waiting to start
+
+    /// Without the speech model, a video needs subtitles to be imported.
+    private var canStart: Bool { app.pendingImports.allSatisfy { canImport || $0.subtitles != nil } }
+
+    private func startImport() {
+        let items = app.pendingImports.map { SubtitlePairing.Item(video: $0.video, subtitles: $0.subtitles) }
+        queue.enqueue(items, profile: app.profile, model: env.preferences.model(for: app.profile), quality: env.videoQuality.quality)
+        app.pendingImports = []
+    }
+
+    private var pendingPanel: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Ready to import").font(Theme.title(16))
+            ForEach(app.pendingImports) { pendingRow($0) }
+            HStack(spacing: 12) {
+                if !canStart {
+                    Text("Download the speech model, or add subtitles to the videos that have none.")
+                        .font(Theme.small).foregroundStyle(Theme.muted)
+                }
+                Spacer()
+                Button("Start") { startImport() }
+                    .buttonStyle(.pill(.primary, compact: true))
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(!canStart)
+            }
+        }
+        .panel()
+        .fileImporter(isPresented: $showSubtitleChooser, allowedContentTypes: [.text] + Self.subtitleTypes,
+                      allowsMultipleSelection: false) { result in
+            if case .success(let urls) = result, let url = urls.first,
+               let index = app.pendingImports.firstIndex(where: { $0.id == subtitlesFor }) {
+                app.pendingImports[index].subtitles = url
+            }
+            subtitlesFor = nil
+        }
+    }
+
+    private func pendingRow(_ item: PendingImport) -> some View {
+        let name = item.video.lastPathComponent
+        return HStack(alignment: .center, spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name).font(.system(.body, design: .rounded, weight: .semibold)).lineLimit(1).truncationMode(.middle)
+                if let subtitles = item.subtitles {
+                    Text("Subtitles: \(subtitles.lastPathComponent)").font(Theme.small).foregroundStyle(Theme.muted)
+                        .lineLimit(1).truncationMode(.middle)
+                } else {
+                    Text(canImport ? String(localized: "No subtitles, so it will be transcribed.")
+                                   : String(localized: "No subtitles. Add them, or download the speech model."))
+                        .font(Theme.small).foregroundStyle(Theme.muted)
+                }
+            }
+            Spacer()
+            if item.subtitles == nil {
+                Button("Add subtitles…") { subtitlesFor = item.id; showSubtitleChooser = true }
+                    .buttonStyle(.pill(.secondary, compact: true))
+                    .accessibilityLabel("Add subtitles for \(name)")
+            } else {
+                Button("Remove subtitles") { setSubtitles(nil, for: item.id) }
+                    .buttonStyle(.pill(.secondary, compact: true))
+                    .accessibilityLabel("Remove the subtitles from \(name)")
+            }
+            Button("Remove \(name)", systemImage: "xmark") { app.pendingImports.removeAll { $0.id == item.id } }
+                .labelStyle(.pillIcon).buttonStyle(.pill(.secondary, compact: true))
+                .help("Take this video off the list. Your file is not touched.")
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    private func setSubtitles(_ url: URL?, for id: UUID) {
+        if let index = app.pendingImports.firstIndex(where: { $0.id == id }) { app.pendingImports[index].subtitles = url }
     }
 
     // MARK: Jobs

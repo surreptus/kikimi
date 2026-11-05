@@ -46,6 +46,9 @@ final class AppState {
     var wordsTypeFilter: PartOfSpeech?
     var wordsSelection = Set<Int64>()
     private(set) var importQueue: ImportQueue?
+    /// Videos chosen for import and not yet started, each with its subtitle file if it has one. Kept here so they are
+    /// still waiting when you come back to the Videos page.
+    var pendingImports: [PendingImport] = []
     /// Words due for review in the selected language.
     private(set) var dueCount = 0
     /// Bumped when the database changes under the views (imports, status changes) so they reload.
