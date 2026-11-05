@@ -276,10 +276,16 @@ Ordered by how much each helps comprehensible input per unit of effort.
       mistakes (`restaurant` as a verb, `faut` as `faillir`, `commence` as a noun). Known gaps: a German separable verb
       ("ruf ... an") is learned as `rufen` and the particle is lost, and compound nouns missing from Wiktionary have no
       meaning. Not yet tried on a real French or German video, and `medium` is not benchmarked for either.
-- [ ] **More languages**: Italian next (Apple's tagger handles it), then Portuguese and Dutch, whose lemmas macOS
-      does not give (tested 30 Oct 2026: no lemma or part of speech), so each needs a lemma source, a dependency to
-      ask about first.
-
+- [ ] **More languages**: Italian, Portuguese and Dutch. **Correction, 5 Nov 2026:** this item used to say Italian is next because
+      Apple's tagger handles it. It does not: on macOS 27 `NLTagger` offers no lexical class and no lemma for Italian,
+      Portuguese or Dutch (only language, script and token type; checked with `availableTagSchemes`, and a probe of ten
+      Italian lines gave every word as "other"). So all three need a lemma source, and Italian is no cheaper than the
+      others. The likeliest source needs no dependency: the Wiktionary data we already use lists every inflected form of a
+      word with its tags, so a table of surface form to lemma and part of speech, built by the dictionary script, can lemmatize
+      them, with an `NLTokenizer` splitting the words. The same table is what *Grammar from your own videos* needs for Spanish,
+      French and German, so the two are one project. Open: how to choose among lemmas when a form is ambiguous (Italian
+      *sono* is both *essere* and *suono*), measured on real lines before any language ships. Mandarin has no inflection, so
+      it avoids the problem but needs a word splitter and a pinyin dictionary (CC-CEDICT, CC BY-SA); Korean is not planned.
 ### Housekeeping
 - [ ] Cache video thumbnails on disk if scrolling a large library feels slow (they are now made once per launch).
 - [ ] **Translate the app's own interface** (no other language yet). The groundwork is done: strings are localisable and
