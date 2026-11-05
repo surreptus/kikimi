@@ -54,6 +54,8 @@ struct SettingsView: View {
                         .tabItem { Label(SettingsTab.about.title, systemImage: SettingsTab.about.symbol) }
                         .tag(SettingsTab.about)
                 }
+                // One size for every tab, so the window doesn't jump as you move between them; a form scrolls if it must.
+                .frame(width: 560, height: 650)
             } else {
                 ProgressView().frame(width: 480, height: 200)
             }
@@ -117,7 +119,6 @@ private struct GeneralTab: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 520, height: 650)
         .task { translationLanguages = await TranslationLanguage.supported() }
     }
 
@@ -161,7 +162,6 @@ private struct LanguagesTab: View {
         }
         .formStyle(.grouped)
         .id(refresh)
-        .frame(width: 520, height: 560)
     }
 
     /// Dropping a language only hides it; its words and videos stay, and ticking it again brings them back.
@@ -268,7 +268,6 @@ private struct DataTab: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 560, height: 640)
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = urls.first(where: { $0.pathExtension == ProgressBackup.fileExtension || LangEnvironment.isFullBackup($0) })
             else { return false }
@@ -483,7 +482,6 @@ private struct AboutTab: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 520, height: 420)
     }
 
     /// Those panels belong to the main window, so bring it forward and open them there.
