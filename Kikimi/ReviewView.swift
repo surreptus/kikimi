@@ -6,6 +6,9 @@ struct ReviewView: View {
     @Environment(AppState.self) private var app
 
     @State private var overview: ReviewOverview?
+    @State private var lessons: DailyLessons?
+    /// The lesson under way, as the words it will go through.
+    @State private var lessonIDs: [Int64]?
     @State private var stats: LearningStats?
     @State private var session: ReviewSession?
     @State private var card: ReviewCard?
@@ -41,19 +44,21 @@ struct ReviewView: View {
         Group {
             if let error {
                 ContentUnavailableView("Review failed", systemImage: "exclamationmark.triangle", description: Text(error))
+            } else if let lessonIDs {
+                LessonView(env: env, wordIDs: lessonIDs) { self.lessonIDs = nil; Task { await loadOverview() } }
             } else if let card {
                 cardWithWord(card)
             } else if let summary {
                 VStack(spacing: 0) {
                     finished(summary).padding(.top, 28)
-                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, stats: stats, style: styleChoice, start: { startSession() }, practise: { startSession(extra: $0) }) }
+                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, lessons: lessons, stats: stats, style: styleChoice, startLessons: { lessonIDs = lessons?.wordIDs }, start: { startSession() }, practise: { startSession(extra: $0) }) }
                 }
             } else if let overview {
-                if overview.isEmpty {
+                if overview.isEmpty, lessons?.wordIDs.isEmpty ?? true {
                     EmptyState(title: "Nothing to review yet", message: "Choose words to learn on the Words page, then come back.",
                                actionTitle: "Go to Words", action: { app.select(.words) })
                 } else {
-                    ReviewOverviewView(overview: overview, stats: stats, style: styleChoice, start: { startSession() }, practise: { startSession(extra: $0) })
+                    ReviewOverviewView(overview: overview, lessons: lessons, stats: stats, style: styleChoice, startLessons: { lessonIDs = lessons?.wordIDs }, start: { startSession() }, practise: { startSession(extra: $0) })
                 }
             } else {
                 ProgressView()
@@ -171,7 +176,7 @@ struct ReviewView: View {
 
                 // The word as it was said in your video: the context is part of the question, the translation is not.
                 if let example = card.example {
-                    Text(highlighted(example)).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                    Text(example.highlighted).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
                         .multilineTextAlignment(.center)
                         .padding(.top, 4)
                 }
@@ -288,7 +293,7 @@ struct ReviewView: View {
     private func listenFace(_ card: ReviewCard) -> some View {
         if revealed {
             if let example = card.example {
-                Text(highlighted(example)).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
+                Text(example.highlighted).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
             }
             answerBlock(card)
         } else {
@@ -489,15 +494,6 @@ struct ReviewView: View {
         Task { await audio.play(example) }
     }
 
-    /// The sentence with the word as it appears in it picked out.
-    private func highlighted(_ example: ExampleLine) -> AttributedString {
-        var text = AttributedString(example.text)
-        if let range = text.range(of: example.surface, options: [.caseInsensitive, .diacriticInsensitive]) {
-            text[range].font = .system(.body, design: .rounded, weight: .medium)
-            text[range].foregroundColor = Color(Theme.ink)
-        }
-        return text
-    }
 
     /// Loads the page's overview. After a session it is kept beneath the summary, and refreshed.
     private func loadOverview(keepingSummary: Bool = false) async {
@@ -505,6 +501,8 @@ struct ReviewView: View {
         error = nil
         do {
             overview = try await env.database.reviewOverview(language: app.languageCode)
+            lessons = try await env.database.dailyLessons(
+                language: app.languageCode, contentPOS: app.profile.contentPOS, perDay: env.dailyLessons.perDay(for: app.profile))
             stats = try await env.database.learningStats(language: app.languageCode)
         } catch { self.error = error.localizedDescription }
     }

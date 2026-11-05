@@ -25,15 +25,18 @@ enum ExtraStudy: Hashable, CaseIterable {
 /// The learn page before a session: what is ready, what to practise, what is coming, and where your words stand.
 struct ReviewOverviewView: View {
     let overview: ReviewOverview
+    let lessons: DailyLessons?
     let stats: LearningStats?
     @Binding var style: ReviewStyle
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let startLessons: () -> Void
     let start: () -> Void
     let practise: (ExtraStudy) -> Void
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
+                lessonsCard
                 ready
                 practice
                 comingUp
@@ -46,6 +49,51 @@ struct ReviewOverviewView: View {
         }
     }
 
+    // MARK: Lessons
+
+    /// Today's new words. Shown when there are some to learn, or to say why there are none.
+    @ViewBuilder
+    private var lessonsCard: some View {
+        if let lessons, !lessons.isOff, !lessons.wordIDs.isEmpty || lessons.heldBack || lessons.startedToday > 0 {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 10) {
+                    HStack(spacing: 10) {
+                        Text("Lessons").font(Theme.title(24))
+                        count(lessons.wordIDs.count)
+                    }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Lessons")
+                    .accessibilityValue(inflected("^[\(lessons.wordIDs.count) lesson](inflect: true) ready"))
+                    Spacer()
+                    Button("Start") { startLessons() }
+                        .buttonStyle(.pill(.primary, compact: true))
+                        .disabled(lessons.wordIDs.isEmpty)
+                }
+                Text(lessonsCaption(lessons)).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+            }
+            .panel()
+        }
+    }
+
+    private func lessonsCaption(_ lessons: DailyLessons) -> String {
+        if lessons.heldBack {
+            return inflected("^[\(overview.dueNow) review](inflect: true) are due. New words wait until fewer than \(LangDatabase.lessonReviewLimit) are, so they don't pile up.")
+        }
+        if lessons.wordIDs.isEmpty {
+            return inflected("You started ^[\(lessons.startedToday) new word](inflect: true) today. More tomorrow.")
+        }
+        return String(localized: "The new words you hear most in your videos. Each comes with a sentence to hear, and nothing is added until you press Learn.")
+    }
+
+    /// The number beside a panel's title: filled when there is something to do.
+    private func count(_ n: Int) -> some View {
+        Text("\(n)")
+            .font(.system(size: 14, weight: .semibold, design: .rounded))
+            .foregroundStyle(n == 0 ? Theme.ink : Theme.onAccent)
+            .padding(.horizontal, 10).padding(.vertical, 2)
+            .background(Capsule().fill(n == 0 ? Theme.ink.opacity(0.12) : Theme.accent))
+    }
+
     // MARK: Ready now
 
     /// What is ready (the title and its count), Start, and the kind of card, together. The kind of card also decides
@@ -55,11 +103,7 @@ struct ReviewOverviewView: View {
             HStack(spacing: 10) {
                 HStack(spacing: 10) {
                     Text("Reviews").font(Theme.title(24))
-                    Text("\(overview.dueNow)")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(overview.dueNow == 0 ? Theme.ink : Theme.onAccent)
-                        .padding(.horizontal, 10).padding(.vertical, 2)
-                        .background(Capsule().fill(overview.dueNow == 0 ? Theme.ink.opacity(0.12) : Theme.accent))
+                    count(overview.dueNow)
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Reviews")

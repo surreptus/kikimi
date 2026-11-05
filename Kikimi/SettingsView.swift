@@ -151,13 +151,16 @@ private struct LanguagesTab: View {
                     Picker("Speech model", selection: modelBinding(profile)) {
                         ForEach(choices(for: profile), id: \.self) { Text(label(for: $0, profile: profile)).tag($0) }
                     }
+                    Picker("New words a day", selection: lessonsBinding(profile)) {
+                        ForEach(DailyLessonPreference.choices, id: \.self) { Text($0 == 0 ? String(localized: "Off") : "\($0)").tag($0) }
+                    }
                     Picker("Sentence audio on review cards", selection: audioBinding(profile)) {
                         ForEach(SentenceAudioMode.allCases, id: \.self) { Text($0.title).tag($0) }
                     }
                 }
             }
             Section {} footer: {
-                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. The kind of card (word and meaning, fill in the word, or listen to the sentence) is chosen on the Learn page. Sentence audio plays only when it wouldn't give the answer away.")
+                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. New words a day sets how many lessons the Learn page offers; Off hides them. The kind of card (word and meaning, fill in the word, or listen to the sentence) is chosen on the Learn page. Sentence audio plays only when it wouldn't give the answer away.")
             }
         }
         .formStyle(.grouped)
@@ -182,6 +185,12 @@ private struct LanguagesTab: View {
                 refresh += 1
                 app.dataChanged()   // so the Videos page re-reads its model choice
             })
+    }
+
+    private func lessonsBinding(_ profile: any LanguageProfile) -> Binding<Int> {
+        Binding(
+            get: { env.dailyLessons.perDay(for: profile) },
+            set: { env.dailyLessons.setPerDay($0, for: profile); refresh += 1; app.dataChanged() })
     }
 
     private func audioBinding(_ profile: any LanguageProfile) -> Binding<SentenceAudioMode> {

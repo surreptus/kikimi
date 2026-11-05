@@ -13,6 +13,7 @@ public final class LangEnvironment: Sendable {
     public let translation: TranslationPreferences
     public let learning: LearningLanguages
     public let reviewAudio: ReviewAudioPreferences
+    public let dailyLessons: DailyLessonPreference
     public let pipeline: ImportPipeline
 
     private static let log = Logger(subsystem: "com.surreptus.Kikimi", category: "dictionary")
@@ -32,6 +33,7 @@ public final class LangEnvironment: Sendable {
         reviewAudio = ReviewAudioPreferences(defaults: defaults)
         videoQuality = VideoQualityPreference(defaults: defaults)
         reviewStyle = ReviewStylePreference(defaults: defaults)
+        dailyLessons = DailyLessonPreference(defaults: defaults)
         translation = TranslationPreferences(defaults: defaults)
         learning = LearningLanguages(defaults: defaults)
         pipeline = ImportPipeline(
