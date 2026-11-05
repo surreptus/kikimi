@@ -153,10 +153,10 @@ extension LangDatabase {
         stride(from: 0, to: ids.count, by: 500).map { Array(ids[$0..<min($0 + 500, ids.count)]) }
     }
 
-    /// Puts words into the review queue at stage 1, due now. Words already being learned or finished are left alone
+    /// Puts words into the review queue at stage 1, due now (or after `delay`, for a word just taught in a lesson and quizzed at once). Words already being learned or finished are left alone
     /// (their stage is not reset). Returns how many were added.
     @discardableResult
-    public func startLearning(wordIDs: [Int64], now: Date = Date()) async throws -> Int {
+    public func startLearning(wordIDs: [Int64], now: Date = Date(), firstReviewAfter delay: TimeInterval = 0) async throws -> Int {
         try await writer.write { [chunks] db in
             var changed = 0
             for ids in chunks(wordIDs) {
@@ -169,7 +169,7 @@ extension LangDatabase {
                     .updateAll(db,
                                Column("status").set(to: WordStatus.learning.rawValue),
                                Column("stage").set(to: SRSStage.stage1.rawValue),
-                               Column("next_review").set(to: now))
+                               Column("next_review").set(to: now.addingTimeInterval(delay)))
             }
             return changed
         }

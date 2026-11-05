@@ -2,14 +2,19 @@ import LangCore
 import SwiftUI
 
 /// Study on top of the schedule. Only a known check can change a word (a miss sends it back to learning).
-enum ExtraStudy: Hashable, CaseIterable {
+enum ExtraStudy: Hashable {
     case ahead, known, finished
+    /// The quiz at the end of a lesson: not offered in Practice, only run by a lesson.
+    case lesson
+
+    static let practiceKinds: [ExtraStudy] = [.ahead, .known, .finished]
 
     var title: LocalizedStringKey {
         switch self {
         case .ahead: "Review ahead"
         case .known: "Review known"
         case .finished: "Practice finished"
+        case .lesson: "Lesson quiz"
         }
     }
 
@@ -18,6 +23,7 @@ enum ExtraStudy: Hashable, CaseIterable {
         case .ahead: "Words you are learning that are not due yet. Nothing moves, whatever you answer."
         case .known: "A quick test of a few words you marked known. Any you miss go back to your reviews, so the numbers stay honest."
         case .finished: "Words that have been through every stage. Nothing moves, whatever you answer."
+        case .lesson: "The words you were just taught, asked at once."
         }
     }
 }
@@ -36,12 +42,8 @@ struct ReviewOverviewView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top, spacing: 14) {
-                    lessonsCard
-                    reviewsCard
-                }
-                .fixedSize(horizontal: false, vertical: true)
-                cardType
+                lessonsCard
+                reviewsCard
                 practice
                 comingUp
                 stages
@@ -55,29 +57,29 @@ struct ReviewOverviewView: View {
 
     // MARK: Lessons
 
-    /// Today's new words. Shown when there are some to learn, or to say why there are none. It is the accent colour, so
-    /// the two things to do here (a lesson, a review) are told apart at a glance.
+    /// Today's new words, taught a few at a time and quizzed at once. Shown when there are some to learn, or to say why
+    /// there are none. It is the accent colour, so the two things to do here (a lesson, a review) are told apart at a glance.
     @ViewBuilder
     private var lessonsCard: some View {
         if let lessons, !lessons.isOff, !lessons.wordIDs.isEmpty || lessons.heldBack || lessons.startedToday > 0 {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 10) {
+            HStack(alignment: .top, spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 10) {
                         Text("Lessons").font(Theme.title(24))
                         count(lessons.wordIDs.count, onAccent: true)
                     }
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("Lessons")
-                    .accessibilityValue(inflected("^[\(lessons.wordIDs.count) lesson](inflect: true) ready"))
-                    Spacer(minLength: 0)
-                    Button("Start") { startLessons() }
-                        .buttonStyle(.pill(.inverted, compact: true))
-                        .disabled(lessons.wordIDs.isEmpty)
+                    .accessibilityValue(inflected("^[\(lessons.wordIDs.count) new word](inflect: true) to learn"))
+                    Text(lessonsCaption(lessons)).font(Theme.small).opacity(0.85).fixedSize(horizontal: false, vertical: true)
                 }
-                Text(lessonsCaption(lessons)).font(Theme.small).opacity(0.85).fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                Button("Start") { startLessons() }
+                    .buttonStyle(.pill(.inverted, compact: true))
+                    .disabled(lessons.wordIDs.isEmpty)
             }
             .foregroundStyle(Theme.onAccent)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
             .background(RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(Theme.accent))
         }
@@ -90,7 +92,7 @@ struct ReviewOverviewView: View {
         if lessons.wordIDs.isEmpty {
             return inflected("You started ^[\(lessons.startedToday) new word](inflect: true) today. More tomorrow.")
         }
-        return String(localized: "The new words you hear most in your videos. Each comes with a sentence to hear, and nothing is added until you press Learn.")
+        return String(localized: "The new words you hear most in your videos, \(DailyLessons.batchSize) at a time: you are taught them, then asked them at once.")
     }
 
     /// The number beside a panel's title: filled when there is something to do.
@@ -104,9 +106,9 @@ struct ReviewOverviewView: View {
 
     // MARK: Ready now
 
-    /// What is ready to review: the title and its count, and Start.
+    /// What is ready to review: the title and its count, Start, and the kind of card that reviews and practice use.
     private var reviewsCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 HStack(spacing: 10) {
                     Text("Reviews").font(Theme.title(24))
@@ -121,16 +123,8 @@ struct ReviewOverviewView: View {
                     .keyboardShortcut(.space, modifiers: [])
                     .disabled(overview.dueNow == 0)
             }
-            Text(overview.dueNow == 0 ? nextText : String(localized: "Words you are learning that are due, each in a sentence from your videos."))
-                .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .panel()
-    }
+            if overview.dueNow == 0 { Text(nextText).font(Theme.small).foregroundStyle(Theme.muted) }
 
-    /// The kind of card, which Reviews and Practice both use.
-    private var cardType: some View {
-        VStack(alignment: .leading, spacing: 12) {
             IconSegmentedPicker(
                 options: ReviewStyle.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
                 selection: $style)
@@ -139,7 +133,7 @@ struct ReviewOverviewView: View {
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
                 .id(style)   // a new line for each choice, which fades in as the panel resizes
                 .transition(.opacity)
-            Text("The card type is used in Reviews and in Practice.").font(Theme.small).foregroundStyle(Theme.muted)
+            Text("The card type is used for reviews and for the practice below, not for lessons.").font(Theme.small).foregroundStyle(Theme.muted)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .panel()
@@ -158,7 +152,7 @@ struct ReviewOverviewView: View {
     /// there is enough to practise.
     @ViewBuilder
     private var practice: some View {
-        let rows = ExtraStudy.allCases.filter { count($0) >= minimum($0) }
+        let rows = ExtraStudy.practiceKinds.filter { count($0) >= minimum($0) }
         if !rows.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Practice").font(Theme.title(17))
@@ -189,6 +183,7 @@ struct ReviewOverviewView: View {
         case .ahead: overview.learning - overview.dueNow
         case .known: overview.known
         case .finished: overview.finished
+        case .lesson: 0
         }
     }
 

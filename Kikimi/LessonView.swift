@@ -13,16 +13,18 @@ extension ExampleLine {
     }
 }
 
-/// A lesson: the day's new words one at a time, each in a sentence from your videos, with its meaning showing. Learn
-/// puts the word into your reviews; Known says you already know it. Nothing is added without a press.
+/// Teaching a few new words, one at a time, each in a sentence from your videos with its meaning showing. Next teaches
+/// the word; Already know it marks it known. When the batch is done the words are started (their first review is hours
+/// away) and the page quizzes them at once, so each is asked while it is fresh.
 struct LessonView: View {
     let env: LangEnvironment
     let wordIDs: [Int64]
-    let finish: () -> Void
+    /// The words that were taught (and are now being learned), and whether to quiz them. Leaving early does not quiz.
+    let finish: (_ taught: [Int64], _ quiz: Bool) -> Void
     @Environment(AppState.self) private var app
     @State private var index = 0
     @State private var card: ReviewCard?
-    @State private var learned = 0
+    @State private var taught: [Int64] = []
     @State private var known = 0
     @State private var audio: SentenceAudioPlayer?
     @State private var error: String?
@@ -30,10 +32,10 @@ struct LessonView: View {
     var body: some View {
         VStack(spacing: 20) {
             HStack(spacing: 14) {
-                Button("End lesson", systemImage: "xmark") { end() }
+                Button("End lesson", systemImage: "xmark") { Task { await end() } }
                     .labelStyle(.pillIcon).buttonStyle(.pill(.secondary, compact: true))
                     .keyboardShortcut(.escape, modifiers: [])
-                    .help("Back to the Learn page (Esc). Words you have already answered are kept.")
+                    .help("Back to the Learn page (Esc). Words you have already been taught are kept.")
                 ProgressView(value: Double(index), total: Double(max(1, wordIDs.count)))
                     .progressViewStyle(.thin)
                 Text("\(max(0, wordIDs.count - index)) left").font(.system(size: 12, weight: .medium, design: .rounded))
@@ -46,8 +48,6 @@ struct LessonView: View {
                 Text(error).foregroundStyle(Theme.muted)
             } else if let card {
                 face(card)
-            } else if index >= wordIDs.count {
-                done
             } else {
                 ProgressView()
             }
@@ -84,31 +84,17 @@ struct LessonView: View {
             .panel(padding: 0, radius: 28)
 
             HStack(spacing: 16) {
-                Button { Task { await answer(learn: false) } } label: { KeyedLabel(title: "Already know it", systemImage: "checkmark", key: "K") }
+                Button { Task { await answer(teach: false) } } label: { KeyedLabel(title: "Already know it", systemImage: "checkmark", key: "K") }
                     .buttonStyle(.pill(.secondary))
                     .keyboardShortcut("k", modifiers: [])
-                Button { Task { await answer(learn: true) } } label: { KeyedLabel(title: "Learn", systemImage: "plus", key: "Return") }
+                Button { Task { await answer(teach: true) } } label: { KeyedLabel(title: "Next", systemImage: "arrow.right", key: "Return") }
                     .buttonStyle(.pill)
                     .keyboardShortcut(.defaultAction)
             }
-            Text("Learn adds it to your reviews. Already know it marks it known.")
+            Text("You will be asked these words as soon as you have seen them all.")
                 .font(Theme.small).foregroundStyle(Theme.muted)
         }
         .padding(28)
-    }
-
-    private var done: some View {
-        VStack(spacing: 12) {
-            Text("Lesson done").font(Theme.title(30))
-            Text(summary).font(.system(.title3, design: .rounded)).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
-            Button("Back to Learn") { end() }.buttonStyle(.pill).keyboardShortcut(.defaultAction).padding(.top, 8)
-        }
-    }
-
-    private var summary: String {
-        learned == 0
-            ? String(localized: "No words added to your reviews.")
-            : inflected("^[\(learned) word](inflect: true) added to your reviews, first one back in a few hours.")
     }
 
     private func lemma(_ card: ReviewCard) -> String {
@@ -131,21 +117,28 @@ struct LessonView: View {
         Task { await audio.play(example) }
     }
 
-    private func answer(learn: Bool) async {
+    private func answer(teach: Bool) async {
         guard let id = card?.word.id else { return }
         audio?.stop()
         do {
-            if learn { try await env.database.startLearning(wordID: id); learned += 1 }
-            else { try await env.database.markKnown(wordID: id); known += 1 }
+            if teach { taught.append(id) } else { try await env.database.markKnown(wordID: id); known += 1 }
             card = nil
             index += 1
-            await app.refreshDue()
+            if index >= wordIDs.count { await end(quiz: true) }
         } catch { self.error = error.localizedDescription }
     }
 
-    private func end() {
+    /// Starts the words that were taught, with their first review a stage-1 interval away: the quiz that follows is the
+    /// first look, so they are not also due at once.
+    private func end(quiz: Bool = false) async {
         audio?.stop()
-        if learned + known > 0 { app.dataChanged() }
-        finish()
+        do {
+            if !taught.isEmpty {
+                try await env.database.startLearning(wordIDs: taught, firstReviewAfter: SRS.intervals[0])
+            }
+            if !taught.isEmpty || known > 0 { app.dataChanged() }
+            await app.refreshDue()
+            finish(taught, quiz)
+        } catch { self.error = error.localizedDescription }
     }
 }

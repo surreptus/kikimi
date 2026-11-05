@@ -7,8 +7,10 @@ struct ReviewView: View {
 
     @State private var overview: ReviewOverview?
     @State private var lessons: DailyLessons?
-    /// The lesson under way, as the words it will go through.
-    @State private var lessonIDs: [Int64]?
+    /// The words of the lesson being taught now.
+    @State private var teaching: [Int64]?
+    /// The rest of today's lessons, in the groups they are taught.
+    @State private var lessonQueue: [[Int64]] = []
     @State private var stats: LearningStats?
     @State private var session: ReviewSession?
     @State private var card: ReviewCard?
@@ -44,21 +46,21 @@ struct ReviewView: View {
         Group {
             if let error {
                 ContentUnavailableView("Review failed", systemImage: "exclamationmark.triangle", description: Text(error))
-            } else if let lessonIDs {
-                LessonView(env: env, wordIDs: lessonIDs) { self.lessonIDs = nil; Task { await loadOverview() } }
+            } else if let teaching {
+                LessonView(env: env, wordIDs: teaching, finish: lessonFinished)
             } else if let card {
                 cardWithWord(card)
             } else if let summary {
                 VStack(spacing: 0) {
                     finished(summary).padding(.top, 28)
-                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, lessons: lessons, stats: stats, style: styleChoice, startLessons: { lessonIDs = lessons?.wordIDs }, start: { startSession() }, practise: { startSession(extra: $0) }) }
+                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, lessons: lessons, stats: stats, style: styleChoice, startLessons: startLessons, start: { startSession() }, practise: { startSession(extra: $0) }) }
                 }
             } else if let overview {
                 if overview.isEmpty, lessons?.wordIDs.isEmpty ?? true {
                     EmptyState(title: "Nothing to review yet", message: "Choose words to learn on the Words page, then come back.",
                                actionTitle: "Go to Words", action: { app.select(.words) })
                 } else {
-                    ReviewOverviewView(overview: overview, lessons: lessons, stats: stats, style: styleChoice, startLessons: { lessonIDs = lessons?.wordIDs }, start: { startSession() }, practise: { startSession(extra: $0) })
+                    ReviewOverviewView(overview: overview, lessons: lessons, stats: stats, style: styleChoice, startLessons: startLessons, start: { startSession() }, practise: { startSession(extra: $0) })
                 }
             } else {
                 ProgressView()
@@ -74,9 +76,21 @@ struct ReviewView: View {
 
     private func finished(_ summary: (answered: Int, correct: Int)) -> some View {
         VStack(spacing: 12) {
-            Text(extra == nil ? "All done for now" : "Practice done").font(Theme.title(30))
+            Text(extra == nil ? "All done for now" : extra == .lesson ? "Lesson done" : "Practice done").font(Theme.title(30))
             Text(summaryText(summary))
                 .font(.system(.title3, design: .rounded)).foregroundStyle(Theme.muted)
+            if extra == .lesson {
+                HStack(spacing: 12) {
+                    if !lessonQueue.isEmpty {
+                        Button("Next \(min(DailyLessons.batchSize, lessonQueue[0].count)) words") { teachNext() }
+                            .buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
+                    }
+                    Button("Back to Learn") { endSession() }
+                        .buttonStyle(.pill(lessonQueue.isEmpty ? .primary : .secondary, compact: true))
+                        .keyboardShortcut(lessonQueue.isEmpty ? .defaultAction : nil)
+                }
+                .padding(.top, 8)
+            }
             if extra == .known, returned > 0 {
                 Text(inflected("^[\(returned) word](inflect: true) went back to your reviews, so each video's coverage no longer counts it as known."))
                     .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
@@ -88,6 +102,7 @@ struct ReviewView: View {
         switch extra {
         case nil: String(localized: "\(summary.correct) of \(summary.answered) answers right the first time.")
         case .known: String(localized: "You knew \(summary.correct) of \(summary.answered) of the words you marked known.")
+        case .lesson: String(localized: "\(summary.correct) of \(summary.answered) right the first time. They come back for review in a few hours.")
         case .ahead, .finished: String(localized: "You got \(summary.correct) of \(summary.answered) right. Nothing moved: these words keep their schedule.")
         }
     }
@@ -507,7 +522,26 @@ struct ReviewView: View {
         } catch { self.error = error.localizedDescription }
     }
 
+    private func startLessons() {
+        lessonQueue = lessons?.batches ?? []
+        teachNext()
+    }
+
+    private func teachNext() {
+        guard !lessonQueue.isEmpty else { teaching = nil; Task { await loadOverview() }; return }
+        teaching = lessonQueue.removeFirst()
+        summary = nil; extra = nil
+    }
+
+    /// A batch has been taught: quiz it at once, or, if it was left early, go back with nothing more to do.
+    private func lessonFinished(_ started: [Int64], quiz: Bool) {
+        teaching = nil
+        guard quiz else { lessonQueue = []; Task { await loadOverview() }; return }
+        if started.isEmpty { teachNext() } else { Task { await begin(extra: .lesson, lessonWords: started) } }
+    }
+
     private func endSession() {
+        lessonQueue = []
         audio?.stop()
         session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil; extra = nil
         Task { await loadOverview() }
@@ -522,7 +556,7 @@ struct ReviewView: View {
 
     private func startSession(extra: ExtraStudy? = nil) { Task { await begin(extra: extra) } }
 
-    private func begin(extra chosen: ExtraStudy? = nil) async {
+    private func begin(extra chosen: ExtraStudy? = nil, lessonWords: [Int64] = []) async {
         session = nil; card = nil; summary = nil; error = nil; revealed = false
         audio?.stop()
         audio = SentenceAudioPlayer(libraryRoot: env.libraryURL)
@@ -536,7 +570,8 @@ struct ReviewView: View {
             let new: ReviewSession
             switch chosen {
             case nil: new = try await ReviewSession(database: env.database, language: app.languageCode, preferring: short)
-            case .known: new = try await ReviewSession(checkingKnown: env.database, language: app.languageCode)
+            case .known: new = try await ReviewSession(checkingKnown: env.database, language: app.languageCode, preferring: short)
+            case .lesson: new = ReviewSession(lessonQuiz: lessonWords, database: env.database, language: app.languageCode, preferring: short)
             case .ahead: new = try await ReviewSession(practising: .ahead, database: env.database, language: app.languageCode, preferring: short)
             case .finished: new = try await ReviewSession(practising: .finished, database: env.database, language: app.languageCode, preferring: short)
             }

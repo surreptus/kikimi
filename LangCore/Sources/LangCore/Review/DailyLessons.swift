@@ -22,6 +22,9 @@ public struct DailyLessonPreference: @unchecked Sendable {
 
 /// Today's lessons: the new words that matter most in your videos, as many as the day's allowance still has room for.
 public struct DailyLessons: Equatable, Sendable {
+    /// Words taught before they are quizzed: a few at a time, so each is still fresh when the quiz comes.
+    public static let batchSize = 5
+
     /// Most useful first.
     public var wordIDs: [Int64] = []
     /// Words started today by any route, which use up the allowance.
@@ -31,6 +34,11 @@ public struct DailyLessons: Equatable, Sendable {
     public var heldBack = false
 
     public var isOff: Bool { perDay == 0 }
+
+    /// The day's words in the groups a lesson teaches and then quizzes.
+    public var batches: [[Int64]] {
+        stride(from: 0, to: wordIDs.count, by: Self.batchSize).map { Array(wordIDs[$0..<min($0 + Self.batchSize, wordIDs.count)]) }
+    }
 }
 
 extension LangDatabase {

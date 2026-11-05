@@ -48,6 +48,8 @@ public actor ReviewSession {
     public let isKnownCheck: Bool
     /// Extra study (review ahead, practice finished): answers are counted and nothing else changes.
     public let isPractice: Bool
+    /// In a lesson's quiz a missed word is asked again until it is right, as the quiz is how the lesson sinks in.
+    private let repeatsMisses: Bool
     public private(set) var answered = 0
     public private(set) var correctFirstTry = 0
     /// In a known-words check: how many were missed, and so went back to being learned.
@@ -59,17 +61,20 @@ public actor ReviewSession {
         self.preferring = preferring
         isKnownCheck = false
         isPractice = false
+        repeatsMisses = false
         queue = try await database.dueWords(language: language, now: now).compactMap(\.id)
     }
 
     /// A quick check of a few words you marked known. A missed word goes back to being learned (so a video's coverage
     /// stops counting it as known); a word you knew is left alone.
-    public init(checkingKnown database: LangDatabase, language: String, count: Int = 10) async throws {
+    public init(checkingKnown database: LangDatabase, language: String, count: Int = 10,
+                preferring: (@Sendable (ExampleLine) -> Bool)? = nil) async throws {
         self.database = database
         self.language = language
-        preferring = nil
+        self.preferring = preferring
         isKnownCheck = true
         isPractice = false
+        repeatsMisses = false
         queue = try await database.knownSample(language: language, count: count)
     }
 
@@ -81,7 +86,21 @@ public actor ReviewSession {
         self.preferring = preferring
         isKnownCheck = false
         isPractice = true
+        repeatsMisses = false
         queue = try await database.practiceSample(kind, language: language, count: count, now: now)
+    }
+
+    /// The quiz at the end of a lesson: these words, asked now, with nothing changed by the answers (the words were just
+    /// started, so their first real review is hours away) and a missed word asked again until it is right.
+    public init(lessonQuiz wordIDs: [Int64], database: LangDatabase, language: String,
+                preferring: (@Sendable (ExampleLine) -> Bool)? = nil) {
+        self.database = database
+        self.language = language
+        self.preferring = preferring
+        isKnownCheck = false
+        isPractice = true
+        repeatsMisses = true
+        queue = wordIDs
     }
 
     public var remaining: Int { queue.count }
@@ -108,7 +127,12 @@ public actor ReviewSession {
         cached = nil
         answered += 1
         if isPractice {
-            if correct { correctFirstTry += 1 }
+            if correct {
+                if !missed.contains(id) { correctFirstTry += 1 }
+            } else if repeatsMisses {
+                missed.insert(id)
+                queue.append(id)
+            }
             return
         }
         if isKnownCheck {

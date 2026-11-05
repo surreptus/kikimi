@@ -60,3 +60,45 @@ final class PracticeTests: XCTestCase {
         XCTAssertEqual(before, after, "no stage, status or date moved")
     }
 }
+
+final class LessonQuizTests: XCTestCase {
+    func testTheDayIsTaughtInBatchesOfFive() {
+        let lessons = DailyLessons(wordIDs: Array(1...12), perDay: 15)
+        XCTAssertEqual(lessons.batches.map(\.count), [5, 5, 2])
+        XCTAssertTrue(DailyLessons().batches.isEmpty)
+    }
+
+    func testAWordTaughtInALessonIsDueAfterItsFirstInterval() async throws {
+        let db = try LangDatabase()
+        let id = try await db.writer.write { d -> Int64 in
+            var w = Word(language: "es", lemma: "casa", pos: .noun); try w.insert(d); return w.id!
+        }
+        let now = Date()
+        try await db.startLearning(wordIDs: [id], now: now, firstReviewAfter: SRS.intervals[0])
+        let word = try await db.word(id: id)
+        XCTAssertEqual(word?.nextReview?.timeIntervalSince(now) ?? 0, SRS.intervals[0], accuracy: 0.01)
+        let due = try await db.dueCount(language: "es", now: now)
+        XCTAssertEqual(due, 0, "the lesson's own quiz is the first look, so it is not also a review")
+    }
+
+    func testAMissedWordInTheQuizIsAskedAgainAndNothingMoves() async throws {
+        let db = try LangDatabase()
+        let ids = try await db.writer.write { d -> [Int64] in
+            try ["casa", "perro"].map { lemma in
+                var w = Word(language: "es", lemma: lemma, pos: .noun, status: .learning, stage: .stage1,
+                             nextReview: Date().addingTimeInterval(14_400)); try w.insert(d); return w.id!
+            }
+        }
+        let session = ReviewSession(lessonQuiz: ids, database: db, language: "es")
+        _ = try await session.currentCard(); try await session.answer(correct: false)   // casa missed
+        _ = try await session.currentCard(); try await session.answer(correct: true)    // perro right
+        var remaining = await session.remaining
+        XCTAssertEqual(remaining, 1, "casa comes back")
+        _ = try await session.currentCard(); try await session.answer(correct: true)
+        remaining = await session.remaining
+        let correct = await session.correctFirstTry
+        XCTAssertEqual([remaining, correct], [0, 1], "only perro was right the first time")
+        let stages = try await db.writer.read { try Word.fetchAll($0).map(\.stage) }
+        XCTAssertEqual(stages, [.stage1, .stage1])
+    }
+}

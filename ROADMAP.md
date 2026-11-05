@@ -147,9 +147,12 @@ Ordered by how much each helps comprehensible input per unit of effort.
         no videos yet there is nothing to queue (see the frequency-list item).
       - **No pile-up.** The day's lessons don't accumulate: unused ones lapse at midnight (our choice, to settle), and no new ones
         are offered while the reviews due are over a limit, as WaniKani does for overload. The limit (say 100) needs measuring.
-      - **The lesson.** One word at a time: the word in a sentence from one of your videos with its audio, then its meaning,
-        readings, article (nouns), kanji (Japanese) and the translation only when asked; pressing "Learn" puts it at stage 1.
-        Not a silent bulk add.
+      - **The lesson** (changed 5 Nov 2026, from the user's feedback: a lesson teaches a batch and quizzes it at once, as
+        WaniKani's does). Five words at a time, one by one: the word in a sentence from one of your videos with its audio and
+        its meaning. "Next" teaches it, "Already know it" marks it known. When the batch is done the words start at stage 1
+        with their first review one stage-1 interval (4 hours) away, and the page quizzes them straight away in the chosen
+        card type, asking a missed word again until it is right; the quiz moves no stage. Then the next five. Not a silent
+        bulk add. Reviews and Practice (including the known and finished rechecks) use the chosen card type; lessons do not.
       - **Where it shows.** The Lessons card on the Learn page (above), with its count, for the language you are in.
       - **Counting the day.** The activity log already records each word started (`learn`), by day, so no new table is needed.
         It counts every start, including words you pick on Words or take from a video's goal; I'd let those use up the day's
