@@ -77,7 +77,7 @@ enum Theme {
 
 /// A solid pill. Primary is the one action that matters (ink face); secondary is a quiet translucent pill.
 struct PillButtonStyle: ButtonStyle {
-    enum Kind { case primary, secondary, danger }
+    enum Kind { case primary, secondary, danger, inverted }
 
     var kind: Kind = .primary
     var compact = false
@@ -104,6 +104,7 @@ struct PillButtonStyle: ButtonStyle {
         case .primary: Theme.accent
         case .secondary: Theme.softStrong
         case .danger: Color(hex: 0xC62828)
+        case .inverted: Theme.onAccent   // on a panel that is itself the accent colour
         }
     }
 
@@ -112,6 +113,7 @@ struct PillButtonStyle: ButtonStyle {
         case .primary: Theme.onAccent
         case .secondary: Theme.ink
         case .danger: .white
+        case .inverted: Theme.accent
         }
     }
 }

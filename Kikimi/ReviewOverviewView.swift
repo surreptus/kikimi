@@ -36,8 +36,12 @@ struct ReviewOverviewView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                lessonsCard
-                ready
+                HStack(alignment: .top, spacing: 14) {
+                    lessonsCard
+                    reviewsCard
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                cardType
                 practice
                 comingUp
                 stages
@@ -51,7 +55,8 @@ struct ReviewOverviewView: View {
 
     // MARK: Lessons
 
-    /// Today's new words. Shown when there are some to learn, or to say why there are none.
+    /// Today's new words. Shown when there are some to learn, or to say why there are none. It is the accent colour, so
+    /// the two things to do here (a lesson, a review) are told apart at a glance.
     @ViewBuilder
     private var lessonsCard: some View {
         if let lessons, !lessons.isOff, !lessons.wordIDs.isEmpty || lessons.heldBack || lessons.startedToday > 0 {
@@ -59,19 +64,22 @@ struct ReviewOverviewView: View {
                 HStack(spacing: 10) {
                     HStack(spacing: 10) {
                         Text("Lessons").font(Theme.title(24))
-                        count(lessons.wordIDs.count)
+                        count(lessons.wordIDs.count, onAccent: true)
                     }
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("Lessons")
                     .accessibilityValue(inflected("^[\(lessons.wordIDs.count) lesson](inflect: true) ready"))
-                    Spacer()
+                    Spacer(minLength: 0)
                     Button("Start") { startLessons() }
-                        .buttonStyle(.pill(.primary, compact: true))
+                        .buttonStyle(.pill(.inverted, compact: true))
                         .disabled(lessons.wordIDs.isEmpty)
                 }
-                Text(lessonsCaption(lessons)).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+                Text(lessonsCaption(lessons)).font(Theme.small).opacity(0.85).fixedSize(horizontal: false, vertical: true)
             }
-            .panel()
+            .foregroundStyle(Theme.onAccent)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(16)
+            .background(RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(Theme.accent))
         }
     }
 
@@ -86,20 +94,19 @@ struct ReviewOverviewView: View {
     }
 
     /// The number beside a panel's title: filled when there is something to do.
-    private func count(_ n: Int) -> some View {
+    private func count(_ n: Int, onAccent: Bool = false) -> some View {
         Text("\(n)")
             .font(.system(size: 14, weight: .semibold, design: .rounded))
-            .foregroundStyle(n == 0 ? Theme.ink : Theme.onAccent)
+            .foregroundStyle(onAccent ? Theme.accent : (n == 0 ? Theme.ink : Theme.onAccent))
             .padding(.horizontal, 10).padding(.vertical, 2)
-            .background(Capsule().fill(n == 0 ? Theme.ink.opacity(0.12) : Theme.accent))
+            .background(Capsule().fill(onAccent ? Theme.onAccent : (n == 0 ? Theme.ink.opacity(0.12) : Theme.accent)))
     }
 
     // MARK: Ready now
 
-    /// What is ready (the title and its count), Start, and the kind of card, together. The kind of card also decides
-    /// the review of known words.
-    private var ready: some View {
-        VStack(alignment: .leading, spacing: 12) {
+    /// What is ready to review: the title and its count, and Start.
+    private var reviewsCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
                 HStack(spacing: 10) {
                     Text("Reviews").font(Theme.title(24))
@@ -108,14 +115,22 @@ struct ReviewOverviewView: View {
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Reviews")
                 .accessibilityValue(inflected("^[\(overview.dueNow) review](inflect: true) ready"))
-                Spacer()
+                Spacer(minLength: 0)
                 Button("Start") { start() }
                     .buttonStyle(.pill(.primary, compact: true))
                     .keyboardShortcut(.space, modifiers: [])
                     .disabled(overview.dueNow == 0)
             }
-            if overview.dueNow == 0 { Text(nextText).font(Theme.small).foregroundStyle(Theme.muted) }
+            Text(overview.dueNow == 0 ? nextText : String(localized: "Words you are learning that are due, each in a sentence from your videos."))
+                .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .panel()
+    }
 
+    /// The kind of card, which Reviews and Practice both use.
+    private var cardType: some View {
+        VStack(alignment: .leading, spacing: 12) {
             IconSegmentedPicker(
                 options: ReviewStyle.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
                 selection: $style)
@@ -124,8 +139,9 @@ struct ReviewOverviewView: View {
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
                 .id(style)   // a new line for each choice, which fades in as the panel resizes
                 .transition(.opacity)
-            Text("Also used in Practice.").font(Theme.small).foregroundStyle(Theme.muted)
+            Text("The card type is used in Reviews and in Practice.").font(Theme.small).foregroundStyle(Theme.muted)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .panel()
         .animation(reduceMotion ? nil : Theme.easeOut(0.18), value: style)
     }
