@@ -141,6 +141,8 @@ struct PlayerView: View {
         Task {
             switch status {
             case .learning: try? await env.database.startLearning(wordID: id)
+            case .ignored: try? await env.database.markIgnored(wordIDs: [id])
+            case .new: try? await env.database.markNew(wordIDs: [id])
             default: try? await env.database.markKnown(wordID: id)
             }
             app.dataChanged()
@@ -424,15 +426,25 @@ struct PlayerView: View {
                     }
                     Spacer()
                     if hint?.wordID != nil {
-                        if hint?.status != .learning && hint?.status != .finished {
+                        if hint?.status == .ignored {
+                            Button { setStatus(.new) } label: { KeyedLabel(title: "Restore", key: "L") }.buttonStyle(.pill(.secondary, compact: true))
+                                .keyboardShortcut("l", modifiers: [])
+                                .help("Bring this word back as a new word (L)")
+                        }
+                        if hint?.status != .learning && hint?.status != .finished && hint?.status != .ignored {
                             Button { setStatus(.learning) } label: { KeyedLabel(title: "Learn", key: "L") }.buttonStyle(.pill(compact: true))
                                 .keyboardShortcut("l", modifiers: [])
                                 .help("Start learning this word (L)")
                         }
-                        if hint?.status != .known {
+                        if hint?.status != .known && hint?.status != .ignored {
                             Button { setStatus(.known) } label: { KeyedLabel(title: "Known", key: "K") }.buttonStyle(.pill(.secondary, compact: true))
                                 .keyboardShortcut("k", modifiers: [])
                                 .help("Mark this word as known (K)")
+                        }
+                        if hint?.status == .new {
+                            Button { setStatus(.ignored) } label: { KeyedLabel(title: "Ignore", key: "X") }.buttonStyle(.pill(.quiet, compact: true))
+                                .keyboardShortcut("x", modifiers: [])
+                                .help("Set this word aside: not worth learning, such as a name or a mistake (X)")
                         }
                     }
                 }

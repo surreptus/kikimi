@@ -16,7 +16,7 @@ struct RootView: View {
                     Text("Opening your library…").font(Theme.title(18)).foregroundStyle(Theme.ink)
                 }
             case .failed(let message):
-                ContentUnavailableView("Couldn't start", systemImage: "exclamationmark.triangle", description: Text(message))
+                FailureView(title: "Couldn't start", detail: message)
             case .ready(let env):
                 if app.needsOnboarding { card { OnboardingView(env: env) } } else { layout(env) }
             }

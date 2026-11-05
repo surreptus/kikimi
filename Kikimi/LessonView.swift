@@ -45,7 +45,7 @@ struct LessonView: View {
 
             Spacer(minLength: 0)
             if let error {
-                Text(error).foregroundStyle(Theme.muted)
+                FailureView(title: "Something went wrong", detail: error)
             } else if let card {
                 face(card)
             } else {

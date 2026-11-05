@@ -302,7 +302,7 @@ struct ImportSection: View {
                         .font(Theme.small).foregroundStyle(Theme.muted)
                 }
                 Spacer()
-                Button("Start") { startImport() }
+                Button("Start import") { startImport() }
                     .buttonStyle(.pill(.primary, compact: true))
                     .keyboardShortcut(.defaultAction)
                     .disabled(!canStart)

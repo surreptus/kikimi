@@ -61,7 +61,7 @@ struct AboutView: View {
     private var gettingStarted: some View {
         section("The first time") {
             VStack(alignment: .leading, spacing: 12) {
-                step(1, "Add a video", "Drop a video you own on Videos, then press Start. Got an .srt or .vtt subtitle file? Press Add subtitles and nothing is transcribed. Otherwise, the first time, download a speech model once.")
+                step(1, "Add a video", "Drop a video you own on Videos, then press Start import. Got an .srt or .vtt subtitle file? Press Add subtitles and nothing is transcribed. Otherwise, the first time, download a speech model once.")
                 step(2, "Let it transcribe", "Kikimi listens on this Mac and writes out what is said, with times. This is the long step: about 3 minutes for a 10 minute video in our tests.")
                 step(3, "Choose your words", "On Words, the words from your videos are listed by how often they appear. Press Learn on the ones you want, or Known on the ones you already know. Or let Learn offer the words you hear most each day, 15 by default (Settings > Languages).")
                 step(4, "Practise", "On Learn, the words you are learning come back at set times, each in a sentence from your videos. Choose the kind of card above Start, and come back whenever the number beside Learn is above zero.")

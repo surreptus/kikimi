@@ -166,9 +166,16 @@ struct WordDetail: View {
                     Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
                         .help("Start learning this word")
                 }
-                if row.word.status != .known {
+                if row.word.status != .known, row.word.status != .ignored {
                     Button("Known") { setStatus(.known) }.buttonStyle(.pill(.secondary, compact: true))
                         .help("Mark this word as known")
+                }
+                if row.word.status == .ignored {
+                    Button("Restore") { setStatus(.new) }.buttonStyle(.pill(.secondary, compact: true))
+                        .help("Bring this word back as a new word")
+                } else {
+                    Button("Ignore") { setStatus(.ignored) }.buttonStyle(.pill(.quiet, compact: true))
+                        .help("Set this word aside: it is not worth learning, such as a name or a mistake")
                 }
             }
         }
@@ -176,8 +183,12 @@ struct WordDetail: View {
 
     private func setStatus(_ status: WordStatus) {
         Task {
-            if status == .learning { try? await env.database.startLearning(wordID: row.id) }
-            else { try? await env.database.markKnown(wordID: row.id) }
+            switch status {
+            case .learning: try? await env.database.startLearning(wordID: row.id)
+            case .ignored: try? await env.database.markIgnored(wordIDs: [row.id])
+            case .new: try? await env.database.markNew(wordIDs: [row.id])
+            default: try? await env.database.markKnown(wordID: row.id)
+            }
             app.dataChanged()
         }
     }

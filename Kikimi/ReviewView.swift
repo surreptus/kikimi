@@ -45,7 +45,7 @@ struct ReviewView: View {
     var body: some View {
         Group {
             if let error {
-                ContentUnavailableView("Review failed", systemImage: "exclamationmark.triangle", description: Text(error))
+                FailureView(title: "Something went wrong", detail: error)
             } else if let teaching {
                 LessonView(env: env, wordIDs: teaching, finish: lessonFinished)
             } else if let card {

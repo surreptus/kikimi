@@ -329,7 +329,7 @@ struct ReviewOverviewView: View {
                     .accessibilityLabel("Stage \(i + 1), back after \(Self.gaps[i].long): \(inflected("^[\(overview.perStage[i]) word](inflect: true)"))")
                 }
             }
-            Text("Under each ring: how long until a word at that stage comes back for review.")
+            Text("Under each ring: how long until a word at that stage comes back. Get it right to move up a stage, miss it to drop one; after stage 8 a word is Finished and no longer comes back for review.")
                 .font(Theme.small).foregroundStyle(Theme.muted)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

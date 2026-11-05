@@ -106,7 +106,7 @@ private struct GeneralTab: View {
                     ForEach(translationChoices) { Text($0.name).tag($0.id) }
                 }
             } footer: {
-                Text("Made on this Mac by macOS, so they can be wrong. \"When I ask\" keeps each hidden until you press the translate button on a line, or T, so you listen first. A video already in this language isn't translated. macOS may ask you to download a language once, in System Settings > General > Language & Region > Translation Languages.")
+                Text("Made on this Mac by macOS, so they can be wrong. \"When I ask\" keeps them hidden until you press the translate button on a line, or T, so you listen first. macOS may ask you to download a language once.")
             }
             }
             Section {
@@ -115,7 +115,7 @@ private struct GeneralTab: View {
                     Text("Original quality").tag(VideoQuality.original.rawValue)
                 }
             } footer: {
-                Text("The copy Kikimi keeps of each video you add. Smallest compresses it (in our tests a 161 MB video became 29 MB), which is plenty to follow along and study from. Original quality keeps your file exactly as it is: the best picture and sound, but the same size. Your own files are never changed either way, and this applies to videos you add from now on.")
+                Text("Smallest compresses the copy Kikimi keeps (in our tests 161 MB became 29 MB), plenty to study from. Your own files are never changed. Applies to videos you add from now on.")
             }
         }
         .formStyle(.grouped)
@@ -160,7 +160,7 @@ private struct LanguagesTab: View {
                 }
             }
             Section {} footer: {
-                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. New words a day sets how many lessons the Learn page offers; Off hides them. The kind of card (word and meaning, fill in the word, or listen to the sentence) is chosen on the Learn page. Sentence audio plays only when it wouldn't give the answer away.")
+                Text("A model downloads once, from the Videos page, the first time you need it, and applies to videos you add from now on. Sentence audio plays only when it wouldn't give the answer away.")
             }
         }
         .formStyle(.grouped)
@@ -261,7 +261,7 @@ private struct DataTab: View {
             } header: {
                 Text("Words you already know")
             } footer: {
-                Text("Choose a text file of \(app.profile.displayName) words you know, one per line (or the first column of a CSV, such as an Anki export). They're marked known, so each video's coverage reflects what you can really follow. Only words already in your library change; to do another language, switch it in the sidebar first.")
+                Text("Choose a text file of \(app.profile.displayName) words you know, one per line (or the first column of a CSV, such as an Anki export). They're marked known, so each video's coverage reflects what you can follow. To do another language, switch it in the sidebar first.")
             }
 
             Section {

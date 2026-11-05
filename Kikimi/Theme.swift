@@ -396,6 +396,27 @@ enum Illustration {
 }
 
 /// Nothing here yet: a character, a title and one line saying what to do. Not for errors, which keep the warning icon.
+/// When something went wrong: what to do in plain words, with the technical message below for anyone reporting it.
+struct FailureView: View {
+    let title: LocalizedStringKey
+    let detail: String
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle").font(.system(size: 36)).foregroundStyle(Theme.muted).accessibilityHidden(true)
+            Text(title).font(Theme.title(22))
+            Text("Quit Kikimi and open it again. If it keeps happening, report it, and include the message below. Reports are public, so leave out anything personal.")
+                .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center).frame(maxWidth: 420)
+            Link("Report a problem", destination: URL(string: "https://github.com/surreptus/kikimi/issues")!)
+                .font(Theme.small)
+            Text(detail).font(.system(size: 12, design: .monospaced)).foregroundStyle(Theme.muted)
+                .multilineTextAlignment(.center).textSelection(.enabled).frame(maxWidth: 480)
+                .padding(.top, 4)
+        }
+        .padding(28)
+    }
+}
+
 struct EmptyState: View {
     let title: LocalizedStringKey
     let message: LocalizedStringKey
