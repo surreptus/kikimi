@@ -46,8 +46,8 @@ public struct ClozeCard: Equatable, Sendable {
     /// The word as it appears in the sentence (so it may be an inflected form of the card's word).
     public let answer: String
     public let after: String
-    /// What to think of: the meaning, plus the dictionary form when the sentence has a different form, or the
-    /// reading in a language that has one. Never the answer itself.
+    /// What to think of: the meaning, plus the dictionary form when the sentence has a different form. In a language
+    /// with readings (Japanese) only the meaning: the reading is what you are asked to produce, so it is not shown.
     public let hint: String
 
     public var prompt: String { before + Self.blank + after }
@@ -58,9 +58,7 @@ public struct ClozeCard: Equatable, Sendable {
               let range = find(example.surface, in: example.text) else { return nil }
         let answer = String(example.text[range])
         var parts: [String] = []
-        if showsReading, let reading = card.entries.first?.reading, !reading.isEmpty, reading != answer {
-            parts.append(reading)
-        } else if !showsReading, answer.lowercased() != card.word.lemma.lowercased() {
+        if !showsReading, answer.lowercased() != card.word.lemma.lowercased() {
             parts.append(card.word.lemma)
         }
         if let gloss = card.entries.first?.gloss, let short = shortGloss(gloss) { parts.append(short) }

@@ -33,12 +33,12 @@ final class ClozeCardTests: XCTestCase {
         XCTAssertEqual(c.prompt, "Casablanca y la ______.", "not the 'casa' inside Casablanca")
     }
 
-    func testAnUnspacedLanguageBlanksTheWordAndHintsTheReading() throws {
+    func testAnUnspacedLanguageBlanksTheWordAndHintsOnlyTheMeaning() throws {
         let c = try XCTUnwrap(ClozeCard.make(
             from: try card(lemma: "秋", surface: "秋", text: "日本の秋はきれいです。", gloss: "1. (noun) autumn; fall", reading: "あき", language: "ja"),
             showsReading: true))
         XCTAssertEqual(c.prompt, "日本の______はきれいです。")
-        XCTAssertEqual(c.hint, "あき · autumn")
+        XCTAssertEqual(c.hint, "autumn", "the reading is the answer, so it is not on the front")
     }
 
     func testNoSentenceOrAWordNotFoundMeansNoClozeCard() throws {

@@ -197,7 +197,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
       lesson, and left out of coverage. Ignore is on the lesson card (X) and on the Words page. The status is stored as
       "ignored", so a backup made with it does not restore in an older Kikimi.
 - [x] **Cloze cards** (Review page > Fill in the word): the example sentence with the word blanked and a short
-      hint of its meaning (and, for Japanese, its reading); you recall the word, then see it filled in with the
+      hint of its meaning ; you recall the word, then see it filled in with the
       sentence audio. Production in context, which avoids the ambiguity of meaning-to-word cards. **Listening
       cards** (done, Review page > Listen to the sentence): hear the sentence, answer before reading.
 - [ ] **Reverse (meaning to word) cards**, only as an optional extra: off by default, only for words that have reached
