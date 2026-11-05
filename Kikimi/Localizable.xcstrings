@@ -526,6 +526,16 @@
         }
       }
     },
+    "%lld of %lld right the first time. They come back for review in a few hours." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld right the first time. They come back for review in a few hours."
+          }
+        }
+      }
+    },
     "%lld of %lld selected" : {
       "localizations" : {
         "de" : {
@@ -1015,9 +1025,6 @@
         }
       }
     },
-    "^[%lld lesson](inflect: true) ready" : {
-
-    },
     "^[%lld more review](inflect: true) after that" : {
       "localizations" : {
         "de" : {
@@ -1045,6 +1052,9 @@
           }
         }
       }
+    },
+    "^[%lld new word](inflect: true) to learn" : {
+
     },
     "^[%lld review](inflect: true)" : {
       "localizations" : {
@@ -1257,9 +1267,6 @@
           }
         }
       }
-    },
-    "^[%lld word](inflect: true) added to your reviews, first one back in a few hours." : {
-
     },
     "^[%lld word](inflect: true) in the list" : {
       "localizations" : {
@@ -2892,7 +2899,7 @@
     "Back to Learn" : {
 
     },
-    "Back to the Learn page (Esc). Words you have already answered are kept." : {
+    "Back to the Learn page (Esc). Words you have already been taught are kept." : {
 
     },
     "Back to the overview (Esc). Your answers so far are kept." : {
@@ -7134,9 +7141,6 @@
     "Learn a language from videos you own. Everything stays on your Mac." : {
 
     },
-    "Learn adds it to your reviews. Already know it marks it known." : {
-
-    },
     "Learn adds it to your reviews. Known means you already know it." : {
 
     },
@@ -7268,6 +7272,9 @@
       }
     },
     "Lesson done" : {
+
+    },
+    "Lesson quiz" : {
 
     },
     "Lessons" : {
@@ -8304,6 +8311,12 @@
         }
       }
     },
+    "Next" : {
+
+    },
+    "Next %lld words" : {
+
+    },
     "Next line" : {
       "localizations" : {
         "de" : {
@@ -8541,9 +8554,6 @@
 
     },
     "No video to go with %@." : {
-
-    },
-    "No words added to your reviews." : {
 
     },
     "No words found" : {
@@ -13122,7 +13132,7 @@
         }
       }
     },
-    "The card type is used in Reviews and in Practice." : {
+    "The card type is used for reviews and for the practice below, not for lessons." : {
 
     },
     "The copy Kikimi keeps of each video you add. Smallest compresses it (in our tests a 161 MB video became 29 MB), which is plenty to follow along and study from. Original quality keeps your file exactly as it is: the best picture and sound, but the same size. Your own files are never changed either way, and this applies to videos you add from now on." : {
@@ -13244,7 +13254,7 @@
         }
       }
     },
-    "The new words you hear most in your videos. Each comes with a sentence to hear, and nothing is added until you press Learn." : {
+    "The new words you hear most in your videos, %lld at a time: you are taught them, then asked them at once." : {
 
     },
     "The ring beside a word fills as it moves up. An empty ring is new, and a green tick is known." : {
@@ -13331,6 +13341,9 @@
           }
         }
       }
+    },
+    "The words you were just taught, asked at once." : {
+
     },
     "This is the app's own copy. Your original file, wherever you imported it from, is not touched by the app." : {
       "localizations" : {
@@ -14650,9 +14663,6 @@
         }
       }
     },
-    "Words you are learning that are due, each in a sentence from your videos." : {
-
-    },
     "Words you are learning that are not due yet. Nothing moves, whatever you answer." : {
 
     },
@@ -14973,6 +14983,9 @@
           }
         }
       }
+    },
+    "You will be asked these words as soon as you have seen them all." : {
+
     },
     "You'll see the same circle beside a word on the Words page, in its panel and in the video. It fills as the word moves up, from red through yellow to green, and becomes a white disc once it is finished. An empty ring is a new word, and a green tick is a word you marked known." : {
       "extractionState" : "stale",

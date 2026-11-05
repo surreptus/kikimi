@@ -53,7 +53,7 @@ struct ReviewView: View {
             } else if let summary {
                 VStack(spacing: 0) {
                     finished(summary).padding(.top, 28)
-                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, lessons: lessons, stats: stats, style: styleChoice, startLessons: startLessons, start: { startSession() }, practise: { startSession(extra: $0) }) }
+                    if let overview, !overview.isEmpty, extra != .lesson { ReviewOverviewView(overview: overview, lessons: lessons, stats: stats, style: styleChoice, startLessons: startLessons, start: { startSession() }, practise: { startSession(extra: $0) }) }
                 }
             } else if let overview {
                 if overview.isEmpty, lessons?.wordIDs.isEmpty ?? true {
@@ -542,6 +542,7 @@ struct ReviewView: View {
 
     private func endSession() {
         lessonQueue = []
+        style = env.reviewStyle.style(for: app.profile)
         audio?.stop()
         session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil; extra = nil
         Task { await loadOverview() }
@@ -561,7 +562,8 @@ struct ReviewView: View {
         audio?.stop()
         audio = SentenceAudioPlayer(libraryRoot: env.libraryURL)
         mode = env.reviewAudio.mode(for: app.profile)
-        style = env.reviewStyle.style(for: app.profile)
+        // A lesson's quiz is always word and meaning, whatever card type is chosen for reviews (which is left as it was).
+        style = chosen == .lesson ? .meaning : env.reviewStyle.style(for: app.profile)
         do {
             // Typing needs a short line, so a word with one gets that one and not a long one.
             let profile = app.profile
