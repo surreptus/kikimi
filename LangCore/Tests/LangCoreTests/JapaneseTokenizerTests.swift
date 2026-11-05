@@ -16,6 +16,19 @@ final class JapaneseTokenizerTests: XCTestCase {
         }
     }
 
+    func testWaNeAfterAWordIsTwoParticlesNotTheVerbHaneru() {
+        for text in ["それはね日本の景色だと思う", "私はね秋の服がすごく好きなんですけど", "9月はねやっぱり暑い", "今回はね日本人の秋の過ごし方を紹介します"] {
+            let tokens = ja.tokenizer.tokens(in: text)
+            XCTAssertFalse(tokens.contains { $0.lemma == "はねる" }, "\(text): \(tokens.map(\.lemma))")
+            XCTAssertEqual(ja.lineSegments(in: text).map(\.text).joined(), text, "the pieces still add up to the line")
+        }
+    }
+
+    func testTheVerbHaneruIsStillFoundWhereItIsTheVerb() {
+        XCTAssertNotNil(content("鯉が水面をはねる")["はねる"])
+        XCTAssertNotNil(content("水をはねて遊んだ")["はねる"])
+    }
+
     func testPunctuationIsNeverAWord() {
         let tokens = ja.tokenizer.tokens(in: "すごい! 本当? いいね...")
         XCTAssertFalse(tokens.contains { !$0.surface.contains(where: { $0.isLetter || $0.isNumber }) }, "\(tokens.map(\.surface))")
