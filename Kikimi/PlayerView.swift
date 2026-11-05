@@ -321,7 +321,7 @@ struct PlayerView: View {
     private var shortcutHints: [(key: String, action: String)] {
         var hints: [(key: String, action: String)] = [
             ("Space", String(localized: "Play or pause")), ("⌘← ⌘→", String(localized: "Line")), ("R", String(localized: "Repeat")),
-            ("⌘↓", String(localized: "Transcript")), ("← →", String(localized: "Word")),
+            ("⌘↓", String(localized: "Pick words")), ("← →", String(localized: "Move")),
             ("E", String(localized: "Edit line")),
         ]
         if translations != nil, translationMode == .onRequest { hints.append(("T", String(localized: "Translation"))) }
