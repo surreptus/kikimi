@@ -1,6 +1,1154 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Drop a video you own on Videos, then press Start. Got an .srt or .vtt subtitle file? Press Add subtitles and nothing is transcribed. Otherwise, the first time, download a speech model once." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suelta un vídeo que tengas en Vídeos y pulsa Empezar. ¿Tienes un archivo de subtítulos .srt o .vtt? Pulsa «Añadir subtítulos» y no se transcribe nada. Si no, la primera vez, descarga un modelo de voz una sola vez."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déposez une vidéo que vous possédez sur Vidéos, puis appuyez sur Commencer. Vous avez un fichier de sous-titres .srt ou .vtt ? Appuyez sur « Ajouter des sous-titres » et rien n’est transcrit. Sinon, la première fois, téléchargez un modèle vocal une seule fois."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe ein Video, das dir gehört, auf „Videos“ und drücke „Los geht’s“. Du hast eine Untertitel-Datei (.srt oder .vtt)? Drücke „Untertitel hinzufügen“, dann wird nichts transkribiert. Sonst lädst du beim ersten Mal einmalig ein Sprachmodell."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お持ちの動画を「動画」にドロップして、「始める」を押します。.srt または .vtt の字幕ファイルがあれば、「字幕を追加」を押すと文字起こしは行われません。なければ、初回に音声モデルを一度だけダウンロードします。"
+          }
+        }
+      }
+    },
+    "Kikimi listens on this Mac and writes out what is said, with times. This is the long step: about 3 minutes for a 10 minute video in our tests." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kikimi escucha en este Mac y escribe lo que se dice, con los tiempos. Es el paso largo: unos 3 minutos para un vídeo de 10 minutos en nuestras pruebas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kikimi écoute sur ce Mac et écrit ce qui est dit, avec les instants. C’est l’étape longue : environ 3 minutes pour une vidéo de 10 minutes dans nos tests."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kikimi hört auf diesem Mac zu und schreibt auf, was gesagt wird, mit Zeitangaben. Das ist der lange Schritt: in unseren Tests etwa 3 Minuten für ein 10-Minuten-Video."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KikimiはこのMac上で話された内容を聞き取り、時刻付きで書き起こします。時間がかかる手順で、テストでは10分の動画で約3分でした。"
+          }
+        }
+      }
+    },
+    "On Words, the words from your videos are listed by how often they appear. Press Learn on the ones you want, or Known on the ones you already know." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Palabras, las palabras de tus vídeos aparecen ordenadas por la frecuencia con que salen. Pulsa «Aprender» en las que quieras, o «Conocida» en las que ya conoces."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Mots, les mots de vos vidéos sont classés selon leur fréquence. Appuyez sur « Apprendre » pour ceux que vous voulez, ou sur « Connu » pour ceux que vous connaissez déjà."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unter „Wörter“ sind die Wörter aus deinen Videos danach sortiert, wie oft sie vorkommen. Drücke „Lernen“ bei denen, die du willst, oder „Bekannt“ bei denen, die du schon kennst."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「単語」には、動画の単語が登場回数の順に並びます。学びたい単語は「学習する」、すでに知っている単語は「既知」を押します。"
+          }
+        }
+      }
+    },
+    "On Review, the words you are learning come back at set times, each in a sentence from your videos. Choose the kind of card above Start, and come back whenever the number beside Review is above zero." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Repaso, las palabras que estás aprendiendo vuelven en momentos fijos, cada una en una frase de tus vídeos. Elige el tipo de tarjeta sobre Empezar y vuelve cuando el número junto a Repaso sea mayor que cero."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Révision, les mots que vous apprenez reviennent à des moments précis, chacun dans une phrase de vos vidéos. Choisissez le type de carte au-dessus de Commencer, et revenez dès que le nombre à côté de Révision dépasse zéro."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unter „Wiederholung“ kommen die Wörter, die du lernst, zu festen Zeiten zurück, jeweils in einem Satz aus deinen Videos. Wähle die Kartenart über „Los geht’s“ und komm wieder, sobald die Zahl neben „Wiederholung“ größer als null ist."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「復習」では、学習中の単語が決まったタイミングで、動画の例文の中で戻ってきます。「始める」の上でカードの種類を選び、「復習」の横の数字が0より大きいときに戻ってきてください。"
+          }
+        }
+      }
+    },
+    "Your original file is only read, never changed or deleted. Its row shows the step it is on, such as 4 of 7 · Transcribing." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu archivo original solo se lee, nunca se cambia ni se elimina. Su fila indica el paso en que está, por ejemplo 4 de 7 · Transcribiendo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre fichier original est seulement lu, jamais modifié ni supprimé. Sa ligne indique l’étape en cours, par exemple 4 sur 7 · Transcription."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Originaldatei wird nur gelesen, nie verändert oder gelöscht. Ihre Zeile nennt den aktuellen Schritt, etwa 4 von 7 · Wird transkribiert."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のファイルは読み取られるだけで、変更や削除は一切されません。その行には、「4/7 · 文字起こし中」のように現在の手順が表示されます。"
+          }
+        }
+      }
+    },
+    "Checks you haven't added this video already." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba que no hayas añadido ya este vídeo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifie que vous n’avez pas déjà ajouté cette vidéo."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prüft, ob du dieses Video nicht schon hinzugefügt hast."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この動画をすでに追加していないか確認します。"
+          }
+        }
+      }
+    },
+    "Makes a working copy." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hace una copia de trabajo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crée une copie de travail."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erstellt eine Arbeitskopie."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "作業用のコピーを作ります。"
+          }
+        }
+      }
+    },
+    "Listens to a short sample, so a Japanese video isn't added as Spanish." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escucha una muestra corta, para que un vídeo japonés no se añada como español."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écoute un court extrait, pour qu’une vidéo japonaise ne soit pas ajoutée comme espagnole."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hört eine kurze Probe an, damit ein japanisches Video nicht als Spanisch hinzugefügt wird."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "短いサンプルを聞いて、日本語の動画がスペイン語として追加されるのを防ぎます。"
+          }
+        }
+      }
+    },
+    "The long step. Longer with larger models." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El paso largo. Más largo con modelos más grandes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’étape longue. Plus longue avec les modèles plus grands."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der lange Schritt. Mit größeren Modellen länger."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間がかかる手順です。大きいモデルほど長くなります。"
+          }
+        }
+      }
+    },
+    "Saves a small copy for playback (161 MB became 29 MB in our tests). Choose Original quality in Settings to skip this." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda una copia pequeña para la reproducción (161 MB pasaron a 29 MB en nuestras pruebas). Elige «Calidad original» en Ajustes para omitirlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre une petite copie pour la lecture (161 Mo sont devenus 29 Mo dans nos tests). Choisissez « Qualité d’origine » dans Réglages pour l’ignorer."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichert eine kleine Kopie zum Abspielen (in unseren Tests wurden aus 161 MB 29 MB). Wähle in den Einstellungen „Originalqualität“, um das zu überspringen."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再生用の小さなコピーを保存します（テストでは161 MBが29 MBに）。省くには、「設定」で「元の画質」を選びます。"
+          }
+        }
+      }
+    },
+    "Checks the copy plays and is the right length." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba que la copia se reproduce y tiene la duración correcta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifie que la copie se lit et qu’elle a la bonne durée."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prüft, ob sich die Kopie abspielen lässt und die richtige Länge hat."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーが再生でき、長さが正しいことを確認します。"
+          }
+        }
+      }
+    },
+    "Stores everything at once: all of it or none of it." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo guarda todo de una vez: o todo o nada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre tout d’un coup : tout ou rien."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert alles auf einmal: alles oder nichts."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてを一度に保存します。全部保存されるか、何も保存されないかです。"
+          }
+        }
+      }
+    },
+    "Cancel at any point before saving and nothing is left behind." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancela en cualquier momento antes de guardar y no queda nada a medias."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulez à tout moment avant l’enregistrement, et rien ne reste derrière."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brich jederzeit vor dem Speichern ab, und es bleibt nichts zurück."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存する前ならいつでもキャンセルでき、何も残りません。"
+          }
+        }
+      }
+    },
+    "A word you get right comes back after a longer wait each time. One you miss comes back sooner." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una palabra que aciertas vuelve tras una espera cada vez más larga. Una que fallas vuelve antes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un mot que vous réussissez revient après une attente de plus en plus longue. Un mot raté revient plus tôt."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Wort, das du richtig hast, kommt nach jeweils längerer Wartezeit wieder. Eines, das du verfehlst, kommt früher."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正解した単語は、毎回少しずつ間を空けて戻ってきます。間違えた単語は早めに戻ってきます。"
+          }
+        }
+      }
+    },
+    "Got it moves a word up a stage. Missed it moves it down one, never below Stage 1." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Lo sabía» sube una palabra una etapa. «Fallé» la baja una, nunca por debajo de la etapa 1."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« Réussi » fait monter un mot d’un niveau. « Raté » le fait descendre d’un niveau, jamais en dessous du niveau 1."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„Gewusst“ bringt ein Wort eine Stufe höher. „Nicht gewusst“ setzt es eine Stufe zurück, nie unter Stufe 1."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「正解」で単語のステージが1つ上がり、「不正解」で1つ下がります。ステージ1より下にはなりません。"
+          }
+        }
+      }
+    },
+    "A word moves only on its first answer in a sitting. A missed word comes back later in the sitting without moving again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una palabra solo se mueve con su primera respuesta en una sesión. Una palabra fallada vuelve más tarde en la sesión sin volver a moverse."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un mot ne bouge qu’à sa première réponse d’une séance. Un mot raté revient plus tard dans la séance sans bouger à nouveau."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Wort verschiebt sich nur bei der ersten Antwort in einer Sitzung. Ein verfehltes Wort kommt später in der Sitzung zurück, ohne sich erneut zu verschieben."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "単語が動くのは、1回の学習で最初に答えたときだけです。間違えた単語は同じ学習の後半で戻ってきますが、再び動くことはありません。"
+          }
+        }
+      }
+    },
+    "The ring beside a word fills as it moves up. An empty ring is new, and a green tick is known." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El anillo junto a una palabra se llena a medida que sube. Un anillo vacío es una palabra nueva, y una marca verde, una conocida."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’anneau à côté d’un mot se remplit à mesure qu’il monte. Un anneau vide est un mot nouveau, une coche verte un mot connu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ring neben einem Wort füllt sich, wenn es aufsteigt. Ein leerer Ring ist neu, ein grünes Häkchen bedeutet bekannt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "単語の横のリングは、ステージが上がるにつれて満ちていきます。空のリングは新規、緑のチェックは既知です。"
+          }
+        }
+      }
+    },
+    "Words marked Known are not reviewed. Reset on Words puts one back to new." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las palabras marcadas como conocidas no se repasan. «Restablecer» en Palabras devuelve una a nueva."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots marqués comme connus ne sont pas révisés. « Réinitialiser » sur Mots en remet un à nouveau."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als bekannt markierte Wörter werden nicht wiederholt. „Zurücksetzen“ unter „Wörter“ macht eines wieder neu."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "既知にした単語は復習されません。「単語」で「リセット」すると新規に戻ります。"
+          }
+        }
+      }
+    },
+    "Review known tests a few words you marked known. Any you miss go back to your reviews." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Revisar conocidas» pone a prueba algunas palabras que marcaste como conocidas. Las que falles vuelven a tus repasos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« Réviser les connus » teste quelques mots que vous avez marqués comme connus. Ceux que vous ratez retournent dans vos révisions."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„Bekannte wiederholen“ prüft ein paar Wörter, die du als bekannt markiert hast. Was du verfehlst, kommt zurück in deine Wiederholungen."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「既知を復習」は、既知にした単語から数語を出題します。間違えた単語は復習に戻ります。"
+          }
+        }
+      }
+    },
+    "Each video shows how much of it you know, such as 91% known · Comfortable. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada vídeo muestra cuánto de él conoces, por ejemplo 91 % conocido · Cómodo. Solo se cuentan sustantivos, verbos, adjetivos y adverbios. Las palabras pequeñas casi siempre se conocen, así que entiendes más de lo que dice la cifra."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque vidéo indique la part que vous en connaissez, par exemple 91 % connu · Confortable. Seuls les noms, verbes, adjectifs et adverbes sont comptés. Les petits mots sont presque toujours connus : vous comprenez donc plus que le chiffre ne l’indique."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes Video zeigt, wie viel davon du kennst, etwa 91 % bekannt · Angenehm. Gezählt werden nur Nomen, Verben, Adjektive und Adverbien. Kleine Wörter sind fast immer bekannt, du verstehst also mehr, als die Zahl sagt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各動画には、どれだけ知っているかが「91% 既知 · 快適」のように表示されます。数えるのは名詞・動詞・形容詞・副詞だけです。小さな語はほとんど既知なので、実際には数字より多く理解できています。"
+          }
+        }
+      }
+    },
+    "Around 90% of the counted words is where following along gets comfortable." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alrededor del 90 % de las palabras contadas es donde seguir el hilo se vuelve cómodo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autour de 90 % des mots comptés, suivre devient confortable."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei etwa 90 % der gezählten Wörter wird das Mitverfolgen angenehm."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数えた単語の約90%を知っていると、内容についていくのが快適になります。"
+          }
+        }
+      }
+    },
+    "A word counts as known if you marked it known, it is finished, or it is at Stage 5 or above." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una palabra cuenta como conocida si la marcaste como conocida, está terminada o está en la etapa 5 o superior."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un mot compte comme connu si vous l’avez marqué comme tel, s’il est terminé ou s’il est au niveau 5 ou au-delà."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Wort zählt als bekannt, wenn du es als bekannt markiert hast, es abgeschlossen ist oder auf Stufe 5 oder höher steht."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "単語が既知として数えられるのは、既知にしたとき、完了したとき、またはステージ5以上のときです。"
+          }
+        }
+      }
+    },
+    "Sort by Closest to my level to see what to watch next." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordena por «Más cercanos a mi nivel» para ver qué ver a continuación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triez par « Les plus proches de mon niveau » pour voir quoi regarder ensuite."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortiere nach „Am nächsten an meinem Niveau“, um zu sehen, was du als Nächstes ansehen kannst."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「自分のレベルに近い順」で並べ替えると、次に見る動画がわかります。"
+          }
+        }
+      }
+    },
+    "Open a video's Info to start learning its commonest new words at once." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la información de un vídeo para empezar a aprender de una vez sus palabras nuevas más comunes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez les informations d’une vidéo pour commencer à apprendre d’un coup ses mots nouveaux les plus courants."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne die Informationen eines Videos, um seine häufigsten neuen Wörter auf einmal zu lernen."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画の「情報」を開くと、その動画の頻出する新しい単語をまとめて学習し始められます。"
+          }
+        }
+      }
+    },
+    "In Settings, under Data, you can mark a list of words you already know." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Ajustes, en Datos, puedes marcar una lista de palabras que ya conoces."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Réglages, sous Données, vous pouvez marquer une liste de mots que vous connaissez déjà."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Einstellungen unter „Daten“ kannst du eine Liste von Wörtern markieren, die du schon kennst."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「設定」の「データ」で、すでに知っている単語のリストを既知にできます。"
+          }
+        }
+      }
+    },
+    "In Settings, under Data, Save backup writes your words, stages and review dates to a .kikimi file. Turn on Include my videos and transcripts to save a folder instead, so a new Mac needs no re-transcribing. Speech models are never included." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Ajustes, en Datos, «Guardar copia…» escribe tus palabras, etapas y fechas de repaso en un archivo .kikimi. Activa «Incluir mis vídeos y transcripciones» para guardar una carpeta en su lugar, y un Mac nuevo no tendrá que volver a transcribir. Los modelos de voz nunca se incluyen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Réglages, sous Données, « Enregistrer la sauvegarde… » écrit vos mots, niveaux et dates de révision dans un fichier .kikimi. Activez « Inclure mes vidéos et transcriptions » pour enregistrer plutôt un dossier, et un nouveau Mac n’aura pas à retranscrire. Les modèles vocaux ne sont jamais inclus."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Einstellungen unter „Daten“ schreibt „Sicherung speichern …“ deine Wörter, Stufen und Wiederholungstermine in eine .kikimi-Datei. Aktiviere „Meine Videos und Transkripte einbeziehen“, um stattdessen einen Ordner zu sichern, dann muss ein neuer Mac nicht neu transkribieren. Sprachmodelle sind nie enthalten."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「設定」の「データ」で「バックアップを保存…」を選ぶと、単語、ステージ、復習日が .kikimi ファイルに書き出されます。「動画と文字起こしを含める」をオンにすると、代わりにフォルダとして保存され、新しいMacで文字起こしをやり直す必要がなくなります。音声モデルは含まれません。"
+          }
+        }
+      }
+    },
+    "To restore, choose the file or folder, or double-click it. You see what would change first, and nothing you already have is overwritten." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para restaurar, elige el archivo o la carpeta, o haz doble clic en él. Primero ves qué cambiaría, y nada de lo que ya tienes se sobrescribe."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour restaurer, choisissez le fichier ou le dossier, ou double-cliquez dessus. Vous voyez d’abord ce qui changerait, et rien de ce que vous avez déjà n’est écrasé."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Wiederherstellen wählst du die Datei oder den Ordner oder doppelklickst darauf. Du siehst zuerst, was sich ändern würde, und nichts, was du schon hast, wird überschrieben."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元するには、ファイルまたはフォルダを選ぶか、ダブルクリックします。変更される内容を先に確認でき、すでにあるものが上書きされることはありません。"
+          }
+        }
+      }
+    },
+    "Add videos" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir vídeos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter des vidéos"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos hinzufügen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画を追加"
+          }
+        }
+      }
+    },
+    "Videos, Words, Review" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vídeos, Palabras, Repaso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vidéos, Mots, Révision"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos, Wörter, Wiederholung"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画、単語、復習"
+          }
+        }
+      }
+    },
+    "Find words" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar palabras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chercher des mots"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wörter suchen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "単語を検索"
+          }
+        }
+      }
+    },
+    "Translate (macOS 26)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducir (macOS 26)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduire (macOS 26)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersetzen (macOS 26)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻訳（macOS 26）"
+          }
+        }
+      }
+    },
+    "Fix the line" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corregir la línea"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corriger la ligne"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeile korrigieren"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "行を修正"
+          }
+        }
+      }
+    },
+    "Open the word" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la palabra"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le mot"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wort öffnen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "単語を開く"
+          }
+        }
+      }
+    },
+    "Keep the meaning" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dejar el significado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder le sens"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedeutung behalten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "意味を固定"
+          }
+        }
+      }
+    },
+    "Translation (macOS 26)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducción (macOS 26)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduction (macOS 26)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersetzung (macOS 26)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訳（macOS 26）"
+          }
+        }
+      }
+    },
+    "Edit the line" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar la línea"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la ligne"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeile bearbeiten"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "行を編集"
+          }
+        }
+      }
+    },
+    "Let go" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soltar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lâcher"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loslassen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定を外す"
+          }
+        }
+      }
+    },
+    "Move" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewegen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動"
+          }
+        }
+      }
+    },
+    "Extend" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ampliar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étendre"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweitern"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "範囲を広げる"
+          }
+        }
+      }
+    },
+    "Select all" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar todo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout sélectionner"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles auswählen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて選択"
+          }
+        }
+      }
+    },
+    "Clear" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désélectionner"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufheben"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "解除"
+          }
+        }
+      }
+    },
     "" : {
 
     },
@@ -1952,7 +3100,7 @@
         }
       }
     },
-    "A video with an .srt or .vtt file of the same name can be imported without it." : {
+    "A video with a subtitle file (.srt or .vtt) can be imported right away. For the rest, download the speech model below, once." : {
 
     },
     "A word counts as known if you marked it known, it is finished, or you are learning it and its reviews are a week or more apart (Stage 5 and above)." : {
@@ -2129,7 +3277,13 @@
         }
       }
     },
-    "Add an .srt or .vtt file with the same name to use its subtitles instead of transcribing." : {
+    "Add a video you own." : {
+
+    },
+    "Add subtitles for %@" : {
+
+    },
+    "Add subtitles…" : {
 
     },
     "Add videos…" : {
@@ -3181,6 +4335,9 @@
         }
       }
     },
+    "Choose a different model" : {
+
+    },
     "Choose a folder for the %@ clips" : {
       "localizations" : {
         "de" : {
@@ -4055,6 +5212,9 @@
         }
       }
     },
+    "Download (%@)" : {
+
+    },
     "Download model%@" : {
       "localizations" : {
         "de" : {
@@ -4082,9 +5242,6 @@
           }
         }
       }
-    },
-    "Download the speech model to import videos that have no subtitles." : {
-
     },
     "Download the speech model to start importing" : {
       "extractionState" : "stale",
@@ -4115,7 +5272,7 @@
         }
       }
     },
-    "Download the speech model to transcribe videos" : {
+    "Download the speech model, or add subtitles to the videos that have none." : {
 
     },
     "Drop %@ videos here" : {
@@ -4232,6 +5389,9 @@
           }
         }
       }
+    },
+    "Each video shows how many of its words you already know. Around 90% is comfortable to follow." : {
+
     },
     "Edit line" : {
       "localizations" : {
@@ -5171,6 +6331,15 @@
           }
         }
       }
+    },
+    "Go to Videos" : {
+
+    },
+    "Go to Words" : {
+
+    },
+    "Got a subtitle file (.srt or .vtt) for it? Add it in the next step and Kikimi skips transcribing." : {
+
     },
     "Got it" : {
       "localizations" : {
@@ -6516,6 +7685,9 @@
     "Learn a language from videos you own. Everything stays on your Mac." : {
 
     },
+    "Learn adds it to your reviews. Known means you already know it." : {
+
+    },
     "Learn the %lld most common words you don't know yet and this video goes from %@ to about %@." : {
       "localizations" : {
         "de" : {
@@ -7781,6 +8953,12 @@
         }
       }
     },
+    "No subtitles, so it will be transcribed." : {
+
+    },
+    "No subtitles. Add them, or download the speech model." : {
+
+    },
     "No video to go with %@." : {
 
     },
@@ -8204,6 +9382,9 @@
         }
       }
     },
+    "On Review, practise them as they come due." : {
+
+    },
     "On Review, words you are learning come back at set times. Each card shows a sentence from one of your videos. Before you press Start, choose the kind of card in the panel at the top of the Review page: Meaning (the word and what it means), Fill in the word (the sentence appears with the word blanked and a short hint, and you recall it before showing the answer), Listen to the sentence (only the sound plays, and you show the answer to read it and, on macOS 26 or later, its translation) or Type what you hear (a short sentence plays and you type it; you see what you missed, marked in the sentence). In Spanish, French and German a noun shows with its article, such as das Buch, so its gender is learned with it. On the Review page, Review known tests a few words you marked known; any you miss go back to your reviews. Below the word stages, Your progress shows how long you have listened, how many reviews you got right, the words you started learning each week, and the words you looked up most; it starts counting from when it was added and stays on this Mac. Come back whenever the number beside Review is above zero." : {
 
     },
@@ -8236,7 +9417,7 @@
         }
       }
     },
-    "On Videos, drop a video file you own. If it comes with an .srt or .vtt subtitle file of the same name, drop that too: its subtitles are used and nothing is transcribed. Otherwise, the first time, pick a speech model and let it download once; the sizes are shown next to each choice." : {
+    "On Videos, drop a video file you own. It joins a list called Ready to import. If it has an .srt or .vtt subtitle file, press Add subtitles to use it and nothing is transcribed (a subtitle file dropped with the video, with the same name, is added for you). Press Start when you are ready. Without subtitles, the first time, pick a speech model and let it download once; the sizes are shown next to each choice." : {
 
     },
     "On Videos, drop a video file you own. The first time, pick a speech model and let it download once; the sizes are shown next to each choice." : {
@@ -8296,7 +9477,14 @@
         }
       }
     },
+    "On Words, choose the words you want to learn." : {
+
+    },
+    "On Words, the words from your videos are listed by how often they appear. Select the ones you want to learn and press Learn, or mark the ones you already know with Known." : {
+
+    },
     "On Words, the words from your videos are listed by how often they appear. Select the ones you want to learn and press Start learning, or mark the ones you already know." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8379,6 +9567,9 @@
           }
         }
       }
+    },
+    "One-time download" : {
+
     },
     "Open a video's Info to see the commonest words you don't know yet, and start learning them all at once." : {
       "localizations" : {
@@ -9310,6 +10501,9 @@
         }
       }
     },
+    "Ready to import" : {
+
+    },
     "Recall the missing word in a sentence from your videos." : {
 
     },
@@ -9341,6 +10535,9 @@
         }
       }
     },
+    "Remove %@" : {
+
+    },
     "Remove and free %@" : {
       "localizations" : {
         "de" : {
@@ -9369,6 +10566,9 @@
         }
       }
     },
+    "Remove subtitles" : {
+
+    },
     "Remove the %@ model?" : {
       "localizations" : {
         "de" : {
@@ -9396,6 +10596,9 @@
           }
         }
       }
+    },
+    "Remove the subtitles from %@" : {
+
     },
     "Removes the app's copy (%@) and its ^[%lld subtitle line](inflect: true). Words you've started learning or marked known are kept; untouched words found only in this video are removed. Your original file isn't affected. This can't be undone, but you can import the file again." : {
       "localizations" : {
@@ -9739,34 +10942,6 @@
         }
       }
     },
-    "Review, %lld due" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wiederholung, %lld fällig"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Repaso, %lld pendientes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Révision, %lld à faire"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "復習、%lld 件が期限"
-          }
-        }
-      }
-    },
     "Review" : {
       "localizations" : {
         "de" : {
@@ -9853,7 +11028,60 @@
       }
     },
     "Review known" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisar conocidas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réviser les connus"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekannte wiederholen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "既知を復習"
+          }
+        }
+      }
+    },
+    "Review, %lld due" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederholung, %lld fällig"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repaso, %lld pendientes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révision, %lld à faire"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復習、%lld 件が期限"
+          }
+        }
+      }
     },
     "Reviews" : {
 
@@ -10394,6 +11622,9 @@
           }
         }
       }
+    },
+    "Select words to use Learn and Known." : {
+
     },
     "Sentence audio on review cards" : {
       "localizations" : {
@@ -11566,6 +12797,7 @@
       }
     },
     "Started learning ^[%lld word](inflect: true)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -11592,6 +12824,9 @@
           }
         }
       }
+    },
+    "Started learning ^[%lld word](inflect: true). They are ready on the Review page." : {
+
     },
     "Starts %@" : {
       "localizations" : {
@@ -11673,6 +12908,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "状態"
+          }
+        }
+      }
+    },
+    "Step %lld: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Step %1$lld: %2$@"
           }
         }
       }
@@ -11907,6 +13152,12 @@
         }
       }
     },
+    "Subtitles: %@" : {
+
+    },
+    "Take this video off the list. Your file is not touched." : {
+
+    },
     "Terms of use" : {
       "localizations" : {
         "de" : {
@@ -12074,6 +13325,9 @@
           }
         }
       }
+    },
+    "The goal: understand more of what you watch" : {
+
     },
     "The JLPT level is KANJIDIC2's, from the exam's older four levels, shown as the matching N levels (N3 and N2 share one). The school year is when Japanese schools teach it." : {
 
@@ -12279,6 +13533,9 @@
           }
         }
       }
+    },
+    "To write out what is said in your videos, Kikimi needs a speech model (%@). It is saved on this Mac and nothing is uploaded. If a video comes with subtitles, you can skip it." : {
+
     },
     "Today" : {
       "localizations" : {
@@ -12892,6 +14149,9 @@
         }
       }
     },
+    "Watch more. Each video shows how much of it you already understand." : {
+
+    },
     "Week of %@: %@ started" : {
       "localizations" : {
         "de" : {
@@ -13353,6 +14613,9 @@
         }
       }
     },
+    "Writing out what's said" : {
+
+    },
     "You already know %@ of this video's words. Nothing more is needed to follow it comfortably." : {
       "localizations" : {
         "de" : {
@@ -13436,6 +14699,9 @@
           }
         }
       }
+    },
+    "You can use the other pages while this runs." : {
+
     },
     "You knew %lld of %lld of the words you marked known." : {
       "localizations" : {
