@@ -29,6 +29,19 @@ final class JapaneseTokenizerTests: XCTestCase {
         XCTAssertNotNil(content("水をはねて遊んだ")["はねる"])
     }
 
+    func testWentIsIkuUnlessItFollowsWo() {
+        XCTAssertEqual(content("友達と昨日行ったの")["行く"], .verb)
+        XCTAssertNil(content("友達と昨日行ったの")["行う"])
+        XCTAssertEqual(content("学校に行って勉強した")["行く"], .verb)
+        XCTAssertEqual(content("調査を行った")["行う"], .verb, "after を it is the other verb")
+    }
+
+    func testAHiraganaStemBeforeDaIsANoun() {
+        let tokens = ja.tokenizer.tokens(in: "あしたはやすみだよ")
+        XCTAssertEqual(tokens.first { $0.surface == "やすみ" }?.pos, .noun)
+        XCTAssertEqual(content("もうすこしやすみたい")["やすむ"], .verb, "a real verb stays one")
+    }
+
     func testPunctuationIsNeverAWord() {
         let tokens = ja.tokenizer.tokens(in: "すごい! 本当? いいね...")
         XCTAssertFalse(tokens.contains { !$0.surface.contains(where: { $0.isLetter || $0.isNumber }) }, "\(tokens.map(\.surface))")
