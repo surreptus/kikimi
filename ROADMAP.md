@@ -125,7 +125,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Audio-only import** (podcasts) for material with no picture.
 
 ### Practising
-- [ ] **A Learn page with three paths** (suggested 4 Nov 2026, in the style of WaniKani's dashboard; the page is renamed Learn and has Reviews and Practice as of 5 Nov 2026, Lessons waits for Daily lessons): the Review page becomes
+- [x] **A Learn page with three paths** (suggested 4 Nov 2026, in the style of WaniKani's dashboard; built 5 Nov 2026 with Lessons, Reviews and Practice, not yet seen on screen): the Review page becomes
       **Learn**, a page of cards, one for each thing you can do now:
       - **Lessons**, with the count of the day's new words (see Daily lessons below). Start opens the lesson.
       - **Reviews**, with the count due now. This is today's panel, with the card type and Start.
@@ -135,7 +135,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
       "Known" and "finished" differ: known is what you marked yourself, finished is what you earned by passing every review.
       The card type applies to all three paths. Settled 5 Nov 2026: a miss in *Practice finished* changes nothing (extra study; only *Review known*
       is a real check), and the sidebar count stays reviews due. It absorbs the *Review ahead* and *Resurface finished words* items.
-- [ ] **Daily lessons** (like WaniKani's): each day Kikimi queues up the most important words you haven't started, 15 for each
+- [x] **Daily lessons** (5 Nov 2026; built as below, 15 a day by default, Settings > Languages > New words a day, 0 turns them off; unused lessons lapse, and none are offered while more than 100 reviews are due; not yet seen on screen) (like WaniKani's): each day Kikimi queues up the most important words you haven't started, 15 for each
       language by default, and you learn them from a short lesson instead of picking every word yourself. The number is a
       setting (Settings > Languages > New words per day, one for each language you learn; 0 turns it off). Today nothing is
       learned until you select words, so someone with videos but no habit meets an empty Review page; a steady supply of the
@@ -155,6 +155,40 @@ Ordered by how much each helps comprehensible input per unit of effort.
         It counts every start, including words you pick on Words or take from a video's goal; I'd let those use up the day's
         allowance too, since it is the cap on new words per day however they begin.
       - It sits beside picking words yourself and the per-video goal, not in place of them. Nothing leaves the Mac.
+- [ ] **Grammar from your own videos** (researched 5 Nov 2026, **not started**): noticing, not a course. Recommendation: **forms
+      of words you meet, shown on demand, with a link out**; no lesson path, no rules taught ahead of the material.
+      - **Fits the loop:** the word panel and word bar say what a form is ("hablaría: conditional, 1st/3rd singular"; "食べさせられた:
+        causative-passive, past") with a few other forms of the same word, and a line's pattern is found by looking, as
+        Japanese already is (see the link-out item). Works against it: a fourth path of explained rules, tables to memorise,
+        pattern drills ahead of use, anything generated (see *Explain this sentence*, dropped; and *Conversation practice*).
+        Grammar is a property of the word you are looking at, so it belongs in the player and the word panel, not on Learn.
+      - **What can be detected.** Japanese: well. MeCab/IPADIC already gives the 活用形 and the auxiliaries (させ, られ, た, ない, たい,
+        ている), and particles are their own part of speech; chaining them names a form with a fixed table in the profile.
+        Spanish, French, German: only lemma and part of speech, since `NLTagger` returns no tense, mood, case or person, and
+        French lemmas are noisy. A form can still be named by looking the *surface* up in the dictionary's inflected forms:
+        `build_kaikki.py` drops the `form_of` senses today, but kaikki carries each one with tags (`first-person singular
+        conditional`). Ambiguity is real (Spanish *hable* is subjunctive 1st or 3rd; German *die* is a case in four ways),
+        so show every reading or none, never one guess. Not detectable: syntax (relative clauses, word order), use
+        (why subjunctive here), German case of a noun phrase. Not measured: how often the form lookup is unambiguous on
+        real lines; measure on the library's transcripts before building.
+      - **Sources and licences** (none verified against the licence texts today; check each before use):
+        Wiktionary forms through kaikki.org (CC BY-SA 4.0, already credited, so no new entry; only a bigger derived file);
+        Tsumiki for Japanese (CC BY-SA per its repository, already credited); Tatoeba example sentences (mostly CC BY 2.0 FR,
+        some CC0; credit the project and not needed if our own video lines serve as examples, which they should);
+        Wikibooks grammars (CC BY-SA 4.0, uneven quality, so only as a link-out). Not usable: Tae Kim's guide (non-commercial
+        licence, we should not mix it in), Bunpro and similar (proprietary), JLPT grammar lists (no official one; unofficial
+        lists are others' work). Notes of our own would be short, written and checked by hand, not generated.
+      - **First slice** (small): Japanese form chains named in full in the word bar (extends the link-out item, no new data),
+        then Spanish/French/German forms from a `forms` table built by the dictionary script (surface to lemma, tags), shown
+        as one line in the word panel. A `LanguageProfile` property for the language's form names; the tag mapping and the
+        lookup in `LangCore` with tests; new strings localisable. The `forms` data is derived, so a new file, no GRDB
+        migration, out of backups. Cost: Spanish verbs alone have about 50 forms each, so roughly +20–40 MB on disk per
+        language read in place, no memory or launch cost unless opened; measure from the real build before committing.
+      - **Left out:** lessons and a grammar index (revisit once forms are named and used), pattern cloze cards (the sentence's
+        form is reachable from the existing cloze with the form as the blank, a later and cheap option), conjugation drills,
+        generated explanations, Italian, Portuguese and Dutch.
+      - **To settle:** whether the form line is on by default or in Settings (a learner sees it all day); whether a cloze
+        blank on a conjugated form should show the form as its hint; whether the size is acceptable per language.
 - [x] **Cloze cards** (Review page > Fill in the word): the example sentence with the word blanked and a short
       hint of its meaning (and, for Japanese, its reading); you recall the word, then see it filled in with the
       sentence audio. Production in context, which avoids the ambiguity of meaning-to-word cards. **Listening
