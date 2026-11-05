@@ -99,7 +99,11 @@ public enum LangMigrations {
                 let lemma: String = row["lemma"]
                 return lemma.contains(where: { $0.isLetter || $0.isNumber }) ? nil : row["id"]
             }
-            for id in ids { try db.execute(sql: "DELETE FROM words WHERE id = ?", arguments: [id]) }
+            // Foreign keys are off while a migration runs, so nothing cascades: the occurrences go first.
+            for id in ids {
+                try db.execute(sql: "DELETE FROM occurrences WHERE word_id = ?", arguments: [id])
+                try db.execute(sql: "DELETE FROM words WHERE id = ?", arguments: [id])
+            }
         }
     }
 
