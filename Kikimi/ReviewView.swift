@@ -18,7 +18,8 @@ struct ReviewView: View {
     @State private var mode: SentenceAudioMode = .onReveal
     @State private var style: ReviewStyle = .meaning
     /// A check of words marked known: the summary says what was missed and sent back to learning.
-    @State private var checking = false
+    /// Which extra study is under way, or nil in a normal review.
+    @State private var extra: ExtraStudy?
     @State private var returned = 0
     /// The word's own page beside the card, opened from the revealed answer (never before: it would show the meaning).
     @State private var showsWord = false
@@ -45,14 +46,14 @@ struct ReviewView: View {
             } else if let summary {
                 VStack(spacing: 0) {
                     finished(summary).padding(.top, 28)
-                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, stats: stats, style: styleChoice, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) }) }
+                    if let overview, !overview.isEmpty { ReviewOverviewView(overview: overview, stats: stats, style: styleChoice, start: { startSession() }, practise: { startSession(extra: $0) }) }
                 }
             } else if let overview {
                 if overview.isEmpty {
                     EmptyState(title: "Nothing to review yet", message: "Choose words to learn on the Words page, then come back.",
                                actionTitle: "Go to Words", action: { app.select(.words) })
                 } else {
-                    ReviewOverviewView(overview: overview, stats: stats, style: styleChoice, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) })
+                    ReviewOverviewView(overview: overview, stats: stats, style: styleChoice, start: { startSession() }, practise: { startSession(extra: $0) })
                 }
             } else {
                 ProgressView()
@@ -68,15 +69,21 @@ struct ReviewView: View {
 
     private func finished(_ summary: (answered: Int, correct: Int)) -> some View {
         VStack(spacing: 12) {
-            Text(checking ? "Check finished" : "All done for now").font(Theme.title(30))
-            Text(checking
-                 ? "You knew \(summary.correct) of \(summary.answered) of the words you marked known."
-                 : "\(summary.correct) of \(summary.answered) answers right the first time.")
+            Text(extra == nil ? "All done for now" : "Practice done").font(Theme.title(30))
+            Text(summaryText(summary))
                 .font(.system(.title3, design: .rounded)).foregroundStyle(Theme.muted)
-            if checking, returned > 0 {
+            if extra == .known, returned > 0 {
                 Text(inflected("^[\(returned) word](inflect: true) went back to your reviews, so each video's coverage no longer counts it as known."))
                     .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
             }
+        }
+    }
+
+    private func summaryText(_ summary: (answered: Int, correct: Int)) -> String {
+        switch extra {
+        case nil: String(localized: "\(summary.correct) of \(summary.answered) answers right the first time.")
+        case .known: String(localized: "You knew \(summary.correct) of \(summary.answered) of the words you marked known.")
+        case .ahead, .finished: String(localized: "You got \(summary.correct) of \(summary.answered) right. Nothing moved: these words keep their schedule.")
         }
     }
 
@@ -494,7 +501,7 @@ struct ReviewView: View {
 
     /// Loads the page's overview. After a session it is kept beneath the summary, and refreshed.
     private func loadOverview(keepingSummary: Bool = false) async {
-        if !keepingSummary { session = nil; card = nil; summary = nil; checking = false }
+        if !keepingSummary { session = nil; card = nil; summary = nil; extra = nil }
         error = nil
         do {
             overview = try await env.database.reviewOverview(language: app.languageCode)
@@ -504,7 +511,7 @@ struct ReviewView: View {
 
     private func endSession() {
         audio?.stop()
-        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil; checking = false
+        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil; extra = nil
         Task { await loadOverview() }
     }
 
@@ -515,9 +522,9 @@ struct ReviewView: View {
             set: { style = $0; env.reviewStyle.setStyle($0, for: app.profile) })
     }
 
-    private func startSession(checkingKnown: Bool = false) { Task { await begin(checkingKnown: checkingKnown) } }
+    private func startSession(extra: ExtraStudy? = nil) { Task { await begin(extra: extra) } }
 
-    private func begin(checkingKnown: Bool = false) async {
+    private func begin(extra chosen: ExtraStudy? = nil) async {
         session = nil; card = nil; summary = nil; error = nil; revealed = false
         audio?.stop()
         audio = SentenceAudioPlayer(libraryRoot: env.libraryURL)
@@ -528,10 +535,14 @@ struct ReviewView: View {
             let profile = app.profile
             var short: (@Sendable (ExampleLine) -> Bool)?
             if style == .dictation { short = { profile.suitsDictation($0) } }
-            let new = checkingKnown
-                ? try await ReviewSession(checkingKnown: env.database, language: app.languageCode)
-                : try await ReviewSession(database: env.database, language: app.languageCode, preferring: short)
-            checking = checkingKnown
+            let new: ReviewSession
+            switch chosen {
+            case nil: new = try await ReviewSession(database: env.database, language: app.languageCode, preferring: short)
+            case .known: new = try await ReviewSession(checkingKnown: env.database, language: app.languageCode)
+            case .ahead: new = try await ReviewSession(practising: .ahead, database: env.database, language: app.languageCode, preferring: short)
+            case .finished: new = try await ReviewSession(practising: .finished, database: env.database, language: app.languageCode, preferring: short)
+            }
+            extra = chosen
             session = new
             total = await new.remaining
             remaining = total   // set together with the total, or the bar shows full for a moment

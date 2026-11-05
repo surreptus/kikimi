@@ -1,19 +1,41 @@
 import LangCore
 import SwiftUI
 
-/// The review page before a session: what is ready, what is coming, and where your words stand.
+/// Study on top of the schedule. Only a known check can change a word (a miss sends it back to learning).
+enum ExtraStudy: Hashable, CaseIterable {
+    case ahead, known, finished
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .ahead: "Review ahead"
+        case .known: "Review known"
+        case .finished: "Practice finished"
+        }
+    }
+
+    var summary: LocalizedStringKey {
+        switch self {
+        case .ahead: "Words you are learning that are not due yet. Nothing moves, whatever you answer."
+        case .known: "A quick test of a few words you marked known. Any you miss go back to your reviews, so the numbers stay honest."
+        case .finished: "Words that have been through every stage. Nothing moves, whatever you answer."
+        }
+    }
+}
+
+/// The learn page before a session: what is ready, what to practise, what is coming, and where your words stand.
 struct ReviewOverviewView: View {
     let overview: ReviewOverview
     let stats: LearningStats?
     @Binding var style: ReviewStyle
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let start: () -> Void
-    let checkKnown: () -> Void
+    let practise: (ExtraStudy) -> Void
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 ready
+                practice
                 comingUp
                 stages
                 if let stats { progress(stats) }
@@ -58,7 +80,7 @@ struct ReviewOverviewView: View {
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
                 .id(style)   // a new line for each choice, which fades in as the panel resizes
                 .transition(.opacity)
-            Text("Also used when you review words you know.").font(Theme.small).foregroundStyle(Theme.muted)
+            Text("Also used in Practice.").font(Theme.small).foregroundStyle(Theme.muted)
         }
         .panel()
         .animation(reduceMotion ? nil : Theme.easeOut(0.18), value: style)
@@ -69,6 +91,49 @@ struct ReviewOverviewView: View {
         guard let next = overview.nextReview else { return String(localized: "Nothing scheduled yet") }
         return String(localized: "Next review \(next.formatted(.relative(presentation: .numeric)))")
     }
+
+    // MARK: Practice
+
+    /// Extra study that does not move the schedule (a known check can send a missed word back). A row is shown only when
+    /// there is enough to practise.
+    @ViewBuilder
+    private var practice: some View {
+        let rows = ExtraStudy.allCases.filter { count($0) >= minimum($0) }
+        if !rows.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Practice").font(Theme.title(17))
+                ForEach(rows, id: \.self) { kind in
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 8) {
+                                Text(kind.title).font(.system(size: 14, weight: .semibold, design: .rounded))
+                                Text("\(count(kind))").font(.system(size: 14, design: .rounded)).foregroundStyle(Theme.muted)
+                            }
+                            Text(kind.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer()
+                        Button("Start") { practise(kind) }
+                            .buttonStyle(.pill(.secondary, compact: true))
+                            .accessibilityLabel(kind.title)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .panel()
+            .accessibilityElement(children: .contain)
+        }
+    }
+
+    private func count(_ kind: ExtraStudy) -> Int {
+        switch kind {
+        case .ahead: overview.learning - overview.dueNow
+        case .known: overview.known
+        case .finished: overview.finished
+        }
+    }
+
+    /// A known check needs a few words to be a test at all.
+    private func minimum(_ kind: ExtraStudy) -> Int { kind == .known ? 3 : 1 }
 
     // MARK: Coming up
 
@@ -211,16 +276,6 @@ struct ReviewOverviewView: View {
             }
             Text("Under each ring: how long until a word at that stage comes back for review.")
                 .font(Theme.small).foregroundStyle(Theme.muted)
-            if overview.known >= 3 {
-                HStack(spacing: 12) {
-                    Text("\(overview.known) known").font(.system(size: 14, weight: .semibold, design: .rounded))
-                    Spacer()
-                    Button("Review known") { checkKnown() }
-                        .buttonStyle(.pill(.secondary, compact: true))
-                        .help("A quick test of a few words you marked known. Any you miss go back to your reviews, so the numbers stay honest.")
-                }
-                .padding(.top, 4)
-            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .panel()

@@ -64,7 +64,7 @@ struct AboutView: View {
                 step(1, "Add a video", "Drop a video you own on Videos, then press Start. Got an .srt or .vtt subtitle file? Press Add subtitles and nothing is transcribed. Otherwise, the first time, download a speech model once.")
                 step(2, "Let it transcribe", "Kikimi listens on this Mac and writes out what is said, with times. This is the long step: about 3 minutes for a 10 minute video in our tests.")
                 step(3, "Choose your words", "On Words, the words from your videos are listed by how often they appear. Press Learn on the ones you want, or Known on the ones you already know.")
-                step(4, "Practise", "On Review, the words you are learning come back at set times, each in a sentence from your videos. Choose the kind of card above Start, and come back whenever the number beside Review is above zero.")
+                step(4, "Practise", "On Learn, the words you are learning come back at set times, each in a sentence from your videos. Choose the kind of card above Start, and come back whenever the number beside Learn is above zero.")
             }
         }
     }
@@ -135,7 +135,7 @@ struct AboutView: View {
                 bullet("A word moves only on its first answer in a sitting. A missed word comes back later in the sitting without moving again.")
                 bullet("The ring beside a word fills as it moves up. An empty ring is new, and a green tick is known.")
                 bullet("Words marked Known are not reviewed. Reset on Words puts one back to new.")
-                bullet("Review known tests a few words you marked known. Any you miss go back to your reviews.")
+                bullet("Under Practice, Review ahead and Practice finished ask words without moving them; Review known tests a few words you marked known, and any you miss go back to your reviews.")
             }
         }
     }

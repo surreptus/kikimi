@@ -93,7 +93,7 @@ struct VideosView: View {
     private var steps: [String] {
         [String(localized: "Add a video you own."),
          String(localized: "On Words, choose the words you want to learn."),
-         String(localized: "On Review, practise them as they come due."),
+         String(localized: "On Learn, practise them as they come due."),
          String(localized: "Watch more. Each video shows how much of it you already understand.")]
     }
 

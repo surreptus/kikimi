@@ -14,7 +14,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
         switch self {
         case .videos: String(localized: "Videos")
         case .words: String(localized: "Words")
-        case .review: String(localized: "Review")
+        case .review: String(localized: "Learn")
         }
     }
 
@@ -115,7 +115,7 @@ struct SideNav: View {
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(item == .review && dueCount > 0 ? String(localized: "Review, \(dueCount) due") : item.title)
+        .accessibilityLabel(item == .review && dueCount > 0 ? String(localized: "Learn, \(dueCount) due") : item.title)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

@@ -125,7 +125,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Audio-only import** (podcasts) for material with no picture.
 
 ### Practising
-- [ ] **A Learn page with three paths** (suggested 4 Nov 2026, in the style of WaniKani's dashboard): the Review page becomes
+- [ ] **A Learn page with three paths** (suggested 4 Nov 2026, in the style of WaniKani's dashboard; the page is renamed Learn and has Reviews and Practice as of 5 Nov 2026, Lessons waits for Daily lessons): the Review page becomes
       **Learn**, a page of cards, one for each thing you can do now:
       - **Lessons**, with the count of the day's new words (see Daily lessons below). Start opens the lesson.
       - **Reviews**, with the count due now. This is today's panel, with the card type and Start.
@@ -133,9 +133,8 @@ Ordered by how much each helps comprehensible input per unit of effort.
         words you marked known, which exists today) and *Practice finished* (words that have been through every stage and
         retired, WaniKani's "burned"), each a row with its count and a button, as WaniKani's Extra Study has.
       "Known" and "finished" differ: known is what you marked yourself, finished is what you earned by passing every review.
-      The card type applies to all three paths. To settle: whether a miss in *Practice finished* sends a word back to
-      learning (it would make it a real check, as *Review known* is) or changes nothing (extra study), and what the sidebar
-      count shows (reviews due, or lessons and reviews). It absorbs the *Review ahead* and *Resurface finished words* items.
+      The card type applies to all three paths. Settled 5 Nov 2026: a miss in *Practice finished* changes nothing (extra study; only *Review known*
+      is a real check), and the sidebar count stays reviews due. It absorbs the *Review ahead* and *Resurface finished words* items.
 - [ ] **Daily lessons** (like WaniKani's): each day Kikimi queues up the most important words you haven't started, 15 for each
       language by default, and you learn them from a short lesson instead of picking every word yourself. The number is a
       setting (Settings > Languages > New words per day, one for each language you learn; 0 turns it off). Today nothing is
@@ -196,7 +195,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
       qualify). A word with no short line is asked as word and meaning, and a session prefers a short line when a word has
       one. Not done: slowing the audio on this card, and judging kana against kanji (a correct reading in kana counts as
       different from the kanji line).
-- [ ] **Review ahead**: practise words that are not due yet without changing their stages ("cram"). A row in the Learn page's
+- [x] **Review ahead** (5 Nov 2026, as a row in Practice on the Learn page): practise words that are not due yet without changing their stages ("cram"). A row in the Learn page's
       Practice area (see above).
 - [x] **Kanji level and school year** (4 Nov 2026): the word panel's Kanji section shows each kanji's JLPT level and the school
       year that teaches it. KANJIDIC2's level is the exam's older four levels; they are shown as N5, N4, N3–N2 and N1 (the

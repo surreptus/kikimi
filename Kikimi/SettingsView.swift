@@ -157,7 +157,7 @@ private struct LanguagesTab: View {
                 }
             }
             Section {} footer: {
-                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. The kind of card (word and meaning, fill in the word, or listen to the sentence) is chosen on the Review page. Sentence audio plays only when it wouldn't give the answer away.")
+                Text("A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. The kind of card (word and meaning, fill in the word, or listen to the sentence) is chosen on the Learn page. Sentence audio plays only when it wouldn't give the answer away.")
             }
         }
         .formStyle(.grouped)

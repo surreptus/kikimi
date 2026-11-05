@@ -275,7 +275,7 @@ struct WordsView: View {
                 case .learn:
                     let started = try await env.database.startLearning(wordIDs: ids)
                     let skipped = ids.count - started
-                    app.showToast(inflected("Started learning ^[\(started) word](inflect: true). They are ready on the Review page.")
+                    app.showToast(inflected("Started learning ^[\(started) word](inflect: true). They are ready on the Learn page.")
                         + (skipped > 0 ? " (\(skipped) already in progress)" : ""))
                 case .known:
                     let n = try await env.database.markKnown(wordIDs: ids)

@@ -23,8 +23,9 @@ Spanish, French, German and Japanese work today.
 - **Words.** A searchable table with dictionary entries, example lines and Anki export. For Japanese, every reading
   of a word and each kanji with its on'yomi and kun'yomi, JLPT level and school year. For Spanish, French and German, a noun shows its article
   (el/la, le/la, der/die/das).
-- **Review.** Nine-stage spaced repetition. Choose the kind of card on the Review page: word and meaning, fill in the
-  word, listen to the sentence, or type a short sentence you hear.
+- **Learn.** Nine-stage spaced repetition. Choose the kind of card on the Learn page: word and meaning, fill in the
+  word, listen to the sentence, or type a short sentence you hear. Under Practice, review words before they are due or
+  practise finished ones without moving the schedule, or test the words you marked known.
 - **Your progress** saves to a `.kikimi` file you can restore later; it never overwrites what you already have.
 
 ## Finding videos to learn from
