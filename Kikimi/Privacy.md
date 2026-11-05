@@ -2,13 +2,13 @@
 
 Kikimi is built so that your videos, and what you learn from them, stay on your Mac.
 
-_Last updated: 4 November 2026._
+_Last updated: 5 November 2026._
 
 ## The short version
 
 - Kikimi does not collect any information about you.
 - Your videos, transcripts, words and progress never leave your Mac.
-- The only time it uses the internet is when you ask it to download a speech model.
+- The only times it uses the internet are when you ask it to download a speech model, or to check for a new version.
 - There are no accounts, no advertising, no analytics and no tracking.
 
 ## What stays on your Mac
@@ -33,15 +33,17 @@ You can remove videos on the Videos page and speech models on the Storage page. 
 
 Transcription runs on your Mac using a speech model you have downloaded. The dictionaries used for word look-ups are built into the app. When Kikimi says a word aloud it uses the voices that come with macOS. None of this sends anything anywhere.
 
-## The one thing that uses the internet
+## The things that use the internet
 
-> The only time Kikimi goes online is to download a speech model, and it sends nothing else.
+> Kikimi goes online only to download a speech model and, when you ask, to check for a new version. It sends nothing else.
 
 A few links open a web page in your browser, such as a Japanese grammar guide. That is your browser visiting the page, as when you click any link: Kikimi sends nothing, and the site sees your visit as any website would.
 
 The first time you need a speech model, Kikimi downloads it from Hugging Face (huggingface.co), a service that hosts it. When it does, Hugging Face can see your internet address and which model files you asked for, as any website would, and handles that under its own privacy policy. Kikimi sends nothing else: not your videos, transcripts, words or how you use the app.
 
-Once a model is downloaded, Kikimi works without an internet connection.
+**Checking for updates.** Choose Check for Updates in the Kikimi menu and Kikimi reads one small file from its website, which GitHub Pages hosts. It does this only when you choose it, never at launch and never in the background. The file holds the newest version number and a link to the download page. When it is read, GitHub can see your internet address and that a file was asked for, as any website would, and handles that under its own privacy policy. As with any request an app makes through macOS, the request names the app and its version. Kikimi sends nothing else: not your videos, transcripts, words or how you use the app.
+
+Once a model is downloaded, Kikimi works without an internet connection, apart from that check if you ask for it.
 
 Translations are made on your Mac by the translation built into macOS, and your subtitles are sent nowhere. If you turn translations on and a language is not on your Mac yet, macOS may download it. That is the system doing it, not Kikimi.
 

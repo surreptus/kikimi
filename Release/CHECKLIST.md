@@ -28,6 +28,8 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       must be covered by `Kikimi/PrivacyInfo.xcprivacy` (it currently declares UserDefaults only; this was not
       checked against third-party packages).
 - [ ] Build: `TEAM_ID=... Scripts/release.sh developer-id --notarize` (direct) or `... app-store`.
+- [ ] **Update `site/public/latest.json`** to the new version (`{"version": "x.y.z", "url": "https://github.com/surreptus/kikimi/releases/latest"}`)
+      and push, so Check for Updates in older copies finds it. Do it only once the release is published, not before.
 - [ ] **Publish a checksum with every download.** Run `shasum -a 256 <the zip or dmg>` on the exact file you attach, and put
       the result in the release notes under "Download and verify" (copy the section from the previous release), so
       people can check the file against the notes. The tag is annotated, and the notes say which commit it is.

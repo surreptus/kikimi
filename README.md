@@ -10,7 +10,7 @@ Spanish, French, German and Japanese work today.
 
 - **Local files only.** Nothing is downloaded from video sites, ever.
 - **On-device.** Transcription runs on your Mac with [WhisperKit](https://github.com/argmaxinc/WhisperKit). The
-  only network use is downloading a speech model the first time you need it.
+  only network use is downloading a speech model the first time you need it, and checking for a new version when you ask.
 - **Your originals are never modified or deleted.**
 
 ## What it does

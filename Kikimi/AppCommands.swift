@@ -10,6 +10,7 @@ struct AppCommands: Commands {
         // The standard About window, with a few lines under the version: what the app is, where to find it, and the credits.
         CommandGroup(replacing: .appInfo) {
             Button("About Kikimi") { Self.showAboutPanel() }
+            Button("Check for Updates…") { Task { await UpdateChecker.run() } }
         }
 
         // One window, so there is no "New Window". Adding a video is what "New" means here.
