@@ -2665,9 +2665,6 @@
         }
       }
     },
-    "Also used in Practice." : {
-
-    },
     "Always" : {
       "localizations" : {
         "de" : {
@@ -13125,6 +13122,9 @@
         }
       }
     },
+    "The card type is used in Reviews and in Practice." : {
+
+    },
     "The copy Kikimi keeps of each video you add. Smallest compresses it (in our tests a 161 MB video became 29 MB), which is plenty to follow along and study from. Original quality keeps your file exactly as it is: the best picture and sound, but the same size. Your own files are never changed either way, and this applies to videos you add from now on." : {
       "localizations" : {
         "de" : {
@@ -14649,6 +14649,9 @@
           }
         }
       }
+    },
+    "Words you are learning that are due, each in a sentence from your videos." : {
+
     },
     "Words you are learning that are not due yet. Nothing moves, whatever you answer." : {
 
