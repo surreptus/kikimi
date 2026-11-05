@@ -119,9 +119,18 @@ struct ReviewView: View {
                 preview: { start, end in Task { await audio?.play(example.edited(start: start, end: end)) } },
                 saved: { saved in
                     translations?.forget(example.id)   // it was of the old text
-                    self.card = card.showing(example.edited(text: saved.text, start: saved.startTime, end: saved.endTime))
                     editingExample = nil
                     app.dataChanged()
+                    Task {
+                        // The fix may have taken the word out of the sentence (it was misread as another word): the card
+                        // can't be asked any more, so it is skipped and the word is asked another time.
+                        let stillThere = (try? await env.database.wordOccurs(wordID: card.id, inSubtitle: example.id)) ?? true
+                        if stillThere {
+                            self.card = card.showing(example.edited(text: saved.text, start: saved.startTime, end: saved.endTime))
+                        } else {
+                            await skipCard(word: card.word.lemma)
+                        }
+                    }
                 }, cancel: { audio?.stop(); editingExample = nil })
         }
         .sidePanel(isPresented: showsWord && revealed) {
@@ -502,6 +511,15 @@ struct ReviewView: View {
             editingDuration = videos.first { $0.id == example.videoID }?.video.duration ?? example.endTime + 30
             editingExample = example
         }
+    }
+
+    /// Moves past a card that no longer fits its edited sentence, without answering it.
+    private func skipCard(word: String) async {
+        guard let session else { return }
+        _ = try? await session.skipCurrent()
+        app.showToast(String(localized: "“\(word)” is no longer in that sentence, so this card was skipped."))
+        await advance(session)
+        if card == nil, summary == nil { await loadOverview(keepingSummary: true) }
     }
 
     private func playSentence() {

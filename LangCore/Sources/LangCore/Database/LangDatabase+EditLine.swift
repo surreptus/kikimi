@@ -2,6 +2,14 @@ import Foundation
 import GRDB
 
 extension LangDatabase {
+    /// Whether a word is still found in a line, which an edit of the line can change.
+    public func wordOccurs(wordID: Int64, inSubtitle subtitleID: Int64) async throws -> Bool {
+        try await writer.read { db in
+            try Int.fetchOne(db, sql: "SELECT 1 FROM occurrences WHERE word_id = ? AND subtitle_id = ?",
+                             arguments: [wordID, subtitleID]) != nil
+        }
+    }
+
     /// Replaces the text of a subtitle line, and the words found in it, because Whisper got it wrong; `start` and `end`
     /// (seconds) move its timing when given. Words you have started learning or marked are kept; words still "new" that
     /// now appear nowhere are removed, as when a video is deleted. Returns the line as saved.

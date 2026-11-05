@@ -137,3 +137,66 @@ final class LessonCompletionTests: XCTestCase {
         XCTAssertEqual(due, 0, "their first review is hours away")
     }
 }
+
+final class SkipCardTests: XCTestCase {
+    private func learning(_ db: LangDatabase, _ lemmas: [String]) async throws -> [Int64] {
+        try await db.writer.write { d in
+            try lemmas.map { lemma in
+                var w = Word(language: "es", lemma: lemma, pos: .noun, status: .learning, stage: .stage3,
+                             nextReview: Date().addingTimeInterval(-60)); try w.insert(d); return w.id!
+            }
+        }
+    }
+
+    func testASkippedReviewCardChangesNothingAndIsAskedAgainLater() async throws {
+        let db = try LangDatabase()
+        _ = try await learning(db, ["casa", "perro"])
+        let session = try await ReviewSession(database: db, language: "es")
+        let first = try await session.currentCard()!
+        let skipped = try await session.skipCurrent()
+        XCTAssertTrue(skipped)
+        let next = try await session.currentCard()!
+        XCTAssertNotEqual(first.id, next.id)
+        let remaining = await session.remaining
+        let answered = await session.answered
+        XCTAssertEqual([remaining, answered], [1, 0], "skipping is not answering")
+        let word = try await db.word(id: first.id)
+        XCTAssertEqual(word?.stage, .stage3, "stage untouched")
+        let due = try await db.dueCount(language: "es")
+        XCTAssertEqual(due, 2, "still due, so it comes back in the next review")
+    }
+
+    func testASkippedLessonWordIsNotStartedWhenTheRestOfTheQuizIsDone() async throws {
+        let db = try LangDatabase()
+        let ids = try await db.writer.write { d in
+            try ["casa", "perro"].map { lemma in
+                var w = Word(language: "es", lemma: lemma, pos: .noun); try w.insert(d); return w.id!
+            }
+        }
+        let session = ReviewSession(lessonQuiz: ids, database: db, language: "es")
+        let first = try await session.currentCard()!
+        try await session.skipCurrent()
+        _ = try await session.currentCard(); try await session.answer(correct: true)
+        let status = try await db.writer.read { db in
+            try Word.fetchAll(db).reduce(into: [Int64: WordStatus]()) { $0[$1.id!] = $1.status }
+        }
+        XCTAssertEqual(status[first.id], .new, "the skipped word was not taught")
+        XCTAssertEqual(status[ids.first { $0 != first.id }!], .learning, "the rest started once the quiz was finished")
+    }
+
+    func testWordOccursSaysWhetherALineStillHasTheWord() async throws {
+        let db = try LangDatabase()
+        let (word, line) = try await db.writer.write { d -> (Int64, Int64) in
+            var v = Video(language: "es", title: "v", contentHash: "h", videoPath: "h/v.mov", duration: 9); try v.insert(d)
+            var s = Subtitle(videoId: v.id!, idx: 0, startTime: 0, endTime: 1, text: "casa"); try s.insert(d)
+            var w = Word(language: "es", lemma: "casa", pos: .noun); try w.insert(d)
+            var o = Occurrence(wordId: w.id!, subtitleId: s.id!, surface: "casa"); try o.insert(d)
+            return (w.id!, s.id!)
+        }
+        var occurs = try await db.wordOccurs(wordID: word, inSubtitle: line)
+        XCTAssertTrue(occurs)
+        try await db.writer.write { try $0.execute(sql: "DELETE FROM occurrences") }
+        occurs = try await db.wordOccurs(wordID: word, inSubtitle: line)
+        XCTAssertFalse(occurs)
+    }
+}

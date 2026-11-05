@@ -51,7 +51,7 @@ public actor ReviewSession {
     /// In a lesson's quiz a missed word is asked again until it is right, as the quiz is how the lesson sinks in.
     private let repeatsMisses: Bool
     /// A lesson's words, started only once the whole quiz has been answered: a lesson stopped half way started nothing.
-    private let startsOnCompletion: [Int64]
+    private var startsOnCompletion: [Int64]
     public private(set) var answered = 0
     public private(set) var correctFirstTry = 0
     /// In a known-words check: how many were missed, and so went back to being learned.
@@ -126,6 +126,22 @@ public actor ReviewSession {
         let card = ReviewCard(word: word, entries: entries, example: example)
         cached = card
         return card
+    }
+
+    /// Drops the card at the front without answering it, for a card that can no longer be asked (its sentence was edited
+    /// and no longer has the word). Nothing about the word changes, so in a review it is simply asked next time; in a
+    /// lesson's quiz it is left out of the words that get started. Returns false if there was no card.
+    @discardableResult
+    public func skipCurrent(now: Date = Date()) async throws -> Bool {
+        guard let id = queue.first else { return false }
+        queue.removeAll { $0 == id }
+        cached = nil
+        let wasLessonWord = startsOnCompletion.contains(id)
+        startsOnCompletion.removeAll { $0 == id }
+        if wasLessonWord, queue.isEmpty, !startsOnCompletion.isEmpty {
+            try await database.startLearning(wordIDs: startsOnCompletion, now: now, firstReviewAfter: SRS.intervals[0])
+        }
+        return true
     }
 
     public func answer(correct: Bool, now: Date = Date()) async throws {
