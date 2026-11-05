@@ -342,8 +342,8 @@ struct PlayerView: View {
     /// What the tints mean, and one switch for them. Two states only: a finished word is simply a known one.
     private var legendBar: some View {
         HStack(spacing: 14) {
-            legendDot(Theme.orange, "Learning", underlined: true)
-            legendDot(Theme.green, "Known")
+            legendSample("Learning") { $0.learningUnderline() }
+            legendSample("Known") { $0.knownUnderline().background(RoundedRectangle(cornerRadius: 5).fill(Theme.green.opacity(0.22)).padding(.horizontal, -2)) }
             Spacer()
             Toggle("Highlight", isOn: $highlightWords)
                 .toggleStyle(.switch).controlSize(.mini)
@@ -353,13 +353,10 @@ struct PlayerView: View {
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.line).frame(height: 1) }
     }
 
-    private func legendDot(_ color: Color, _ label: String, underlined: Bool = false) -> some View {
-        HStack(spacing: 5) {
-            if !underlined { Circle().fill(color.opacity(0.85)).frame(width: 8, height: 8) }
-            // The same marks the subtitles use, so the legend is a true sample, not a description.
-            Text(label).learningUnderline(underlined)
-                .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
-        }
+    /// The same marks the subtitles use, so the legend is a true sample, not a description.
+    private func legendSample<V: View>(_ label: LocalizedStringKey, mark: (Text) -> V) -> some View {
+        mark(Text(label))
+            .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
     }
 
     private func subtitleList(_ controller: PlaybackController) -> some View {

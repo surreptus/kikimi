@@ -246,6 +246,7 @@ struct SubtitleRow: View {
                 Text(chunk.text)
                     .font(textFont)
                     .learningUnderline(status(of: chunk.token) == .learning)
+                    .knownUnderline(status(of: chunk.token) == .known || status(of: chunk.token) == .finished)
                     // The highlight is slightly wider than the word, but takes no layout space (no gaps in Japanese).
                     .background(RoundedRectangle(cornerRadius: 5)
                         .fill(isPinned ? Theme.ink.opacity(0.2) : isHovered ? Theme.ink.opacity(0.12) : tint(for: chunk.token))
@@ -324,6 +325,21 @@ extension View {
     func learningUnderline(_ on: Bool = true) -> some View {
         overlay(alignment: .bottom) {
             if on { Capsule().fill(Theme.orange.opacity(0.8)).frame(height: 1.5).padding(.horizontal, 1).offset(y: 1) }
+        }
+    }
+}
+
+extension View {
+    /// A dotted underline for a word you know, so it differs from a learning word's line by shape and not only by colour.
+    func knownUnderline(_ on: Bool = true) -> some View {
+        overlay(alignment: .bottom) {
+            if on {
+                Path { path in path.move(to: .zero); path.addLine(to: CGPoint(x: 400, y: 0)) }
+                    .stroke(Theme.green, style: StrokeStyle(lineWidth: 1.5, lineCap: .round, dash: [0.1, 3.2]))
+                    .frame(height: 1.5)
+                    .clipped()
+                    .offset(y: 1)
+            }
         }
     }
 }
