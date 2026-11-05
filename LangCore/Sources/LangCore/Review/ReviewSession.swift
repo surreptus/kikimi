@@ -46,6 +46,8 @@ public actor ReviewSession {
     private let preferring: (@Sendable (ExampleLine) -> Bool)?
     /// A check of words marked known, not a review: answers don't move any stage.
     public let isKnownCheck: Bool
+    /// Extra study (review ahead, practice finished): answers are counted and nothing else changes.
+    public let isPractice: Bool
     public private(set) var answered = 0
     public private(set) var correctFirstTry = 0
     /// In a known-words check: how many were missed, and so went back to being learned.
@@ -56,6 +58,7 @@ public actor ReviewSession {
         self.language = language
         self.preferring = preferring
         isKnownCheck = false
+        isPractice = false
         queue = try await database.dueWords(language: language, now: now).compactMap(\.id)
     }
 
@@ -66,7 +69,19 @@ public actor ReviewSession {
         self.language = language
         preferring = nil
         isKnownCheck = true
+        isPractice = false
         queue = try await database.knownSample(language: language, count: count)
+    }
+
+    /// Extra study that changes no stage and no status, so it can be done any time without disturbing the schedule.
+    public init(practising kind: PracticeKind, database: LangDatabase, language: String,
+                preferring: (@Sendable (ExampleLine) -> Bool)? = nil, count: Int = 20, now: Date = Date()) async throws {
+        self.database = database
+        self.language = language
+        self.preferring = preferring
+        isKnownCheck = false
+        isPractice = true
+        queue = try await database.practiceSample(kind, language: language, count: count, now: now)
     }
 
     public var remaining: Int { queue.count }
@@ -92,6 +107,10 @@ public actor ReviewSession {
         queue.removeFirst()
         cached = nil
         answered += 1
+        if isPractice {
+            if correct { correctFirstTry += 1 }
+            return
+        }
         if isKnownCheck {
             if correct { correctFirstTry += 1 }
             else {
