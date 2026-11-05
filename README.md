@@ -5,7 +5,8 @@
 A native macOS app for learning a language from videos you already own.
 
 Drop in a video. Kikimi transcribes it on your Mac, finds the words you'll meet, and helps you learn them with
-spaced repetition, using real sentences from your own videos. Spanish, French, German and Japanese work today.
+spaced repetition, using real sentences from your own videos. The aim is to understand more of what you watch.
+Spanish, French, German and Japanese work today.
 
 - **Local files only.** Nothing is downloaded from video sites, ever.
 - **On-device.** Transcription runs on your Mac with [WhisperKit](https://github.com/argmaxinc/WhisperKit). The
@@ -45,22 +46,28 @@ have a different licence from its video, so check each one you use. This is not 
 
 ## Install
 
-Releases aren't signed with an Apple Developer ID or notarized yet, so macOS blocks a downloaded copy the first
-time. This is Gatekeeper, not a damaged file. With a `Kikimi.zip`:
+Download the latest `Kikimi-….zip` from the [Releases page](https://github.com/surreptus/kikimi/releases/latest), unzip
+it and drag **Kikimi** into Applications.
 
-1. Unzip it and drag **Kikimi** into Applications.
-2. Open it. macOS says it can't verify the app. Click **Done**.
-3. Open **System Settings > Privacy & Security**, scroll to the message about Kikimi, click **Open Anyway** and
-   confirm.
+The first time you open it, macOS says it can't verify the app. That is expected: Kikimi is free and open source, and
+isn't notarized yet (Apple charges a yearly fee for that). To open it:
 
-Or remove the download flag once in Terminal, then open it normally:
+1. Click **Done** on the warning.
+2. Open **System Settings > Privacy & Security**, scroll to the message about Kikimi, click **Open Anyway** and confirm.
+
+Each release lists a SHA-256 to check the download against. Building from source (below) avoids the warning.
+
+<details>
+<summary>Advanced: skip the warning from Terminal</summary>
+
+Remove the download flag once, then open the app normally:
 
 ```bash
 xattr -dr com.apple.quarantine /Applications/Kikimi.app
 ```
 
-Do this only for a copy you trust. Each release lists a SHA-256 to check the download against. Building from
-source avoids all of this.
+Do this only for a copy you trust, since it skips macOS's check.
+</details>
 
 ## Build from source
 
