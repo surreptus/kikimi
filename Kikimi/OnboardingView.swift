@@ -22,12 +22,12 @@ struct OnboardingView: View {
 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I'm learning").font(Theme.title(16))
-                    ForEach(LanguageProfiles.all, id: \.code) { profile in
-                        Toggle(profile.displayName, isOn: binding(for: profile)).toggleStyle(.checkbox)
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+                        ForEach(LanguageProfiles.all, id: \.code) { profile in
+                            LanguageTile(profile: profile, selected: chosen.contains(profile.code)) { toggle(profile) }
+                        }
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .panel()
 
                 Text(TranslationPreferences.isSupported
                      ? String(localized: "Translations stay hidden until you ask for one, so you listen first. Next: add a video you own.")
@@ -49,9 +49,47 @@ struct OnboardingView: View {
         }
     }
 
-    private func binding(for profile: any LanguageProfile) -> Binding<Bool> {
-        Binding(
-            get: { chosen.contains(profile.code) },
-            set: { if $0 { chosen.insert(profile.code) } else { chosen.remove(profile.code) } })
+    private func toggle(_ profile: any LanguageProfile) {
+        if chosen.contains(profile.code) { chosen.remove(profile.code) } else { chosen.insert(profile.code) }
+    }
+}
+
+/// One language to learn: its flag, its own name large and its name in your language beneath. Several can be chosen;
+/// a tick (not only the fill) says which.
+private struct LanguageTile: View {
+    let profile: any LanguageProfile
+    let selected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .top) {
+                    if let region = profile.flagRegion { Flag(region: region) }
+                    Spacer()
+                    Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 20))
+                        .foregroundStyle(selected ? Theme.ink : Theme.muted)
+                }
+                Spacer(minLength: 0)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(profile.nativeName).font(Theme.title(22))
+                    if profile.displayName != profile.nativeName {
+                        Text(profile.displayName).font(Theme.small).foregroundStyle(Theme.muted)
+                    }
+                }
+            }
+            .foregroundStyle(Theme.ink)
+            .padding(16)
+            .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(selected ? Theme.softStrong : Theme.soft))
+            .overlay(RoundedRectangle(cornerRadius: Theme.cornerRadius)
+                .strokeBorder(Theme.ink.opacity(selected ? 0.8 : 0), lineWidth: 2))
+            .contentShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(profile.displayName == profile.nativeName ? profile.displayName : "\(profile.nativeName), \(profile.displayName)")
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
 }
