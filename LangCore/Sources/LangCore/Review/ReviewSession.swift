@@ -50,6 +50,8 @@ public actor ReviewSession {
     public let isPractice: Bool
     /// In a lesson's quiz a missed word is asked again until it is right, as the quiz is how the lesson sinks in.
     private let repeatsMisses: Bool
+    /// A lesson's words, started only once the whole quiz has been answered: a lesson stopped half way started nothing.
+    private let startsOnCompletion: [Int64]
     public private(set) var answered = 0
     public private(set) var correctFirstTry = 0
     /// In a known-words check: how many were missed, and so went back to being learned.
@@ -62,6 +64,7 @@ public actor ReviewSession {
         isKnownCheck = false
         isPractice = false
         repeatsMisses = false
+        startsOnCompletion = []
         queue = try await database.dueWords(language: language, now: now).compactMap(\.id)
     }
 
@@ -75,6 +78,7 @@ public actor ReviewSession {
         isKnownCheck = true
         isPractice = false
         repeatsMisses = false
+        startsOnCompletion = []
         queue = try await database.knownSample(language: language, count: count)
     }
 
@@ -87,11 +91,13 @@ public actor ReviewSession {
         isKnownCheck = false
         isPractice = true
         repeatsMisses = false
+        startsOnCompletion = []
         queue = try await database.practiceSample(kind, language: language, count: count, now: now)
     }
 
-    /// The quiz at the end of a lesson: these words, asked now, with nothing changed by the answers (the words were just
-    /// started, so their first real review is hours away) and a missed word asked again until it is right.
+    /// The quiz at the end of a lesson: these words, asked now, with a missed word asked again until it is right. The
+    /// answers change nothing; when the last one is right the words are started, their first review a stage-1 interval
+    /// away. Stopping before that starts none of them, so a lesson is only done when both parts are.
     public init(lessonQuiz wordIDs: [Int64], database: LangDatabase, language: String,
                 preferring: (@Sendable (ExampleLine) -> Bool)? = nil) {
         self.database = database
@@ -100,6 +106,7 @@ public actor ReviewSession {
         isKnownCheck = false
         isPractice = true
         repeatsMisses = true
+        startsOnCompletion = wordIDs
         queue = wordIDs
     }
 
@@ -132,6 +139,9 @@ public actor ReviewSession {
             } else if repeatsMisses {
                 missed.insert(id)
                 queue.append(id)
+            }
+            if queue.isEmpty, !startsOnCompletion.isEmpty {
+                try await database.startLearning(wordIDs: startsOnCompletion, now: now, firstReviewAfter: SRS.intervals[0])
             }
             return
         }

@@ -102,3 +102,38 @@ final class LessonQuizTests: XCTestCase {
         XCTAssertEqual(stages, [.stage1, .stage1])
     }
 }
+
+final class LessonCompletionTests: XCTestCase {
+    private func words() async throws -> (LangDatabase, [Int64]) {
+        let db = try LangDatabase()
+        let ids = try await db.writer.write { d -> [Int64] in
+            try ["casa", "perro"].map { lemma in
+                var w = Word(language: "es", lemma: lemma, pos: .noun); try w.insert(d); return w.id!
+            }
+        }
+        return (db, ids)
+    }
+
+    func testAQuizStoppedHalfWayStartsNoWord() async throws {
+        let (db, ids) = try await words()
+        let session = ReviewSession(lessonQuiz: ids, database: db, language: "es")
+        _ = try await session.currentCard(); try await session.answer(correct: true)   // one of two answered, then it is dropped
+        let started = try await db.startedToday(language: "es")
+        let learning = try await db.writer.read { try Word.filter(Column("status") == WordStatus.learning.rawValue).fetchCount($0) }
+        XCTAssertEqual([started, learning], [0, 0], "the lesson is not done, so nothing counts towards the day")
+    }
+
+    func testAFinishedQuizStartsEveryWordAndCountsTheDay() async throws {
+        let (db, ids) = try await words()
+        let session = ReviewSession(lessonQuiz: ids, database: db, language: "es")
+        _ = try await session.currentCard(); try await session.answer(correct: false)   // missed: asked again, still not done
+        _ = try await session.currentCard(); try await session.answer(correct: true)
+        var started = try await db.startedToday(language: "es")
+        XCTAssertEqual(started, 0, "a missed word is still to be answered")
+        _ = try await session.currentCard(); try await session.answer(correct: true)
+        started = try await db.startedToday(language: "es")
+        XCTAssertEqual(started, 2)
+        let due = try await db.dueCount(language: "es")
+        XCTAssertEqual(due, 0, "their first review is hours away")
+    }
+}

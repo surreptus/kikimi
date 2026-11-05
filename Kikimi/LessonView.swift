@@ -14,12 +14,12 @@ extension ExampleLine {
 }
 
 /// Teaching a few new words, one at a time, each in a sentence from your videos with its meaning showing. Next teaches
-/// the word; Already know it marks it known. When the batch is done the words are started (their first review is hours
-/// away) and the page quizzes them at once, so each is asked while it is fresh.
+/// the word; Already know it marks it known. When the batch is done the page quizzes it at once, so each word is asked
+/// while it is fresh. The words are started only when that quiz is finished, so leaving early starts none of them.
 struct LessonView: View {
     let env: LangEnvironment
     let wordIDs: [Int64]
-    /// The words that were taught (and are now being learned), and whether to quiz them. Leaving early does not quiz.
+    /// The words that were taught, and whether to quiz them. Leaving early does not quiz, and starts nothing.
     let finish: (_ taught: [Int64], _ quiz: Bool) -> Void
     @Environment(AppState.self) private var app
     @State private var index = 0
@@ -35,7 +35,7 @@ struct LessonView: View {
                 Button("End lesson", systemImage: "xmark") { Task { await end() } }
                     .labelStyle(.pillIcon).buttonStyle(.pill(.secondary, compact: true))
                     .keyboardShortcut(.escape, modifiers: [])
-                    .help("Back to the Learn page (Esc). Words you have already been taught are kept.")
+                    .help("Back to the Learn page (Esc). Words you were taught but not yet quizzed on are not started.")
                 ProgressView(value: Double(index), total: Double(max(1, wordIDs.count)))
                     .progressViewStyle(.thin)
                 Text("\(max(0, wordIDs.count - index)) left").font(.system(size: 12, weight: .medium, design: .rounded))
@@ -128,17 +128,11 @@ struct LessonView: View {
         } catch { self.error = error.localizedDescription }
     }
 
-    /// Starts the words that were taught, with their first review a stage-1 interval away: the quiz that follows is the
-    /// first look, so they are not also due at once.
+    /// Hands the taught words on to be quizzed, or, when leaving early, hands on nothing. Words marked known are already
+    /// saved, since that was a decision of its own.
     private func end(quiz: Bool = false) async {
         audio?.stop()
-        do {
-            if !taught.isEmpty {
-                try await env.database.startLearning(wordIDs: taught, firstReviewAfter: SRS.intervals[0])
-            }
-            if !taught.isEmpty || known > 0 { app.dataChanged() }
-            await app.refreshDue()
-            finish(taught, quiz)
-        } catch { self.error = error.localizedDescription }
+        if known > 0 { app.dataChanged() }
+        finish(quiz ? taught : [], quiz)
     }
 }

@@ -610,7 +610,7 @@ struct ReviewView: View {
             if card == nil, await session.answered > 0 {
                 summary = (await session.answered, await session.correctFirstTry)
                 returned = await session.returnedToLearning
-                if await session.isKnownCheck { app.dataChanged() }   // coverage and the word lists have changed
+                if await session.isKnownCheck || extra == .lesson { app.dataChanged() }   // the lists and coverage have changed
                 await loadOverview(keepingSummary: true)
             }
         } catch { self.error = error.localizedDescription }
