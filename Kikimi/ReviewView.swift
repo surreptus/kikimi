@@ -446,7 +446,7 @@ struct ReviewView: View {
         var text = AttributedString(cloze.before)
         var answer = AttributedString(cloze.answer)
         answer.font = .system(size: 28, weight: .semibold, design: .rounded)
-        answer.foregroundColor = Color(Theme.ink)
+        answer.foregroundColor = Color(Theme.highlight)
         text.append(answer)
         text.append(AttributedString(cloze.after))
         return text

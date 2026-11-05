@@ -6,8 +6,8 @@ extension ExampleLine {
     var highlighted: AttributedString {
         var styled = AttributedString(text)
         if let range = styled.range(of: surface, options: [.caseInsensitive, .diacriticInsensitive]) {
-            styled[range].font = .system(.body, design: .rounded, weight: .medium)
-            styled[range].foregroundColor = Color(Theme.ink)
+            styled[range].inlinePresentationIntent = .stronglyEmphasized   // keeps the line's own size
+            styled[range].foregroundColor = Color(Theme.highlight)
         }
         return styled
     }

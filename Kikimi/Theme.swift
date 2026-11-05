@@ -55,6 +55,10 @@ enum Theme {
     static let orange = Color(light: Color(hex: 0x935800), dark: Color(hex: 0xFFB84D))
     static let purple = Color(light: Color(hex: 0x6F45C5), dark: Color(hex: 0xC3A6FF))
 
+    /// The word a card is about, picked out in its sentence: a persimmon orange (4.7:1 on the Light card, 7.8:1 on the
+    /// Dark one), always with bold as well, so colour is not the only signal.
+    static let highlight = Color(light: Color(hex: 0xC4400F), dark: Color(hex: 0xFF8A5C))
+
     static let cornerRadius: CGFloat = 20
     /// Inset of every screen's content from the window edge, so headings sit in the same place everywhere.
     static let screenPadding: CGFloat = 26
