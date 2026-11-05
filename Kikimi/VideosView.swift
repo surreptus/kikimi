@@ -61,6 +61,7 @@ struct VideosView: View {
                     subtitle: items.isEmpty ? String(localized: "Drop videos you own. They never leave this Mac.")
                         : inflected("^[\(items.count) video](inflect: true) · \(formatBytes(totalBytes)) on this Mac"))
                 ImportSection(env: env, compact: !items.isEmpty)
+                if items.isEmpty { firstSteps }
                 if !items.isEmpty { sortMenu }
                 ForEach(orderedItems) { item in
                     row(item)
@@ -71,22 +72,52 @@ struct VideosView: View {
         .task(id: "\(app.languageCode)-\(app.dataVersion)") { await reload() }
     }
 
+    /// Until there is a video: what this is for, and the four things to do.
+    private var firstSteps: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("The goal: understand more of what you watch").font(Theme.title(17))
+            ForEach(Array(steps.enumerated()), id: \.offset) { index, text in
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text("\(index + 1)").font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .frame(width: 24, height: 24).background(Circle().fill(Theme.ink.opacity(0.1)))
+                        .accessibilityHidden(true)
+                    Text(text).font(.system(.body, design: .rounded)).foregroundStyle(Theme.ink)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Step \(index + 1): \(text)")
+            }
+        }
+        .padding(.top, 6)
+    }
+
+    private var steps: [String] {
+        [String(localized: "Add a video you own."),
+         String(localized: "On Words, choose the words you want to learn."),
+         String(localized: "On Review, practise them as they come due."),
+         String(localized: "Watch more. Each video shows how much of it you already understand.")]
+    }
+
     /// "Your videos" with the order they are in, and the way to change it.
     private var sortMenu: some View {
-        HStack {
-            Text("Your videos").font(Theme.title(17))
-            Spacer()
-            Menu {
-                Picker("Order", selection: $sort) {
-                    Text("Newest first").tag("newest")
-                    Text("Closest to my level").tag("fit")
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text("Your videos").font(Theme.title(17))
+                Spacer()
+                Menu {
+                    Picker("Order", selection: $sort) {
+                        Text("Newest first").tag("newest")
+                        Text("Closest to my level").tag("fit")
+                    }
+                    .pickerStyle(.inline)
+                } label: {
+                    Label(sort == "fit" ? String(localized: "Closest to my level") : String(localized: "Newest first"), systemImage: "arrow.up.arrow.down")
                 }
-                .pickerStyle(.inline)
-            } label: {
-                Label(sort == "fit" ? String(localized: "Closest to my level") : String(localized: "Newest first"), systemImage: "arrow.up.arrow.down")
+                .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+                .help("Puts first the videos where you know most of the words, but not all")
             }
-            .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
-            .help("Puts first the videos where you know most of the words, but not all")
+            // The percentage on each video, said in words once, where it is first met.
+            Text("Each video shows how many of its words you already know. Around 90% is comfortable to follow.")
+                .font(Theme.small).foregroundStyle(Theme.muted)
         }
         .padding(.top, 8)
     }

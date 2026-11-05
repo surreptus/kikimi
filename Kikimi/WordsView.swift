@@ -192,7 +192,8 @@ struct WordsView: View {
         .overlay {
             if rows.isEmpty {
                 if trimmedSearch.isEmpty && filter == nil && typeFilter == nil {
-                    EmptyState(title: "No words yet", message: "Add a video on the Videos page to collect words.", illustration: .bubble)
+                    EmptyState(title: "No words yet", message: "Add a video on the Videos page to collect words.", illustration: .bubble,
+                               actionTitle: "Go to Videos", action: { app.select(.videos) })
                 } else {
                     EmptyState(title: "No matches", message: "Try a different search or status.")
                 }
@@ -208,6 +209,9 @@ struct WordsView: View {
         HStack(spacing: 10) {
             Text(selection.isEmpty ? "\(rows.count) words" : "\(selection.count) of \(rows.count) selected")
                 .foregroundStyle(Theme.muted)
+            if selection.isEmpty {
+                Text("Select words to use Learn and Known.").font(Theme.small).foregroundStyle(Theme.muted).lineLimit(1)
+            }
             Spacer()
             // Works with nothing selected too: it then exports the words you are learning.
             Button("Export to Anki…") { chooseAnki = true }
@@ -271,7 +275,7 @@ struct WordsView: View {
                 case .learn:
                     let started = try await env.database.startLearning(wordIDs: ids)
                     let skipped = ids.count - started
-                    app.showToast(inflected("Started learning ^[\(started) word](inflect: true)")
+                    app.showToast(inflected("Started learning ^[\(started) word](inflect: true). They are ready on the Review page.")
                         + (skipped > 0 ? " (\(skipped) already in progress)" : ""))
                 case .known:
                     let n = try await env.database.markKnown(wordIDs: ids)

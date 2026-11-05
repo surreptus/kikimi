@@ -441,6 +441,10 @@ struct PlayerView: View {
                 }
                 Text(hint?.gloss ?? "No dictionary entry").font(.system(.callout, design: .rounded)).lineLimit(2)
                     .foregroundStyle(hint?.gloss == nil ? Theme.muted : Theme.ink)
+                if hint?.wordID != nil, hint?.status == .new {
+                    Text("Learn adds it to your reviews. Known means you already know it.")
+                        .font(Theme.small).foregroundStyle(Theme.muted)
+                }
             } else {
                 Text("Point at a word, or use ← → on a line, to see what it means. Click it or press Return to keep it here.")
                     .font(.system(.callout, design: .rounded)).foregroundStyle(Theme.faint)

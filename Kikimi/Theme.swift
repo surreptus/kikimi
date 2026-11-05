@@ -393,16 +393,24 @@ struct EmptyState: View {
     let title: LocalizedStringKey
     let message: LocalizedStringKey
     var illustration: Illustration = .flower
+    /// A button to the next step, so an empty page is never a dead end.
+    var actionTitle: LocalizedStringKey?
+    var action: (() -> Void)?
 
     var body: some View {
         VStack(spacing: 10) {
-            illustration.view
-            Text(title).font(Theme.title(22)).foregroundStyle(Theme.ink)
-            Text(message).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
-                .multilineTextAlignment(.center)
+            VStack(spacing: 10) {
+                illustration.view
+                Text(title).font(Theme.title(22)).foregroundStyle(Theme.ink)
+                Text(message).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                    .multilineTextAlignment(.center)
+            }
+            .accessibilityElement(children: .combine)
+            if let actionTitle, let action {
+                Button(actionTitle, action: action).buttonStyle(.pill(compact: true)).padding(.top, 6)
+            }
         }
         .padding(24)
-        .accessibilityElement(children: .combine)
     }
 }
 

@@ -49,7 +49,8 @@ struct ReviewView: View {
                 }
             } else if let overview {
                 if overview.isEmpty {
-                    EmptyState(title: "Nothing to review yet", message: "Choose words to learn on the Words page, then come back.")
+                    EmptyState(title: "Nothing to review yet", message: "Choose words to learn on the Words page, then come back.",
+                               actionTitle: "Go to Words", action: { app.select(.words) })
                 } else {
                     ReviewOverviewView(overview: overview, stats: stats, style: styleChoice, start: { startSession() }, checkKnown: { startSession(checkingKnown: true) })
                 }
