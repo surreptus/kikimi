@@ -9739,6 +9739,34 @@
         }
       }
     },
+    "Review, %lld due" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederholung, %lld fällig"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repaso, %lld pendientes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révision, %lld à faire"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復習、%lld 件が期限"
+          }
+        }
+      }
+    },
     "Review" : {
       "localizations" : {
         "de" : {

@@ -115,5 +115,7 @@ struct SideNav: View {
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(item == .review && dueCount > 0 ? String(localized: "Review, \(dueCount) due") : item.title)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
