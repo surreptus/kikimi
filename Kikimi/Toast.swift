@@ -39,7 +39,7 @@ struct ToastHost: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-        .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: app.toast)
+        .animation(reduceMotion ? nil : Theme.easeOut(0.2), value: app.toast)
         .allowsHitTesting(app.toast != nil)
     }
 }

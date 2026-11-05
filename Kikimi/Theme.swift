@@ -59,10 +59,12 @@ enum Theme {
     /// Inset of every screen's content from the window edge, so headings sit in the same place everywhere.
     static let screenPadding: CGFloat = 26
 
-    /// How screens change: a short spring, or a plain quick fade when Reduce Motion is on.
-    static func screenChange(_ reduceMotion: Bool) -> Animation {
-        reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.38, dampingFraction: 0.86)
-    }
+    /// Every animation is this one curve, a cubic bezier that starts fast and settles gently, so movement feels
+    /// responsive and never bounces.
+    static func easeOut(_ duration: Double) -> Animation { .timingCurve(0.16, 1, 0.3, 1, duration: duration) }
+
+    /// How screens change: a short ease out, or a plain quick fade when Reduce Motion is on.
+    static func screenChange(_ reduceMotion: Bool) -> Animation { easeOut(reduceMotion ? 0.12 : 0.35) }
 
     /// The smallest text in the app. Furigana over subtitle words is the one exception (see `SubtitleRow`).
     static let small = Font.system(size: 12, design: .rounded)
@@ -94,7 +96,7 @@ struct PillButtonStyle: ButtonStyle {
             .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.4)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .contentShape(Capsule())
-            .animation(.easeOut(duration: 0.08), value: configuration.isPressed)
+            .animation(Theme.easeOut(0.08), value: configuration.isPressed)
     }
 
     private var face: Color {
@@ -169,7 +171,7 @@ struct ThinProgressStyle: ProgressViewStyle {
                     Capsule().fill(Theme.ink)
                         .frame(width: max(height, proxy.size.width * fraction))
                         .opacity(fraction > 0 ? 1 : 0)
-                        .animation(.easeOut(duration: 0.25), value: fraction)
+                        .animation(Theme.easeOut(0.25), value: fraction)
                 }
             }
             .frame(height: height)

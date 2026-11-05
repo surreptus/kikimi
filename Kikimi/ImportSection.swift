@@ -493,7 +493,7 @@ private extension View {
             .overlay(RoundedRectangle(cornerRadius: radius)
                 .strokeBorder(Theme.ink.opacity(targeted ? 0.7 : 0.35), style: StrokeStyle(lineWidth: 1.5, dash: [8, 7])))
             .scaleEffect(targeted && !reduceMotion ? 1.01 : 1)
-            .animation(reduceMotion ? nil : .easeOut(duration: 0.12), value: targeted)
+            .animation(reduceMotion ? nil : Theme.easeOut(0.12), value: targeted)
             .dropDestination(for: URL.self) { urls, _ in onDrop(urls) } isTargeted: { isTargeted.wrappedValue = $0 }
     }
 }

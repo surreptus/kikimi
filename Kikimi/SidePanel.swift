@@ -18,7 +18,7 @@ private struct SidePanel<Panel: View>: ViewModifier {
                     .transition(reduceMotion ? .opacity : .move(edge: .trailing).combined(with: .opacity))
             }
         }
-        .animation(reduceMotion ? nil : .easeOut(duration: 0.18), value: isPresented)
+        .animation(reduceMotion ? nil : Theme.easeOut(0.18), value: isPresented)
     }
 }
 

@@ -25,7 +25,7 @@ struct IconSegmentedPicker<Value: Hashable>: View {
         .padding(3)
         .background(Capsule().fill(Theme.ink.opacity(0.08)))
         // The highlight slides to the new choice and the labels change weight with it.
-        .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: selection)
+        .animation(reduceMotion ? nil : Theme.easeOut(0.2), value: selection)
         .accessibilityElement(children: .contain)
     }
 

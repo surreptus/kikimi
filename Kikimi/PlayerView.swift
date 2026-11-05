@@ -308,7 +308,7 @@ struct PlayerView: View {
             }
         }
         .labelStyle(.pillIcon)
-        .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: controller.loopingIndex != nil)
+        .animation(reduceMotion ? nil : Theme.easeOut(0.15), value: controller.loopingIndex != nil)
         .background {
             // Moves the keyboard into the transcript without Full Keyboard Access; a menu-less shortcut, so it has no face.
             Button("Focus transcript") { focusedLine = controller.activeIndex ?? 0 }
@@ -371,7 +371,7 @@ struct PlayerView: View {
                             moveFocus: { delta in
                                 let target = index + delta
                                 guard controller.lines.indices.contains(target) else { return }
-                                withAnimation(reduceMotion ? nil : .default) { proxy.scrollTo(target, anchor: .center) }
+                                withAnimation(reduceMotion ? nil : Theme.easeOut(0.3)) { proxy.scrollTo(target, anchor: .center) }
                                 Task { @MainActor in focusedLine = target }   // after the row exists, if it was off screen
                             },
                             seek: { Task { await controller.seek(toLine: index) } },
@@ -390,7 +390,7 @@ struct PlayerView: View {
                 .padding(10)
             }
             .onChange(of: controller.activeIndex) { _, new in
-                if let new { withAnimation(reduceMotion ? nil : .default) { proxy.scrollTo(new, anchor: .center) } }
+                if let new { withAnimation(reduceMotion ? nil : Theme.easeOut(0.3)) { proxy.scrollTo(new, anchor: .center) } }
             }
         }
     }

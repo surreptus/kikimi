@@ -47,7 +47,7 @@ private struct ModalModifier<Panel: View>: ViewModifier {
                     .transition(.opacity)
                 }
             }
-            .animation(.easeOut(duration: 0.15), value: isPresented)
+            .animation(Theme.easeOut(0.15), value: isPresented)
     }
 }
 

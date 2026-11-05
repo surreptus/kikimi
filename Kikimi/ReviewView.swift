@@ -229,7 +229,7 @@ struct ReviewView: View {
             .padding(.vertical, 30).padding(.horizontal, 28)
             .frame(maxWidth: .infinity)
             .panel(padding: 0, radius: 28)
-            .animation(.easeOut(duration: 0.18), value: revealed)
+            .animation(Theme.easeOut(0.18), value: revealed)
 
             Spacer(minLength: 0)
 

@@ -114,7 +114,7 @@ struct SubtitleRow: View {
         .contentShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture { focusedLine.wrappedValue = index; seek() }
         .onHover { rowHovered = $0 }
-        .animation(.easeOut(duration: 0.12), value: rowHovered)
+        .animation(Theme.easeOut(0.12), value: rowHovered)
         .contextMenu { lineActions }
         .accessibilityAction(named: "Jump to this line", seek)
         .accessibilityAction(named: "Edit line", edit)

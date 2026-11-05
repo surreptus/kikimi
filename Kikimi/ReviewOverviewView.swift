@@ -61,7 +61,7 @@ struct ReviewOverviewView: View {
             Text("Also used when you review words you know.").font(Theme.small).foregroundStyle(Theme.muted)
         }
         .panel()
-        .animation(reduceMotion ? nil : .easeOut(duration: 0.18), value: style)
+        .animation(reduceMotion ? nil : Theme.easeOut(0.18), value: style)
     }
 
     /// "Next review in 3 hours", or that nothing is scheduled.
