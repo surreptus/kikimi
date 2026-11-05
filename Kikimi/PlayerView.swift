@@ -321,7 +321,7 @@ struct PlayerView: View {
     private var shortcutHints: [(key: String, action: String)] {
         var hints: [(key: String, action: String)] = [
             ("Space", String(localized: "Play or pause")), ("⌘← ⌘→", String(localized: "Line")), ("R", String(localized: "Repeat")),
-            ("⌘↓", String(localized: "Transcript")), ("← →", String(localized: "Word")), ("L", String(localized: "Learn")), ("K", String(localized: "Known")),
+            ("⌘↓", String(localized: "Transcript")), ("← →", String(localized: "Word")),
             ("E", String(localized: "Edit line")),
         ]
         if translations != nil, translationMode == .onRequest { hints.append(("T", String(localized: "Translation"))) }
@@ -425,12 +425,12 @@ struct PlayerView: View {
                     Spacer()
                     if hint?.wordID != nil {
                         if hint?.status != .learning && hint?.status != .finished {
-                            Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
+                            Button { setStatus(.learning) } label: { KeyedLabel(title: "Learn", key: "L") }.buttonStyle(.pill(compact: true))
                                 .keyboardShortcut("l", modifiers: [])
                                 .help("Start learning this word (L)")
                         }
                         if hint?.status != .known {
-                            Button("Known") { setStatus(.known) }.buttonStyle(.pill(.secondary, compact: true))
+                            Button { setStatus(.known) } label: { KeyedLabel(title: "Known", key: "K") }.buttonStyle(.pill(.secondary, compact: true))
                                 .keyboardShortcut("k", modifiers: [])
                                 .help("Mark this word as known (K)")
                         }

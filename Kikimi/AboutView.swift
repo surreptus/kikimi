@@ -5,6 +5,7 @@ import SwiftUI
 /// scheduled, and the keyboard shortcuts. The review intervals are read from `SRS`, so this page can't drift from it.
 struct AboutView: View {
     @Environment(\.dismissModal) private var dismiss
+    @Environment(AppState.self) private var app
 
     private static let stageNames = [
         String(localized: "Stage 1"), String(localized: "Stage 2"), String(localized: "Stage 3"), String(localized: "Stage 4"),
@@ -19,6 +20,7 @@ struct AboutView: View {
                 Button("Done") { dismiss() }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
             }
             .padding(20)
+            ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 26) {
                     gettingStarted
@@ -26,10 +28,15 @@ struct AboutView: View {
                     importSteps
                     reviews
                     backups
-                    shortcuts
+                    shortcuts.id("keyboard")
                 }
                 .padding(.horizontal, 24).padding(.bottom, 28)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .onAppear {
+                if app.aboutAtKeyboard { proxy.scrollTo("keyboard", anchor: .top) }
+                app.aboutAtKeyboard = false
+            }
             }
         }
         .frame(width: 640, height: 600)

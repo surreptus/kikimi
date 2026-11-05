@@ -196,7 +196,7 @@ struct ReviewView: View {
                             text: (app.profile.display.showsReadings ? card.entries.first?.reading : nil) ?? card.word.lemma,
                             languageCode: app.profile.whisperCode, showsTitle: true, shortcut: "w")
                         if card.example != nil {
-                            Button("Play sentence", systemImage: "speaker.wave.2.fill") { playSentence() }
+                            Button { playSentence() } label: { KeyedLabel(title: "Play sentence", systemImage: "speaker.wave.2.fill", key: "R") }
                                 .buttonStyle(.pill(.secondary, compact: true))
                                 .keyboardShortcut("r", modifiers: [])
                                 .help("Play this sentence from your video (R)")
@@ -235,25 +235,27 @@ struct ReviewView: View {
 
             if revealed {
                 HStack(spacing: 16) {
-                    Button { Task { await answer(false) } } label: { Label("Missed it", systemImage: "xmark") }
+                    Button { Task { await answer(false) } } label: { KeyedLabel(title: "Missed it", systemImage: "xmark", key: "←") }
                         .buttonStyle(.pill(.secondary))
                         .keyboardShortcut(.leftArrow, modifiers: [])
-                    Button { Task { await answer(true) } } label: { Label("Got it", systemImage: "checkmark") }
+                    Button { Task { await answer(true) } } label: { KeyedLabel(title: "Got it", systemImage: "checkmark", key: "→") }
                         .buttonStyle(.pill)
                         .keyboardShortcut(.rightArrow, modifiers: [])
                 }
             } else {
-                Button("Show answer") {
+                Button {
                     if dictation(for: card) { checkDictation(); return }
                     revealed = true
                     // In a fill-in card the sentence is the question, so hearing it before the answer would give it away.
                     if !listening(for: card), mode == .onReveal || (mode == .onCardShown && cloze(for: card) != nil) { playSentence() }
+                } label: {
+                    KeyedLabel(title: "Show answer", key: dictation(for: card) ? nil : "Space")
                 }
                 .buttonStyle(.pill(dictation(for: card) ? .secondary : .primary))
                 // Space is a letter while typing, so a typed card checks with Return instead.
                 .keyboardShortcut(dictation(for: card) ? nil : KeyboardShortcut(.space, modifiers: []))
             }
-            ShortcutHints(items: shortcutHints)
+            if !shortcutHints.isEmpty { ShortcutHints(items: shortcutHints) }
         }
         .padding(28)
     }
@@ -287,7 +289,7 @@ struct ReviewView: View {
             Text("Listen").font(Theme.title(26))
             Text("What does the sentence say? Play it as often as you like, then show the answer.")
                 .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
-            Button("Play again", systemImage: "speaker.wave.2.fill") { playSentence() }
+            Button { playSentence() } label: { KeyedLabel(title: "Play again", systemImage: "speaker.wave.2.fill", key: "R") }
                 .buttonStyle(.pill(.secondary, compact: true))
                 .keyboardShortcut("r", modifiers: [])
                 .help("Play the sentence again (R)")
@@ -418,10 +420,10 @@ struct ReviewView: View {
     private var shortcutHints: [(key: String, action: String)] {
         guard revealed else {
             if dictation(for: card) { return [("Return", "Check"), ("⌘R", "Play again")] }
-            return listening(for: card) ? [("Space", "Show answer"), ("R", "Play again")] : [("Space", "Show answer")]
+            return []   // Space and R are on the buttons
         }
-        var hints: [(key: String, action: String)] = [("←", "Missed it"), ("→", "Got it"), ("W", "Say word"), ("I", "Word page")]
-        if card?.example != nil { hints.append(("R", "Play sentence")); hints.append(("E", "Edit sentence")) }
+        var hints: [(key: String, action: String)] = [("W", "Say word"), ("I", "Word page")]
+        if card?.example != nil { hints.append(("E", "Edit sentence")) }
         if canTranslate, card?.example != nil { hints.append(("T", "Translation")) }
         return hints
     }

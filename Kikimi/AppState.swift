@@ -20,6 +20,8 @@ final class AppState {
     var section: SidebarItem = .videos
     /// The panels over the window. They live here, not in the views, so the menu bar can open them too.
     var showAbout = false
+    /// Open How it works at its keyboard list (Help > Keyboard Shortcuts) rather than at the top.
+    var aboutAtKeyboard = false
     var showPrivacy = false
     var showTerms = false
     var showStorage = false

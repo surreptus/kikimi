@@ -417,6 +417,36 @@ struct EmptyState: View {
 }
 
 /// A quiet line of keys and what they do, such as "Space  Show answer". Wraps on a narrow window.
+/// A key drawn as a small outlined cap, in the colour of the text around it so it reads on a dark or a light pill.
+/// Hidden from VoiceOver: the button already has its name, and the keys are listed under Help > Keyboard Shortcuts.
+struct KeyCap: View {
+    let key: String
+
+    init(_ key: String) { self.key = key }
+
+    var body: some View {
+        Text(key)
+            .font(.system(size: 12, weight: .medium, design: .rounded))
+            .padding(.horizontal, 5).padding(.vertical, 1)
+            .overlay(RoundedRectangle(cornerRadius: 5).strokeBorder(lineWidth: 1).opacity(0.55))
+            .accessibilityHidden(true)
+    }
+}
+
+/// A button's face with the key that presses it, so the key is learned where it is used.
+struct KeyedLabel: View {
+    let title: LocalizedStringKey
+    var systemImage: String?
+    let key: String?
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if let systemImage { Label(title, systemImage: systemImage) } else { Text(title) }
+            if let key { KeyCap(key) }
+        }
+    }
+}
+
 struct ShortcutHints: View {
     let items: [(key: String, action: String)]
 
