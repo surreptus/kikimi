@@ -28,6 +28,8 @@ public protocol LanguageProfile: Sendable {
     /// App language code, e.g. `es`. Key for `words` and `dictionary` rows.
     var code: String { get }
     var displayName: String { get }
+    /// The country whose flag stands for the language on the welcome page (ISO 3166, e.g. `ES`), or nil for none.
+    var flagRegion: String? { get }
     /// Language code WhisperKit expects.
     var whisperCode: String { get }
     /// Default WhisperKit model variant for this language.
@@ -51,6 +53,12 @@ public protocol LanguageProfile: Sendable {
 }
 
 extension LanguageProfile {
+    public var flagRegion: String? { nil }
+    /// The language's name in itself ("Español"), so a learner can find it whatever language the Mac is set to.
+    public var nativeName: String {
+        let locale = Locale(identifier: code)
+        return locale.localizedString(forLanguageCode: code)?.capitalized(with: locale) ?? displayName
+    }
     public var contentPOS: Set<PartOfSpeech> { [.noun, .verb, .adjective, .adverb] }
     public var kanjiResourceName: String? { nil }
     public var nounArticles: [String: String] { [:] }
