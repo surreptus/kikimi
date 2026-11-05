@@ -38,9 +38,9 @@ struct ImportSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            modelSection
             if compact { compactDropZone } else { dropZone }
             if !app.pendingImports.isEmpty { pendingPanel }
+            modelSection
             if !queue.jobs.isEmpty { jobList }
         }
         .task(id: app.languageCode) { await loadModel() }
@@ -81,7 +81,46 @@ struct ImportSection: View {
         ModelCatalog.name(for: env.preferences.model(for: app.profile))
     }
 
+    @ViewBuilder
     private var modelCard: some View {
+        if modelInstalled == false, !changingModel { modelExplanation } else { modelChooser }
+    }
+
+    /// The first time: what the download is for, how big it is, and that subtitles make it unnecessary. The list of
+    /// models is behind a link, so the first choice is just whether to download.
+    private var modelExplanation: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.ink)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("One-time download").font(.system(.headline, design: .rounded))
+                    Text("To write out what is said in your videos, Kikimi needs a speech model (\(modelSize)). It is saved on this Mac and nothing is uploaded. If a video comes with subtitles, you can skip it.")
+                        .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+                    Button("Choose a different model") { changingModel = true }
+                        .buttonStyle(.plain).font(Theme.small.weight(.semibold)).foregroundStyle(Theme.ink)
+                }
+                Spacer()
+                if let progress = downloadProgress {
+                    VStack(alignment: .trailing, spacing: 4) {
+                        ProgressView(value: progress).progressViewStyle(.thin).frame(width: 160)
+                        Text("\(Int(progress * 100))%").font(Theme.small.weight(.medium)).foregroundStyle(Theme.muted)
+                    }
+                } else {
+                    Button("Download (\(modelSize))") { Task { await download() } }.buttonStyle(.pill(compact: true))
+                }
+            }
+            if let downloadError { Text(downloadError).font(Theme.small).foregroundStyle(Theme.red) }
+        }
+        .panel()
+    }
+
+    /// "1.5 GB": the size of the model chosen for this language.
+    private var modelSize: String {
+        ModelCatalog.info(for: env.preferences.model(for: app.profile))
+            .map { ByteCountFormatter.string(fromByteCount: $0.downloadBytes, countStyle: .file) } ?? ""
+    }
+
+    private var modelChooser: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 14) {
                 Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.ink)
@@ -177,7 +216,7 @@ struct ImportSection: View {
 
     private var dropZone: some View {
         VStack(spacing: 12) {
-            Text(canImport ? String(localized: "Drop \(app.profile.displayName) videos here") : String(localized: "Download the speech model to transcribe videos"))
+            Text("Drop \(app.profile.displayName) videos here")
                 .font(Theme.title(20))
             // Only worth saying when there is a choice of language to import as.
             if app.learning.count > 1 {
@@ -185,8 +224,8 @@ struct ImportSection: View {
                     .font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.ink)
             }
             Text(canImport
-                 ? String(localized: "Then add its subtitles (.srt or .vtt), if it has them, to skip transcribing.")
-                 : String(localized: "A video that comes with subtitles (.srt or .vtt) can be imported without it."))
+                 ? String(localized: "Got a subtitle file (.srt or .vtt) for it? Add it in the next step and Kikimi skips transcribing.")
+                 : String(localized: "A video with a subtitle file (.srt or .vtt) can be imported right away. For the rest, download the speech model below, once."))
                 .font(.callout).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
             Text("Your original files are never changed or deleted.")
                 .font(.callout).foregroundStyle(Theme.muted)
@@ -319,6 +358,9 @@ struct ImportSection: View {
 
     private var jobList: some View {
         VStack(alignment: .leading, spacing: 14) {
+            if queue.isBusy {
+                Text("You can use the other pages while this runs.").font(Theme.small).foregroundStyle(Theme.muted)
+            }
             ForEach(queue.jobs) { job in
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
@@ -434,7 +476,7 @@ struct ImportSection: View {
         case .hashing: String(localized: "Reading file")
         case .staging: String(localized: "Copying")
         case .detectingLanguage: String(localized: "Checking language")
-        case .transcribing: String(localized: "Transcribing")
+        case .transcribing: String(localized: "Writing out what's said")
         case .transcoding: String(localized: "Compressing video")
         case .verifying: String(localized: "Verifying")
         case .saving: String(localized: "Saving")
