@@ -94,7 +94,17 @@ final class AppState {
     private(set) var learningCodes: [String]?
 
     /// Shown instead of the app until the person has said what they are learning.
-    var needsOnboarding: Bool { isReady && learningCodes == nil }
+    var needsOnboarding: Bool {
+        #if DEBUG
+        if previewingWelcome { return isReady }
+        #endif
+        return isReady && learningCodes == nil
+    }
+
+    #if DEBUG
+    /// Debug menu > Show Welcome Page: the welcome page again, without touching the saved choice. Start closes it.
+    var previewingWelcome = false
+    #endif
 
     /// What the sidebar and Settings offer.
     var learning: [any LanguageProfile] {
@@ -136,6 +146,9 @@ final class AppState {
     /// Saves the languages being learned, and moves to one of them if the current one was dropped.
     func setLearning(_ codes: [String]) {
         guard case .ready(let env) = phase else { return }
+        #if DEBUG
+        if previewingWelcome { previewingWelcome = false; return }
+        #endif
         env.learning.codes = codes
         learningCodes = env.learning.codes
         if let learningCodes, !learningCodes.contains(languageCode) { languageCode = learningCodes[0] }

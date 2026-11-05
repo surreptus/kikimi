@@ -40,6 +40,13 @@ struct AppCommands: Commands {
                 .disabled(!app.isReady)
         }
 
+        #if DEBUG
+        CommandMenu("Debug") {
+            Button("Show Welcome Page") { app.previewingWelcome = true }
+                .disabled(!app.isReady)
+        }
+        #endif
+
         CommandGroup(replacing: .help) {
             Button("How Kikimi Works") { app.showAbout = true }
                 .disabled(!app.isReady)
