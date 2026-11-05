@@ -44,7 +44,6 @@ struct ReviewOverviewView: View {
             VStack(alignment: .leading, spacing: 14) {
                 lessonsCard
                 reviewsCard
-                practice
                 comingUp
                 stages
                 if let stats { progress(stats) }
@@ -133,7 +132,8 @@ struct ReviewOverviewView: View {
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
                 .id(style)   // a new line for each choice, which fades in as the panel resizes
                 .transition(.opacity)
-            Text("The card type is used for reviews and for the practice below, not for lessons.").font(Theme.small).foregroundStyle(Theme.muted)
+            Text("The card type is used for reviews and practice, not for lessons.").font(Theme.small).foregroundStyle(Theme.muted)
+            practice
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .panel()
@@ -148,14 +148,16 @@ struct ReviewOverviewView: View {
 
     // MARK: Practice
 
-    /// Extra study that does not move the schedule (a known check can send a missed word back). A row is shown only when
-    /// there is enough to practise.
+    /// Extra study that does not move the schedule (a known check can send a missed word back), inside the Reviews panel
+    /// because it uses the same card type. A row is shown only when there is enough to practise; its button is quiet,
+    /// since it is something you do again and again.
     @ViewBuilder
     private var practice: some View {
         let rows = ExtraStudy.practiceKinds.filter { count($0) >= minimum($0) }
         if !rows.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Practice").font(Theme.title(17))
+                Divider()
+                Text("Practice").font(Theme.title(17)).accessibilityAddTraits(.isHeader)
                 ForEach(rows, id: \.self) { kind in
                     HStack(spacing: 12) {
                         VStack(alignment: .leading, spacing: 2) {
@@ -167,13 +169,11 @@ struct ReviewOverviewView: View {
                         }
                         Spacer()
                         Button("Start") { practise(kind) }
-                            .buttonStyle(.pill(.secondary, compact: true))
+                            .buttonStyle(.pill(.quiet, compact: true))
                             .accessibilityLabel(kind.title)
                     }
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .panel()
             .accessibilityElement(children: .contain)
         }
     }

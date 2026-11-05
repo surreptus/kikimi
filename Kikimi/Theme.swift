@@ -77,7 +77,7 @@ enum Theme {
 
 /// A solid pill. Primary is the one action that matters (ink face); secondary is a quiet translucent pill.
 struct PillButtonStyle: ButtonStyle {
-    enum Kind { case primary, secondary, danger, inverted }
+    enum Kind { case primary, secondary, danger, inverted, quiet }
 
     var kind: Kind = .primary
     var compact = false
@@ -93,6 +93,7 @@ struct PillButtonStyle: ButtonStyle {
             .padding(.horizontal, compact ? 14 : 26)
             .frame(maxWidth: fullWidth ? .infinity : nil)
             .background(Capsule().fill(face))
+            .overlay { if kind == .quiet { Capsule().strokeBorder(Theme.line, lineWidth: 1) } }
             .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.4)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .contentShape(Capsule())
@@ -105,6 +106,7 @@ struct PillButtonStyle: ButtonStyle {
         case .secondary: Theme.softStrong
         case .danger: Color(hex: 0xC62828)
         case .inverted: Theme.onAccent   // on a panel that is itself the accent colour
+        case .quiet: .clear              // for an action done again and again, so it asks for little attention
         }
     }
 
@@ -114,6 +116,7 @@ struct PillButtonStyle: ButtonStyle {
         case .secondary: Theme.ink
         case .danger: .white
         case .inverted: Theme.accent
+        case .quiet: Theme.ink
         }
     }
 }
