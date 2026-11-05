@@ -59,6 +59,10 @@ struct StatusIndicator: View {
         case .new: StageRing(stage: 0, size: size)
         case .learning: StageRing(stage: max(1, stage ?? 1), size: size)
         case .finished: StageRing(stage: 9, size: size)
+        case .ignored:
+            Image(systemName: "eye.slash").font(.system(size: size * 0.7, weight: .medium)).foregroundStyle(Theme.muted)
+                .frame(width: size, height: size)
+                .accessibilityLabel("Ignored")
         case .known:
             ZStack {
                 Circle().fill(Theme.green)

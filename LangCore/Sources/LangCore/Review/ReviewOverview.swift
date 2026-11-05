@@ -54,7 +54,7 @@ extension LangDatabase {
                 case .known: overview.known = n
                 case .finished: overview.finished = n
                 case .new: overview.new = n
-                case nil: break
+                case .ignored, nil: break
                 }
             }
             return overview

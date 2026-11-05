@@ -309,7 +309,7 @@ struct SubtitleRow: View {
         switch current {
         case .learning: return .clear
         case .known, .finished: return Theme.green.opacity(0.22)
-        case .new: return .clear
+        case .new, .ignored: return .clear
         }
     }
 

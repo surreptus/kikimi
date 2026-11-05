@@ -93,7 +93,7 @@ extension LangDatabase {
             try WordRow.fetchAll(db, sql: """
                 SELECT words.*, (SELECT COUNT(*) FROM occurrences WHERE word_id = words.id) AS occurrence_count
                 FROM words
-                WHERE language = ?1 AND (?2 IS NULL OR status = ?2) AND (?5 IS NULL OR pos = ?5)
+                WHERE language = ?1 AND (status = ?2 OR (?2 IS NULL AND status != 'ignored')) AND (?5 IS NULL OR pos = ?5)
                   AND lemma LIKE ?3 ESCAPE '\\'
                 ORDER BY occurrence_count DESC, lemma
                 LIMIT ?4
@@ -184,6 +184,19 @@ extension LangDatabase {
                 for id in becoming { try Self.bump(.known, subject: id, at: Date(), in: db) }
                 return total + (try Word.filter(keys: ids).updateAll(
                     db, Column("status").set(to: WordStatus.known.rawValue),
+                    Column("stage").set(to: nil), Column("next_review").set(to: nil)))
+            }
+        }
+    }
+
+    /// Sets words aside: out of the queue, out of the Words list, lessons and coverage, but kept (and so can be brought
+    /// back with `markNew`). Returns how many changed.
+    @discardableResult
+    public func markIgnored(wordIDs: [Int64]) async throws -> Int {
+        try await writer.write { [chunks] db in
+            try chunks(wordIDs).reduce(0) { total, ids in
+                total + (try Word.filter(keys: ids).filter(Column("status") != WordStatus.ignored.rawValue).updateAll(
+                    db, Column("status").set(to: WordStatus.ignored.rawValue),
                     Column("stage").set(to: nil), Column("next_review").set(to: nil)))
             }
         }

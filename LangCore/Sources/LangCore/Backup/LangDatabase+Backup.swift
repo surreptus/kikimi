@@ -86,7 +86,7 @@ extension LangDatabase {
     ) -> (stage: SRSStage?, nextReview: Date?)? {
         switch status {
         case .new: return nil
-        case .known: return (nil, nil)
+        case .known, .ignored: return (nil, nil)
         case .finished: return (.finished, nil)
         case .learning:
             // A learning word needs a stage from the first eight, and a date it is due (now, if none was kept).

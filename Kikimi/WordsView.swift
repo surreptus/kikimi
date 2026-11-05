@@ -10,6 +10,7 @@ extension WordRow {
         case .learning: 1
         case .known: 2
         case .finished: 3
+        case .ignored: 4
         }
     }
 }
@@ -22,6 +23,7 @@ struct WordsView: View {
     @State private var dictionaryHits: [DictionaryEntry] = []
     @State private var sort = WordSort(column: .seen, ascending: false)
     @State private var confirmReset = false
+    @State private var confirmIgnore = false
     @State private var chooseAnki = false
     @State private var ankiResult: AnkiExportResult?
     @FocusState private var searchFocused: Bool
@@ -55,6 +57,7 @@ struct WordsView: View {
         case .learning: String(localized: "Learning words shown")
         case .known: String(localized: "Known words shown")
         case .finished: String(localized: "Finished words shown")
+        case .ignored: String(localized: "Ignored words shown")
         }
     }
     private var selectionBinding: Binding<Set<Int64>> { Binding(get: { app.wordsSelection }, set: { app.wordsSelection = $0 }) }
@@ -98,6 +101,11 @@ struct WordsView: View {
         } message: {
             if let ankiResult { Text(ankiMessage(ankiResult)) }
         }
+        .confirmationDialog("Ignore \(selection.count) words?", isPresented: $confirmIgnore) {
+            Button("Ignore", role: .destructive) { apply(.ignore) }
+        } message: {
+            Text("Words being learned or finished lose their review progress. Ignored words are hidden, and left out of lessons and of how much of a video you know. Show them with the Ignored status filter and press Reset to bring them back.")
+        }
         .confirmationDialog("Reset \(selection.count) words?", isPresented: $confirmReset) {
             Button("Reset", role: .destructive) { apply(.reset) }
         } message: {
@@ -112,6 +120,7 @@ struct WordsView: View {
         case .learning: Theme.orange
         case .known: Theme.green
         case .finished: Theme.ink
+        case .ignored: Theme.muted
         }
     }
 
@@ -149,7 +158,7 @@ struct WordsView: View {
                 Menu {
                     Picker("Status", selection: filterBinding) {
                         Text("All statuses").tag(WordStatus?.none)
-                        ForEach([WordStatus.new, .learning, .known, .finished], id: \.self) {
+                        ForEach([WordStatus.new, .learning, .known, .finished, .ignored], id: \.self) {
                             Text($0.title).tag(WordStatus?.some($0))
                         }
                     }
@@ -203,7 +212,7 @@ struct WordsView: View {
 
     // MARK: Bulk actions
 
-    private enum Bulk { case learn, known, reset }
+    private enum Bulk { case learn, known, reset, ignore }
 
     private var bulkBar: some View {
         HStack(spacing: 10) {
@@ -226,6 +235,16 @@ struct WordsView: View {
                     }
                 }
                 .buttonStyle(.pill(.secondary, compact: true))
+                .help("Back to a new word, so it can be learned from the start")
+                Button("Ignore") {
+                    if selectedRows.contains(where: { $0.word.status == .learning || $0.word.status == .finished }) {
+                        confirmIgnore = true
+                    } else {
+                        apply(.ignore)
+                    }
+                }
+                .buttonStyle(.pill(.secondary, compact: true))
+                .help("Set aside words that are not worth learning, such as names or mistakes. They stay, and Reset brings them back.")
                 Button("Known") { apply(.known) }.buttonStyle(.pill(.secondary, compact: true))
                 Button("Learn") { apply(.learn) }.buttonStyle(.pill(compact: true))
             }
@@ -280,6 +299,9 @@ struct WordsView: View {
                 case .known:
                     let n = try await env.database.markKnown(wordIDs: ids)
                     app.showToast(inflected("Marked ^[\(n) word](inflect: true) as known"))
+                case .ignore:
+                    let n = try await env.database.markIgnored(wordIDs: ids)
+                    app.showToast(inflected("Ignored ^[\(n) word](inflect: true). Show them with the Ignored status filter."))
                 case .reset:
                     let n = try await env.database.markNew(wordIDs: ids)
                     app.showToast(inflected("Reset ^[\(n) word](inflect: true)"))
@@ -306,7 +328,7 @@ struct WordsView: View {
         } else if selection.count > 1 {
             VStack(alignment: .leading, spacing: 10) {
                 Text("\(selection.count) words selected").font(.title2.bold())
-                ForEach([WordStatus.new, .learning, .known, .finished], id: \.self) { status in
+                ForEach([WordStatus.new, .learning, .known, .finished, .ignored], id: \.self) { status in
                     let count = selectedRows.filter { $0.word.status == status }.count
                     if count > 0 { HStack { StatusPill(text: status.title, color: summaryColor(status)); Text("\(count)") } }
                 }

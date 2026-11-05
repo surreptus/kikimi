@@ -192,6 +192,10 @@ Ordered by how much each helps comprehensible input per unit of effort.
         generated explanations, Italian, Portuguese and Dutch.
       - **To settle:** whether the form line is on by default or in Settings (a learner sees it all day); whether a cloze
         blank on a conjugated form should show the form as its hint; whether the size is acceptable per language.
+- [x] **Ignore** (5 Nov 2026): a fifth word status for entries that are not worth learning (names, tokenizer mistakes). An ignored
+      word is kept, hidden from the Words list (the Ignored status filter shows it, Reset brings it back), never offered as a
+      lesson, and left out of coverage. Ignore is on the lesson card (X) and on the Words page. The status is stored as
+      "ignored", so a backup made with it does not restore in an older Kikimi.
 - [x] **Cloze cards** (Review page > Fill in the word): the example sentence with the word blanked and a short
       hint of its meaning (and, for Japanese, its reading); you recall the word, then see it filled in with the
       sentence audio. Production in context, which avoids the ambiguity of meaning-to-word cards. **Listening

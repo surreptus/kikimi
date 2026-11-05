@@ -12,6 +12,9 @@ extension LangRecord {
 public enum WordStatus: String, Codable, Sendable {
     /// `finished` is stored as "burned": the name of this state in saved data and backups, kept so they stay valid.
     case new, learning, known, finished = "burned"
+    /// Set aside as not a word worth learning (a name, a tokenizer mistake, punctuation). Kept, so it can be brought back,
+    /// but left out of lists, lessons and coverage.
+    case ignored
 }
 
 public struct Video: LangRecord {

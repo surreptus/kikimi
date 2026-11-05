@@ -20,6 +20,7 @@ extension WordStatus {
         case .learning: String(localized: "Learning")
         case .known: String(localized: "Known")
         case .finished: String(localized: "Finished")
+        case .ignored: String(localized: "Ignored")
         }
     }
 }

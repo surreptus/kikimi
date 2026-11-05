@@ -84,6 +84,10 @@ struct LessonView: View {
             .panel(padding: 0, radius: 28)
 
             HStack(spacing: 16) {
+                Button { Task { await answer(teach: nil) } } label: { KeyedLabel(title: "Ignore", systemImage: "eye.slash", key: "X") }
+                    .buttonStyle(.pill(.quiet))
+                    .keyboardShortcut("x", modifiers: [])
+                    .help("Not a word worth learning, such as a name or a mistake. It is set aside and left out of lessons.")
                 Button { Task { await answer(teach: false) } } label: { KeyedLabel(title: "Already know it", systemImage: "checkmark", key: "K") }
                     .buttonStyle(.pill(.secondary))
                     .keyboardShortcut("k", modifiers: [])
@@ -117,11 +121,16 @@ struct LessonView: View {
         Task { await audio.play(example) }
     }
 
-    private func answer(teach: Bool) async {
+    /// `true` teaches the word, `false` marks it known, nil sets it aside.
+    private func answer(teach: Bool?) async {
         guard let id = card?.word.id else { return }
         audio?.stop()
         do {
-            if teach { taught.append(id) } else { try await env.database.markKnown(wordID: id); known += 1 }
+            switch teach {
+            case true?: taught.append(id)
+            case false?: try await env.database.markKnown(wordID: id); known += 1
+            case nil: try await env.database.markIgnored(wordIDs: [id]); known += 1   // saved now, so the Words page is refreshed
+            }
             card = nil
             index += 1
             if index >= wordIDs.count { await end(quiz: true) }

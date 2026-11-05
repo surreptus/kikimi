@@ -116,7 +116,8 @@ extension LangDatabase {
     public func videoCoverage(language: String? = nil) async throws -> [Int64: VideoCoverage] {
         try await writer.read { db in
             let rows = try Row.fetchAll(db, sql: """
-                SELECT videos.id AS video_id, COUNT(occurrences.id) AS total,
+                SELECT videos.id AS video_id,
+                       COUNT(CASE WHEN occurrences.id IS NOT NULL AND words.status IS NOT 'ignored' THEN 1 END) AS total,
                        COALESCE(SUM(CASE WHEN \(knownCondition) THEN 1 ELSE 0 END), 0) AS known
                 FROM videos
                 LEFT JOIN subtitles ON subtitles.video_id = videos.id
@@ -148,7 +149,7 @@ extension LangDatabase {
                 FROM occurrences
                 JOIN subtitles ON subtitles.id = occurrences.subtitle_id
                 JOIN words ON words.id = occurrences.word_id
-                WHERE subtitles.video_id = ? AND NOT \(knownCondition)
+                WHERE subtitles.video_id = ? AND words.status != 'ignored' AND NOT \(knownCondition)
                 GROUP BY words.id
                 ORDER BY n DESC, words.lemma
                 """, arguments: [id]).map {
