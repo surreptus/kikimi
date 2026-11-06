@@ -113,3 +113,28 @@ final class ShadowingStyleTests: XCTestCase {
         XCTAssertFalse(ReviewStyle.shadowing.suits(try card(nil, end: 1), showsReading: false, profile: es), "needs a sentence")
     }
 }
+
+final class SpanishLemmaFixTests: XCTestCase {
+    private func lemmas(_ text: String) -> [String: String] {
+        Dictionary(SpanishProfile().tokenizer.tokens(in: text).map { ($0.surface.lowercased(), $0.lemma) }, uniquingKeysWith: { a, _ in a })
+    }
+
+    func testPresentFormsOfPoderAreNotPodar() {
+        // The tagger reads every present form of poder as podar, which would teach the wrong verb.
+        let found = lemmas("Puedo ir. Tú puedes. Ella puede. Podemos hablar. Ellos pueden. Para que podáis hacer el quiz.")
+        for form in ["puedo", "puedes", "puede", "podemos", "pueden", "podáis"] { XCTAssertEqual(found[form], "poder", form) }
+    }
+
+    func testOtherCommonVerbsAreFixedToo() {
+        let found = lemmas("Él sale. Lo siento. Que venga. Creo que sí.")
+        XCTAssertEqual(found["sale"], "salir")
+        XCTAssertEqual(found["siento"], "sentir")
+        XCTAssertEqual(found["venga"], "venir")
+        XCTAssertEqual(found["creo"], "creer")
+    }
+
+    func testTheRealVerbPodarKeepsItsOwnForms() {
+        XCTAssertEqual(lemmas("Él poda las rosas.")["poda"], "podar", "left to the tagger")
+        XCTAssertEqual(lemmas("Hay que podar el árbol.")["podar"], "podar")
+    }
+}

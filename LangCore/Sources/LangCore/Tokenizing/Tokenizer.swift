@@ -42,10 +42,14 @@ public struct NLTaggerTokenizer: WordTokenizer {
     public let language: NLLanguage
     /// Lemmas the tagger gets wrong in a known, systematic way, mapped to the right one.
     private let lemmaFixes: [String: String]
+    /// Words, as written in lower case, whose lemma the tagger gets wrong where the lemma it gives is also a real word
+    /// (so `lemmaFixes` would damage the right uses): the lemma to use for that spelling instead.
+    private let spellingFixes: [String: String]
 
-    public init(language: NLLanguage, lemmaFixes: [String: String] = [:]) {
+    public init(language: NLLanguage, lemmaFixes: [String: String] = [:], spellingFixes: [String: String] = [:]) {
         self.language = language
         self.lemmaFixes = lemmaFixes
+        self.spellingFixes = spellingFixes
     }
 
     public func tokens(in text: String) -> [Token] {
@@ -61,7 +65,7 @@ public struct NLTaggerTokenizer: WordTokenizer {
             let lemma = (tagger.tag(at: range.lowerBound, unit: .word, scheme: .lemma).0?.rawValue ?? surface).lowercased()
             result.append(Token(
                 surface: surface,
-                lemma: lemmaFixes[lemma] ?? lemma,
+                lemma: spellingFixes[surface.lowercased().precomposedStringWithCanonicalMapping] ?? lemmaFixes[lemma] ?? lemma,
                 pos: Self.map(tag)))
             return true
         }
