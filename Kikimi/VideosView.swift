@@ -20,6 +20,9 @@ struct VideosView: View {
     @State private var renaming: Video?
     @State private var newTitle = ""
     @State private var renameError: String?
+    /// The first video gets one card of next steps, until it is used or there is a second video.
+    @AppStorage("firstVideoCardDone") private var firstVideoCardDone = false
+    @State private var firstGoal: CoverageGoal?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -62,6 +65,7 @@ struct VideosView: View {
                         : inflected("^[\(items.count) video](inflect: true) · \(formatBytes(totalBytes)) on this Mac"))
                 ImportSection(env: env, compact: !items.isEmpty)
                 if items.isEmpty { firstSteps }
+                if let first = firstVideo, let goal = firstGoal { firstVideoCard(first, goal) }
                 if let next = nextUp { nextUpCard(next.item, next.coverage) }
                 if !items.isEmpty { sortMenu }
                 ForEach(orderedItems) { item in
@@ -209,6 +213,49 @@ struct VideosView: View {
         items = (try? await env.database.libraryVideos(language: app.languageCode)) ?? []
         totalBytes = env.libraryBytes()
         coverages = (try? await env.database.videoCoverage(language: app.languageCode)) ?? [:]
+        firstGoal = nil
+        if let id = firstVideo?.id { firstGoal = try? await env.database.wordsToReach(target: 0.90, inVideo: id) }
+    }
+
+    /// The only video, while it has not been used for its card.
+    private var firstVideo: LibraryEntry? { items.count == 1 && !firstVideoCardDone ? items.first : nil }
+
+    /// What to do with the first video: watch it, or first learn the few words that would let you follow it.
+    private func firstVideoCard(_ item: LibraryEntry, _ goal: CoverageGoal) -> some View {
+        let percent = Int((goal.current.fraction * 100).rounded()), fresh = goal.notStarted
+        return VStack(alignment: .leading, spacing: 10) {
+            Text("Your first video is ready").font(Theme.title(17))
+            Text("You know \(percent)% of its words.").foregroundStyle(Theme.muted)
+            if !goal.isReached, !fresh.isEmpty {
+                Text(inflected("Learning ^[\(fresh.count) word](inflect: true) would take it to about 90%."))
+                    .foregroundStyle(Theme.muted)
+            }
+            HStack(spacing: 10) {
+                Button("Watch") { firstVideoCardDone = true; open(item.video, at: nil) }
+                    .buttonStyle(.pill(compact: true))
+                    .accessibilityLabel("Watch \(item.video.title)")
+                if !goal.isReached, !fresh.isEmpty {
+                    Button(inflected("Start learning ^[\(fresh.count) word](inflect: true)")) { startLearning(fresh) }
+                        .buttonStyle(.pill(.secondary, compact: true))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .panel()
+        .accessibilityElement(children: .contain)
+    }
+
+    private func startLearning(_ entries: [CoverageGoal.Entry]) {
+        Task {
+            do {
+                let added = try await env.database.startLearning(wordIDs: entries.map(\.wordID))
+                firstVideoCardDone = true
+                app.dataChanged()
+                app.showToast(inflected("Added ^[\(added) word](inflect: true) to your reviews."))
+            } catch {
+                app.showToast(error.localizedDescription)
+            }
+        }
     }
 
     /// The list in the chosen order. "Best fit" uses coverage; videos with nothing to judge by go last.
