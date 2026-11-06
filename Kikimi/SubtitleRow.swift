@@ -72,6 +72,20 @@ struct SubtitleRow: View {
     /// The words that have a meaning to show; the ones the keyboard can land on.
     private var contentChunks: [Chunk] { chunks.filter(isContent) }
 
+    /// One even bar in place of the text, so nothing of the words shows: not their lengths, their marks or their readings.
+    /// Longer lines get a longer bar, by how long they last.
+    private var hiddenLine: some View {
+        let fraction = min(1, max(0.25, (line.endTime - line.startTime) / 6))
+        return Text("M").font(textFont).hidden()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .leading) {
+                GeometryReader { geo in
+                    Capsule().fill(Theme.ink.opacity(0.14)).frame(width: geo.size.width * fraction, height: max(8, size.points * 0.5))
+                        .frame(maxHeight: .infinity, alignment: .center)
+                }
+            }
+    }
+
     /// This line's text is masked: subtitles are hidden and it has not been asked for.
     private var textHidden: Bool { subtitlesHidden && !lineShown }
 
@@ -95,7 +109,9 @@ struct SubtitleRow: View {
                 .foregroundStyle(active ? Theme.ink : Theme.muted)
             VStack(alignment: .leading, spacing: 3) {
                 Group {
-                    if segments.isEmpty {
+                    if textHidden {
+                        hiddenLine
+                    } else if segments.isEmpty {
                         Text(line.text).font(textFont)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
@@ -107,8 +123,6 @@ struct SubtitleRow: View {
                         .accessibilityLabel("Line at \(stamp(line.startTime))")
                     }
                 }
-                .redacted(reason: textHidden ? .placeholder : [])
-                .allowsHitTesting(!textHidden)
                 .accessibilityHidden(textHidden)
                 if translationShown { translationText }
             }

@@ -173,6 +173,7 @@
       }
     },
     "%@ known · %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -202,6 +203,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ 既知 · %@"
+          }
+        }
+      }
+    },
+    "%@ of words known · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of words known · %2$@"
           }
         }
       }
@@ -5868,9 +5879,6 @@
     "Hear it" : {
 
     },
-    "Hear it, then say it after and record yourself to compare." : {
-
-    },
     "Hear the sentence" : {
       "localizations" : {
         "de" : {
@@ -5900,6 +5908,15 @@
       }
     },
     "Hear yourself" : {
+
+    },
+    "Hide subtitle" : {
+
+    },
+    "Hide subtitles" : {
+
+    },
+    "Hide the subtitles (H), to listen without reading" : {
 
     },
     "Hide the translation (T)" : {
@@ -6960,6 +6977,16 @@
         }
       }
     },
+    "Known-word coverage %@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Known-word coverage %1$@: %2$@"
+          }
+        }
+      }
+    },
     "Kun reading: %@" : {
       "localizations" : {
         "de" : {
@@ -7580,6 +7607,9 @@
       }
     },
     "Listen, then check" : {
+
+    },
+    "Listen, then repeat the sentence aloud." : {
 
     },
     "listening in all" : {
@@ -11746,6 +11776,15 @@
         }
       }
     },
+    "Show line" : {
+
+    },
+    "Show one line" : {
+
+    },
+    "Show subtitle" : {
+
+    },
     "Show the translation (T)" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -13162,6 +13201,12 @@
           }
         }
       }
+    },
+    "Subtitles" : {
+
+    },
+    "Subtitles are hidden (H). Press again to show them, or S to show one line." : {
+
     },
     "Subtitles: %@" : {
 
@@ -14999,6 +15044,7 @@
       }
     },
     "You know %@ of its words: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -15033,6 +15079,7 @@
       }
     },
     "You know %lld of this video's %lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -15062,6 +15109,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この動画の内容語 %2$lld 語（1行につき1回と数えます）のうち %1$lld 語を知っています。サンプルでは、内容語の90%%を知っていると、話された内容全体の約94〜96%%（小さな語を既知として数えた場合）にあたり、リスニングが快適になるあたりでした。"
+          }
+        }
+      }
+    },
+    "You know %lld of this video's %lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You know %1$lld of this video's %2$lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too."
           }
         }
       }
