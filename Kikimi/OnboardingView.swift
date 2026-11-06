@@ -16,7 +16,7 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Welcome to Kikimi").font(Theme.title(30))
-                    Text("Learn a language from videos you own. Everything stays on this Mac.")
+                    Text("Learn a language from videos on your Mac. Nothing leaves it.")
                         .foregroundStyle(Theme.muted)
                 }
 

@@ -67,7 +67,7 @@ struct AppCommands: Commands {
     /// with its links written in it.
     private static func showAboutPanel() {
         let paragraphs = [
-            String(localized: "Learn a language from videos you own. Everything stays on your Mac."),
+            String(localized: "Learn a language from videos on your Mac. Nothing leaves it."),
             String(localized: "Free and open source under the [MIT licence](https://github.com/surreptus/kikimi/blob/main/LICENSE). [Website](https://surreptus.github.io/kikimi/), [source code](https://github.com/surreptus/kikimi) and [problem reports](https://github.com/surreptus/kikimi/issues)."),
             String(localized: "Dictionary data from JMdict, KANJIDIC2 and Wiktionary (CC BY-SA 4.0), and speech recognition by OpenAI Whisper. All credits are under Help > Acknowledgements."),
         ]

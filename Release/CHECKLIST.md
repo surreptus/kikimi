@@ -30,10 +30,15 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
 - [ ] Build: `TEAM_ID=... Scripts/release.sh developer-id --notarize` (direct) or `... app-store`.
 - [ ] **Update `site/public/latest.json`** to the new version (`{"version": "x.y.z", "url": "https://github.com/surreptus/kikimi/releases/latest"}`)
       and push, so Check for Updates in older copies finds it. Do it only once the release is published, not before.
-- [ ] **Publish a checksum with every download.** Run `shasum -a 256 <the zip or dmg>` on the exact file you attach, and put
-      the result in the release notes under "Download and verify" (copy the section from the previous release), so
-      people can check the file against the notes. The tag is annotated, and the notes say which commit it is.
-      A checksum only shows the file is the one published, not that it is safe; say nothing stronger than that.
+- [ ] **Write the version's section in `CHANGELOG.md`** (a summary line, then New and Fixed), and run
+      `python3 -I Scripts/check_release_sync.py`: it fails if the changelog's newest section isn't the Xcode project's version,
+      or if `site/public/latest.json` is ahead of it. The changelog is the one source: the website's changelog page imports it,
+      and the release notes are made from it.
+- [ ] **Publish a checksum with every download.** Make the notes with
+      `python3 -I Scripts/release_notes.py X.Y.Z --zip <the zip> --commit <the tagged commit> --out build/notes-X.Y.Z.md --tests "N automated tests pass."`
+      and pass them to `gh release create --notes-file`. It computes the SHA-256 of the exact file you attach and adds the beta notice,
+      the download block and the standing limits in `Release/known-limits.md` (edit that file when they change). The tag is annotated,
+      and the notes say which commit it is. A checksum only shows the file is the one published, not that it is safe; say nothing stronger than that.
 
 ## Test the result (on a Mac or user account that has never run a dev build)
 - [ ] The app opens without a Gatekeeper warning (direct download).

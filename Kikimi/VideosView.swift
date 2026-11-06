@@ -66,7 +66,7 @@ struct VideosView: View {
             VStack(alignment: .leading, spacing: 14) {
                 ScreenTitle(
                     text: "Videos",
-                    subtitle: items.isEmpty ? String(localized: "Drop videos you own. They never leave this Mac.")
+                    subtitle: items.isEmpty ? String(localized: "Drop in videos from your Mac. They never leave it.")
                         : inflected("^[\(items.count) video](inflect: true) · \(formatBytes(totalBytes)) on this Mac"))
                 ImportSection(env: env, compact: !items.isEmpty)
                 if items.isEmpty { firstSteps }
@@ -127,7 +127,7 @@ struct VideosView: View {
     }
 
     private var steps: [String] {
-        [String(localized: "Add a video you own, with its subtitle file if it has one."),
+        [String(localized: "Add a video from your Mac, with its subtitle file if it has one."),
          String(localized: "Watch it, and click any word you don't know."),
          String(localized: "Learn the words that would take it to about 90%, then watch more.")]
     }
