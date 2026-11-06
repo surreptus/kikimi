@@ -1,0 +1,59 @@
+---
+title: Learn a language from videos you already have
+description: Kikimi finds the words in your own videos, shows how much of each you know, and teaches you the rest with sentences from those videos. Private, on your Mac.
+template: splash
+hero:
+  tagline: Kikimi finds the words in your own videos, shows how much of each one you already know, and teaches you the rest with sentences from those same videos. Spanish, French, German and Japanese, on your Mac, with nothing uploaded.
+  image:
+    file: ../../assets/icon.svg
+    alt: The Kikimi icon, a white asanoha star on dark green
+  actions:
+    - text: Download for Mac
+      link: /kikimi/download/
+      icon: download
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import Screenshot from '../../components/Screenshot.astro';
+
+Free and open source. Needs macOS 15 or later; Apple silicon recommended. It is a beta and is not notarized yet, so macOS asks you to confirm opening it: [here is how](/kikimi/download/).
+
+<Screenshot name="player.png" alt="The Kikimi player: a video on the left and its clickable subtitles on the right, with the meaning of the chosen word below."
+  caption="The player. Click any word in the subtitles to see what it means, and keep the ones you want to learn." />
+
+## Watch, collect, learn, watch again
+
+<CardGrid>
+  <Card title="1 · Add something you enjoy">
+    Drop in a video from your Mac, with its subtitles if it has them. Without subtitles, Kikimi writes them out on your Mac.
+  </Card>
+  <Card title="2 · See the words you meet">
+    Click a word as you watch. Every word from your videos is listed with how often you hear it and where.
+  </Card>
+  <Card title="3 · Learn them in context">
+    Short daily lessons, then spaced-repetition reviews. Every card uses a sentence from your own videos.
+  </Card>
+  <Card title="4 · Come back and understand more">
+    Each video shows how much of its words you now know, so you can choose what to watch next.
+  </Card>
+</CardGrid>
+
+<Screenshot name="videos.png" alt="The Videos page: a list of videos, each with the share of its words you know." caption="Videos: choose by how much you already know." />
+<Screenshot name="words.png" alt="The Words page: a table of words with their status and next review." caption="Words: everything you have met, by how often you hear it." />
+<Screenshot name="word-detail.png" alt="The word panel: its meaning and sentences from your own videos." caption="A word, with sentences from your own videos." />
+<Screenshot name="learn.png" alt="The Learn page with lessons, reviews and practice." caption="Learn: one clear next thing to do." />
+
+## Made for comprehensible input
+
+The idea is simple: you learn a language by understanding a lot of it. Each video shows how many of its words you know, so you can pick material that is mostly familiar with a little new. One button starts learning the commonest words that would make a video comfortable to follow. The figure counts words you know. It is a guide, not a promise that you will understand every line.
+
+## Private by design
+
+- No accounts, no ads, no analytics. Your videos, transcripts and progress stay on your Mac.
+- It goes online to download a speech model, and to check for a new version when you ask. That is all.
+- The microphone is used only if you record yourself on a Shadow card, and the recording is deleted when the card ends.
+- Your original files are only read, never changed or deleted.
+
+## Finding videos to learn from
+
+Kikimi never finds or downloads videos; it works on files you give it. If you have none, some places publish video you may download and study, each under its own licence: the [Internet Archive's Moving Image Archive](https://archive.org/details/movies) (some items come with subtitle files, which Kikimi can use instead of transcribing), [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:Videos), and [TED Talks](https://www.ted.com/about/our-organization/our-policies-terms/ted-talks-usage-policy) for personal use. "Creative Commons" is not one licence: check what each video and its subtitle file allow. This is not legal advice.

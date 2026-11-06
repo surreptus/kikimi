@@ -1,0 +1,7 @@
+---
+// The version is the one in latest.json, which the app's Check for Updates also reads, and which is only raised once a
+// release is published. The link goes to the Releases page, where the zip and its checksum are.
+import { LinkButton } from '@astrojs/starlight/components';
+import latest from '../../public/latest.json';
+---
+<LinkButton href={latest.url} variant="primary" icon="download">Download Kikimi {latest.version}</LinkButton>

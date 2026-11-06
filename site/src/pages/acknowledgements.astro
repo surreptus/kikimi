@@ -1,5 +1,5 @@
 ---
-import Base from '../layouts/Base.astro';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 // The licence texts are the app's own files, so the website and the app show the same notices.
 const files = import.meta.glob('../../../LangCore/Sources/LangCore/Resources/Licenses/*.txt', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const titles: Record<string, string> = {
@@ -18,20 +18,12 @@ const items = Object.entries(files)
   .map(([path, text]) => { const key = path.split('/').pop()!.replace('.txt', ''); return { title: titles[key] ?? key, text }; })
   .sort((a, b) => a.title.localeCompare(b.title));
 ---
-<Base title="Acknowledgements · Kikimi">
-  <article class="doc">
-    <h1>Acknowledgements</h1>
-    <p>Kikimi is free software under the MIT licence. It uses the software, models and data below, each under its own licence.</p>
-    {items.map((item) => (
-      <details>
-        <summary>{item.title}</summary>
-        <pre>{item.text}</pre>
-      </details>
-    ))}
-  </article>
-</Base>
-<style>
-  details { margin-top: 12px; background: var(--soft); border-radius: 14px; padding: 12px 16px; }
-  summary { cursor: pointer; font-weight: 600; }
-  pre { white-space: pre-wrap; font-size: 13px; line-height: 1.45; color: var(--muted); margin: 12px 0 0; }
-</style>
+<StarlightPage frontmatter={{ title: 'Acknowledgements', tableOfContents: false, description: 'The software, models and data Kikimi uses, and their licences.' }}>
+  <p>Kikimi is free software under the MIT licence. It uses the software, models and data below, each under its own licence.</p>
+  {items.map((item) => (
+    <details class="licence">
+      <summary>{item.title}</summary>
+      <pre>{item.text}</pre>
+    </details>
+  ))}
+</StarlightPage>

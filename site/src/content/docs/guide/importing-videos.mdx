@@ -1,0 +1,43 @@
+---
+title: Importing videos
+description: Which files work, how subtitles save time, speech models, and what happens at each step.
+---
+
+## What you can add
+
+Video files on your Mac, which you own or may copy and study (see the [terms](/kikimi/terms/)). Kikimi never downloads anything from video sites, and your original file is only read, never changed or deleted. Audio-only files are not supported yet.
+
+Add videos by dropping them on **Videos**, by pressing **Choose files**, or with <kbd>⌘O</kbd>. A video can be dropped together with its subtitle file.
+
+## With subtitles
+
+If you have an `.srt` or `.vtt` file for the video, add it and Kikimi uses its text and times instead of transcribing. A subtitle file with the same name as the video (such as `film.mp4` and `film.srt`) is paired with it automatically; otherwise press **Add subtitles** on the video's row. No speech model is needed, and it is the quickest way to start.
+
+## Without subtitles: the speech model
+
+Kikimi writes out what is said using a speech model that runs on your Mac. You download it once, from the Videos page:
+
+| Language | Default model | Size |
+|---|---|---|
+| Spanish, French, German | Whisper medium | about 1.5 GB |
+| Japanese | Whisper large-v3 turbo | 1.6 GB |
+
+The model is saved on this Mac and nothing is uploaded. You can choose a different model for each language in **Settings > Languages**. Transcription accuracy depends on the model and the audio, and times can be a little off in fast, overlapping speech.
+
+## What happens at each step
+
+Each row shows the step it is on, such as *4 of 7 · Transcribing*.
+
+1. **Reading file.** Checks you haven't added this video already.
+2. **Copying.** Makes a working copy.
+3. **Checking language.** Listens to a short sample, so a Japanese video isn't added as Spanish. If it sounds like a different language, Kikimi asks before going on.
+4. **Transcribing.** The long step, and the longer the larger the model. Skipped with subtitles.
+5. **Compressing video.** Saves a small copy for playback. In Settings you can choose **Original quality** to skip this.
+6. **Verifying.** Checks the copy plays and is the right length.
+7. **Saving.** Stores everything at once: all of it, or none of it.
+
+You can cancel at any point before saving and nothing is left behind. You can use the other pages while an import runs.
+
+## Where to find videos
+
+Kikimi doesn't find videos for you. Some places publish video you may download and study, each under its own licence, such as the Internet Archive and Wikimedia Commons. See the [home page](/kikimi/#finding-videos-to-learn-from).

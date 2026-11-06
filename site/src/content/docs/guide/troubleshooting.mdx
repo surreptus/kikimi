@@ -1,0 +1,36 @@
+---
+title: Troubleshooting
+description: What to do when something doesn't work.
+---
+
+## macOS says it can't verify Kikimi
+
+That is expected: Kikimi is not notarized yet. Click **Done**, then open **System Settings > Privacy & Security** and click **Open Anyway**. The [download page](/kikimi/download/) has the steps.
+
+## The speech model won't download
+
+Check your internet connection and try again. If it keeps failing, import the video with a subtitle file instead, which needs no model. Models download from Hugging Face and are about 1.5 GB (1.6 GB for Japanese).
+
+## It says the video is a different language
+
+Kikimi listens to a short sample before transcribing so a Japanese video isn't added as Spanish. If it sounds like another language than the one selected, it asks. Choose the right language, or cancel and switch language in the sidebar.
+
+## The transcript has mistakes
+
+Speech recognition isn't perfect, and its times can be a little off in fast speech. Press <kbd>E</kbd> on a line in the player to fix it; Kikimi finds the line's words again. A subtitle file you trust gives better text than transcription.
+
+## A word is wrong, or isn't a word
+
+Word-splitting has limits: Japanese uses a 2007 dictionary, so modern slang can be split or missed; French word forms are noisier; and a German separable verb ("ruf … an") is learned as *rufen*. Press **Ignore** (<kbd>X</kbd>) on names and mistakes: it is kept but never offered again. Please report patterns on the [issues page](https://github.com/surreptus/kikimi/issues).
+
+## There is nothing on Learn
+
+Learn needs words. Start some from **Words**, or wait for lessons, which are offered from your videos each day. If lessons say they are on hold, you have more than 100 reviews due, so finish those first.
+
+## The Shadow card won't record
+
+Check that Kikimi is allowed to use the microphone in **System Settings > Privacy & Security > Microphone**. See [shadowing](/kikimi/guide/shadowing/).
+
+## Still stuck
+
+Open an issue on [GitHub](https://github.com/surreptus/kikimi/issues). Issues are public, so leave out personal details. For a security problem, read the [security policy](https://github.com/surreptus/kikimi/security/policy) first.

@@ -1,0 +1,89 @@
+/* The site in the app's colours: deep green ink on a warm off-white page in Light, off-white on a very
+   dark green in Dark. Starlight's own layout, navigation and search stay as they are. */
+:root {
+  --sl-font: ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  /* Ordinary heading sizes: Starlight's own grow to 42, 35 and 29 px on a wide window. */
+  --sl-text-h1: 2rem;
+  --sl-text-h2: 1.5rem;
+  --sl-text-h3: 1.25rem;
+  --sl-text-h4: 1.125rem;
+  --sl-text-h5: 1rem;
+  --sl-text-6xl: 3rem;   /* the homepage title */
+}
+
+/* The rounded look of the app: pills for the sidebar's links and the search box, rounded corners on cards and notes. */
+.sidebar-content a { border-radius: 999px; padding-inline: 0.75rem; }
+site-search button { border-radius: 999px; }
+.card { border-radius: 16px; }
+.starlight-aside { border-radius: 12px; }
+.expressive-code { --ec-brdRad: 0.75rem; }
+
+:root[data-theme='light'] {
+  --sl-color-bg: #faf4e6;
+  --sl-color-bg-nav: #faf4e6;
+  --sl-color-bg-sidebar: #faf4e6;
+  --sl-color-text: #153a0b;
+  --sl-color-text-accent: #153a0b;
+  --sl-color-white: #153a0b;
+  --sl-color-accent-low: #e4ecd3;
+  --sl-color-accent: #2f6b1a;
+  --sl-color-accent-high: #153a0b;
+  /* Lines in the ink colour, strong enough to see on the cream page (Starlight's own are nearly white here). */
+  --sl-color-hairline: rgb(21 58 11 / 0.24);
+  --sl-color-hairline-light: rgb(21 58 11 / 0.16);
+  --sl-color-hairline-shade: rgb(21 58 11 / 0.32);
+  --sl-color-gray-5: #cfc8ae;
+  --sl-color-gray-6: #efe8d3;
+  --soft: rgb(21 58 11 / 0.07);
+  /* Notes use the blue scale; here it is the app's green. */
+  --sl-color-blue-low: #e4ecd3;
+  --sl-color-blue: #2f6b1a;
+  --sl-color-blue-high: #153a0b;
+}
+
+:root[data-theme='dark'] {
+  --sl-color-bg: #081611;
+  --sl-color-bg-nav: #081611;
+  --sl-color-bg-sidebar: #081611;
+  --sl-color-text: #f4f1ea;
+  --sl-color-text-accent: #f4f1ea;
+  --sl-color-white: #f4f1ea;
+  --sl-color-accent-low: #123b2a;
+  --sl-color-accent: #6fd6a0;
+  --sl-color-accent-high: #c8f0d8;
+  --sl-color-hairline: rgb(255 255 255 / 0.24);
+  --sl-color-hairline-light: rgb(255 255 255 / 0.18);
+  --sl-color-hairline-shade: rgb(255 255 255 / 0.22);
+  --sl-color-gray-5: #34503f;
+  --sl-color-gray-6: #10261d;
+  --soft: rgb(255 255 255 / 0.08);
+  --sl-color-blue-low: #123b2a;
+  --sl-color-blue: #6fd6a0;
+  --sl-color-blue-high: #c8f0d8;
+}
+
+/* A key such as ⌘O or Space, written as <kbd> in the guide. */
+.sl-markdown-content kbd {
+  display: inline-block;
+  padding: 0 0.4em;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 6px;
+  font: 0.85em ui-rounded, system-ui, sans-serif;
+  background: var(--soft);
+}
+
+/* Screenshots, when they have been added. */
+.shot { margin: 1.5rem 0 0; }
+.shot img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--sl-color-hairline); }
+.shot figcaption { margin-top: 0.5rem; font-size: var(--sl-text-sm); color: var(--sl-color-gray-3); }
+
+/* The privacy policy and terms are the app's own Markdown files, which start with their own title; the page already has one. */
+.legal > h1:first-child { display: none; }
+
+/* The licence texts on the acknowledgements page. */
+.licence { margin-top: 0.75rem; padding: 0.6rem 1rem; border-radius: 12px; background: var(--soft); }
+.licence summary { cursor: pointer; font-weight: 600; }
+.licence pre { white-space: pre-wrap; font-size: var(--sl-text-xs); margin: 0.75rem 0 0; }
+
+/* The download and hero buttons. */
+.sl-link-button { font-weight: 600; }

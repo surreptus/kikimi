@@ -1,0 +1,56 @@
+---
+title: Common questions
+description: "Common questions about Kikimi: privacy, languages, subtitles, speech models and accuracy."
+---
+
+## What does Kikimi do, in one sentence?
+
+It finds the words in videos on your Mac, shows how much of each video you know, and teaches you the rest with sentences from those videos.
+
+## Is it free? Is it open source?
+
+Yes to both. The code is under the MIT licence at [github.com/surreptus/kikimi](https://github.com/surreptus/kikimi). The dictionaries have their own licences, listed on the [acknowledgements](/kikimi/acknowledgements/) page.
+
+## Does it send my videos or progress anywhere?
+
+No. Transcription runs on your Mac. Kikimi goes online only to download a speech model and, when you choose Check for Updates, to read one small file from this website. There are no accounts and no analytics. The [privacy policy](/kikimi/privacy/) says the same in full.
+
+## Which languages work?
+
+Spanish, French, German and Japanese. Spanish and Japanese have had the most use on real videos. French and German have been checked on sentences but not yet on a real video, and French word forms in particular are noisier. Italian, Portuguese and Dutch are planned.
+
+## Do I need subtitles?
+
+No. Without them, Kikimi transcribes the audio on your Mac using a speech model you download once. With an `.srt` or `.vtt` file for the video, nothing is transcribed and no model is needed, which is also the fastest way to start. See [importing videos](/kikimi/guide/importing-videos/).
+
+## How accurate is the transcription?
+
+It depends on the model and the audio. On one long synthesized Spanish passage the default model got about 23% of words wrong. Timestamps can be a little off in fast, overlapping speech. If a line is wrong, you can fix it: press <kbd>E</kbd> in the player.
+
+## Can I use videos from YouTube or Netflix?
+
+Kikimi never downloads anything from video sites and does not work on streaming sites. It works on files you give it, so use videos you own or may copy and study. The [home page](/kikimi/#finding-videos-to-learn-from) lists places that publish videos you may download.
+
+## Why does macOS warn me when I open it?
+
+Kikimi is not notarized yet, which Apple charges a yearly fee for. The [download page](/kikimi/download/) shows how to open it anyway.
+
+## What does "90% known" mean?
+
+Each video shows what share of its nouns, verbs, adjectives and adverbs you know. Knowing about 90% of them is roughly where following along becomes comfortable. It counts words you know, not grammar, idioms or speed, so treat it as a guide and not a promise that you will understand every line.
+
+## Why does it ask for the microphone?
+
+Only the Shadow card uses it, and only when you press Record. The recording stays on your Mac and is deleted when the card ends. It is never uploaded, transcribed or analysed. See [shadowing](/kikimi/guide/shadowing/).
+
+## Where is my data, and how do I back it up?
+
+In Kikimi's folder inside your Mac's Library. In Settings under Data, Save backup writes your progress to a readable `.kikimi` file, or to a folder that includes your videos. See [backups](/kikimi/guide/backups/).
+
+## Does it work offline?
+
+Yes, once a speech model is downloaded (or if you only import videos with subtitles). Only downloading a model and checking for updates need the internet.
+
+## I found a bug or a wrong word. Where do I report it?
+
+On the [GitHub issues page](https://github.com/surreptus/kikimi/issues). Issues there are public, so don't include personal details. For a security problem, see the [security policy](https://github.com/surreptus/kikimi/security/policy).
