@@ -69,14 +69,26 @@ struct WordsView: View {
             && rows.contains { $0.word.status == .new }
             && !rows.contains { $0.word.status == .learning || $0.word.status == .finished }
     }
+    /// No words in this language at all (not just none that match a search or filter).
+    private var noWordsYet: Bool { rows.isEmpty && trimmedSearch.isEmpty && filter == nil && typeFilter == nil }
     private var selectedRows: [WordRow] { rows.filter { selection.contains($0.id) } }
     private var trimmedSearch: String { search.trimmingCharacters(in: .whitespaces) }
 
     var body: some View {
         VStack(spacing: 0) {
-            header
-            table
-            bulkBar
+            if noWordsYet {
+                // Nothing to search, sort or select yet: only where words come from.
+                ScreenTitle(text: "Words", subtitle: "Pick words to learn, or mark the ones you already know.")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, Theme.screenPadding).padding(.top, Theme.screenPadding)
+                EmptyState(title: "No words yet", message: "Add a video on the Videos page to collect words.", illustration: .bubble,
+                           actionTitle: "Go to Videos", action: { app.select(.videos) })
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                header
+                table
+                bulkBar
+            }
         }
         .sidePanel(isPresented: inspectorShown.wrappedValue) { inspector }
         .task(id: LoadKey(language: app.languageCode, search: search, filter: filter, type: typeFilter, version: app.dataVersion)) {
@@ -199,14 +211,7 @@ struct WordsView: View {
         WordTable(rows: sortedRows, selection: selectionBinding, sort: $sort)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
-            if rows.isEmpty {
-                if trimmedSearch.isEmpty && filter == nil && typeFilter == nil {
-                    EmptyState(title: "No words yet", message: "Add a video on the Videos page to collect words.", illustration: .bubble,
-                               actionTitle: "Go to Videos", action: { app.select(.videos) })
-                } else {
-                    EmptyState(title: "No matches", message: "Try a different search or status.")
-                }
-            }
+            if rows.isEmpty { EmptyState(title: "No matches", message: "Try a different search or status.") }
         }
     }
 

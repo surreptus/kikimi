@@ -101,6 +101,7 @@ struct SideNav: View {
                         .foregroundStyle(Theme.onAccent)
                         .padding(.horizontal, 8).padding(.vertical, 2)
                         .background(Capsule().fill(Theme.accent))
+                        .help(inflected("^[\(dueCount) review](inflect: true) due now"))
                 }
             }
             .foregroundStyle(Theme.ink)

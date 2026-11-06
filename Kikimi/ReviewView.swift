@@ -216,7 +216,7 @@ struct ReviewView: View {
                             Text(reading).font(Theme.title(22)).foregroundStyle(Theme.ink)
                         }
                         Text(card.entries.first?.gloss ?? "No dictionary entry")
-                            .font(.system(.title3, design: .rounded))
+                            .font(.system(.title3, design: .rounded)).lineSpacing(4)
                             .multilineTextAlignment(.center)
                             .textSelection(.enabled)
                         if let example = card.example {

@@ -232,7 +232,7 @@ struct VideosView: View {
             Text("Your first video is ready").font(Theme.title(17))
             Text("You know \(percent)% of its words.").foregroundStyle(Theme.muted)
             if !goal.isReached, !fresh.isEmpty {
-                Text(inflected("Learning ^[\(fresh.count) word](inflect: true) would take it to about 90%."))
+                Text(inflected("Learning ^[\(fresh.count) word](inflect: true) would take it to about 90% of its words known."))
                     .foregroundStyle(Theme.muted)
             }
             HStack(spacing: 10) {

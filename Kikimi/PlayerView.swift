@@ -349,7 +349,7 @@ struct PlayerView: View {
             .lineLimit(2)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 16).padding(.top, 20).padding(.bottom, 6)
+            .padding(.horizontal, 16).padding(.top, 20).padding(.bottom, 12)
             .accessibilityAddTraits(.isHeader)
     }
 
@@ -427,7 +427,7 @@ struct PlayerView: View {
                         .font(Theme.small).foregroundStyle(Theme.muted)
                 }
             } else {
-                Text("Point at a word, or use ← → on a line, to see what it means. Click it or press Return to keep it here.")
+                Text("Point at a word, or use ← → on a line, to see what it means. Click it or press Return to keep its meaning open.")
                     .font(.system(.callout, design: .rounded)).foregroundStyle(Theme.faint)
             }
         }
