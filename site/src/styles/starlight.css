@@ -63,7 +63,7 @@ site-search button { border-radius: 999px; }
 }
 
 /* A key such as ⌘O or Space, written as <kbd> in the guide. */
-kbd {
+.sl-markdown-content kbd {
   display: inline-block;
   padding: 0 0.4em;
   border: 1px solid var(--sl-color-hairline);
