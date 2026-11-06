@@ -415,52 +415,10 @@ struct PlayerView: View {
     private var hintBar: some View {
         VStack(alignment: .leading, spacing: 3) {
             if let token = shownToken {
-                HStack(spacing: 8) {
-                    Text(hint?.nounPhrase ?? hint?.lemma ?? token.lemma).font(Theme.title(17))
-                    if let reading = hint?.reading ?? token.reading {
-                        Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
-                    }
-                    if let others = hint?.otherReadings, !others.isEmpty {
-                        Text(others.joined(separator: "・")).font(.system(.callout, design: .rounded)).foregroundStyle(Theme.muted)
-                            .accessibilityLabel("Also read \(listed(others))")
-                    }
-                    StatusPill(text: token.pos.title)
-                    // Japanese verbs and adjectives show the form they are in; the link opens the page on how it is built.
-                    if let stem = TsumikiStem.stem(for: token) {
-                        Link(destination: stem.url) {
-                            Text("\(stem.name) ↗").font(.system(size: 12, weight: .semibold, design: .rounded))
-                        }
-                        .foregroundStyle(Theme.ink)
-                        .help("How \(stem.label) is built (opens Tsumiki, a Japanese grammar guide, in your browser)")
-                        .accessibilityLabel("Grammar: \(stem.name), \(stem.label). Opens a web page.")
-                    }
-                    // A new word needs no badge: Learn and Known beside it already say it is new.
-                    if let status = hint?.status, status != .new {
-                        StatusBadge(status: status, stage: hint?.stage)
-                    }
-                    Spacer()
-                    if hint?.wordID != nil {
-                        if hint?.status == .ignored {
-                            Button { setStatus(.new) } label: { KeyedLabel(title: "Restore", key: "L") }.buttonStyle(.pill(.secondary, compact: true))
-                                .keyboardShortcut("l", modifiers: [])
-                                .help("Bring this word back as a new word (L)")
-                        }
-                        if hint?.status != .learning && hint?.status != .finished && hint?.status != .ignored {
-                            Button { setStatus(.learning) } label: { KeyedLabel(title: "Learn", key: "L") }.buttonStyle(.pill(compact: true))
-                                .keyboardShortcut("l", modifiers: [])
-                                .help("Start learning this word (L)")
-                        }
-                        if hint?.status != .known && hint?.status != .ignored {
-                            Button { setStatus(.known) } label: { KeyedLabel(title: "Known", key: "K") }.buttonStyle(.pill(.secondary, compact: true))
-                                .keyboardShortcut("k", modifiers: [])
-                                .help("Mark this word as known (K)")
-                        }
-                        if hint?.status == .new {
-                            Button { setStatus(.ignored) } label: { KeyedLabel(title: "Ignore", key: "X") }.buttonStyle(.pill(.quiet, compact: true))
-                                .keyboardShortcut("x", modifiers: [])
-                                .help("Set this word aside: not worth learning, such as a name or a mistake (X)")
-                        }
-                    }
+                // The buttons never wrap: when they don't fit beside the word, they go on a line of their own.
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) { wordInfo(token); Spacer(); wordActions }
+                    VStack(alignment: .leading, spacing: 8) { HStack(spacing: 8) { wordInfo(token) }; HStack(spacing: 8) { wordActions } }
                 }
                 Text(hint?.gloss ?? "No dictionary entry").font(.system(.callout, design: .rounded)).lineLimit(2)
                     .foregroundStyle(hint?.gloss == nil ? Theme.muted : Theme.ink)
@@ -489,6 +447,60 @@ struct PlayerView: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Word meaning")
+    }
+
+    /// The word, how it is read, what kind it is and its state.
+    @ViewBuilder
+    private func wordInfo(_ token: Token) -> some View {
+        Text(hint?.nounPhrase ?? hint?.lemma ?? token.lemma).font(Theme.title(17))
+        if let reading = hint?.reading ?? token.reading {
+            Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
+        }
+        if let others = hint?.otherReadings, !others.isEmpty {
+            Text(others.joined(separator: "・")).font(.system(.callout, design: .rounded)).foregroundStyle(Theme.muted)
+                .accessibilityLabel("Also read \(listed(others))")
+        }
+        StatusPill(text: token.pos.title)
+        // Japanese verbs and adjectives show the form they are in; the link opens the page on how it is built.
+        if let stem = TsumikiStem.stem(for: token) {
+            Link(destination: stem.url) {
+                Text("\(stem.name) ↗").font(.system(size: 12, weight: .semibold, design: .rounded))
+            }
+            .foregroundStyle(Theme.ink)
+            .help("How \(stem.label) is built (opens Tsumiki, a Japanese grammar guide, in your browser)")
+            .accessibilityLabel("Grammar: \(stem.name), \(stem.label). Opens a web page.")
+        }
+        // A new word needs no badge: Learn and Known beside it already say it is new.
+        if let status = hint?.status, status != .new {
+            StatusBadge(status: status, stage: hint?.stage)
+        }
+    }
+
+    /// Learn, Known and the rest, for the word in the hint bar. Never wraps.
+    @ViewBuilder
+    private var wordActions: some View {
+        if hint?.wordID != nil {
+            if hint?.status == .ignored {
+                Button { setStatus(.new) } label: { KeyedLabel(title: "Restore", key: "L") }.buttonStyle(.pill(.secondary, compact: true))
+                    .keyboardShortcut("l", modifiers: [])
+                    .help("Bring this word back as a new word (L)")
+            }
+            if hint?.status != .learning && hint?.status != .finished && hint?.status != .ignored {
+                Button { setStatus(.learning) } label: { KeyedLabel(title: "Learn", key: "L") }.buttonStyle(.pill(compact: true))
+                    .keyboardShortcut("l", modifiers: [])
+                    .help("Start learning this word (L)")
+            }
+            if hint?.status != .known && hint?.status != .ignored {
+                Button { setStatus(.known) } label: { KeyedLabel(title: "Known", key: "K") }.buttonStyle(.pill(.secondary, compact: true))
+                    .keyboardShortcut("k", modifiers: [])
+                    .help("Mark this word as known (K)")
+            }
+            if hint?.status == .new {
+                Button { setStatus(.ignored) } label: { KeyedLabel(title: "Ignore", key: "X") }.buttonStyle(.pill(.quiet, compact: true))
+                    .keyboardShortcut("x", modifiers: [])
+                    .help("Set this word aside: not worth learning, such as a name or a mistake (X)")
+            }
+        }
     }
 
     // MARK: Export
