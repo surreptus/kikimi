@@ -1,0 +1,41 @@
+/* The guide in the app's colours (see theme.css): deep green ink on a warm off-white page in Light, off-white on a very
+   dark green in Dark. Starlight's own layout, navigation and search stay as they are. */
+:root {
+  --sl-font: ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+}
+
+:root[data-theme='light'] {
+  --sl-color-bg: #faf4e6;
+  --sl-color-bg-nav: #faf4e6;
+  --sl-color-bg-sidebar: #f3ecd9;
+  --sl-color-text: #153a0b;
+  --sl-color-text-accent: #153a0b;
+  --sl-color-white: #153a0b;
+  --sl-color-accent-low: #e4ecd3;
+  --sl-color-accent: #2f6b1a;
+  --sl-color-accent-high: #153a0b;
+  --sl-color-hairline: rgb(0 0 0 / 0.12);
+}
+
+:root[data-theme='dark'] {
+  --sl-color-bg: #081611;
+  --sl-color-bg-nav: #081611;
+  --sl-color-bg-sidebar: #0c2d20;
+  --sl-color-text: #f4f1ea;
+  --sl-color-text-accent: #f4f1ea;
+  --sl-color-white: #f4f1ea;
+  --sl-color-accent-low: #123b2a;
+  --sl-color-accent: #6fd6a0;
+  --sl-color-accent-high: #c8f0d8;
+  --sl-color-hairline: rgb(255 255 255 / 0.16);
+}
+
+/* A key such as ⌘O or Space, written as <kbd> in the guide. */
+kbd {
+  display: inline-block;
+  padding: 0 0.4em;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 6px;
+  font: 0.85em ui-rounded, system-ui, sans-serif;
+  background: var(--sl-color-bg-sidebar);
+}
