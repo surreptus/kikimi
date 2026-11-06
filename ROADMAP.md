@@ -125,6 +125,18 @@ Ordered by how much each helps comprehensible input per unit of effort.
       marked finished and replays are not marked down. It is hidden with one video, or when every video is still hard.
 - [ ] **Frequency-list bootstrap**: mark the most common words as known for a beginner who has nothing yet. Needs
       a data source and a licence decision first.
+- [ ] **Calibrate on the first video** (proposed 6 Nov 2026, **not started**): a new learner has nothing marked known, so every
+      video reads as mostly unknown and the first lessons teach words they already know. Offer a short pass from the
+      first-video card: show that video's most-seen new content words in batches of about 20, the learner taps the ones
+      they *don't* know, and it stops when most of a batch is unknown (or after about 120 words). Nothing changes until a
+      final screen says "You know about N of these words" and the learner confirms; then those words are marked known, and
+      the card's coverage figure updates. It needs no frequency list or new data (the order is the video's own counts, as in
+      `wordsToReach`) and works the same in all four languages, so unlike the frequency-list bootstrap above it has no
+      licence question. **Not a level label:** it does not guess "B1" or any grade, since the app has no validated mapping
+      from words known to a level; coverage per video is the measure. Risks: people over-claim (the known-words check
+      sends a missed word back to learning) and a single short video gives a noisy ranking. Today's manual way, hidden: Words >
+      Select > "250 most-seen new words" > Known. Needs the chips to work by keyboard and VoiceOver, and its strings to be
+      localisable.
 - [ ] **Audio-only import** (podcasts) for material with no picture.
 
 ### Practising
