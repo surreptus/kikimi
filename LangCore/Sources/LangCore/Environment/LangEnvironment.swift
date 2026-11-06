@@ -44,10 +44,14 @@ public final class LangEnvironment: Sendable {
     static let databaseName = "kikimi.sqlite"
 
     /// The app's own folder inside its sandbox container.
-    public static func standard() throws -> LangEnvironment {
+    public static func standardRoot() throws -> URL {
         let support = try FileManager.default.url(
             for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        return try LangEnvironment(root: support.appending(path: folderName, directoryHint: .isDirectory))
+        return support.appending(path: folderName, directoryHint: .isDirectory)
+    }
+
+    public static func standard() throws -> LangEnvironment {
+        try LangEnvironment(root: standardRoot())
     }
 
     /// Launch-time work: drop crash leftovers, and prove every dictionary opens and has entries, so a broken

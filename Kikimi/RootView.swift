@@ -35,6 +35,9 @@ struct RootView: View {
         .tint(Theme.accent)
         .fontDesign(.rounded)
         .modal(isPresented: Binding(get: { app.showAcknowledgements }, set: { app.showAcknowledgements = $0 })) { AcknowledgementsView() }
+        #if DEBUG
+        .modifier(DebugResetAlert())
+        #endif
     }
 
     /// The window is the sidebar's colour once the library is open, with the page in a card on it; while it opens, or

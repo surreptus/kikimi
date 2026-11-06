@@ -111,6 +111,8 @@ final class AppState {
     #if DEBUG
     /// Debug menu > Show Welcome Page: the welcome page again, without touching the saved choice. Start closes it.
     var previewingWelcome = false
+    /// The Debug menu's reset, waiting for the person to confirm.
+    var confirmingReset: DebugReset.Kind?
     #endif
 
     /// What the sidebar and Settings offer.
@@ -124,6 +126,9 @@ final class AppState {
     }
 
     init() {
+        #if DEBUG
+        DebugReset.applyPending()   // first of all, before anything opens the library
+        #endif
         languageCode = UserDefaults.standard.string(forKey: "language") ?? LanguageProfiles.all[0].code
     }
 

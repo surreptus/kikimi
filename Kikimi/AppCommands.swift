@@ -45,6 +45,9 @@ struct AppCommands: Commands {
         CommandMenu("Debug") {
             Button("Show Welcome Page") { app.previewingWelcome = true }
                 .disabled(!app.isReady)
+            Divider()
+            Button("Reset Library…") { app.confirmingReset = .library }
+            Button("Reset Library and Settings…") { app.confirmingReset = .everything }
         }
         #endif
 

@@ -572,3 +572,40 @@ final class VideoThumbnailTests: XCTestCase {
         XCTAssertNil(missing, "an unreadable file gives no thumbnail, not a crash")
     }
 }
+
+#if DEBUG
+final class LibraryResetTests: XCTestCase {
+    private func fixture() throws -> URL {
+        let root = FileManager.default.temporaryDirectory.appending(path: "reset-\(UUID().uuidString)")
+        let fm = FileManager.default
+        try fm.createDirectory(at: root.appending(path: "Library/h"), withIntermediateDirectories: true)
+        try fm.createDirectory(at: root.appending(path: "Models/m"), withIntermediateDirectories: true)
+        try fm.createDirectory(at: root.appending(path: "Staging"), withIntermediateDirectories: true)
+        for name in ["kikimi.sqlite", "kikimi.sqlite-wal", "Library/h/video.mov", "Models/m/weights.bin"] {
+            try Data(name.utf8).write(to: root.appending(path: name))
+        }
+        return root
+    }
+
+    func testTheLibraryIsMovedAsideAndNothingIsDeleted() throws {
+        let root = try fixture()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let folder = try XCTUnwrap(try LibraryReset.setAside(root: root, now: Date(timeIntervalSince1970: 0)))
+        let fm = FileManager.default
+        for gone in ["kikimi.sqlite", "kikimi.sqlite-wal", "Library", "Staging"] {
+            XCTAssertFalse(fm.fileExists(atPath: root.appending(path: gone).path), "\(gone) is no longer in place")
+        }
+        XCTAssertEqual(try String(contentsOf: folder.appending(path: "Library/h/video.mov"), encoding: .utf8), "Library/h/video.mov")
+        XCTAssertTrue(fm.fileExists(atPath: folder.appending(path: "kikimi.sqlite").path), "the database is set aside, not deleted")
+        XCTAssertTrue(fm.fileExists(atPath: root.appending(path: "Models/m/weights.bin").path), "speech models stay")
+        XCTAssertEqual(folder.deletingLastPathComponent().lastPathComponent, "Set Aside")
+    }
+
+    func testNothingToMoveIsNotAnError() throws {
+        let root = FileManager.default.temporaryDirectory.appending(path: "reset-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        XCTAssertNil(try LibraryReset.setAside(root: root))
+    }
+}
+#endif
