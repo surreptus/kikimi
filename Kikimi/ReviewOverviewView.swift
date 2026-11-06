@@ -132,10 +132,17 @@ struct ReviewOverviewView: View {
                 .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
             // Only a sentence can be answered more than one way.
             if style.prompt == .sentence {
-                IconSegmentedPicker(
-                    options: ReviewAnswer.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
-                    selection: answerChoice)
-                    .accessibilityLabel("How you answer")
+                Menu {
+                    Picker("How you answer", selection: answerChoice) {
+                        ForEach(ReviewAnswer.allCases, id: \.self) { Label($0.title, systemImage: $0.symbol).tag($0) }
+                    }
+                    .pickerStyle(.inline).labelsHidden()
+                } label: {
+                    Label(style.answer.title, systemImage: style.answer.symbol)
+                }
+                .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).fixedSize()
+                .accessibilityLabel("How you answer")
+                .help("How you answer a sentence card")
             }
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
                 .id(style)   // a new line for each choice, which fades in as the panel resizes

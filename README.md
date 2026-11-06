@@ -57,7 +57,7 @@ about 90%. A **Next up** card suggests the one that fits you best, heard before 
   You are taught a few at a time and quizzed on them at once.
 - **Reviews.** Nine-stage spaced repetition. Choose the kind of card: word and meaning, fill in the word, listen to the
   sentence, type a short sentence you hear, or say it aloud and play yourself beside the original (the Shadow
-  card, which uses the microphone; nothing is saved).
+  card, which uses the microphone).
 - **Practice.** Review words before they are due, practise finished ones, or test the words you marked known, without
   moving the schedule.
 

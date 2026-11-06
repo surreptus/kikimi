@@ -100,7 +100,7 @@ public struct ClozeCard: Equatable, Sendable {
     }
 
     /// The first meaning, without its number or part of speech, cut short: "1. (noun) house; home" becomes "house".
-    static func shortGloss(_ gloss: String, limit: Int = 60) -> String? {
+    public static func shortGloss(_ gloss: String, limit: Int = 60) -> String? {
         var line = gloss.split(separator: "\n").first.map(String.init) ?? gloss
         if let match = line.range(of: #"^\d+\.\s*(\([^)]*\)\s*)?"#, options: .regularExpression) { line.removeSubrange(match) }
         if let semicolon = line.firstIndex(of: ";") { line = String(line[..<semicolon]) }

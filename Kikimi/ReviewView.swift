@@ -73,6 +73,8 @@ struct ReviewView: View {
         .task(id: app.dataVersion) { if card == nil { await loadOverview(keepingSummary: true) } }
         .task(id: app.languageCode) { style = env.reviewStyle.style(for: app.profile) }
         .onDisappear { audio?.stop(); voice.discard() }
+        // Having said it, the answer is what you want next.
+        .onChange(of: voice.state) { _, state in if state == .recorded, shadowing(for: card) { revealed = true } }
     }
 
     private func finished(_ summary: (answered: Int, correct: Int)) -> some View {
@@ -229,7 +231,8 @@ struct ReviewView: View {
                 if translationVisible, card.example != nil { translationLine(card) }
 
                 // Hearing the word or its sentence would give the answer away, so these wait for the reveal.
-                if revealed {
+                // A shadow card has its own buttons for hearing the sentence.
+                if revealed, !shadowing(for: card) {
                     HStack(spacing: 10) {
                         SpeakButton(
                             text: (app.profile.display.showsReadings ? card.entries.first?.reading : nil) ?? card.word.lemma,
@@ -370,15 +373,24 @@ struct ReviewView: View {
         style == .shadowing && card?.example.map(app.profile.suitsDictation) == true
     }
 
-    /// Say the sentence after hearing it, then play yourself beside the original. Nothing is judged: you compare by ear,
-    /// and answer Got it or Missed it yourself. The recording lives only while the card does.
+    /// The meaning is the question; the sentence itself would give it away, so it waits for the answer. Hear it, say it
+    /// after, then play yourself beside the original. Nothing is judged: you compare by ear, and answer Got it or Missed
+    /// it yourself. The recording lives only while the card does, and finishing it shows the answer.
     @ViewBuilder
     private func shadowFace(_ card: ReviewCard) -> some View {
         if let example = card.example {
             Image(systemName: "mic").font(.system(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
-            Text("Say it aloud").font(Theme.title(26))
-            Text(example.highlighted).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
-            if revealed { answerBlock(card) }
+            if revealed {
+                Text(example.highlighted).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
+                lemmaText(card, font: Theme.title(20))
+                if app.profile.display.showsReadings, let reading = readings(of: card) {
+                    Text(reading).font(Theme.title(16)).foregroundStyle(Theme.ink)
+                }
+            } else {
+                Text("Say it aloud").font(Theme.title(26))
+            }
+            Text(card.entries.first.flatMap { ClozeCard.shortGloss($0.gloss) } ?? card.entries.first?.gloss ?? "No dictionary entry")
+                .font(.system(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
             HStack(spacing: 10) {
                 Button { playSentence() } label: { KeyedLabel(title: "Hear it", systemImage: "speaker.wave.2.fill", key: "R") }
                     .buttonStyle(.pill(.secondary, compact: true))
@@ -416,8 +428,10 @@ struct ReviewView: View {
             case .failed:
                 Text("Couldn't record. Check your microphone and try again.").font(Theme.small).foregroundStyle(Theme.muted)
             default:
-                Text("Hear it, say it after, then record yourself and compare. Nothing is saved.")
-                    .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+                if !revealed {
+                    Text("Hear it, then say it after and record yourself to compare.")
+                        .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+                }
             }
         }
     }

@@ -86,7 +86,7 @@ extension ReviewStyle {
         case .cloze: String(localized: "Recall the missing word in a sentence from your videos.")
         case .listening: String(localized: "Hear a sentence from your videos, then check what it said.")
         case .dictation: String(localized: "Hear a short sentence from your videos and type it. You see what you missed.")
-        case .shadowing: String(localized: "Hear a short sentence from your videos, say it aloud and play yourself beside the original. Uses the microphone; nothing is saved.")
+        case .shadowing: String(localized: "Hear a short sentence from your videos, say it aloud and play yourself beside the original. Uses the microphone.")
         }
     }
 }
