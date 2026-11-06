@@ -2,12 +2,26 @@
    dark green in Dark. Starlight's own layout, navigation and search stay as they are. */
 :root {
   --sl-font: ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  /* Ordinary heading sizes: Starlight's own grow to 42, 35 and 29 px on a wide window. */
+  --sl-text-h1: 2rem;
+  --sl-text-h2: 1.5rem;
+  --sl-text-h3: 1.25rem;
+  --sl-text-h4: 1.125rem;
+  --sl-text-h5: 1rem;
+  --sl-text-6xl: 3rem;   /* the homepage title */
 }
+
+/* The rounded look of the app: pills for the sidebar's links and the search box, rounded corners on cards and notes. */
+.sidebar-content a { border-radius: 999px; padding-inline: 0.75rem; }
+site-search button { border-radius: 999px; }
+.card { border-radius: 16px; }
+.starlight-aside { border-radius: 12px; }
+.expressive-code { --ec-brdRad: 0.75rem; }
 
 :root[data-theme='light'] {
   --sl-color-bg: #faf4e6;
   --sl-color-bg-nav: #faf4e6;
-  --sl-color-bg-sidebar: #f3ecd9;
+  --sl-color-bg-sidebar: #faf4e6;
   --sl-color-text: #153a0b;
   --sl-color-text-accent: #153a0b;
   --sl-color-white: #153a0b;
@@ -15,6 +29,7 @@
   --sl-color-accent: #2f6b1a;
   --sl-color-accent-high: #153a0b;
   --sl-color-hairline: rgb(0 0 0 / 0.12);
+  --soft: rgb(21 58 11 / 0.07);
   /* Notes use the blue scale; here it is the app's green. */
   --sl-color-blue-low: #e4ecd3;
   --sl-color-blue: #2f6b1a;
@@ -24,7 +39,7 @@
 :root[data-theme='dark'] {
   --sl-color-bg: #081611;
   --sl-color-bg-nav: #081611;
-  --sl-color-bg-sidebar: #0c2d20;
+  --sl-color-bg-sidebar: #081611;
   --sl-color-text: #f4f1ea;
   --sl-color-text-accent: #f4f1ea;
   --sl-color-white: #f4f1ea;
@@ -32,6 +47,7 @@
   --sl-color-accent: #6fd6a0;
   --sl-color-accent-high: #c8f0d8;
   --sl-color-hairline: rgb(255 255 255 / 0.16);
+  --soft: rgb(255 255 255 / 0.08);
   --sl-color-blue-low: #123b2a;
   --sl-color-blue: #6fd6a0;
   --sl-color-blue-high: #c8f0d8;
@@ -44,7 +60,7 @@ kbd {
   border: 1px solid var(--sl-color-hairline);
   border-radius: 6px;
   font: 0.85em ui-rounded, system-ui, sans-serif;
-  background: var(--sl-color-bg-sidebar);
+  background: var(--soft);
 }
 
 /* Screenshots, when they have been added. */
@@ -56,6 +72,6 @@ kbd {
 .legal > h1:first-child { display: none; }
 
 /* The licence texts on the acknowledgements page. */
-.licence { margin-top: 0.75rem; padding: 0.6rem 1rem; border-radius: 12px; background: var(--sl-color-bg-sidebar); }
+.licence { margin-top: 0.75rem; padding: 0.6rem 1rem; border-radius: 12px; background: var(--soft); }
 .licence summary { cursor: pointer; font-weight: 600; }
 .licence pre { white-space: pre-wrap; font-size: var(--sl-text-xs); margin: 0.75rem 0 0; }
