@@ -151,6 +151,24 @@ class KaikkiTests(unittest.TestCase):
             self.assertEqual(build_kaikki.build(src, out, "es", "Spanish"), 1)
             self.assertEqual(rows(out), [("casa", None, "1. (noun) house; home; household\n2. (verb) to marry")])
 
+    def test_a_short_form_with_a_meaning_of_its_own_is_kept(self):
+        # "muy" is only an apocopic form of "mucho" to Wiktionary, but it means "very"; a bare spelling variant has no meaning to keep.
+        lines = [
+            {"word": "muy", "lang_code": "es", "pos": "adv", "senses": [
+                {"glosses": ["apocopic form of mucho; very"], "alt_of": [{"word": "mucho", "extra": "very"}]}]},
+            {"word": "sólo", "lang_code": "es", "pos": "adv", "senses": [
+                {"glosses": ["alternative spelling of solo"], "alt_of": [{"word": "solo"}]}]},
+            {"word": "kesesto", "lang_code": "es", "pos": "contraction", "senses": [
+                {"glosses": ["misspelling of que es esto; what is this"], "tags": ["misspelling"],
+                 "alt_of": [{"word": "qué es esto", "extra": "what is this"}]}]},
+        ]
+        with tempfile.TemporaryDirectory() as d:
+            src, out = os.path.join(d, "k.jsonl"), os.path.join(d, "es.sqlite")
+            with open(src, "w", encoding="utf-8") as f:
+                f.write("\n".join(json.dumps(x) for x in lines))
+            build_kaikki.build(src, out, "es", "Spanish")
+            self.assertEqual(rows(out), [("muy", None, "1. (adv) very")])
+
     def test_a_meaning_repeated_across_senses_is_kept_once(self):
         # Wiktionary's senses often restate each other: "to have; to possess" then "to have; to possess; to be ...".
         lines = [{"word": "tener", "lang_code": "es", "pos": "verb", "senses": [

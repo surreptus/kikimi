@@ -25,6 +25,10 @@ def is_uncommon(sense):
     return any(t in UNCOMMON_TAGS or t[:1].isupper() for t in sense.get("tags", []))
 
 
+# Short forms that are mistakes or spoken spellings are not worth a headword of their own.
+NOT_STANDARD_TAGS = {"misspelling", "nonstandard", "pronunciation-spelling", "eye-dialect", "proscribed"}
+
+
 def noun_gender(entry):
     """(ordinary, uncommon): the genders of a noun entry as sets of letters ("m", "f", "n"), the first from its ordinary
     senses and the second from senses meant for some regions or registers; both empty for any other part of speech
@@ -77,13 +81,22 @@ def meanings(gloss):
 
 
 def pos_block(entry):
-    """(pos, glosses) for one kaikki entry, dropping inflected-form and alternative-form senses. Wiktionary senses often
+    """(pos, glosses) for one kaikki entry, dropping inflected-form and alternative-form senses, except a short form that
+    gives a meaning of its own ("muy": apocopic form of mucho, "very"), which is that meaning. Wiktionary senses often
     repeat each other's meanings ("to have; to possess" then "to have; to possess; to be..."), so each meaning is kept once."""
     glosses, seen = [], set()
     for sense in entry.get("senses", []):
-        if sense.get("form_of") or sense.get("alt_of"):
+        if sense.get("form_of"):
             continue
-        chain = sense.get("glosses") or []
+        if sense.get("alt_of"):
+            if is_uncommon(sense) or NOT_STANDARD_TAGS & set(sense.get("tags", [])):
+                continue
+            own = " ".join(a.get("extra", "") for a in sense["alt_of"]).strip()
+            if not own:
+                continue
+            chain = [own]
+        else:
+            chain = sense.get("glosses") or []
         if not chain:
             continue
         for meaning in meanings(chain[-1]):
