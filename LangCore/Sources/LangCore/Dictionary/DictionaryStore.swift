@@ -69,30 +69,60 @@ public final class DictionaryStore: Sendable {
         return try await file.read { try Int.fetchOne($0, sql: "SELECT COUNT(*) FROM entries") ?? 0 }
     }
 
-    /// Entries whose headword or reading equals `term`; headword matches first, then file order (the commoner word first),
-    /// except that an all-capitals form (an abbreviation such as NO, "northwest") comes after the word itself ("no", "not").
-    /// A word's other capitalisations count too: the lemma is lower case, but a dictionary can keep a sense under the
-    /// capitalised form (Wiktionary has "nochebuena" as the plant and "Nochebuena" as Christmas Eve).
-    public func lookup(language: String, term: String, limit: Int) async throws -> [DictionaryEntry] {
+    /// Entries whose headword or reading equals `term`: headword matches first, then reading matches, each in file order (the
+    /// commoner word first). A word's other capitalisations count too: the lemma is lower case, but a dictionary can keep a
+    /// sense under the capitalised form (Wiktionary has "nochebuena" as the plant and "Nochebuena" as Christmas Eve).
+    ///
+    /// Which capitalisation comes first depends on how the word is spelt where it was met, since the lemma doesn't say:
+    /// `surface` is that spelling. Capitalised in the video ("Navidad"), the capitalised entry leads; lower case ("dorado",
+    /// golden, not the constellation "Dorado"), the lower-case one does. An all-capitals form (an abbreviation such as NO,
+    /// "northwest") comes last unless it is what was met. With no `surface`, the entry for `term` as written leads.
+    public func lookup(language: String, term: String, limit: Int, surface: String? = nil) async throws -> [DictionaryEntry] {
         guard let file = files[language] else { return [] }
         let capitalised = term.prefix(1).uppercased() + term.dropFirst()
+        let lower = term.lowercased(), upper = term.uppercased()
+        let order: [String]
+        switch Self.capitalisation(of: surface) {
+        case nil: order = [term, lower, capitalised, upper]
+        case .lower?: order = [lower, term, capitalised, upper]
+        case .capitalised?: order = [capitalised, lower, term, upper]
+        case .upper?: order = [upper, capitalised, lower, term]
+        }
         let gender = withGender.contains(language) ? "gender" : "NULL AS gender"
         return try await file.read { db in
             try Row.fetchAll(db, sql: """
                 SELECT id, headword, reading, gloss, \(gender) FROM entries
                 WHERE headword IN (?1, ?2, ?3, ?4) OR reading = ?1
-                ORDER BY headword IN (?1, ?2, ?3, ?4) DESC, (headword = ?4 AND ?4 != ?1), id
-                LIMIT ?5
-                """, arguments: [term, capitalised, term.lowercased(), term.uppercased(), limit]).map {
+                ORDER BY CASE headword WHEN ?5 THEN 0 WHEN ?6 THEN 1 WHEN ?7 THEN 2 WHEN ?8 THEN 3 ELSE 4 END, id
+                LIMIT ?9
+                """, arguments: StatementArguments([term, capitalised, lower, upper] + order) + [limit]).map {
                 DictionaryEntry(id: $0["id"], language: language, headword: $0["headword"],
                                 reading: $0["reading"], gloss: $0["gloss"], gender: $0["gender"])
             }
         }
     }
+
+    enum Capitalisation { case lower, capitalised, upper }
+
+    static func capitalisation(of surface: String?) -> Capitalisation? {
+        guard let surface, let first = surface.first else { return nil }
+        if surface.count > 1, surface == surface.uppercased(), surface != surface.lowercased() { return .upper }
+        return first.isUppercase ? .capitalised : .lower
+    }
+
+    /// One spelling to stand for how a word is written across the lines it was met in: a capitalised one when most of them
+    /// are capitalised, else a lower-case one. nil when there are none.
+    public static func commonSurface(of surfaces: [String]) -> String? {
+        let all = surfaces.filter { !$0.isEmpty }
+        guard !all.isEmpty else { return nil }
+        let capitalised = all.filter { $0.first?.isUppercase == true }
+        if capitalised.count * 2 > all.count { return capitalised[0] }
+        return all.first { $0.first?.isUppercase != true } ?? all[0]
+    }
 }
 
 extension LangDatabase {
-    public func lookup(language: String, term: String, limit: Int = 20) async throws -> [DictionaryEntry] {
-        try await dictionaries.lookup(language: language, term: term, limit: limit)
+    public func lookup(language: String, term: String, limit: Int = 20, surface: String? = nil) async throws -> [DictionaryEntry] {
+        try await dictionaries.lookup(language: language, term: term, limit: limit, surface: surface)
     }
 }

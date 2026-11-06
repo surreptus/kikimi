@@ -55,9 +55,10 @@ struct WordDetail: View {
         .task { audio = SentenceAudioPlayer(libraryRoot: env.libraryURL) }
         .task(id: row.id) {
             let word = row.word, id = row.id
-            let newEntries = (try? await env.database.lookup(language: word.language, term: word.lemma, limit: 5)) ?? []
-            let newKanji = await env.kanjiInfo(in: word.lemma, language: word.language)
             let newExamples = (try? await env.database.examples(wordID: id)) ?? []
+            let newEntries = (try? await env.database.lookup(language: word.language, term: word.lemma, limit: 5,
+                                                              surface: DictionaryStore.commonSurface(of: newExamples.map(\.surface)))) ?? []
+            let newKanji = await env.kanjiInfo(in: word.lemma, language: word.language)
             let newSeen = (try? await env.database.seen(wordID: id)) ?? WordSeen()
             guard !Task.isCancelled else { return }   // you moved on before this one finished
             audio?.stop()

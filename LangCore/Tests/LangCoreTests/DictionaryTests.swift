@@ -37,13 +37,35 @@ final class DictionaryTests: XCTestCase {
         XCTAssertEqual(hits.map(\.headword), ["nochebuena", "Nochebuena"], "both are found, in file order")
         let capital = try await db.lookup(language: "es", term: "madrid")
         XCTAssertEqual(capital.map(\.headword), ["Madrid"])
-        // The commoner sense comes first whichever capitalisation it is under: "Navidad" (Christmas) beats the
-        // lower-case "navidad" (a Christmas present) for the lower-case lemma the tokenizer gives.
+        // Which capitalisation leads follows how the word is spelt where it was met: "Navidad" (Christmas) when the
+        // video has it capitalised, the lower-case sense when it does not.
         let christmas = try LangDatabase(dictionaries: TestDictionaries.store(["es": [
             ("Navidad", nil, "1. (name) Christmas"), ("navidad", nil, "1. (noun) Christmas present"),
         ]]))
-        let first = try await christmas.lookup(language: "es", term: "navidad")
-        XCTAssertEqual(first.map(\.headword), ["Navidad", "navidad"])
+        let capitalised = try await christmas.lookup(language: "es", term: "navidad", surface: "Navidad")
+        XCTAssertEqual(capitalised.map(\.headword), ["Navidad", "navidad"])
+        let lowerCase = try await christmas.lookup(language: "es", term: "navidad", surface: "navidad")
+        XCTAssertEqual(lowerCase.map(\.headword), ["navidad", "Navidad"])
+    }
+
+    func testTheCommonWordLeadsWhenTheVideoSpellsItInLowerCase() async throws {
+        // "Dorado" (a constellation) is listed before "dorado" (golden), but "dorado" in a video means golden.
+        let db = try LangDatabase(dictionaries: TestDictionaries.store(["es": [
+            ("Dorado", nil, "1. (name) a constellation"), ("dorado", nil, "1. (adj) golden"),
+        ]]))
+        let seen = try await db.lookup(language: "es", term: "dorado", surface: "dorado")
+        XCTAssertEqual(seen.first?.gloss, "1. (adj) golden")
+        let none = try await db.lookup(language: "es", term: "dorado")
+        XCTAssertEqual(none.first?.headword, "dorado", "with no spelling to go by, the entry for the term as written")
+        let named = try await db.lookup(language: "es", term: "dorado", surface: "Dorado")
+        XCTAssertEqual(named.first?.headword, "Dorado")
+    }
+
+    func testOneSpellingStandsForTheLinesAWordWasMetIn() {
+        XCTAssertEqual(DictionaryStore.commonSurface(of: ["Navidad", "Navidad", "navidad"]), "Navidad")
+        XCTAssertEqual(DictionaryStore.commonSurface(of: ["dorado", "Dorado", "dorado"]), "dorado")
+        XCTAssertEqual(DictionaryStore.commonSurface(of: ["Dorado", "dorado"]), "dorado", "a tie goes to lower case")
+        XCTAssertNil(DictionaryStore.commonSurface(of: []))
     }
 
     func testEachLanguageHasItsOwnDictionaryAndLimitsApply() async throws {

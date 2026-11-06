@@ -118,8 +118,10 @@ public actor ReviewSession {
         guard let id = queue.first else { return nil }
         let word = try await database.writer.read { try Word.fetchOne($0, key: id) }
         guard let word else { queue.removeFirst(); return try await currentCard() }
-        let entries = try await database.lookup(language: language, term: word.lemma, limit: 3)
         let examples = try await database.examples(wordID: id, limit: 50)
+        // How the word is spelt in your videos picks which capitalisation's entry leads (dorado, not the constellation Dorado).
+        let entries = try await database.lookup(language: language, term: word.lemma, limit: 3,
+                                                surface: DictionaryStore.commonSurface(of: examples.map(\.surface)))
         let liked = preferring.map { examples.filter($0) } ?? []
         let example = ExamplePicker.pick(from: liked.isEmpty ? examples : liked, avoiding: lastExample[id])
         lastExample[id] = example?.id
