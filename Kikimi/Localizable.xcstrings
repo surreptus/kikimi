@@ -88,6 +88,9 @@
         }
       }
     },
+    "“%@” is no longer in that sentence, so this card was skipped." : {
+
+    },
     "%@ · %@" : {
       "localizations" : {
         "en" : {
@@ -1914,6 +1917,9 @@
         }
       }
     },
+    "A model downloads once, from the Videos page, the first time you need it, and applies to videos you add from now on. Sentence audio plays only when it wouldn't give the answer away." : {
+
+    },
     "A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. \"Fill in the word\" shows a sentence from your videos with the word blanked, for you to recall. \"Listen to the sentence\" plays only the sound of the sentence, and you show the answer to read it. A word with no sentence is asked the usual way, and in both styles the sentence audio plays only when it wouldn't give the answer away." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1942,9 +1948,6 @@
           }
         }
       }
-    },
-    "A model downloads once, from the Videos page, the first time you need it. It applies to videos you add from now on; videos already added keep their transcripts. New words a day sets how many lessons the Learn page offers; Off hides them. The kind of card (word and meaning, fill in the word, or listen to the sentence) is chosen on the Learn page. Sentence audio plays only when it wouldn't give the answer away." : {
-
     },
     "A quick test of a few words you marked known. Any you miss go back to your reviews, so the numbers stay honest." : {
       "localizations" : {
@@ -2896,10 +2899,13 @@
         }
       }
     },
+    "Back to a new word, so it can be learned from the start" : {
+
+    },
     "Back to Learn" : {
 
     },
-    "Back to the Learn page (Esc). Words you have already been taught are kept." : {
+    "Back to the Learn page (Esc). Words you were taught but not yet quizzed on are not started." : {
 
     },
     "Back to the overview (Esc). Your answers so far are kept." : {
@@ -2985,6 +2991,12 @@
           }
         }
       }
+    },
+    "Bring this word back as a new word" : {
+
+    },
+    "Bring this word back as a new word (L)" : {
+
     },
     "Can't play this video" : {
       "localizations" : {
@@ -3189,6 +3201,9 @@
         }
       }
     },
+    "Check for Updates…" : {
+
+    },
     "Check language" : {
       "localizations" : {
         "de" : {
@@ -3245,6 +3260,9 @@
           }
         }
       }
+    },
+    "Check your internet connection and try again later." : {
+
     },
     "Checking language" : {
       "localizations" : {
@@ -3503,7 +3521,11 @@
         }
       }
     },
+    "Choose a text file of %@ words you know, one per line (or the first column of a CSV, such as an Anki export). They're marked known, so each video's coverage reflects what you can follow. To do another language, switch it in the sidebar first." : {
+
+    },
     "Choose a text file of %@ words you know, one per line (or the first column of a CSV, such as an Anki export). They're marked known, so each video's coverage reflects what you can really follow. Only words already in your library change; to do another language, switch it in the sidebar first." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3979,6 +4001,9 @@
         }
       }
     },
+    "Couldn't check for updates" : {
+
+    },
     "Couldn't mark those words: %@" : {
       "localizations" : {
         "de" : {
@@ -4034,6 +4059,9 @@
           }
         }
       }
+    },
+    "Couldn't record. Check your microphone and try again." : {
+
     },
     "Couldn't restore the backup: %@" : {
       "localizations" : {
@@ -4468,7 +4496,11 @@
         }
       }
     },
+    "Drop a video you own on Videos, then press Start import. Got an .srt or .vtt subtitle file? Press Add subtitles and nothing is transcribed. Otherwise, the first time, download a speech model once." : {
+
+    },
     "Drop a video you own on Videos, then press Start. Got an .srt or .vtt subtitle file? Press Add subtitles and nothing is transcribed. Otherwise, the first time, download a speech model once." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5830,6 +5862,15 @@
     "Hear a short sentence from your videos and type it. You see what you missed." : {
 
     },
+    "Hear a short sentence from your videos, say it aloud and play yourself beside the original. Uses the microphone; nothing is saved." : {
+
+    },
+    "Hear it" : {
+
+    },
+    "Hear it, say it after, then record yourself and compare. Nothing is saved." : {
+
+    },
     "Hear the sentence" : {
       "localizations" : {
         "de" : {
@@ -5857,6 +5898,9 @@
           }
         }
       }
+    },
+    "Hear yourself" : {
+
     },
     "Hide the translation (T)" : {
       "extractionState" : "stale",
@@ -6114,6 +6158,9 @@
         }
       }
     },
+    "How you answer" : {
+
+    },
     "I'm learning" : {
       "localizations" : {
         "de" : {
@@ -6141,6 +6188,21 @@
           }
         }
       }
+    },
+    "Ignore" : {
+
+    },
+    "Ignore %lld words?" : {
+
+    },
+    "Ignored" : {
+
+    },
+    "Ignored ^[%lld word](inflect: true). Show them with the Ignored status filter." : {
+
+    },
+    "Ignored words shown" : {
+
     },
     "Import as %@" : {
       "localizations" : {
@@ -6716,6 +6778,12 @@
     "Kikimi" : {
 
     },
+    "Kikimi %@ is available" : {
+
+    },
+    "Kikimi can't use the microphone. You can allow it in System Settings > Privacy & Security > Microphone." : {
+
+    },
     "Kikimi is free software under the MIT licence." : {
       "localizations" : {
         "de" : {
@@ -6743,6 +6811,9 @@
           }
         }
       }
+    },
+    "Kikimi is up to date" : {
+
     },
     "Kikimi listens on this Mac and writes out what is said, with times. This is the long step: about 3 minutes for a 10 minute video in our tests." : {
       "localizations" : {
@@ -7477,6 +7548,7 @@
       }
     },
     "Listen to the sentence" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7503,6 +7575,9 @@
           }
         }
       }
+    },
+    "Listen, then check" : {
+
     },
     "listening in all" : {
       "localizations" : {
@@ -7792,6 +7867,7 @@
       }
     },
     "Made on this Mac by macOS, so they can be wrong. \"When I ask\" keeps each hidden until you press the translate button on a line, or T, so you listen first. A video already in this language isn't translated. macOS may ask you to download a language once, in System Settings > General > Language & Region > Translation Languages." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7818,6 +7894,9 @@
           }
         }
       }
+    },
+    "Made on this Mac by macOS, so they can be wrong. \"When I ask\" keeps them hidden until you press the translate button on a line, or T, so you listen first. macOS may ask you to download a language once." : {
+
     },
     "Make a file Anki can import (File > Import), from the selected words or the ones you are learning" : {
       "localizations" : {
@@ -8457,6 +8536,9 @@
         }
       }
     },
+    "Next up" : {
+
+    },
     "Next: add a video you own." : {
 
     },
@@ -8668,6 +8750,9 @@
         }
       }
     },
+    "Not a word worth learning, such as a name or a mistake. It is set aside and left out of lessons." : {
+
+    },
     "Not in use" : {
       "localizations" : {
         "de" : {
@@ -8695,6 +8780,9 @@
           }
         }
       }
+    },
+    "Not Now" : {
+
     },
     "Not started" : {
       "localizations" : {
@@ -9278,6 +9366,12 @@
         }
       }
     },
+    "Open Download Page" : {
+
+    },
+    "Open Microphone Settings" : {
+
+    },
     "Open source" : {
       "localizations" : {
         "de" : {
@@ -9847,6 +9941,9 @@
         }
       }
     },
+    "Play the sentence from your video (R)" : {
+
+    },
     "Play this part" : {
       "localizations" : {
         "de" : {
@@ -10164,6 +10261,9 @@
         }
       }
     },
+    "Quit Kikimi and open it again. If it keeps happening, report it, and include the message below. Reports are public, so leave out anything personal." : {
+
+    },
     "Read more" : {
       "localizations" : {
         "de" : {
@@ -10224,6 +10324,15 @@
 
     },
     "Recall the missing word in a sentence from your videos." : {
+
+    },
+    "Record" : {
+
+    },
+    "Record yourself saying the sentence (M). The recording is deleted when the card ends." : {
+
+    },
+    "Recording… say the sentence, then press Stop." : {
 
     },
     "Remove" : {
@@ -10493,6 +10602,9 @@
         }
       }
     },
+    "Report a problem" : {
+
+    },
     "Reset" : {
       "localizations" : {
         "de" : {
@@ -10722,6 +10834,7 @@
       }
     },
     "Review failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -11277,6 +11390,12 @@
         }
       }
     },
+    "Say it aloud" : {
+
+    },
+    "Say the sentence aloud" : {
+
+    },
     "Say word" : {
       "localizations" : {
         "de" : {
@@ -11435,6 +11554,9 @@
     "Select words to use Learn and Known." : {
 
     },
+    "Sentence" : {
+
+    },
     "Sentence audio on review cards" : {
       "localizations" : {
         "de" : {
@@ -11463,6 +11585,18 @@
         }
       }
     },
+    "Sentence from your videos" : {
+
+    },
+    "Set aside words that are not worth learning, such as names or mistakes. They stay, and Reset brings them back." : {
+
+    },
+    "Set this word aside: it is not worth learning, such as a name or a mistake" : {
+
+    },
+    "Set this word aside: not worth learning, such as a name or a mistake (X)" : {
+
+    },
     "Settings" : {
       "localizations" : {
         "de" : {
@@ -11490,6 +11624,9 @@
           }
         }
       }
+    },
+    "Shadow" : {
+
     },
     "Show %lld more" : {
       "localizations" : {
@@ -11806,6 +11943,9 @@
         }
       }
     },
+    "Smallest compresses the copy Kikimi keeps (in our tests 161 MB became 29 MB), plenty to study from. Your own files are never changed. Applies to videos you add from now on." : {
+
+    },
     "Smallest size (recommended)" : {
       "localizations" : {
         "de" : {
@@ -11833,6 +11973,9 @@
           }
         }
       }
+    },
+    "Something went wrong" : {
+
     },
     "Sort by %@" : {
       "localizations" : {
@@ -12458,6 +12601,9 @@
           }
         }
       }
+    },
+    "Start import" : {
+
     },
     "Start learning ^[%lld word](inflect: true)" : {
       "localizations" : {
@@ -13136,6 +13282,7 @@
 
     },
     "The copy Kikimi keeps of each video you add. Smallest compresses it (in our tests a 161 MB video became 29 MB), which is plenty to follow along and study from. Original quality keeps your file exactly as it is: the best picture and sound, but the same size. Your own files are never changed either way, and this applies to videos you add from now on." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -13938,6 +14085,7 @@
 
     },
     "Under each ring: how long until a word at that stage comes back for review." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -13964,6 +14112,9 @@
           }
         }
       }
+    },
+    "Under each ring: how long until a word at that stage comes back. Get it right to move up a stage, miss it to drop one; after stage 8 a word is Finished and no longer comes back for review." : {
+
     },
     "Under Practice, Review ahead and Practice finished ask words without moving them; Review known tests a few words you marked known, and any you miss go back to your reviews." : {
 
@@ -14194,6 +14345,12 @@
           }
         }
       }
+    },
+    "Watch" : {
+
+    },
+    "Watch %@" : {
+
     },
     "Watch more. Each video shows how much of it you already understand." : {
 
@@ -14547,6 +14704,9 @@
     "Words being learned or finished lose their review progress and go back to new. A word that is in none of your videos' lines is removed." : {
 
     },
+    "Words being learned or finished lose their review progress. Ignored words are hidden, and left out of lessons and of how much of a video you know. Show them with the Ignored status filter and press Reset to bring them back." : {
+
+    },
     "Words found" : {
       "localizations" : {
         "de" : {
@@ -14795,6 +14955,12 @@
         }
       }
     },
+    "You have %@. The download page has the new version and what changed." : {
+
+    },
+    "You have the newest version, %@." : {
+
+    },
     "You knew %lld of %lld of the words you marked known." : {
       "localizations" : {
         "de" : {
@@ -14896,6 +15062,9 @@
           }
         }
       }
+    },
+    "You know %lld%% of its words." : {
+
     },
     "You started ^[%lld new word](inflect: true) today. More tomorrow." : {
 
