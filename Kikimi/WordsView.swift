@@ -212,12 +212,12 @@ struct WordsView: View {
             HStack(spacing: 10) {
                 if !ids(for: .reset).isEmpty {
                     Button("Reset") { apply(.reset) }
-                        .buttonStyle(.pill(.secondary, compact: true))
+                        .buttonStyle(.pill(.quiet, compact: true))
                         .help("Back to a new word, so it can be learned from the start")
                 }
                 if !ids(for: .ignore).isEmpty {
                     Button("Ignore") { apply(.ignore) }
-                        .buttonStyle(.pill(.secondary, compact: true))
+                        .buttonStyle(.pill(.quiet, compact: true))
                         .help("Set aside words that are not worth learning, such as names or mistakes. They stay, and Reset brings them back.")
                 }
                 if !ids(for: .known).isEmpty {

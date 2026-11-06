@@ -162,20 +162,21 @@ struct WordDetail: View {
             HStack(spacing: 10) {
                 StatusBadge(status: row.word.status, stage: row.word.stage)
                 Spacer(minLength: 8)
-                if row.word.status == .new {
-                    Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
-                        .help("Start learning this word")
+                // The same order and styles as the bar under the list: set-aside actions quiet, Known beside Learn.
+                if row.word.status == .ignored {
+                    Button("Restore") { setStatus(.new) }.buttonStyle(.pill(.quiet, compact: true))
+                        .help("Bring this word back as a new word")
+                } else {
+                    Button("Ignore") { setStatus(.ignored) }.buttonStyle(.pill(.quiet, compact: true))
+                        .help("Set this word aside: it is not worth learning, such as a name or a mistake")
                 }
                 if row.word.status != .known, row.word.status != .ignored {
                     Button("Known") { setStatus(.known) }.buttonStyle(.pill(.secondary, compact: true))
                         .help("Mark this word as known")
                 }
-                if row.word.status == .ignored {
-                    Button("Restore") { setStatus(.new) }.buttonStyle(.pill(.secondary, compact: true))
-                        .help("Bring this word back as a new word")
-                } else {
-                    Button("Ignore") { setStatus(.ignored) }.buttonStyle(.pill(.quiet, compact: true))
-                        .help("Set this word aside: it is not worth learning, such as a name or a mistake")
+                if row.word.status == .new {
+                    Button("Learn") { setStatus(.learning) }.buttonStyle(.pill(compact: true))
+                        .help("Start learning this word")
                 }
             }
         }
