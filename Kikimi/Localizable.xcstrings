@@ -2229,6 +2229,9 @@
         }
       }
     },
+    "Add a video from your Mac, with its subtitle file if it has one." : {
+
+    },
     "Add a video on the Videos page to collect words." : {
       "localizations" : {
         "de" : {
@@ -2256,9 +2259,6 @@
           }
         }
       }
-    },
-    "Add a video you own, with its subtitle file if it has one." : {
-
     },
     "Add subtitles for %@" : {
 
@@ -4513,7 +4513,7 @@
         }
       }
     },
-    "Drop a video you own on Videos, then press Start import. Got an .srt or .vtt subtitle file? Press Add subtitles and nothing is transcribed. Otherwise, the first time, download a speech model once." : {
+    "Drop a video on Videos, then press Start import. Got an .srt or .vtt subtitle file? Press Add subtitles and nothing is transcribed. Otherwise, the first time, download a speech model once." : {
 
     },
     "Drop a video you own on Videos, then press Start. Got an .srt or .vtt subtitle file? Press Add subtitles and nothing is transcribed. Otherwise, the first time, download a speech model once." : {
@@ -4545,10 +4545,14 @@
         }
       }
     },
+    "Drop in videos from your Mac. They never leave it." : {
+
+    },
     "Drop videos with subtitle files here, or" : {
 
     },
     "Drop videos you own. They never leave this Mac." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5629,6 +5633,9 @@
           }
         }
       }
+    },
+    "Get a word right to move it forward. Miss it and it moves back. After the last stage it is finished. Under each ring is how long until that stage comes back." : {
+
     },
     "Get Info…" : {
       "localizations" : {
@@ -7189,7 +7196,14 @@
         }
       }
     },
+    "Learn a language from videos on your Mac." : {
+
+    },
+    "Learn a language from videos on your Mac. Nothing leaves it." : {
+
+    },
     "Learn a language from videos you own, on your Mac." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7218,6 +7232,7 @@
       }
     },
     "Learn a language from videos you own. Everything stays on this Mac." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7244,9 +7259,6 @@
           }
         }
       }
-    },
-    "Learn a language from videos you own. Everything stays on your Mac." : {
-
     },
     "Learn adds it to your reviews. Known means you already know it." : {
 
@@ -8529,6 +8541,7 @@
       }
     },
     "Next review %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -12352,6 +12365,16 @@
         }
       }
     },
+    "Stage %lld: back after %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stage %1$lld: back after %2$@"
+          }
+        }
+      }
+    },
     "Stage 1" : {
       "localizations" : {
         "de" : {
@@ -12804,7 +12827,11 @@
         }
       }
     },
+    "Start with the 25 new words you hear most" : {
+
+    },
     "Start with the 25 words you hear most" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14175,9 +14202,6 @@
         }
       }
     },
-    "Under each ring: how long until a word at that stage comes back. Get it right to move up a stage, miss it to drop one; after stage 8 a word is Finished and no longer comes back for review." : {
-
-    },
     "Under Practice, Review ahead and Practice finished ask words without moving them; Review known tests a few words you marked known, and any you miss go back to your reviews." : {
 
     },
@@ -15258,6 +15282,9 @@
           }
         }
       }
+    },
+    "You're up to date. Next review %@" : {
+
     },
     "Your first video is ready" : {
 
