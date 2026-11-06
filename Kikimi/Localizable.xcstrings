@@ -7865,6 +7865,9 @@
         }
       }
     },
+    "M" : {
+
+    },
     "macOS can't translate from %@ to %@." : {
       "localizations" : {
         "de" : {

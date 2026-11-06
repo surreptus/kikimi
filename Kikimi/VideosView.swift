@@ -99,7 +99,7 @@ struct VideosView: View {
         .accessibilityElement(children: .contain)
     }
 
-    /// Until there is a video: what this is for, and the four things to do.
+    /// Until there is a video: what this is for, and the three things to do.
     private var firstSteps: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("The goal: understand more of what you watch").font(Theme.title(17))
@@ -118,10 +118,9 @@ struct VideosView: View {
     }
 
     private var steps: [String] {
-        [String(localized: "Add a video you own."),
-         String(localized: "On Words, choose the words you want to learn."),
-         String(localized: "On Learn, practise them as they come due."),
-         String(localized: "Watch more. Each video shows how much of it you already understand.")]
+        [String(localized: "Add a video you own, with its subtitle file if it has one."),
+         String(localized: "Watch it, and click any word you don't know."),
+         String(localized: "Learn the words that would take it to about 90%, then watch more.")]
     }
 
     /// "Your videos" with the order they are in, and the way to change it.

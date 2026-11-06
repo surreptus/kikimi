@@ -93,8 +93,8 @@ struct ImportSection: View {
             HStack(alignment: .top, spacing: 14) {
                 Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.ink)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("One-time download").font(.system(.headline, design: .rounded))
-                    Text("To write out what is said in your videos, Kikimi needs a speech model (\(modelSize)). It is saved on this Mac and nothing is uploaded. If a video comes with subtitles, you can skip it.")
+                    Text("Only for videos without subtitles").font(.system(.headline, design: .rounded))
+                    Text("A video that comes with a subtitle file (.srt or .vtt) needs no download. To write out what is said in any other, Kikimi needs a speech model (\(modelSize)), downloaded once and saved on this Mac. Nothing is uploaded.")
                         .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
                     Button("Choose a different model") { changingModel = true }
                         .buttonStyle(.plain).font(Theme.small.weight(.semibold)).foregroundStyle(Theme.ink)
