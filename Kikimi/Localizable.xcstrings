@@ -605,6 +605,7 @@
       }
     },
     "%lld words" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -956,6 +957,7 @@
       }
     },
     "^[%lld card](inflect: true)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2379,6 +2381,7 @@
       }
     },
     "Added ^[%lld word](inflect: true) to your reviews." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2777,6 +2780,7 @@
       }
     },
     "Anki file saved" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3511,6 +3515,7 @@
       }
     },
     "Choose a folder for the Anki file" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3963,6 +3968,7 @@
       }
     },
     "Copy the files in the media folder into Anki's collection.media folder first, so the sentence audio plays." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4191,6 +4197,9 @@
           }
         }
       }
+    },
+    "Couldn't undo: %@" : {
+
     },
     "Dark" : {
       "localizations" : {
@@ -4929,6 +4938,7 @@
       }
     },
     "Export text only" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4985,6 +4995,7 @@
       }
     },
     "Export to Anki" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5013,6 +5024,7 @@
       }
     },
     "Export to Anki…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5069,6 +5081,7 @@
       }
     },
     "Export with sentence audio" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5125,6 +5138,7 @@
       }
     },
     "Exports the %lld selected words, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5153,6 +5167,7 @@
       }
     },
     "Exports the words you are learning, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6225,9 +6240,6 @@
     "Ignore" : {
 
     },
-    "Ignore %lld words?" : {
-
-    },
     "Ignored" : {
 
     },
@@ -7196,6 +7208,9 @@
         }
       }
     },
+    "Learn ^[%lld word](inflect: true) in lessons" : {
+
+    },
     "Learn a language from videos on your Mac." : {
 
     },
@@ -7959,6 +7974,7 @@
 
     },
     "Make a file Anki can import (File > Import), from the selected words or the ones you are learning" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8731,6 +8747,7 @@
       }
     },
     "No words to export." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -9045,6 +9062,7 @@
       }
     },
     "OK" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -9367,6 +9385,9 @@
     "Only for videos without subtitles" : {
 
     },
+    "Open a video's Info to learn its commonest new words in lessons: you are taught them five at a time, and can ignore or skip any that don't belong." : {
+
+    },
     "Open a video's Info to see the commonest words you don't know yet, and start learning them all at once." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9397,6 +9418,7 @@
       }
     },
     "Open a video's Info to start learning its commonest new words at once." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10696,6 +10718,7 @@
       }
     },
     "Reset %lld words?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -11182,6 +11205,7 @@
       }
     },
     "Saved %@ to %@. In Anki, choose File > Import and pick %@." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -11612,9 +11636,6 @@
           }
         }
       }
-    },
-    "Select words to use Learn and Known." : {
-
     },
     "Sentence" : {
 
@@ -12687,6 +12708,7 @@
 
     },
     "Start learning ^[%lld word](inflect: true)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -13645,6 +13667,9 @@
         }
       }
     },
+    "Those words are already known, set aside or in your reviews." : {
+
+    },
     "Title" : {
       "localizations" : {
         "de" : {
@@ -14203,6 +14228,12 @@
       }
     },
     "Under Practice, Review ahead and Practice finished ask words without moving them; Review known tests a few words you marked known, and any you miss go back to your reviews." : {
+
+    },
+    "Undo" : {
+
+    },
+    "Undone" : {
 
     },
     "Use the buttons below the list to learn, mark as known, or reset them all at once." : {
@@ -14786,12 +14817,6 @@
           }
         }
       }
-    },
-    "Words being learned or finished lose their review progress and go back to new. A word that is in none of your videos' lines is removed." : {
-
-    },
-    "Words being learned or finished lose their review progress. Ignored words are hidden, and left out of lessons and of how much of a video you know. Show them with the Ignored status filter and press Reset to bring them back." : {
-
     },
     "Words found" : {
       "localizations" : {
