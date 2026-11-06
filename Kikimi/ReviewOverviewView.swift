@@ -28,6 +28,16 @@ enum ExtraStudy: Hashable {
     }
 }
 
+/// The lessons card: filled with the accent colour when it leads the page, otherwise an ordinary panel.
+private struct LessonsBackground: ViewModifier {
+    let lead: Bool
+
+    func body(content: Content) -> some View {
+        if lead { content.padding(16).background(RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(Theme.accent)) }
+        else { content.panel() }
+    }
+}
+
 /// The learn page before a session: what is ready, what to practise, what is coming, and where your words stand.
 struct ReviewOverviewView: View {
     let overview: ReviewOverview
@@ -43,8 +53,8 @@ struct ReviewOverviewView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                lessonsCard
-                reviewsCard
+                // The card for the thing to do first goes first.
+                if lessonsLead { lessonsCard; reviewsCard } else { reviewsCard; lessonsCard }
                 comingUp
                 stages
                 if let stats { progress(stats) }
@@ -57,8 +67,11 @@ struct ReviewOverviewView: View {
 
     // MARK: Lessons
 
+    /// There is one thing to do first: reviews while any are due, since waiting makes them harder, then lessons.
+    private var lessonsLead: Bool { overview.dueNow == 0 && lessons.map { !$0.isOff && !$0.wordIDs.isEmpty } == true }
+
     /// Today's new words, taught a few at a time and quizzed at once. Shown when there are some to learn, or to say why
-    /// there are none. It is the accent colour, so the two things to do here (a lesson, a review) are told apart at a glance.
+    /// there are none. It is the accent colour, and its Start the main button, only when it is the thing to do first.
     @ViewBuilder
     private var lessonsCard: some View {
         if let lessons, !lessons.isOff, !lessons.wordIDs.isEmpty || lessons.heldBack || lessons.startedToday > 0 {
@@ -66,7 +79,7 @@ struct ReviewOverviewView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 10) {
                         Text("Lessons").font(Theme.title(24))
-                        count(lessons.wordIDs.count, onAccent: true)
+                        count(lessons.wordIDs.count, onAccent: lessonsLead)
                     }
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("Lessons")
@@ -75,13 +88,13 @@ struct ReviewOverviewView: View {
                 }
                 Spacer(minLength: 0)
                 Button("Start") { startLessons() }
-                    .buttonStyle(.pill(.inverted, compact: true))
+                    .buttonStyle(.pill(lessonsLead ? .inverted : .quiet, compact: true))
+                    .keyboardShortcut(lessonsLead ? KeyboardShortcut(.space, modifiers: []) : nil)
                     .disabled(lessons.wordIDs.isEmpty)
             }
-            .foregroundStyle(Theme.onAccent)
+            .foregroundStyle(lessonsLead ? Theme.onAccent : Theme.ink)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(16)
-            .background(RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(Theme.accent))
+            .modifier(LessonsBackground(lead: lessonsLead))
         }
     }
 
@@ -119,7 +132,7 @@ struct ReviewOverviewView: View {
                 .accessibilityValue(inflected("^[\(overview.dueNow) review](inflect: true) ready"))
                 Spacer(minLength: 0)
                 Button("Start") { start() }
-                    .buttonStyle(.pill(.primary, compact: true))
+                    .buttonStyle(.pill(overview.dueNow > 0 ? .primary : .quiet, compact: true))
                     .keyboardShortcut(.space, modifiers: [])
                     .disabled(overview.dueNow == 0)
             }
