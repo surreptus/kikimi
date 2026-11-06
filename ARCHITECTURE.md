@@ -24,7 +24,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 |---|---|
 | `Profiles/` | `LanguageProfile` and the Spanish, French, German and Japanese profiles; `LanguageProfiles.all` is the registry; `LearningLanguages` is the subset the person chose. |
 | `Tokenizing/` | Turns a line of text into content words (lemma and part of speech). Spanish, French and German use Apple's `NaturalLanguage`; Japanese uses the vendored MeCab (`Sources/CMeCab`). |
-| `Dictionary/` | `DictionaryStore` and `KanjiStore` read the bundled dictionary and kanji files in place, read-only. They are never copied into the database. |
+| `Dictionary/` | `DictionaryStore` and `KanjiStore` read the bundled dictionary and kanji files in place, read-only. They are never copied into the database. `VerbForms` reads a dictionary file's `forms` table (the spellings of common verbs, built from Wiktionary), which `NLTaggerTokenizer` uses to overrule a verb the tagger names that the spelling cannot be a form of (Spanish: `puede` read as `podar`). |
 | `Database/` | GRDB records, migrations (`LangMigrations`) and queries. Schema changes are new migrations only. |
 | `Import/` | The import pipeline, queue, transcription, video compaction and the language check. `SubtitleParser.swift` reads .srt and .vtt files (and pairs them with their video by name) so a video with subtitles skips transcribing and the speech model. |
 | `Models/` | Speech-model download, listing and removal (`ModelManager`), plus `ModelCatalog` (sizes and notes). |

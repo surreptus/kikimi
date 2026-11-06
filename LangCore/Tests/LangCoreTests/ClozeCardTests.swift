@@ -138,3 +138,39 @@ final class SpanishLemmaFixTests: XCTestCase {
         XCTAssertEqual(lemmas("Hay que podar el árbol.")["podar"], "podar")
     }
 }
+
+final class VerbFormsTests: XCTestCase {
+    private func forms(_ rows: [(String, String)]) throws -> VerbForms {
+        let url = FileManager.default.temporaryDirectory.appending(path: "forms-\(UUID().uuidString).sqlite")
+        let queue = try DatabaseQueue(path: url.path)
+        try queue.write { db in
+            try db.execute(sql: "CREATE TABLE forms (form TEXT PRIMARY KEY, lemmas TEXT NOT NULL) WITHOUT ROWID")
+            for (form, lemmas) in rows { try db.execute(sql: "INSERT INTO forms VALUES (?, ?)", arguments: [form, lemmas]) }
+        }
+        return VerbForms(url: url)
+    }
+
+    func testTheTableOverrulesAVerbTheSpellingCannotBe() throws {
+        // No hand-written fixes here: only the table. The tagger reads puede as podar.
+        let tokenizer = NLTaggerTokenizer(language: .spanish, verbForms: try forms([("puede", "poder:2")]))
+        XCTAssertEqual(tokenizer.tokens(in: "Ella puede venir.").first { $0.surface == "puede" }?.lemma, "poder")
+        let bare = NLTaggerTokenizer(language: .spanish)
+        XCTAssertEqual(bare.tokens(in: "Ella puede venir.").first { $0.surface == "puede" }?.lemma, "podar", "what the tagger says alone")
+    }
+
+    func testTheTaggersVerbIsKeptWhenTheSpellingCanBeAFormOfIt() throws {
+        let tokenizer = NLTaggerTokenizer(language: .spanish, verbForms: try forms([("puede", "podar:3,poder:2")]))
+        XCTAssertEqual(tokenizer.tokens(in: "Ella puede venir.").first { $0.surface == "puede" }?.lemma, "podar")
+    }
+
+    func testAFileWithoutTheTableKnowsNoForms() {
+        XCTAssertEqual(VerbForms(url: URL(filePath: "/nonexistent.sqlite")).lemmas(for: "puede"), [])
+    }
+
+    func testTheBundledSpanishDictionaryHasTheTable() {
+        let forms = VerbForms(resource: "dictionary-es")
+        XCTAssertEqual(forms.lemmas(for: "puede"), ["poder"])
+        XCTAssertEqual(forms.lemmas(for: "sale"), ["salir"], "salar has one meaning, so it is not a common verb")
+        XCTAssertEqual(forms.lemmas(for: "xyzzy"), [])
+    }
+}

@@ -31,7 +31,7 @@ done
 cd "$ROOT"
 python3 -I Scripts/dictionaries/build_jmdict.py "$WORK/JMdict_e.gz" "$OUT/dictionary-ja.sqlite"
 python3 -I Scripts/dictionaries/build_kanjidic.py "$WORK/kanjidic2.xml.gz" "$OUT/kanji-ja.sqlite"
-python3 -I Scripts/dictionaries/build_kaikki.py "$WORK/Spanish.jsonl" "$OUT/dictionary-es.sqlite" es Spanish
+python3 -I Scripts/dictionaries/build_kaikki.py "$WORK/Spanish.jsonl" "$OUT/dictionary-es.sqlite" es Spanish --forms
 python3 -I Scripts/dictionaries/build_kaikki.py "$WORK/French.jsonl" "$OUT/dictionary-fr.sqlite" fr French
 python3 -I Scripts/dictionaries/build_kaikki.py "$WORK/German.jsonl" "$OUT/dictionary-de.sqlite" de German
 ls -l "$OUT"

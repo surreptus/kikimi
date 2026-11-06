@@ -45,11 +45,15 @@ public struct NLTaggerTokenizer: WordTokenizer {
     /// Words, as written in lower case, whose lemma the tagger gets wrong where the lemma it gives is also a real word
     /// (so `lemmaFixes` would damage the right uses): the lemma to use for that spelling instead.
     private let spellingFixes: [String: String]
+    /// Common verbs' spellings, to overrule a verb the tagger names that the spelling cannot be a form of.
+    private let verbForms: VerbForms?
 
-    public init(language: NLLanguage, lemmaFixes: [String: String] = [:], spellingFixes: [String: String] = [:]) {
+    public init(language: NLLanguage, lemmaFixes: [String: String] = [:], spellingFixes: [String: String] = [:],
+                verbForms: VerbForms? = nil) {
         self.language = language
         self.lemmaFixes = lemmaFixes
         self.spellingFixes = spellingFixes
+        self.verbForms = verbForms
     }
 
     public func tokens(in text: String) -> [Token] {
@@ -63,10 +67,15 @@ public struct NLTaggerTokenizer: WordTokenizer {
         ) { tag, range in
             let surface = String(text[range])
             let lemma = (tagger.tag(at: range.lowerBound, unit: .word, scheme: .lemma).0?.rawValue ?? surface).lowercased()
-            result.append(Token(
-                surface: surface,
-                lemma: spellingFixes[surface.lowercased().precomposedStringWithCanonicalMapping] ?? lemmaFixes[lemma] ?? lemma,
-                pos: Self.map(tag)))
+            let spelling = surface.lowercased().precomposedStringWithCanonicalMapping
+            let pos = Self.map(tag)
+            var chosen = spellingFixes[spelling] ?? lemmaFixes[lemma] ?? lemma
+            // Only for a verb: the same spelling as a noun (cuenta) is a word of its own, and the tagger may be right.
+            if pos == .verb, spellingFixes[spelling] == nil, let forms = verbForms?.lemmas(for: spelling),
+               let best = forms.first, !forms.contains(chosen) {
+                chosen = best
+            }
+            result.append(Token(surface: surface, lemma: chosen, pos: pos))
             return true
         }
         return result

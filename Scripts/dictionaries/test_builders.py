@@ -169,6 +169,24 @@ class KaikkiTests(unittest.TestCase):
             build_kaikki.build(src, out, "es", "Spanish")
             self.assertEqual(rows(out), [("muy", None, "1. (adv) very")])
 
+    def test_the_forms_table_has_spellings_of_common_verbs_only(self):
+        lines = [
+            {"word": "poder", "lang_code": "es", "pos": "verb", "senses": [{"glosses": ["to be able"]}, {"glosses": ["to may"]}]},
+            {"word": "podar", "lang_code": "es", "pos": "verb", "senses": [{"glosses": ["to prune"]}]},
+            {"word": "puede", "lang_code": "es", "pos": "verb", "senses": [{"glosses": ["third-person of poder"], "form_of": [{"word": "poder"}]}]},
+            {"word": "podáis", "lang_code": "es", "pos": "verb", "senses": [
+                {"glosses": ["subjunctive of poder"], "form_of": [{"word": "poder"}]},
+                {"glosses": ["indicative of podar"], "form_of": [{"word": "podar"}]}]},
+            {"word": "poda", "lang_code": "es", "pos": "verb", "senses": [{"glosses": ["third-person of podar"], "form_of": [{"word": "podar"}]}]},
+        ]
+        with tempfile.TemporaryDirectory() as d:
+            src, out = os.path.join(d, "k.jsonl"), os.path.join(d, "es.sqlite")
+            with open(src, "w", encoding="utf-8") as f:
+                f.write("\n".join(json.dumps(x) for x in lines))
+            build_kaikki.build(src, out, "es", "Spanish", with_forms=True)
+            found = dict(sqlite3.connect(out).execute("SELECT form, lemmas FROM forms").fetchall())
+            self.assertEqual(found, {"puede": "poder:2", "podáis": "poder:2"}, "podar has one meaning, so its forms are left out")
+
     def test_a_meaning_repeated_across_senses_is_kept_once(self):
         # Wiktionary's senses often restate each other: "to have; to possess" then "to have; to possess; to be ...".
         lines = [{"word": "tener", "lang_code": "es", "pos": "verb", "senses": [

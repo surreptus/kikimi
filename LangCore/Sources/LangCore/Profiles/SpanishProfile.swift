@@ -19,24 +19,16 @@ public struct SpanishProfile: LanguageProfile {
         return "\(article) \(headword)"
     }
     public let defaultModel = "openai_whisper-medium"
-    public let tokenizer: any WordTokenizer = NLTaggerTokenizer(language: .spanish, spellingFixes: SpanishProfile.spellingFixes)
+    public let tokenizer: any WordTokenizer = NLTaggerTokenizer(
+        language: .spanish, spellingFixes: SpanishProfile.spellingFixes, verbForms: VerbForms(resource: "dictionary-es"))
 
-    /// Present-tense forms the tagger gives the wrong verb for (found by running forms of 40 common verbs through it): poder
-    /// comes out as podar, salir as salar, sentir as sentar, venir as vengar, creer as crear. Where a spelling is also a
-    /// form of the other verb (podáis of podar), the commoner verb wins. Spellings that are also nouns, such as cuenta and
-    /// juego, are left alone: the tagger may be right about them in context.
-    static let spellingFixes: [String: String] = {
-        let forms: [String: [String]] = [
-            "poder": ["puedo", "puedes", "puede", "podemos", "podéis", "pueden", "pueda", "puedas", "puedan", "podamos", "podáis"],
-            "salir": ["sale", "sales", "salen"],
-            "sentir": ["siento", "sientes", "siente", "sienten"],
-            "venir": ["vengo", "venga", "vengas", "vengan"],
-            "creer": ["creo", "creemos"],
-            "dejar": ["dejas"],
-            "morir": ["muera", "mueras", "mueran"],
-        ]
-        return Dictionary(uniqueKeysWithValues: forms.flatMap { lemma, spellings in spellings.map { ($0, lemma) } })
-    }()
+    /// Spellings that two common verbs share, where the dictionary's table of verb forms (`VerbForms`) cannot choose and
+    /// the tagger picks the wrong one: siento is sentir ("lo siento"), not sentar. The table overrules the rest of the
+    /// tagger's mistakes by itself (puede read as podar, sale as salar, venga as vengar, creo as crear), found by running
+    /// forms of 40 common verbs through it.
+    static let spellingFixes: [String: String] = [
+        "siento": "sentir", "sientes": "sentir", "siente": "sentir", "sienten": "sentir",
+    ]
     public let dictionarySource = DictionarySource(
         resourceName: "dictionary-es",
         attribution: "Wiktionary via kaikki.org (CC BY-SA 4.0)")

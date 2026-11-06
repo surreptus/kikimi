@@ -44,3 +44,16 @@ def write_database(path, rows, meta):
     db.execute("VACUUM")
     db.close()
     return count
+
+
+def add_forms(path, forms):
+    """Adds a `forms` table to a built dictionary: forms maps a spelling to [(lemma, meanings)], the lemma with the most
+    meanings first. The app uses it to check a tagger's idea of which verb a spelling belongs to."""
+    db = sqlite3.connect(path)
+    db.execute("CREATE TABLE forms (form TEXT PRIMARY KEY, lemmas TEXT NOT NULL) WITHOUT ROWID")
+    db.executemany("INSERT INTO forms VALUES (?, ?)",
+                   ((form, ",".join(f"{lemma}:{count}" for lemma, count in lemmas)) for form, lemmas in sorted(forms.items())))
+    db.commit()
+    db.execute("VACUUM")
+    db.close()
+    return len(forms)

@@ -1,7 +1,8 @@
 """Builds dictionary-<code>.sqlite from kaikki.org's extract of English Wiktionary's entries for one language
 (that language's words, English definitions).
 
-Usage: python3 -I build_kaikki.py kaikki.org-dictionary-Spanish.jsonl dictionary-es.sqlite es Spanish
+Usage: python3 -I build_kaikki.py kaikki.org-dictionary-Spanish.jsonl dictionary-es.sqlite es Spanish [--forms]
+--forms also writes a table of the spellings of common verbs, for checking a tagger's lemmas (Spanish uses it).
 Wiktionary content is CC BY-SA 4.0 (and GFDL); extraction by Tatu Ylonen's wiktextract.
 """
 import json
@@ -12,6 +13,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import dictbuild
 
 MAX_GLOSSES_PER_POS = 8   # separate meanings, after repeats are removed
+# A verb needs this many meanings of its own to count as a common one in the forms table: a tagger that reads a spelling
+# as a rare verb (puede as podar) is then overruled. Wiktionary has no frequency, and meanings stand in for it.
+MIN_VERB_MEANINGS = 2
 GENDER_TAGS = {"masculine": "m", "feminine": "f", "neuter": "n"}
 GENDER_ORDER = "mfn"
 
@@ -107,15 +111,37 @@ def pos_block(entry):
 
 
 
-def build(input_path, output_path, code, name):
+def verb_forms(pending, meanings):
+    """{spelling: [(lemma, meanings)]} for the forms of verbs with at least MIN_VERB_MEANINGS meanings, most meanings first."""
+    forms = {}
+    for form, lemma in pending:
+        count = meanings.get(lemma, 0)
+        if count >= MIN_VERB_MEANINGS and (lemma, count) not in forms.setdefault(form, []):
+            forms[form].append((lemma, count))
+    for lemmas in forms.values():
+        lemmas.sort(key=lambda item: -item[1])
+    return {form: lemmas for form, lemmas in forms.items() if lemmas}
+
+
+def build(input_path, output_path, code, name, with_forms=False):
     by_word = {}  # insertion-ordered
     genders = {}
+    verb_meanings, form_pairs = {}, []
     with open(input_path, encoding="utf-8") as f:
         for line in f:
             entry = json.loads(line)
             if entry.get("lang_code") != code or not entry.get("word"):
                 continue
             pos, glosses = pos_block(entry)
+            if with_forms and pos == "verb":
+                word = entry["word"].lower()
+                own = [x for x in entry.get("senses", []) if not (x.get("form_of") or x.get("alt_of")) and x.get("glosses")]
+                if own:
+                    verb_meanings[word] = verb_meanings.get(word, 0) + len(own)
+                for sense in entry.get("senses", []):
+                    for target in sense.get("form_of") or []:
+                        if target.get("word") and target["word"].lower() != word:
+                            form_pairs.append((word, target["word"].lower()))
             if glosses:
                 by_word.setdefault(entry["word"], []).append((pos, glosses))
                 genders[entry["word"]] = merge_genders(genders.get(entry["word"]), noun_gender(entry))
@@ -126,10 +152,14 @@ def build(input_path, output_path, code, name):
         "source_url": f"https://kaikki.org/dictionary/{name}/kaikki.org-dictionary-{name}.jsonl",
         "license": "CC BY-SA 4.0 and GFDL, Wiktionary contributors",
     }
-    return dictbuild.write_database(output_path, rows, meta)
+    count = dictbuild.write_database(output_path, rows, meta)
+    if with_forms:
+        print(f"{dictbuild.add_forms(output_path, verb_forms(form_pairs, verb_meanings))} verb spellings in the forms table")
+    return count
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
+    args = [a for a in sys.argv[1:] if a != "--forms"]
+    if len(args) != 4:
         sys.exit(__doc__)
-    print(f"{build(*sys.argv[1:])} entries")
+    print(f"{build(*args, with_forms='--forms' in sys.argv)} entries")
