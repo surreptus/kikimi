@@ -1988,6 +1988,9 @@
         }
       }
     },
+    "A video that comes with a subtitle file (.srt or .vtt) needs no download. To write out what is said in any other, Kikimi needs a speech model (%@), downloaded once and saved on this Mac. Nothing is uploaded." : {
+
+    },
     "A video with a subtitle file (.srt or .vtt) can be imported right away. For the rest, download the speech model below, once." : {
 
     },
@@ -2251,7 +2254,7 @@
         }
       }
     },
-    "Add a video you own." : {
+    "Add a video you own, with its subtitle file if it has one." : {
 
     },
     "Add subtitles for %@" : {
@@ -7313,6 +7316,9 @@
         }
       }
     },
+    "Learn the words that would take it to about 90%, then watch more." : {
+
+    },
     "Learn, %lld due" : {
 
     },
@@ -7343,6 +7349,9 @@
           }
         }
       }
+    },
+    "Learning ^[%lld word](inflect: true) would take it to about 90%%." : {
+
     },
     "Learning words shown" : {
       "localizations" : {
@@ -9072,9 +9081,6 @@
         }
       }
     },
-    "On Learn, practise them as they come due." : {
-
-    },
     "On Learn, the words you are learning come back at set times, each in a sentence from your videos. Choose the kind of card above Start, and come back whenever the number beside Learn is above zero." : {
 
     },
@@ -9222,9 +9228,6 @@
         }
       }
     },
-    "On Words, choose the words you want to learn." : {
-
-    },
     "On Words, the words from your videos are listed by how often they appear. Press Learn on the ones you want, or Known on the ones you already know." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9342,7 +9345,7 @@
         }
       }
     },
-    "One-time download" : {
+    "Only for videos without subtitles" : {
 
     },
     "Open a video's Info to see the commonest words you don't know yet, and start learning them all at once." : {
@@ -13690,9 +13693,6 @@
         }
       }
     },
-    "To write out what is said in your videos, Kikimi needs a speech model (%@). It is saved on this Mac and nothing is uploaded. If a video comes with subtitles, you can skip it." : {
-
-    },
     "Today" : {
       "localizations" : {
         "de" : {
@@ -14403,7 +14403,7 @@
     "Watch %@" : {
 
     },
-    "Watch more. Each video shows how much of it you already understand." : {
+    "Watch it, and click any word you don't know." : {
 
     },
     "Week of %@: %@ started" : {
@@ -15247,6 +15247,9 @@
           }
         }
       }
+    },
+    "Your first video is ready" : {
+
     },
     "Your original file is only ever read, never changed or deleted. Kikimi works on a copy and keeps a smaller one for playback. While a video is being added, its row says which step it is on, such as 4 of 7 · Transcribing. If you chose to go ahead despite a language warning, the language check is skipped and there are 6 steps." : {
       "extractionState" : "stale",
