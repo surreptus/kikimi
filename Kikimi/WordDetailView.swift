@@ -199,8 +199,17 @@ struct WordDetail: View {
             Text(line.text).font(.system(.body, design: .rounded)).textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 4) {
-                Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(Theme.small).foregroundStyle(Theme.muted)
-                    .lineLimit(1).truncationMode(.middle)
+                // The source is a way back to the video, as well as the small button beside it.
+                Button {
+                    audio?.stop()
+                    app.openVideo(id: line.videoID, at: line.startTime)
+                } label: {
+                    Text("\(line.videoTitle) · \(timestamp(line.startTime))").font(Theme.small).foregroundStyle(Theme.muted)
+                        .lineLimit(1).truncationMode(.middle)
+                }
+                .buttonStyle(.plain)
+                .help("Open the video at this moment")
+                .accessibilityHidden(true)   // the Open video button beside it says the same
                 Spacer(minLength: 8)
                 Button(isPlaying ? String(localized: "Stop") : String(localized: "Hear"), systemImage: isPlaying ? "stop.fill" : "speaker.wave.2") {
                     togglePlayback(line)

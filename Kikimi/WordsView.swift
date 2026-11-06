@@ -147,7 +147,7 @@ struct WordsView: View {
         VStack(alignment: .leading, spacing: 12) {
             ScreenTitle(text: "Words", subtitle: "Pick words to learn, or mark the ones you already know.")
             if showsStartHere {
-                Button("Start with the 25 words you hear most") { selectMostSeenNew(25); apply(.learn) }
+                Button("Start with the 25 new words you hear most") { selectMostSeenNew(25); apply(.learn) }
                     .buttonStyle(.pill(compact: true))
                     .help("Starts learning the 25 new words that come up most often in your videos")
             }
