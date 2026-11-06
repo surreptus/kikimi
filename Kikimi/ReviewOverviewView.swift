@@ -34,6 +34,7 @@ struct ReviewOverviewView: View {
     let lessons: DailyLessons?
     let stats: LearningStats?
     @Binding var style: ReviewStyle
+    @State private var sentenceAnswer: ReviewAnswer = .check
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let startLessons: () -> Void
     let start: () -> Void
@@ -125,10 +126,17 @@ struct ReviewOverviewView: View {
             if overview.dueNow == 0 { Text(nextText).font(Theme.small).foregroundStyle(Theme.muted) }
 
             IconSegmentedPicker(
-                options: ReviewStyle.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
-                selection: $style)
+                options: ReviewPrompt.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
+                selection: promptChoice)
                 .accessibilityLabel("Card type")
                 .help("A word with no sentence from your videos (or no short one, for typing) is asked as word and meaning.")
+            // Only a sentence can be answered more than one way.
+            if style.prompt == .sentence {
+                IconSegmentedPicker(
+                    options: ReviewAnswer.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
+                    selection: answerChoice)
+                    .accessibilityLabel("How you answer")
+            }
             Text(style.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
                 .id(style)   // a new line for each choice, which fades in as the panel resizes
                 .transition(.opacity)
@@ -138,6 +146,20 @@ struct ReviewOverviewView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .panel()
         .animation(reduceMotion ? nil : Theme.easeOut(0.18), value: style)
+        .onAppear { if style.prompt == .sentence { sentenceAnswer = style.answer } }
+    }
+
+    /// The card type; choosing a sentence keeps the way of answering it that was used last.
+    private var promptChoice: Binding<ReviewPrompt> {
+        Binding(
+            get: { style.prompt },
+            set: { style = ReviewStyle(prompt: $0, answer: $0 == .sentence ? sentenceAnswer : .check) ?? .meaning })
+    }
+
+    private var answerChoice: Binding<ReviewAnswer> {
+        Binding(
+            get: { style.answer },
+            set: { sentenceAnswer = $0; style = ReviewStyle(prompt: .sentence, answer: $0) ?? .listening })
     }
 
     /// "Next review in 3 hours", or that nothing is scheduled.

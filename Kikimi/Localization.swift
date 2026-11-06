@@ -25,38 +25,60 @@ extension WordStatus {
     }
 }
 
-extension ReviewStyle {
+extension ReviewPrompt {
     var title: String {
         switch self {
-        case .meaning: String(localized: "Word and meaning")
+        case .word: String(localized: "Word and meaning")
         case .cloze: String(localized: "Fill in the word")
-        case .listening: String(localized: "Listen to the sentence")
-        case .dictation: String(localized: "Type what you hear")
-        case .shadowing: String(localized: "Say the sentence aloud")
+        case .sentence: String(localized: "Sentence from your videos")
         }
     }
 
     /// A word or two for a segment of the picker; `title` is the full name, which VoiceOver uses.
     var shortTitle: String {
         switch self {
-        case .meaning: String(localized: "Meaning")
+        case .word: String(localized: "Meaning")
         case .cloze: String(localized: "Fill in")
-        case .listening: String(localized: "Listen")
-        case .dictation: String(localized: "Type")
-        case .shadowing: String(localized: "Shadow")
+        case .sentence: String(localized: "Sentence")
         }
     }
 
     var symbol: String {
         switch self {
-        case .meaning: "character.book.closed"
+        case .word: "character.book.closed"
         case .cloze: "ellipsis.rectangle"
-        case .listening: "ear"
-        case .dictation: "keyboard"
-        case .shadowing: "mic"
+        case .sentence: "ear"
+        }
+    }
+}
+
+extension ReviewAnswer {
+    var title: String {
+        switch self {
+        case .check: String(localized: "Listen, then check")
+        case .type: String(localized: "Type what you hear")
+        case .speak: String(localized: "Say the sentence aloud")
         }
     }
 
+    var shortTitle: String {
+        switch self {
+        case .check: String(localized: "Listen")
+        case .type: String(localized: "Type")
+        case .speak: String(localized: "Shadow")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .check: "eye"
+        case .type: "keyboard"
+        case .speak: "mic"
+        }
+    }
+}
+
+extension ReviewStyle {
     /// One line on what the cards ask, shown under the choice.
     var summary: String {
         switch self {

@@ -81,6 +81,22 @@ final class ClozeCardTests: XCTestCase {
     }
 }
 
+final class ReviewPromptAnswerTests: XCTestCase {
+    func testEveryStyleIsOneOfAPromptAndAnAnswer() {
+        for style in ReviewStyle.allCases {
+            XCTAssertEqual(ReviewStyle(prompt: style.prompt, answer: style.answer), style)
+        }
+    }
+
+    func testOnlyASentenceCanBeTypedOrSpoken() {
+        XCTAssertEqual(ReviewStyle(prompt: .sentence, answer: .type), .dictation)
+        XCTAssertEqual(ReviewStyle(prompt: .sentence, answer: .speak), .shadowing)
+        XCTAssertEqual(ReviewStyle(prompt: .sentence, answer: .check), .listening)
+        XCTAssertNil(ReviewStyle(prompt: .word, answer: .type))
+        XCTAssertNil(ReviewStyle(prompt: .cloze, answer: .speak))
+    }
+}
+
 final class ShadowingStyleTests: XCTestCase {
     private func card(_ text: String?, end: Double) throws -> ReviewCard {
         let example = try text.map { try ExampleLine(row: Row(["subtitle_id": 1, "surface": "casa", "text": $0, "start_time": 0.0,

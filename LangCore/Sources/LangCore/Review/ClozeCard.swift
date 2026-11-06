@@ -1,5 +1,11 @@
 import Foundation
 
+/// What a review card shows: a word, a sentence with the word blanked, or a sentence heard without its text.
+public enum ReviewPrompt: String, CaseIterable, Sendable { case word, cloze, sentence }
+
+/// How a review card is answered.
+public enum ReviewAnswer: String, CaseIterable, Sendable { case check, type, speak }
+
 /// How a review card asks: the word and its meaning ("meaning"), a sentence from your videos with the word blanked,
 /// for you to recall ("cloze"), or the sentence only as audio, to follow by ear before you read it ("listening").
 public enum ReviewStyle: String, CaseIterable, Sendable {
@@ -10,6 +16,30 @@ public enum ReviewStyle: String, CaseIterable, Sendable {
     case dictation
     /// Hear a short sentence, say it aloud and compare yourself with the original by ear; offered only for short lines.
     case shadowing
+
+    /// What the card shows, apart from how you answer it.
+    public var prompt: ReviewPrompt {
+        switch self {
+        case .meaning: .word
+        case .cloze: .cloze
+        case .listening, .dictation, .shadowing: .sentence
+        }
+    }
+
+    /// How you answer: think of it and check, type it, or say it aloud.
+    public var answer: ReviewAnswer {
+        switch self {
+        case .meaning, .cloze, .listening: .check
+        case .dictation: .type
+        case .shadowing: .speak
+        }
+    }
+
+    /// The style for a prompt and an answer, or nil when that pair isn't offered (only a sentence can be typed or spoken).
+    public init?(prompt: ReviewPrompt, answer: ReviewAnswer) {
+        guard let style = ReviewStyle.allCases.first(where: { $0.prompt == prompt && $0.answer == answer }) else { return nil }
+        self = style
+    }
 
     /// Whether `card` can be asked in this style. Cloze and listening need a sentence from your videos (cloze also
     /// needs the word to be found in it); a card that can't is asked the usual way.
