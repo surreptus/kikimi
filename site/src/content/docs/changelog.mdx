@@ -1,0 +1,55 @@
+---
+title: Changelog
+description: What changed in each version of Kikimi.
+---
+
+Kikimi is a beta and changes quickly. These are short summaries; every release has its full notes and checksum on the [Releases page](https://github.com/surreptus/kikimi/releases).
+
+## 0.15.0
+
+*6 November 2026.* Say a sentence aloud and compare yourself with the original, hide the subtitles to listen, and a clearer Learn page and first run.
+
+- The Shadow card: hear a short sentence, say it aloud, and play yourself beside the original. It uses the microphone only while you record, and the recording is deleted when the card ends.
+- Card types are Meaning, Fill in and Sentence; a sentence can be answered by listening, typing or shadowing.
+- The Learn page leads with one action: reviews while any are due, then lessons.
+- Hide subtitles in the player (<kbd>H</kbd>) to listen without reading, and show a single line (<kbd>S</kbd>).
+- A Next up card suggests the video that fits you best, and the first video gets a card of next steps.
+- Fixed: Spanish "muy" and about 680 other short forms were missing from the dictionary; the subtitle chooser now lets you pick `.srt` files.
+
+## 0.14.1
+
+*6 November 2026.* A much faster speech model for Japanese, a way to check for new versions, and a round of fixes.
+
+- Japanese now uses Whisper large-v3 turbo (1.6 GB, down from 3 GB), which transcribed a 5-minute video 8 times faster in our test.
+- Check for Updates in the Kikimi menu. It reads one small file from this website, only when you choose it.
+- Ignore: set aside a name or a mistake from the word panel, the player, lessons or the Words page.
+- The word is picked out in orange in its sentence on review and lesson cards.
+- The typing exercise switches your keyboard to the language's when you have one installed.
+- Fixed: several Japanese word mistakes (それはね, 行った, やすみ), and fill-in cards for Japanese no longer give the reading away.
+
+## 0.14.0
+
+*5 November 2026.* Lessons that teach and then quiz, a Learn page, and a way to set aside entries that are not words.
+
+- Lessons: each day, the new words you hear most are offered, 15 by default. A lesson teaches five, then quizzes them straight away.
+- A Learn page with Lessons, Reviews and Practice.
+- Ignore for names, mistakes and punctuation.
+- Keys shown on the buttons, and Help > Keyboard Shortcuts.
+
+## 0.13.0
+
+*5 November 2026.* Import with subtitle files, a clearer first run, and the keys shown on the buttons.
+
+- Import a video with an `.srt` or `.vtt` file: nothing is transcribed, so no speech model is needed.
+- A clearer first import, and a welcome page with language tiles.
+- Kanji levels (JLPT level and school year) in the word panel.
+- Accessibility: VoiceOver hears the selected page and the number of reviews due.
+
+## 0.12.0
+
+*4 November 2026.* Kikimi now supports macOS 15 and later, and the Review page is easier to use.
+
+- macOS 15 and later. Translations still need macOS 26.
+- A clearer Review page, and a fuller About window.
+
+Earlier versions, back to 0.9.0, are on the Releases page.

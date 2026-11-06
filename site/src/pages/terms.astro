@@ -1,7 +1,7 @@
 ---
-import Base from '../layouts/Base.astro';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Content } from '../../../Kikimi/Terms.md';
 ---
-<Base title="Terms of use · Kikimi">
-  <article class="doc"><Content /></article>
-</Base>
+<StarlightPage frontmatter={{ title: 'Terms of use', tableOfContents: false, description: 'The terms for using Kikimi.' }}>
+  <div class="legal"><Content /></div>
+</StarlightPage>

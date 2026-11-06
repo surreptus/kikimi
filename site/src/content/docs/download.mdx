@@ -1,0 +1,57 @@
+---
+title: Download Kikimi
+description: Download Kikimi for Mac, how to open it the first time, and what it needs.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+import DownloadButton from '../../components/DownloadButton.astro';
+
+Free, open source and a beta. It runs on your Mac and needs no account.
+
+<DownloadButton />
+
+The button opens the Releases page on GitHub, where each version has its zip file and a checksum to check it against.
+
+## What you need
+
+- A Mac with macOS 15 or later. Apple silicon is recommended; speech models run much faster on it.
+- Translations need macOS 26. On macOS 15 to 25 every translation control is hidden and nothing else changes.
+- About 1.5 GB of free space for a speech model (1.6 GB for Japanese), only if you want Kikimi to transcribe videos that have no subtitles. A video with an `.srt` or `.vtt` file needs no model.
+
+## Opening it the first time
+
+<Aside type="note" title="macOS will say it can't verify the app">
+That is expected. Kikimi is free and open source, and it is not notarized yet (Apple charges a yearly fee for that).
+</Aside>
+
+<Steps>
+1. Unzip the download and drag **Kikimi** into Applications.
+2. Open it. When macOS shows the warning, click **Done**.
+3. Open **System Settings > Privacy & Security**, scroll to the message about Kikimi, click **Open Anyway** and confirm.
+</Steps>
+
+If you prefer Terminal, this removes the download flag once. Do it only for a copy you trust, since it skips macOS's check:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Kikimi.app
+```
+
+Building from source avoids the warning altogether; the [README](https://github.com/surreptus/kikimi#build-from-source) explains how.
+
+## Check the download
+
+Each release lists a SHA-256 checksum. In Terminal, run this on the file you downloaded and compare it with the one in the notes:
+
+```bash
+shasum -a 256 ~/Downloads/Kikimi-*-macOS.zip
+```
+
+A matching checksum shows you have the file that was published, not that it is safe. The code is public, so you can read it or build the same version yourself.
+
+## Updates
+
+**Kikimi > Check for Updates** reads one small file from this website, only when you choose it, and sends nothing else. There is no automatic updating. See the [changelog](/kikimi/changelog/) for what changed.
+
+## Next
+
+Start with [the first-session guide](/kikimi/guide/getting-started/).

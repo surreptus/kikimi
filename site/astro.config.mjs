@@ -8,18 +8,21 @@ export default defineConfig({
   base: '/kikimi',
   integrations: [
     starlight({
-      title: 'Kikimi guide',
-      description: 'How to use Kikimi: importing videos, the player, words, lessons and reviews, shadowing and backups.',
+      title: 'Kikimi',
+      description: 'Learn a language from videos you already own. Private, on your Mac.',
       favicon: '/favicon.svg',
       customCss: ['./src/styles/starlight.css'],
       social: [{ icon: 'github', label: 'Source on GitHub', href: 'https://github.com/surreptus/kikimi' }],
       lastUpdated: false,
       sidebar: [
+        { label: 'Kikimi', items: [
+          { label: 'Home', link: '/' }, { slug: 'download' }, { slug: 'faq' }, { slug: 'changelog' },
+        ] },
         { label: 'Start here', items: [{ slug: 'guide/getting-started' }, { slug: 'guide/importing-videos' }] },
         { label: 'Using Kikimi', items: [{ slug: 'guide/player' }, { slug: 'guide/words' }, { slug: 'guide/lessons-and-reviews' }, { slug: 'guide/shadowing' }] },
         { label: 'Looking after it', items: [{ slug: 'guide/backups' }, { slug: 'guide/troubleshooting' }] },
-        { label: 'Kikimi', items: [
-          { label: 'Home', link: '/' }, { label: 'Download', link: '/download/' }, { label: 'FAQ', link: '/faq/' }, { label: 'Changelog', link: '/changelog/' },
+        { label: 'About', items: [
+          { label: 'Privacy policy', link: '/privacy/' }, { label: 'Terms of use', link: '/terms/' }, { label: 'Acknowledgements', link: '/acknowledgements/' },
         ] },
       ],
     }),

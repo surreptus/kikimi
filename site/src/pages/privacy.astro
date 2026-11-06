@@ -1,7 +1,7 @@
 ---
-import Base from '../layouts/Base.astro';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Content } from '../../../Kikimi/Privacy.md';
 ---
-<Base title="Privacy policy · Kikimi">
-  <article class="doc"><Content /></article>
-</Base>
+<StarlightPage frontmatter={{ title: 'Privacy policy', tableOfContents: false, description: 'What Kikimi does with your data: nothing leaves your Mac.' }}>
+  <div class="legal"><Content /></div>
+</StarlightPage>

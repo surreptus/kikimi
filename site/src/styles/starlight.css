@@ -1,4 +1,4 @@
-/* The guide in the app's colours (see theme.css): deep green ink on a warm off-white page in Light, off-white on a very
+/* The site in the app's colours: deep green ink on a warm off-white page in Light, off-white on a very
    dark green in Dark. Starlight's own layout, navigation and search stay as they are. */
 :root {
   --sl-font: ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
@@ -15,6 +15,10 @@
   --sl-color-accent: #2f6b1a;
   --sl-color-accent-high: #153a0b;
   --sl-color-hairline: rgb(0 0 0 / 0.12);
+  /* Notes use the blue scale; here it is the app's green. */
+  --sl-color-blue-low: #e4ecd3;
+  --sl-color-blue: #2f6b1a;
+  --sl-color-blue-high: #153a0b;
 }
 
 :root[data-theme='dark'] {
@@ -28,6 +32,9 @@
   --sl-color-accent: #6fd6a0;
   --sl-color-accent-high: #c8f0d8;
   --sl-color-hairline: rgb(255 255 255 / 0.16);
+  --sl-color-blue-low: #123b2a;
+  --sl-color-blue: #6fd6a0;
+  --sl-color-blue-high: #c8f0d8;
 }
 
 /* A key such as ⌘O or Space, written as <kbd> in the guide. */
@@ -39,3 +46,16 @@ kbd {
   font: 0.85em ui-rounded, system-ui, sans-serif;
   background: var(--sl-color-bg-sidebar);
 }
+
+/* Screenshots, when they have been added. */
+.shot { margin: 1.5rem 0 0; }
+.shot img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--sl-color-hairline); }
+.shot figcaption { margin-top: 0.5rem; font-size: var(--sl-text-sm); color: var(--sl-color-gray-3); }
+
+/* The privacy policy and terms are the app's own Markdown files, which start with their own title; the page already has one. */
+.legal > h1:first-child { display: none; }
+
+/* The licence texts on the acknowledgements page. */
+.licence { margin-top: 0.75rem; padding: 0.6rem 1rem; border-radius: 12px; background: var(--sl-color-bg-sidebar); }
+.licence summary { cursor: pointer; font-weight: 600; }
+.licence pre { white-space: pre-wrap; font-size: var(--sl-text-xs); margin: 0.75rem 0 0; }
