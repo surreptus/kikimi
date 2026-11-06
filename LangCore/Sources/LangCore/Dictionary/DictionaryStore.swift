@@ -102,6 +102,11 @@ public final class DictionaryStore: Sendable {
         }
     }
 
+    /// Where a bundled dictionary file is, for tests that read it directly.
+    static func bundledURL(_ resource: String) -> URL? {
+        Bundle.module.url(forResource: resource, withExtension: "sqlite", subdirectory: "dictionaries")
+    }
+
     enum Capitalisation { case lower, capitalised, upper }
 
     static func capitalisation(of surface: String?) -> Capitalisation? {
