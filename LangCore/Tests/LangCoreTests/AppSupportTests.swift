@@ -84,6 +84,50 @@ final class AppSupportTests: XCTestCase {
         XCTAssertEqual(order, [])
     }
 
+    func testABulkActionCanBeUndoneExactly() async throws {
+        let (db, _) = try await seededDatabase()
+        let casa = try await wordID(db, "casa"), grande = try await wordID(db, "grande")
+        let today = Date()
+        try await db.startLearning(wordID: grande, now: today)   // already in your reviews before the action
+        let before = try await db.snapshot(of: [casa, grande])
+
+        try await db.startLearning(wordIDs: [casa, grande], now: today)   // only casa changes
+        try await db.markKnown(wordIDs: [grande])
+        let startedBefore = try await db.startedToday(language: "es", now: today)
+        XCTAssertEqual(startedBefore, 2)
+
+        let restored = try await db.restore(before, now: today)
+        XCTAssertEqual(restored, 2)
+        let words = try await db.writer.read { try Word.fetchAll($0, keys: [casa, grande]) }.sorted { $0.id! < $1.id! }
+        let c = try XCTUnwrap(words.first { $0.id == casa }), g = try XCTUnwrap(words.first { $0.id == grande })
+        XCTAssertEqual(c.status, .new)
+        XCTAssertNil(c.stage)
+        XCTAssertNil(c.nextReview)
+        XCTAssertEqual(g.status, .learning, "back to learning, as it was")
+        XCTAssertEqual(g.stage, .stage1)
+        let startedAfter = try await db.startedToday(language: "es", now: today)
+        XCTAssertEqual(startedAfter, 1, "casa's start is taken off today's tally; grande's earlier one stays")
+    }
+
+    func testAResetWordThatWasRemovedComesBack() async throws {
+        let (db, _) = try await seededDatabase()
+        let orphan = try await db.writer.write { db -> Int64 in
+            var word = Word(language: "es", lemma: "zzz", pos: .noun, status: .learning, stage: .stage3, nextReview: Date())
+            try word.insert(db)
+            return word.id!
+        }
+        let before = try await db.snapshot(of: [orphan])
+        try await db.markNew(wordIDs: [orphan])   // no line has it, so a reset removes it
+        let gone = try await db.snapshot(of: [orphan])
+        XCTAssertTrue(gone.isEmpty)
+        try await db.restore(before)
+        let back = try await db.snapshot(of: [orphan])
+        XCTAssertEqual(back.first?.lemma, "zzz")
+        XCTAssertEqual(back.first?.status, .learning)
+        XCTAssertEqual(back.first?.stage, .stage3)
+        XCTAssertEqual(back.first?.id, orphan)
+    }
+
     func testExamplesComeFromYourVideos() async throws {
         let (db, _) = try await seededDatabase()
         let id = try await wordID(db, "casa")

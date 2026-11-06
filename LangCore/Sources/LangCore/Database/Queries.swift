@@ -188,6 +188,32 @@ extension LangDatabase {
         return ids.filter { found.contains($0) }
     }
 
+    /// The words as they are now, so that a bulk action can be undone. Ids that name no word are left out.
+    public func snapshot(of wordIDs: [Int64]) async throws -> [Word] {
+        try await writer.read { [chunks] db in
+            try chunks(wordIDs).flatMap { try Word.filter(keys: $0).fetchAll(db) }
+        }
+    }
+
+    /// Puts words back as a snapshot had them: status, stage and next review, and today's "started learning" and "marked
+    /// known" tallies for the words the action had moved into those states. A word that a reset removed comes back with its
+    /// old id. Returns how many were restored.
+    @discardableResult
+    public func restore(_ words: [Word], now: Date = Date()) async throws -> Int {
+        try await writer.write { db in
+            var restored = 0
+            for var word in words {
+                guard let id = word.id else { continue }
+                let current = try Word.fetchOne(db, key: id)
+                if current?.status == .learning, word.status != .learning { try Self.unbump(.learn, subject: id, at: now, in: db) }
+                if current?.status == .known, word.status != .known { try Self.unbump(.known, subject: id, at: now, in: db) }
+                try word.save(db)
+                restored += 1
+            }
+            return restored
+        }
+    }
+
     /// Marks words as known and takes them out of the review queue.
     @discardableResult
     public func markKnown(wordIDs: [Int64]) async throws -> Int {

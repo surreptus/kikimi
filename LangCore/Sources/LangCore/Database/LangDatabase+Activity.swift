@@ -30,6 +30,15 @@ extension LangDatabase {
             """, arguments: [ActivityDay.string(date, calendar: calendar), kind.rawValue, subject, amount])
     }
 
+    /// Takes one off today's tally for a subject, inside the caller's transaction: the inverse of `bump`, for an undo.
+    static func unbump(
+        _ kind: ActivityKind, subject: Int64, at date: Date, in db: Database, calendar: Calendar = .current
+    ) throws {
+        let arguments: StatementArguments = [ActivityDay.string(date, calendar: calendar), kind.rawValue, subject]
+        try db.execute(sql: "UPDATE activity SET amount = amount - 1 WHERE day = ? AND kind = ? AND subject = ?", arguments: arguments)
+        try db.execute(sql: "DELETE FROM activity WHERE day = ? AND kind = ? AND subject = ? AND amount <= 0", arguments: arguments)
+    }
+
     public func record(_ kind: ActivityKind, subject: Int64 = 0, amount: Double = 1, at date: Date = Date()) async throws {
         try await writer.write { try Self.bump(kind, subject: subject, amount: amount, at: date, in: $0) }
     }
