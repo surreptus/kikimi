@@ -62,10 +62,13 @@ final class AppState {
     private(set) var toast: Toast?
     @ObservationIgnored private var toastTimer: Task<Void, Never>?
 
-    func showToast(_ text: String, isError: Bool = false) {
-        toast = Toast(text: text, isError: isError)
-        AccessibilityNotification.Announcement(text).post()   // VoiceOver can't see it appear
-        dismissToast(after: isError ? 8 : 4)
+    /// `undo` puts a button on the toast, and keeps it up longer so there is time to use it.
+    func showToast(_ text: String, isError: Bool = false, undo: (title: String, run: () -> Void)? = nil) {
+        var shown = Toast(text: text, isError: isError)
+        shown.action = undo
+        toast = shown
+        AccessibilityNotification.Announcement(undo == nil ? text : "\(text). \(undo!.title) is available.").post()   // VoiceOver can't see it appear
+        dismissToast(after: isError || undo != nil ? 8 : 4)
     }
 
     func dismissToast() {

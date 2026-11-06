@@ -47,7 +47,7 @@ about 90%. A **Next up** card suggests the one that fits you best, heard before 
 
 ### Words
 
-- A searchable table with dictionary entries, example lines and Anki export.
+- A searchable table with dictionary entries and example lines. Select words to learn, mark known, ignore or reset them, and undo it.
 - **Japanese:** every reading of a word, and each kanji with its on'yomi and kun'yomi, JLPT level and school year.
 - **Spanish, French and German:** a noun shows its article (el/la, le/la, der/die/das).
 

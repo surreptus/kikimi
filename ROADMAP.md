@@ -223,7 +223,7 @@ Ordered by how much each helps comprehensible input per unit of effort.
       per week, hours of listening (the measure that matters for comprehensible input), and how often you look
       each word up, so the words you keep checking stand out as your weakest. A new table, so a deliberate step;
       the log stays on the Mac and is left out of nothing the privacy policy promises.
-- [x] **Anki export** (Words page > Export to Anki…): a local text file Anki imports (word, meaning, example sentence), with
+- [x] **Anki export** (built; **no longer offered in the app since 6 Nov 2026**, when its button came off the Words page; the code and its tests remain, and a File menu item or removing the code is open): a local text file Anki imports (word, meaning, example sentence), with
       optional sentence audio in a media folder. Checked against Anki 25.09's own importer: notes land in a
       "Kikimi Spanish" deck, and exporting again updates them instead of duplicating.
 

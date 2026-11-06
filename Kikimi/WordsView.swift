@@ -22,10 +22,6 @@ struct WordsView: View {
     @State private var rows: [WordRow] = []
     @State private var dictionaryHits: [DictionaryEntry] = []
     @State private var sort = WordSort(column: .seen, ascending: false)
-    @State private var confirmReset = false
-    @State private var confirmIgnore = false
-    @State private var chooseAnki = false
-    @State private var ankiResult: AnkiExportResult?
     @FocusState private var searchFocused: Bool
 
     private struct LoadKey: Equatable {
@@ -87,7 +83,8 @@ struct WordsView: View {
             } else {
                 header
                 table
-                bulkBar
+                // Nothing to act on until a word is selected.
+                if !selection.isEmpty { bulkBar }
             }
         }
         .sidePanel(isPresented: inspectorShown.wrappedValue) { inspector }
@@ -97,32 +94,6 @@ struct WordsView: View {
         .onChange(of: app.languageCode) { selection = [] }
         .onChange(of: app.findWordsPending) { _, pending in if pending { focusSearch() } }
         .task { if app.findWordsPending { focusSearch() } }
-        .confirmationDialog("Export to Anki", isPresented: $chooseAnki) {
-            Button("Export with sentence audio") { exportAnki(includeAudio: true) }
-            Button("Export text only") { exportAnki(includeAudio: false) }
-        } message: {
-            Text(selection.isEmpty
-                 ? "Exports the words you are learning, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once."
-                 : "Exports the \(selection.count) selected words, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once.")
-        }
-        .alert("Anki file saved", isPresented: Binding(get: { ankiResult != nil }, set: { if !$0 { ankiResult = nil } })) {
-            if let ankiResult {
-                Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([ankiResult.file]) }
-            }
-            Button("OK", role: .cancel) {}
-        } message: {
-            if let ankiResult { Text(ankiMessage(ankiResult)) }
-        }
-        .confirmationDialog("Ignore \(selection.count) words?", isPresented: $confirmIgnore) {
-            Button("Ignore", role: .destructive) { apply(.ignore) }
-        } message: {
-            Text("Words being learned or finished lose their review progress. Ignored words are hidden, and left out of lessons and of how much of a video you know. Show them with the Ignored status filter and press Reset to bring them back.")
-        }
-        .confirmationDialog("Reset \(selection.count) words?", isPresented: $confirmReset) {
-            Button("Reset", role: .destructive) { apply(.reset) }
-        } message: {
-            Text("Words being learned or finished lose their review progress and go back to new. A word that is in none of your videos' lines is removed.")
-        }
     }
 
     /// The selection summary counts words by status, not stage, so it uses a plain dot rather than the stage ring.
@@ -200,6 +171,7 @@ struct WordsView: View {
                     }
                 }
                 .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
+                Text(inflected("^[\(rows.count) word](inflect: true)")).font(Theme.small).foregroundStyle(Theme.muted).fixedSize()
             }
         }
         .padding(.horizontal, Theme.screenPadding).padding(.top, Theme.screenPadding).padding(.bottom, 10)
@@ -219,70 +191,46 @@ struct WordsView: View {
 
     private enum Bulk { case learn, known, reset, ignore }
 
+    /// The words in the selection an action would change: Learn starts only new words, Known skips ones already known or set
+    /// aside, Ignore skips ones already ignored, and Reset skips new ones.
+    private func ids(for action: Bulk) -> [Int64] {
+        selectedRows.filter { row in
+            switch action {
+            case .learn: row.word.status == .new
+            case .known: [.new, .learning, .finished].contains(row.word.status)
+            case .ignore: row.word.status != .ignored
+            case .reset: row.word.status != .new
+            }
+        }.map(\.id)
+    }
+
+    /// Shown only while words are selected, and each button only when it would change one of them.
     private var bulkBar: some View {
         HStack(spacing: 10) {
-            Text(selection.isEmpty ? "\(rows.count) words" : "\(selection.count) of \(rows.count) selected")
-                .foregroundStyle(Theme.muted)
-            if selection.isEmpty {
-                Text("Select words to use Learn and Known.").font(Theme.small).foregroundStyle(Theme.muted).lineLimit(1)
-            }
+            Text("\(selection.count) of \(rows.count) selected").foregroundStyle(Theme.muted)
             Spacer()
-            // Works with nothing selected too: it then exports the words you are learning.
-            Button("Export to Anki…") { chooseAnki = true }
-                .buttonStyle(.pill(.secondary, compact: true))
-                .help("Make a file Anki can import (File > Import), from the selected words or the ones you are learning")
             HStack(spacing: 10) {
-                Button("Reset") {
-                    if selectedRows.contains(where: { $0.word.status == .learning || $0.word.status == .finished }) {
-                        confirmReset = true
-                    } else {
-                        apply(.reset)
-                    }
+                if !ids(for: .reset).isEmpty {
+                    Button("Reset") { apply(.reset) }
+                        .buttonStyle(.pill(.secondary, compact: true))
+                        .help("Back to a new word, so it can be learned from the start")
                 }
-                .buttonStyle(.pill(.secondary, compact: true))
-                .help("Back to a new word, so it can be learned from the start")
-                Button("Ignore") {
-                    if selectedRows.contains(where: { $0.word.status == .learning || $0.word.status == .finished }) {
-                        confirmIgnore = true
-                    } else {
-                        apply(.ignore)
-                    }
+                if !ids(for: .ignore).isEmpty {
+                    Button("Ignore") { apply(.ignore) }
+                        .buttonStyle(.pill(.secondary, compact: true))
+                        .help("Set aside words that are not worth learning, such as names or mistakes. They stay, and Reset brings them back.")
                 }
-                .buttonStyle(.pill(.secondary, compact: true))
-                .help("Set aside words that are not worth learning, such as names or mistakes. They stay, and Reset brings them back.")
-                Button("Known") { apply(.known) }.buttonStyle(.pill(.secondary, compact: true))
-                Button("Learn") { apply(.learn) }.buttonStyle(.pill(compact: true))
+                if !ids(for: .known).isEmpty {
+                    Button("Known") { apply(.known) }.buttonStyle(.pill(.secondary, compact: true))
+                }
+                if !ids(for: .learn).isEmpty {
+                    Button("Learn") { apply(.learn) }.buttonStyle(.pill(compact: true))
+                }
             }
-            .disabled(selection.isEmpty)
         }
         .padding(.horizontal, Theme.screenPadding).padding(.vertical, 12)
         .background(Theme.soft.opacity(0.5))
         .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 1) }
-    }
-
-    private func exportAnki(includeAudio: Bool) {
-        guard let folder = ExportPanels.chooseFolder(message: String(localized: "Choose a folder for the Anki file")) else { return }
-        app.showToast(String(localized: "Exporting…"))
-        Task {
-            do {
-                let ids = selection.isEmpty
-                    ? try await env.database.learningWordIDs(language: app.languageCode)
-                    : sortedRows.filter { selection.contains($0.id) }.map(\.id)
-                guard !ids.isEmpty else { app.showToast(String(localized: "No words to export.")); return }
-                ankiResult = try await env.exportAnki(wordIDs: ids, language: app.languageCode, includeAudio: includeAudio, into: folder)
-                app.dismissToast()   // the saved-file alert takes over
-            } catch {
-                app.showToast(String(localized: "Export failed: \(error.localizedDescription)"), isError: true)
-            }
-        }
-    }
-
-    private func ankiMessage(_ result: AnkiExportResult) -> String {
-        var text = String(localized: "Saved \(inflected("^[\(result.cards) card](inflect: true)")) to \(result.file.deletingLastPathComponent().lastPathComponent). In Anki, choose File > Import and pick \(result.file.lastPathComponent).")
-        if result.audioFiles > 0 {
-            text += " " + String(localized: "Copy the files in the media folder into Anki's collection.media folder first, so the sentence audio plays.")
-        }
-        return text
     }
 
     /// The words you meet most that you haven't touched yet: the best ones to start learning.
@@ -292,28 +240,42 @@ struct WordsView: View {
     }
 
     private func apply(_ action: Bulk) {
-        let ids = Array(selection)
+        let ids = ids(for: action)
+        guard !ids.isEmpty else { return }
         Task {
             do {
+                let before = try await env.database.snapshot(of: ids)   // so Undo can put each word back as it was
+                let text: String
                 switch action {
                 case .learn:
-                    let started = try await env.database.startLearning(wordIDs: ids)
-                    let skipped = ids.count - started
-                    app.showToast(inflected("Started learning ^[\(started) word](inflect: true). They are ready on the Learn page.")
-                        + (skipped > 0 ? " (\(skipped) already in progress)" : ""))
+                    let n = try await env.database.startLearning(wordIDs: ids)
+                    text = inflected("Started learning ^[\(n) word](inflect: true). They are ready on the Learn page.")
                 case .known:
                     let n = try await env.database.markKnown(wordIDs: ids)
-                    app.showToast(inflected("Marked ^[\(n) word](inflect: true) as known"))
+                    text = inflected("Marked ^[\(n) word](inflect: true) as known")
                 case .ignore:
                     let n = try await env.database.markIgnored(wordIDs: ids)
-                    app.showToast(inflected("Ignored ^[\(n) word](inflect: true). Show them with the Ignored status filter."))
+                    text = inflected("Ignored ^[\(n) word](inflect: true). Show them with the Ignored status filter.")
                 case .reset:
                     let n = try await env.database.markNew(wordIDs: ids)
-                    app.showToast(inflected("Reset ^[\(n) word](inflect: true)"))
+                    text = inflected("Reset ^[\(n) word](inflect: true)")
                 }
                 app.dataChanged()
+                app.showToast(text, undo: (String(localized: "Undo"), { undo(before) }))
             } catch {
                 app.showToast(String(localized: "Failed: \(error.localizedDescription)"), isError: true)
+            }
+        }
+    }
+
+    private func undo(_ before: [Word]) {
+        Task {
+            do {
+                try await env.database.restore(before)
+                app.dataChanged()
+                app.showToast(String(localized: "Undone"))
+            } catch {
+                app.showToast(String(localized: "Couldn't undo: \(error.localizedDescription)"), isError: true)
             }
         }
     }

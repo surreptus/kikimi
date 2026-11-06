@@ -33,7 +33,7 @@ Shared code never checks a language code such as `"ja"`. It asks the `LanguagePr
 | `Export/` | Audio and video clip export. |
 | `Resources/Localizable.xcstrings` | Strings shown to the user from this package (errors, titles). The app's own are in `Kikimi/Localizable.xcstrings`. |
 | `Database/LangDatabase+EditLine.swift` | Editing a subtitle line and re-finding its words. |
-| `Export/AnkiExport.swift` | The Anki import file (tab-separated text with header lines) and the export of a set of words, with optional sentence audio. |
+| `Export/AnkiExport.swift` | The Anki import file (tab-separated text with header lines) and the export of a set of words, with optional sentence audio. Tested, but no screen offers it since 6 Nov 2026 (the button was removed from the Words page). |
 | `Review/ClozeCard.swift` | The fill-in-the-blank card (the sentence with the word blanked, and its hint) and the per-language choice of review style (meaning, fill in, listening, typing). `Dictation.swift`: the comparison of what you typed with the line (a plain spelling diff), the per-language limits on how long a line may be to be offered, and `DictationCheck`. `KnownCheck.swift`: a sample of known words for the quick check. |
 | `Database/LangDatabase+Activity.swift` | The daily tally (`activity` table: listening seconds, lookups, words started or marked known, reviews) and the stats the Review page shows. |
 | `Translation/` | Translating a video's lines with macOS's on-device Translation framework: the translator (behind a protocol, so tests use a stand-in), the service that translates only what isn't kept yet, and the display and language preferences. Kept in the `translations` table. |
