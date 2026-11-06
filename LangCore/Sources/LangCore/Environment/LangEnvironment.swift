@@ -54,6 +54,7 @@ public final class LangEnvironment: Sendable {
     /// install fails here with a clear message instead of as empty lookups later.
     public func prepare() async throws {
         await pipeline.cleanOrphanedStaging()
+        await preferences.keepInstalledEarlierDefaults { await self.models.isInstalled($0) }
         for language in database.dictionaries.languages {
             let count = try await database.dictionaries.entryCount(language: language)
             guard count > 0 else { throw DictionaryError.missingResource("dictionary-\(language) is empty") }

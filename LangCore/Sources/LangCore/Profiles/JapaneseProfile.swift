@@ -8,7 +8,7 @@ public struct JapaneseProfile: LanguageProfile {
     public var flagRegion: String? { "JP" }
     public var keyboardKeywords: [String] { ["Japanese"] }
     public let whisperCode = "ja"
-    public let defaultModel = "openai_whisper-large-v3"
+    public let defaultModel = "openai_whisper-large-v3-v20240930_turbo"
     public let tokenizer: any WordTokenizer = JapaneseTokenizer(JapaneseProfile.sharedTokenizer)
     public let dictionarySource = DictionarySource(
         resourceName: "dictionary-ja",

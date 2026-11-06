@@ -22,8 +22,10 @@ public enum ModelCatalog {
                   note: "A middle size. Not tested here."),
         ModelInfo(variant: "openai_whisper-medium", name: "medium", downloadBytes: 1_530_000_000,
                   note: "Good for Spanish: few mistakes on clear speech, and 3 to 5 times faster than real time in our tests on one Apple silicon Mac. Not tested here for French or German."),
+        ModelInfo(variant: "openai_whisper-large-v3-v20240930_turbo", name: "large-v3 turbo", downloadBytes: 1_638_000_000,
+                  note: "Close to large-v3 in accuracy with a much lighter decoder. On one 5-minute Japanese video it transcribed 8 times faster than large-v3 (5 times faster for the whole import) and made fewer of the mistakes we checked. Not tested here for other languages."),
         ModelInfo(variant: "openai_whisper-large-v3", name: "large-v3", downloadBytes: 3_090_000_000,
-                  note: "The most accurate and the usual choice for Japanese, which smaller models handle noticeably worse. Largest and slowest; not benchmarked here."),
+                  note: "The largest. Smaller models handle Japanese noticeably worse, but turbo matched it on our Japanese video at a fraction of the time and download. On that video it ran at about real time."),
     ]
 
     public static func info(for variant: String) -> ModelInfo? { all.first { $0.variant == variant } }

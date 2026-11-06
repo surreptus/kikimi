@@ -163,6 +163,19 @@ public struct ModelPreferences: @unchecked Sendable {
 
     public init(defaults: UserDefaults = .standard) { self.defaults = defaults }
 
+    /// A language's earlier default, for someone who has it installed and never chose a model: they keep it rather than
+    /// being asked to download the new default.
+    static let previousDefaults = ["ja": "openai_whisper-large-v3"]
+
+    /// Keeps the earlier default for anyone who already has it and has not chosen otherwise.
+    public func keepInstalledEarlierDefaults(installed: (String) async -> Bool) async {
+        for profile in LanguageProfiles.all {
+            guard defaults.string(forKey: key(profile)) == nil, let earlier = Self.previousDefaults[profile.code],
+                  earlier != profile.defaultModel else { continue }
+            if await installed(earlier), await !installed(profile.defaultModel) { setModel(earlier, for: profile) }
+        }
+    }
+
     public func model(for profile: any LanguageProfile) -> String {
         defaults.string(forKey: key(profile)) ?? profile.defaultModel
     }

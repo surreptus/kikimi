@@ -216,12 +216,12 @@ final class AppSupportTests: XCTestCase {
         let defaults = UserDefaults(suiteName: "test-\(UUID().uuidString)")!
         let prefs = ModelPreferences(defaults: defaults)
         let ja = JapaneseProfile()
-        XCTAssertEqual(prefs.model(for: ja), "openai_whisper-large-v3")
+        XCTAssertEqual(prefs.model(for: ja), ja.defaultModel)
         prefs.setModel("openai_whisper-small", for: ja)
         XCTAssertEqual(prefs.model(for: ja), "openai_whisper-small")
         XCTAssertEqual(prefs.model(for: SpanishProfile()), "openai_whisper-medium", "other languages unaffected")
         prefs.setModel(nil, for: ja)
-        XCTAssertEqual(prefs.model(for: ja), "openai_whisper-large-v3")
+        XCTAssertEqual(prefs.model(for: ja), ja.defaultModel)
     }
 
     func testAcknowledgementsAreBundled() {

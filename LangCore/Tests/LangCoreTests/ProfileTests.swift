@@ -4,7 +4,7 @@ import XCTest
 final class ProfileTests: XCTestCase {
     func testRegistry() {
         XCTAssertEqual(LanguageProfiles.all.map(\.code), ["es", "fr", "de", "ja"])
-        XCTAssertEqual(LanguageProfiles.profile(for: "ja")?.defaultModel, "openai_whisper-large-v3")
+        XCTAssertEqual(LanguageProfiles.profile(for: "ja")?.defaultModel, "openai_whisper-large-v3-v20240930_turbo")
         XCTAssertEqual(LanguageProfiles.profile(for: "es")?.defaultModel, "openai_whisper-medium")
         XCTAssertNil(LanguageProfiles.profile(for: "xx"))
     }

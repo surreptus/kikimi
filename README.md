@@ -82,7 +82,7 @@ Scripts/build_dictionaries.sh   # JMdict, KANJIDIC2, Spanish, French and German 
 ```
 
 Then open `Kikimi.xcodeproj`, pick the **Kikimi** scheme and **My Mac**, and press ⌘R. On the Videos page, download
-a speech model (about 1.5 GB for Spanish, French and German, 3 GB for Japanese), then drop in a video.
+a speech model (about 1.5 GB for Spanish, French and German, 1.6 GB for Japanese), then drop in a video.
 
 Tests: `cd LangCore && swift test`.
 

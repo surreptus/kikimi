@@ -172,3 +172,35 @@ final class ModelCatalogTests: XCTestCase {
         XCTAssertTrue(untested.allSatisfy { $0.note.contains("Not tested") }, "no invented claims about unmeasured models")
     }
 }
+
+final class EarlierDefaultTests: XCTestCase {
+    private func preferences() -> ModelPreferences {
+        ModelPreferences(defaults: UserDefaults(suiteName: "EarlierDefaultTests.\(UUID().uuidString)")!)
+    }
+    private let ja = JapaneseProfile()
+
+    func testSomeoneWhoHasTheOldDefaultKeepsItAndIsNotAskedToDownloadTheNewOne() async {
+        let prefs = preferences()
+        await prefs.keepInstalledEarlierDefaults { $0 == "openai_whisper-large-v3" }
+        XCTAssertEqual(prefs.model(for: ja), "openai_whisper-large-v3")
+    }
+
+    func testSomeoneWithoutItGetsTheNewDefault() async {
+        let prefs = preferences()
+        await prefs.keepInstalledEarlierDefaults { _ in false }
+        XCTAssertEqual(prefs.model(for: ja), ja.defaultModel)
+    }
+
+    func testAChoiceAlreadyMadeIsNeverChanged() async {
+        let prefs = preferences()
+        prefs.setModel("openai_whisper-small", for: ja)
+        await prefs.keepInstalledEarlierDefaults { _ in true }
+        XCTAssertEqual(prefs.model(for: ja), "openai_whisper-small")
+    }
+
+    func testWhoHasBothUsesTheNewDefault() async {
+        let prefs = preferences()
+        await prefs.keepInstalledEarlierDefaults { _ in true }
+        XCTAssertEqual(prefs.model(for: ja), ja.defaultModel, "turbo is installed, so there is nothing to keep")
+    }
+}
