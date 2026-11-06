@@ -1108,6 +1108,9 @@
         }
       }
     },
+    "^[%lld review](inflect: true) due now" : {
+
+    },
     "^[%lld review](inflect: true) ready" : {
       "localizations" : {
         "de" : {
@@ -7350,7 +7353,7 @@
         }
       }
     },
-    "Learning ^[%lld word](inflect: true) would take it to about 90%%." : {
+    "Learning ^[%lld word](inflect: true) would take it to about 90%% of its words known." : {
 
     },
     "Learning words shown" : {
@@ -8584,7 +8587,10 @@
     "Next up" : {
 
     },
-    "Next: add a video you own." : {
+    "Next: add a video you enjoy." : {
+
+    },
+    "Next: add a video you enjoy. Translations stay hidden until you ask for one, so you listen first." : {
 
     },
     "No dictionary entry" : {
@@ -10096,6 +10102,7 @@
       }
     },
     "Point at a word, or use ← → on a line, to see what it means. Click it or press Return to keep it here." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10122,6 +10129,9 @@
           }
         }
       }
+    },
+    "Point at a word, or use ← → on a line, to see what it means. Click it or press Return to keep its meaning open." : {
+
     },
     "Practice" : {
 
@@ -14018,6 +14028,7 @@
       }
     },
     "Translations stay hidden until you ask for one, so you listen first. Next: add a video you own." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
