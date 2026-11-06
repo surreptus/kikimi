@@ -28,6 +28,10 @@ struct SubtitleRow: View {
     let translationWaiting: Bool
     let toggleTranslation: () -> Void
     let wantTranslation: () -> Void
+    /// Listening practice: with subtitles hidden, a line's text waits until it is asked for.
+    let subtitlesHidden: Bool
+    let lineShown: Bool
+    let toggleShown: () -> Void
 
     @AppStorage(TranscriptSize.key) private var size = TranscriptSize.standard
     @State private var segments: [LineSegment] = []
@@ -68,6 +72,9 @@ struct SubtitleRow: View {
     /// The words that have a meaning to show; the ones the keyboard can land on.
     private var contentChunks: [Chunk] { chunks.filter(isContent) }
 
+    /// This line's text is masked: subtitles are hidden and it has not been asked for.
+    private var textHidden: Bool { subtitlesHidden && !lineShown }
+
     private var isFocused: Bool { focusedLine.wrappedValue == index }
 
     private var reservesRuby: Bool {
@@ -87,17 +94,22 @@ struct SubtitleRow: View {
                 .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(active ? Theme.ink : Theme.muted)
             VStack(alignment: .leading, spacing: 3) {
-                if segments.isEmpty {
-                    Text(line.text).font(textFont)
+                Group {
+                    if segments.isEmpty {
+                        Text(line.text).font(textFont)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    } else {
+                        FlowLayout {
+                            ForEach(chunks) { chunk in chunkView(chunk) }
+                        }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                } else {
-                    FlowLayout {
-                        ForEach(chunks) { chunk in chunkView(chunk) }
+                        .accessibilityElement(children: .contain)
+                        .accessibilityLabel("Line at \(stamp(line.startTime))")
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityElement(children: .contain)
-                    .accessibilityLabel("Line at \(stamp(line.startTime))")
                 }
+                .redacted(reason: textHidden ? .placeholder : [])
+                .allowsHitTesting(!textHidden)
+                .accessibilityHidden(textHidden)
                 if translationShown { translationText }
             }
             // Room for the menu button, so a long line never runs under it.
@@ -119,6 +131,9 @@ struct SubtitleRow: View {
         .accessibilityAction(named: "Jump to this line", seek)
         .accessibilityAction(named: "Edit line", edit)
         .accessibilityActions {
+            if subtitlesHidden { Button(lineShown ? "Hide subtitle" : "Show subtitle", action: toggleShown) }
+        }
+        .accessibilityActions {
             if translationMode == .onRequest {
                 Button(translationShown ? "Hide translation" : "Show translation", action: toggleTranslation)
             }
@@ -134,6 +149,11 @@ struct SubtitleRow: View {
         .onKeyPress(.return) { pinCaret() }
         .onKeyPress("e") {
             edit()
+            return .handled
+        }
+        .onKeyPress("s") {
+            guard subtitlesHidden else { return .ignored }
+            toggleShown()
             return .handled
         }
         .onKeyPress("t") {
@@ -181,6 +201,9 @@ struct SubtitleRow: View {
     /// What can be done with a line: the same list in its menu button and when you right-click it.
     @ViewBuilder
     private var lineActions: some View {
+        if subtitlesHidden {
+            Button(lineShown ? "Hide subtitle" : "Show subtitle", action: toggleShown)
+        }
         if translationMode == .onRequest {
             Button(translationShown ? "Hide translation" : "Show translation", action: toggleTranslation)
             Divider()

@@ -30,6 +30,9 @@ struct PlayerView: View {
     /// Status of every word in this video, so learning and known words can be tinted in the subtitles.
     @State private var statuses: [WordKey: WordStatus] = [:]
     @AppStorage("highlightWords") private var highlightWords = true
+    /// Listening practice: the transcript's text is masked until a line is asked for.
+    @AppStorage("hideSubtitles") private var hideSubtitles = false
+    @State private var shownLines: Set<Int> = []
     @AppStorage("pauseAfterLine") private var pauseAfterLine = false
     /// How fast a looped line plays (1 is normal).
     @AppStorage("loopSpeed") private var loopSpeed = 1.0
@@ -287,6 +290,14 @@ struct PlayerView: View {
                 .help(pauseAfterLine ? "Pausing after each line (P). Press again to play straight through."
                                      : "Pause after each line (P), to think or look a word up")
                 .accessibilityValue(pauseAfterLine ? "On" : "Off")
+            Button("Hide subtitles", systemImage: hideSubtitles ? "captions.bubble.fill" : "captions.bubble") {
+                hideSubtitles.toggle(); shownLines = []
+            }
+            .buttonStyle(.pill(hideSubtitles ? .primary : .secondary, compact: true))
+            .keyboardShortcut("h", modifiers: [])
+            .help(hideSubtitles ? "Subtitles are hidden (H). Press again to show them, or S to show one line."
+                                : "Hide the subtitles (H), to listen without reading")
+            .accessibilityValue(hideSubtitles ? "On" : "Off")
             Button("Loop this line", systemImage: "repeat") { Task { await controller.toggleLoop() } }
                 .buttonStyle(.pill(controller.loopingIndex != nil ? .primary : .secondary, compact: true))
                 .keyboardShortcut("r", modifiers: [])
@@ -324,8 +335,9 @@ struct PlayerView: View {
         var hints: [(key: String, action: String)] = [
             ("Space", String(localized: "Play or pause")), ("⌘← ⌘→", String(localized: "Line")), ("R", String(localized: "Repeat")),
             ("⌘↓", String(localized: "Pick words")), ("← →", String(localized: "Move")),
-            ("E", String(localized: "Edit line")),
+            ("E", String(localized: "Edit line")), ("H", String(localized: "Subtitles")),
         ]
+        if hideSubtitles { hints.append(("S", String(localized: "Show line"))) }
         if translations != nil, translationMode == .onRequest { hints.append(("T", String(localized: "Translation"))) }
         return hints
     }
@@ -385,7 +397,9 @@ struct PlayerView: View {
                             translationShown: translationMode == .always || (line.id.map(shownTranslations.contains) ?? false),
                             translationWaiting: line.id.map { translations?.waiting.contains($0) ?? false } ?? false,
                             toggleTranslation: { toggleTranslation(of: line) },
-                            wantTranslation: { translations?.need(line) })
+                            wantTranslation: { translations?.need(line) },
+                            subtitlesHidden: hideSubtitles, lineShown: shownLines.contains(index),
+                            toggleShown: { if !shownLines.insert(index).inserted { shownLines.remove(index) } })
                         .id(index)
                     }
                 }

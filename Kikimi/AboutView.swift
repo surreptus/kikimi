@@ -182,6 +182,7 @@ struct AboutView: View {
                     ("Space", String(localized: "Play or pause")), ("⌘← ⌘→", String(localized: "Line")), ("← →", String(localized: "Word")),
                     ("Return", String(localized: "Keep the meaning")), ("L", String(localized: "Learn")), ("K", String(localized: "Known")),
                     ("P", String(localized: "Pause after each line")), ("R", String(localized: "Repeat")), ("T", String(localized: "Translation (macOS 26)")),
+                    ("H", String(localized: "Hide subtitles")), ("S", String(localized: "Show one line")),
                     ("E", String(localized: "Edit the line")), ("Esc", String(localized: "Let go"))])
                 shortcutGroup("Words", [
                     ("↑ ↓", String(localized: "Move")), ("Shift", String(localized: "Extend")), ("⌘A", String(localized: "Select all")), ("Esc", String(localized: "Clear"))])

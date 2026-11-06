@@ -5862,13 +5862,13 @@
     "Hear a short sentence from your videos and type it. You see what you missed." : {
 
     },
-    "Hear a short sentence from your videos, say it aloud and play yourself beside the original. Uses the microphone; nothing is saved." : {
+    "Hear a short sentence from your videos, say it aloud and play yourself beside the original. Uses the microphone." : {
 
     },
     "Hear it" : {
 
     },
-    "Hear it, say it after, then record yourself and compare. Nothing is saved." : {
+    "Hear it, then say it after and record yourself to compare." : {
 
     },
     "Hear the sentence" : {
@@ -6159,6 +6159,9 @@
       }
     },
     "How you answer" : {
+
+    },
+    "How you answer a sentence card" : {
 
     },
     "I'm learning" : {
