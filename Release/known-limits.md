@@ -1,0 +1,4 @@
+- Not signed with a Developer ID or notarized, so macOS asks you to confirm opening it.
+- **Built and tested on macOS 27 only.** It is built to run from macOS 15, and its tests pass, but it has not been run on macOS 15 to 25.
+- Some labels are English in the Spanish, French, German and Japanese interface, and the translations that exist are machine-made and not read by a native speaker.
+- The terms haven't been reviewed by a lawyer.
