@@ -84,3 +84,6 @@ site-search button { border-radius: 999px; }
 .licence { margin-top: 0.75rem; padding: 0.6rem 1rem; border-radius: 12px; background: var(--soft); }
 .licence summary { cursor: pointer; font-weight: 600; }
 .licence pre { white-space: pre-wrap; font-size: var(--sl-text-xs); margin: 0.75rem 0 0; }
+
+/* The download and hero buttons. */
+.sl-link-button { font-weight: 600; }
