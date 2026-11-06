@@ -9,6 +9,7 @@ _Last updated: 5 November 2026._
 - Kikimi does not collect any information about you.
 - Your videos, transcripts, words and progress never leave your Mac.
 - The only times it uses the internet are when you ask it to download a speech model, or to check for a new version.
+- The microphone is used only if you choose the Shadow card type and press Record, and the recording is deleted when the card ends.
 - There are no accounts, no advertising, no analytics and no tracking.
 
 ## What stays on your Mac
@@ -23,6 +24,7 @@ Everything Kikimi works with is stored on your Mac, in the app's own folder:
 - Translations of the subtitle lines you have asked to see, so each is made once.
 - A daily tally of your activity: how long you have watched, which words you looked up, and how many reviews you answered. It is only counts, kept to show your progress.
 - The speech models you have downloaded.
+- A recording made for a Shadow card, only while that card is open (see below).
 - Your settings, such as the language you chose.
 
 Your original video files are only ever read. Kikimi never changes or deletes them.
@@ -32,6 +34,14 @@ You can remove videos on the Videos page and speech models on the Storage page. 
 ## Transcription, dictionaries and speech
 
 Transcription runs on your Mac using a speech model you have downloaded. The dictionaries used for word look-ups are built into the app. When Kikimi says a word aloud it uses the voices that come with macOS. None of this sends anything anywhere.
+
+## The microphone
+
+> The microphone is used only when you press Record on a Shadow card, and the recording is deleted when the card ends.
+
+The Shadow card type asks you to say a sentence from your video aloud and then compare yourself with the original. When you press Record, Kikimi records from your Mac's microphone; macOS asks your permission the first time, and you can withdraw it at any time in System Settings > Privacy & Security > Microphone.
+
+The recording is kept in a temporary file only so you can play it beside the original. It is deleted when you move to the next card, leave the page or quit, and any left behind by a crash are deleted the next time Kikimi opens. It is never uploaded, never transcribed or analysed, never included in a backup, and Kikimi does not judge your pronunciation: you compare by ear. If you never use the Shadow card type, Kikimi never uses the microphone and never asks for permission.
 
 ## The things that use the internet
 
