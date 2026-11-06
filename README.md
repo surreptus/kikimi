@@ -37,7 +37,7 @@ The aim is to understand more of what you watch. Spanish, French, German and Jap
 
 Each video is transcribed with timestamps, or imported with its own `.srt` or `.vtt` subtitles, which needs no speech
 model. Each one shows how much of it you already know, and one button starts learning the words that would take it to
-about 90%.
+about 90%. A **Next up** card suggests the one that fits you best, heard before or not.
 
 ### Player
 

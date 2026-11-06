@@ -71,6 +71,13 @@ public struct VideoCoverage: Equatable, Sendable {
     /// nil when there are no words to judge by.
     public var fit: LevelFit? { totalWords == 0 ? nil : LevelFit(fraction: fraction) }
 
+    /// The video most worth watching next, or nil when none is within reach (all of them hard, or with nothing to judge
+    /// by). Only fit counts: a video you have heard before is as good a choice as a new one, since listening again is
+    /// how a video you almost understand becomes one you do.
+    public static func nextUp(from all: [VideoCoverage]) -> VideoCoverage? {
+        all.filter { $0.fit.map { $0 != .hard } ?? false }.min(by: bestFirst)
+    }
+
     /// Orders videos from the best next watch to the worst: by fit, then by how close to `LevelFit.ideal`.
     public static func bestFirst(_ a: VideoCoverage, _ b: VideoCoverage) -> Bool {
         switch (a.fit, b.fit) {

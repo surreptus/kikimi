@@ -96,6 +96,20 @@ final class CoverageTests: XCTestCase {
         XCTAssertEqual(([empty, cov(1, 95)]).sorted(by: VideoCoverage.bestFirst).map(\.videoID), [1, 9], "nothing to judge goes last")
     }
 
+    func testNextUpIsTheBestFitWhetherOrNotItHasBeenHeard() {
+        func cov(_ id: Int64, _ known: Int, total: Int = 100) -> VideoCoverage { VideoCoverage(videoID: id, totalWords: total, knownWords: known) }
+        XCTAssertEqual(VideoCoverage.nextUp(from: [cov(1, 60), cov(2, 93), cov(3, 90)])?.videoID, 2)
+        XCTAssertEqual(VideoCoverage.nextUp(from: [cov(1, 100), cov(2, 84)])?.videoID, 2, "a stretch beats one with nothing left to learn")
+        XCTAssertEqual(VideoCoverage.nextUp(from: [cov(1, 100)])?.videoID, 1, "an easy video is still worth hearing again")
+    }
+
+    func testNextUpIsNilWhenNothingIsWithinReach() {
+        func cov(_ id: Int64, _ known: Int, total: Int = 100) -> VideoCoverage { VideoCoverage(videoID: id, totalWords: total, knownWords: known) }
+        XCTAssertNil(VideoCoverage.nextUp(from: [cov(1, 40), cov(2, 79)]), "all hard")
+        XCTAssertNil(VideoCoverage.nextUp(from: [cov(3, 0, total: 0)]), "nothing to judge by")
+        XCTAssertNil(VideoCoverage.nextUp(from: []))
+    }
+
     // MARK: Words to reach a target
 
     func testTheShortestListThatReachesTheTarget() async throws {

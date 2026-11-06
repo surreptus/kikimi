@@ -119,7 +119,9 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Word-level timestamps**, so a single word can be played and clips are tighter.
 
 ### Finding the right material
-- [ ] **Next up**: suggest the next video to watch by fit (we sort by fit now; this surfaces it on launch).
+- [x] **Next up** (5 Nov 2026): a card at the top of Videos suggests the video that fits best, by fit alone. A video you have heard is as
+      good a choice as a new one, since listening again is how an almost-understood video becomes understood, so nothing is
+      marked finished and replays are not marked down. It is hidden with one video, or when every video is still hard.
 - [ ] **Frequency-list bootstrap**: mark the most common words as known for a beginner who has nothing yet. Needs
       a data source and a licence decision first.
 - [ ] **Audio-only import** (podcasts) for material with no picture.

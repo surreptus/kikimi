@@ -62,6 +62,7 @@ struct VideosView: View {
                         : inflected("^[\(items.count) video](inflect: true) · \(formatBytes(totalBytes)) on this Mac"))
                 ImportSection(env: env, compact: !items.isEmpty)
                 if items.isEmpty { firstSteps }
+                if let next = nextUp { nextUpCard(next.item, next.coverage) }
                 if !items.isEmpty { sortMenu }
                 ForEach(orderedItems) { item in
                     row(item)
@@ -70,6 +71,32 @@ struct VideosView: View {
             .padding(Theme.screenPadding)
         }
         .task(id: "\(app.languageCode)-\(app.dataVersion)") { await reload() }
+    }
+
+    /// The video to watch next, by fit alone: one you have heard is as good a choice as a new one. Not offered with a
+    /// single video, which the list already shows, or when none is within reach.
+    private var nextUp: (item: LibraryEntry, coverage: VideoCoverage)? {
+        guard items.count > 1, let best = VideoCoverage.nextUp(from: Array(coverages.values.filter { id in items.contains { $0.id == id.videoID } })),
+              let item = items.first(where: { $0.id == best.videoID }) else { return nil }
+        return (item, best)
+    }
+
+    private func nextUpCard(_ item: LibraryEntry, _ coverage: VideoCoverage) -> some View {
+        HStack(spacing: 14) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Next up").font(Theme.title(17))
+                Text(item.video.title).font(.system(.headline, design: .rounded)).lineLimit(2)
+                Text("You know \(Int((coverage.fraction * 100).rounded()))% of its words.")
+                    .font(Theme.small).foregroundStyle(Theme.muted)
+            }
+            Spacer()
+            Button("Watch") { open(item.video, at: nil) }
+                .buttonStyle(.pill(.primary, compact: true))
+                .accessibilityLabel("Watch \(item.video.title)")
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .panel()
+        .accessibilityElement(children: .contain)
     }
 
     /// Until there is a video: what this is for, and the four things to do.
