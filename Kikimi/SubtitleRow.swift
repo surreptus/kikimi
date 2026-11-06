@@ -124,7 +124,8 @@ struct SubtitleRow: View {
                     }
                 }
                 .accessibilityHidden(textHidden)
-                if translationShown { translationText }
+                // A translation would give the line away as much as its text, so it waits with the text.
+                if translationShown, !textHidden { translationText }
             }
             // Room for the menu button, so a long line never runs under it.
             .padding(.trailing, 22)
