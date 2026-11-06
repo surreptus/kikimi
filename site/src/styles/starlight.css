@@ -53,7 +53,7 @@ site-search button { border-radius: 999px; }
   --sl-color-accent-high: #c8f0d8;
   --sl-color-hairline: rgb(255 255 255 / 0.24);
   --sl-color-hairline-light: rgb(255 255 255 / 0.18);
-  --sl-color-hairline-shade: rgb(0 0 0 / 0.5);
+  --sl-color-hairline-shade: rgb(255 255 255 / 0.22);
   --sl-color-gray-5: #34503f;
   --sl-color-gray-6: #10261d;
   --soft: rgb(255 255 255 / 0.08);
