@@ -8,7 +8,7 @@
 </h1>
 
 <p align="center">
-  A native macOS app for learning a language from videos you already own.
+  A native macOS app for learning a language from videos already on your Mac.
 </p>
 
 <p align="center">
