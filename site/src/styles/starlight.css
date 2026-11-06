@@ -28,7 +28,12 @@ site-search button { border-radius: 999px; }
   --sl-color-accent-low: #e4ecd3;
   --sl-color-accent: #2f6b1a;
   --sl-color-accent-high: #153a0b;
-  --sl-color-hairline: rgb(0 0 0 / 0.12);
+  /* Lines in the ink colour, strong enough to see on the cream page (Starlight's own are nearly white here). */
+  --sl-color-hairline: rgb(21 58 11 / 0.24);
+  --sl-color-hairline-light: rgb(21 58 11 / 0.16);
+  --sl-color-hairline-shade: rgb(21 58 11 / 0.32);
+  --sl-color-gray-5: #cfc8ae;
+  --sl-color-gray-6: #efe8d3;
   --soft: rgb(21 58 11 / 0.07);
   /* Notes use the blue scale; here it is the app's green. */
   --sl-color-blue-low: #e4ecd3;
@@ -46,7 +51,11 @@ site-search button { border-radius: 999px; }
   --sl-color-accent-low: #123b2a;
   --sl-color-accent: #6fd6a0;
   --sl-color-accent-high: #c8f0d8;
-  --sl-color-hairline: rgb(255 255 255 / 0.16);
+  --sl-color-hairline: rgb(255 255 255 / 0.24);
+  --sl-color-hairline-light: rgb(255 255 255 / 0.18);
+  --sl-color-hairline-shade: rgb(0 0 0 / 0.5);
+  --sl-color-gray-5: #34503f;
+  --sl-color-gray-6: #10261d;
   --soft: rgb(255 255 255 / 0.08);
   --sl-color-blue-low: #123b2a;
   --sl-color-blue: #6fd6a0;
