@@ -66,7 +66,7 @@ final class ClozeCardTests: XCTestCase {
         XCTAssertFalse(ReviewStyle.listening.suits(noSentence, showsReading: false))
         XCTAssertTrue(ReviewStyle.dictation.suits(withSentence, showsReading: false, profile: SpanishProfile()), "a short line")
         XCTAssertFalse(ReviewStyle.dictation.suits(noSentence, showsReading: false, profile: SpanishProfile()))
-        XCTAssertEqual(ReviewStyle.allCases.map(\.rawValue), ["meaning", "cloze", "listening", "dictation"])
+        XCTAssertEqual(ReviewStyle.allCases.map(\.rawValue), ["meaning", "cloze", "listening", "dictation", "shadowing"])
     }
 
     func testTheStyleDefaultsToMeaningPerLanguageAndIsRemembered() {
@@ -78,5 +78,22 @@ final class ClozeCardTests: XCTestCase {
         XCTAssertEqual(preference.style(for: JapaneseProfile()), .meaning, "another language is unaffected")
         preference.setStyle(.meaning, for: SpanishProfile())
         XCTAssertNil(defaults.string(forKey: "reviewStyle.es"))
+    }
+}
+
+final class ShadowingStyleTests: XCTestCase {
+    private func card(_ text: String?, end: Double) throws -> ReviewCard {
+        let example = try text.map { try ExampleLine(row: Row(["subtitle_id": 1, "surface": "casa", "text": $0, "start_time": 0.0,
+                                                               "end_time": end, "video_id": 1, "video_title": "v", "media_path": "h/video.mov"])) }
+        return ReviewCard(word: Word(id: 1, language: "es", lemma: "casa", pos: .noun), entries: [], example: example)
+    }
+
+    func testShadowingNeedsAShortSentenceLikeTyping() throws {
+        let es = SpanishProfile()
+        XCTAssertTrue(ReviewStyle.shadowing.suits(try card("La casa es grande.", end: 2), showsReading: false, profile: es))
+        XCTAssertFalse(ReviewStyle.shadowing.suits(
+            try card("La casa es muy grande y tiene un jardín enorme con muchos árboles viejos.", end: 12), showsReading: false, profile: es),
+            "too long to repeat")
+        XCTAssertFalse(ReviewStyle.shadowing.suits(try card(nil, end: 1), showsReading: false, profile: es), "needs a sentence")
     }
 }

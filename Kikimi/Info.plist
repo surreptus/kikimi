@@ -63,6 +63,8 @@
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>
 	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Kikimi uses the microphone only when you press Record on a Shadow card, so you can hear yourself beside the original. The recording stays on this Mac and is deleted when the card ends.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

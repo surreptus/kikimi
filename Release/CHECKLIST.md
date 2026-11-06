@@ -50,6 +50,7 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       Privacy "nutrition label": data not collected.
 - [ ] Export compliance: only standard HTTPS (model downloads) is used.
 - [ ] Screenshots, description, age rating, category (Education).
+- [ ] Review notes: the microphone is used only for the Shadow card type, and recordings are deleted when the card ends.
 - [ ] Review notes: the app downloads Whisper speech models (about 1.5 GB, data not code) from Hugging Face on
       first use, and works only on files the user provides.
 

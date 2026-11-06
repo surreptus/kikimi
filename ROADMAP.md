@@ -227,7 +227,8 @@ Ordered by how much each helps comprehensible input per unit of effort.
       runtime) might correct better but is untested and changes the "only a speech model downloads" promise, so it needs the
       policy first. Revisit when the built-in model improves or when correction can be checked.
 
-- [ ] **Shadowing**: hear a line from your own video, record yourself saying it, and play both to compare. No AI, and the
+- [x] **Shadowing** (5 Nov 2026; built as the Shadow card type, with the privacy policy changed first; **the recording, the permission prompt and the
+      playback were not tried in the running app**): hear a line from your own video, record yourself saying it, and play both to compare. No AI, and the
       recording stays on the Mac. Needs the microphone (a sandbox entitlement and a usage string), so the privacy policy
       says so first. (From a look at JIVX's features, 3 Nov 2026.)
 - [x] **Type what you hear** (3 Nov 2026): a card type on the Review page. Hear a sentence and type it; the sentence then

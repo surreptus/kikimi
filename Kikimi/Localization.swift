@@ -32,6 +32,7 @@ extension ReviewStyle {
         case .cloze: String(localized: "Fill in the word")
         case .listening: String(localized: "Listen to the sentence")
         case .dictation: String(localized: "Type what you hear")
+        case .shadowing: String(localized: "Say the sentence aloud")
         }
     }
 
@@ -42,6 +43,7 @@ extension ReviewStyle {
         case .cloze: String(localized: "Fill in")
         case .listening: String(localized: "Listen")
         case .dictation: String(localized: "Type")
+        case .shadowing: String(localized: "Shadow")
         }
     }
 
@@ -51,6 +53,7 @@ extension ReviewStyle {
         case .cloze: "ellipsis.rectangle"
         case .listening: "ear"
         case .dictation: "keyboard"
+        case .shadowing: "mic"
         }
     }
 
@@ -61,6 +64,7 @@ extension ReviewStyle {
         case .cloze: String(localized: "Recall the missing word in a sentence from your videos.")
         case .listening: String(localized: "Hear a sentence from your videos, then check what it said.")
         case .dictation: String(localized: "Hear a short sentence from your videos and type it. You see what you missed.")
+        case .shadowing: String(localized: "Hear a short sentence from your videos, say it aloud and play yourself beside the original. Uses the microphone; nothing is saved.")
         }
     }
 }

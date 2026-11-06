@@ -31,6 +31,7 @@ struct ReviewView: View {
     @State private var wordNow: Word?
     /// Typing what you hear: what was typed, and how it compared once checked.
     @State private var typed = ""
+    @State private var voice = VoiceRecorder()
     @State private var dictationResult: DictationCheck?
     @FocusState private var typingFocused: Bool
     /// The sentence being corrected, and how long its video is (the editor's limit for the end time).
@@ -71,7 +72,7 @@ struct ReviewView: View {
         .task(id: app.languageCode) { await loadOverview() }
         .task(id: app.dataVersion) { if card == nil { await loadOverview(keepingSummary: true) } }
         .task(id: app.languageCode) { style = env.reviewStyle.style(for: app.profile) }
-        .onDisappear { audio?.stop() }
+        .onDisappear { audio?.stop(); voice.discard() }
     }
 
     private func finished(_ summary: (answered: Int, correct: Int)) -> some View {
@@ -194,6 +195,8 @@ struct ReviewView: View {
                     listenFace(card)
                 } else if dictation(for: card) {
                     dictationFace(card)
+                } else if shadowing(for: card) {
+                    shadowFace(card)
                 } else {
                 lemmaText(card, font: .system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
                 StatusPill(text: card.word.pos.title)
@@ -360,6 +363,63 @@ struct ReviewView: View {
         }
         .padding(.top, 6)
         .transition(.opacity.combined(with: .scale(scale: 0.98)))
+    }
+
+    /// Whether this card is said aloud: the chosen style, and a sentence short enough to repeat.
+    private func shadowing(for card: ReviewCard?) -> Bool {
+        style == .shadowing && card?.example.map(app.profile.suitsDictation) == true
+    }
+
+    /// Say the sentence after hearing it, then play yourself beside the original. Nothing is judged: you compare by ear,
+    /// and answer Got it or Missed it yourself. The recording lives only while the card does.
+    @ViewBuilder
+    private func shadowFace(_ card: ReviewCard) -> some View {
+        if let example = card.example {
+            Image(systemName: "mic").font(.system(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
+            Text("Say it aloud").font(Theme.title(26))
+            Text(example.highlighted).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
+            if revealed { answerBlock(card) }
+            HStack(spacing: 10) {
+                Button { playSentence() } label: { KeyedLabel(title: "Hear it", systemImage: "speaker.wave.2.fill", key: "R") }
+                    .buttonStyle(.pill(.secondary, compact: true))
+                    .keyboardShortcut("r", modifiers: [])
+                    .help("Play the sentence from your video (R)")
+                Button {
+                    if voice.state == .recording { voice.stop() }
+                    else { audio?.stop(); Task { await voice.start(maxSeconds: min(20, (example.endTime - example.startTime) * 2 + 3)) } }
+                } label: {
+                    KeyedLabel(title: voice.state == .recording ? "Stop" : "Record", systemImage: voice.state == .recording ? "stop.fill" : "mic.fill", key: "M")
+                }
+                .buttonStyle(.pill(voice.state == .recording ? .primary : .secondary, compact: true))
+                .keyboardShortcut("m", modifiers: [])
+                .help("Record yourself saying the sentence (M). The recording is deleted when the card ends.")
+                if voice.state == .recorded {
+                    Button { audio?.stop(); voice.togglePlayback() } label: {
+                        KeyedLabel(title: voice.isPlaying ? "Stop" : "Hear yourself", systemImage: voice.isPlaying ? "stop.fill" : "waveform", key: "Y")
+                    }
+                    .buttonStyle(.pill(.secondary, compact: true))
+                    .keyboardShortcut("y", modifiers: [])
+                }
+            }
+            switch voice.state {
+            case .recording:
+                Text("Recording… say the sentence, then press Stop.").font(Theme.small).foregroundStyle(Theme.muted)
+            case .denied:
+                VStack(spacing: 6) {
+                    Text("Kikimi can't use the microphone. You can allow it in System Settings > Privacy & Security > Microphone.")
+                        .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+                    Button("Open Microphone Settings") {
+                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone") { NSWorkspace.shared.open(url) }
+                    }
+                    .buttonStyle(.pill(.secondary, compact: true))
+                }
+            case .failed:
+                Text("Couldn't record. Check your microphone and try again.").font(Theme.small).foregroundStyle(Theme.muted)
+            default:
+                Text("Hear it, say it after, then record yourself and compare. Nothing is saved.")
+                    .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+            }
+        }
     }
 
     /// Whether this card is typed from hearing it: the chosen style, and a sentence short enough to hold in your head.
@@ -593,7 +653,7 @@ struct ReviewView: View {
             // Typing needs a short line, so a word with one gets that one and not a long one.
             let profile = app.profile
             var short: (@Sendable (ExampleLine) -> Bool)?
-            if style == .dictation { short = { profile.suitsDictation($0) } }
+            if style == .dictation || style == .shadowing { short = { profile.suitsDictation($0) } }
             let new: ReviewSession
             switch chosen {
             case nil: new = try await ReviewSession(database: env.database, language: app.languageCode, preferring: short)
@@ -622,6 +682,7 @@ struct ReviewView: View {
 
     private func advance(_ session: ReviewSession) async {
         revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil
+        voice.discard()   // the recording was for the card that has just been answered
         do {
             let next = try await session.currentCard()
             // Update the counts before the card, so the bar never shows a card with a stale count.
