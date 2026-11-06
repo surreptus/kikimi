@@ -1,13 +1,14 @@
 # Roadmap
 
 What exists, what is left for 1.0, and what comes after. Measured against the principles in
-[AGENTS.md](AGENTS.md). Last updated 2026-10-26.
+[AGENTS.md](AGENTS.md). Last updated 2026-11-06.
 
 ## Where we are
 
 The core loop works end to end: import a video you own, transcribe it on the Mac, find and look up its words,
 play it with synced and clickable subtitles, review words with spaced repetition, see how much of each video you
-already know, and back your progress up. Spanish and Japanese are supported.
+already know, and back your progress up. Spanish, French, German and Japanese are supported. Spanish and Japanese have
+been used on real videos; French and German have been checked on sentences only (see More languages).
 
 **Verdict: feature-complete for 1.0, not yet release-ready.** What remains is mostly proving the app on a clean
 machine, release plumbing, and a few promises we have made but not kept (below). New features can wait.
