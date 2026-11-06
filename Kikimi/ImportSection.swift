@@ -31,7 +31,7 @@ struct ImportSection: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// Subtitle files can be chosen with the videos: they are paired by name and used instead of transcribing.
-    private static let subtitleTypes = SubtitleParser.fileExtensions.sorted().compactMap { UTType(filenameExtension: $0, conformingTo: .text) }
+    private static let subtitleTypes = SubtitleParser.fileExtensions.sorted().compactMap { UTType(filenameExtension: $0) }
 
     private var queue: ImportQueue { app.importQueue! }
     private var canImport: Bool { modelInstalled == true }
