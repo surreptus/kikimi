@@ -14,12 +14,12 @@ struct CoverageBadge: View {
                     Capsule().fill(Theme.ink).frame(width: max(5, 64 * coverage.fraction))
                 }
                 .frame(width: 64, height: 6)
-                Text("\(percent(coverage)) known · \(fit.title)")
+                Text("\(percent(coverage)) of words known · \(fit.title)")
                     .font(Theme.small).foregroundStyle(Theme.ink)
             }
-            .help("You know \(coverage.knownWords) of this video's \(coverage.totalWords) content words (counted once per line). In our samples, knowing 90% of the content words was about 94% to 96% of everything said (counting the small words as known), around where listening becomes comfortable.")
+            .help("You know \(coverage.knownWords) of this video's \(coverage.totalWords) content words (counted once per line). In our samples, knowing 90% of the content words was about 94% to 96% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too.")
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("You know \(percent(coverage)) of its words: \(fit.title)")
+            .accessibilityLabel("Known-word coverage \(percent(coverage)): \(fit.title)")
         } else {
             Text("No words found").font(Theme.small).foregroundStyle(Theme.muted)
         }

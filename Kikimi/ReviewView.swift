@@ -429,7 +429,7 @@ struct ReviewView: View {
                 Text("Couldn't record. Check your microphone and try again.").font(Theme.small).foregroundStyle(Theme.muted)
             default:
                 if !revealed {
-                    Text("Hear it, then say it after and record yourself to compare.")
+                    Text("Listen, then repeat the sentence aloud.")
                         .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
                 }
             }
