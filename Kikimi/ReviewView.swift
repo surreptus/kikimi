@@ -48,7 +48,10 @@ struct ReviewView: View {
             if let error {
                 FailureView(title: "Something went wrong", detail: error)
             } else if let teaching {
+                // A batch of its own: when every word in one is marked known there is no quiz, so the next batch follows at
+                // once, and without this identity it would inherit the last one's position and wait on a card that never loads.
                 LessonView(env: env, wordIDs: teaching, finish: lessonFinished)
+                    .id(teaching)
             } else if let card {
                 cardWithWord(card)
             } else if let summary {
