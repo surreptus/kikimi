@@ -1,0 +1,31 @@
+# CodeQL for the Swift in LangCore, which has to be built to be scanned. The dictionaries and the tokenizer data are
+# generated files that are not in the repository, so empty folders stand in for them: the scan only needs the code to
+# compile, not the data to be there. The app target is not built here.
+name: CodeQL (Swift)
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '41 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir -p LangCore/Sources/LangCore/Resources/ipadic LangCore/Sources/LangCore/Resources/dictionaries
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: swift
+          build-mode: manual
+      - run: swift build
+        working-directory: LangCore
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:swift

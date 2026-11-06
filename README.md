@@ -13,6 +13,9 @@ Spanish, French, German and Japanese work today.
   only network use is downloading a speech model the first time you need it, and checking for a new version when you ask.
 - **Your originals are never modified or deleted.**
 
+[![CodeQL](https://github.com/surreptus/kikimi/actions/workflows/codeql.yml/badge.svg)](https://github.com/surreptus/kikimi/security/code-scanning)
+Scanned with CodeQL and watched by Dependabot; see [SECURITY.md](SECURITY.md) for what that does and doesn't show.
+
 ## What it does
 
 - **Videos.** Transcribed with timestamps, or imported with their own `.srt` or `.vtt` subtitles, which needs no speech

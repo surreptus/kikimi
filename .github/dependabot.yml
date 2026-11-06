@@ -1,0 +1,18 @@
+# Watches the dependencies for known vulnerabilities and proposes updates as pull requests, never merging them.
+# Astro stays pinned to an exact version (see AGENTS.md): an update to it is a pull request to read and decide on.
+version: 2
+updates:
+  - package-ecosystem: swift
+    directory: /LangCore
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+  - package-ecosystem: npm
+    directory: /site
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
