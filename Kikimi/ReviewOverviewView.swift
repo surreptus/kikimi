@@ -55,8 +55,9 @@ struct ReviewOverviewView: View {
             VStack(alignment: .leading, spacing: 14) {
                 // The card for the thing to do first goes first.
                 if lessonsLead { lessonsCard; reviewsCard } else { reviewsCard; lessonsCard }
-                comingUp
-                stages
+                // Nothing to chart until something is scheduled or started: the Reviews card already says what is next.
+                if overview.scheduled > 0 { comingUp }
+                if !overview.isEmpty { stages }
                 if let stats { progress(stats) }
             }
             .frame(maxWidth: 640)
@@ -185,7 +186,7 @@ struct ReviewOverviewView: View {
     /// "Next review in 3 hours", or that nothing is scheduled.
     private var nextText: String {
         guard let next = overview.nextReview else { return String(localized: "Nothing scheduled yet") }
-        return String(localized: "Next review \(next.formatted(.relative(presentation: .numeric)))")
+        return String(localized: "You're up to date. Next review \(next.formatted(.relative(presentation: .numeric)))")
     }
 
     // MARK: Practice
@@ -288,9 +289,11 @@ struct ReviewOverviewView: View {
                         figure("\(Int((accuracy * 100).rounded()))%", "right in reviews, last 30 days")
                     }
                 }
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Words you started learning, by week").font(Theme.small).foregroundStyle(Theme.muted)
-                    weeklyBars(stats.startedPerWeek)
+                if stats.startedPerWeek.contains(where: { $0 > 0 }) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Words you started learning, by week").font(Theme.small).foregroundStyle(Theme.muted)
+                        weeklyBars(stats.startedPerWeek)
+                    }
                 }
                 if !stats.mostLookedUp.isEmpty {
                     Text("Looked up most: " + stats.mostLookedUp.map { "\($0.lemma) ×\($0.count)" }.joined(separator: "   "))
@@ -359,20 +362,23 @@ struct ReviewOverviewView: View {
             Text("Where your words are").font(Theme.title(17))
             Text("\(overview.learning) learning · \(overview.known) known · \(overview.finished) finished")
                 .font(Theme.small).foregroundStyle(Theme.muted)
-            HStack(spacing: 0) {
-                ForEach(0..<8, id: \.self) { i in
-                    VStack(spacing: 6) {
-                        StageRing(stage: i + 1, size: 24)
-                        Text("\(overview.perStage[i])").font(.system(size: 14, weight: .semibold, design: .rounded))
-                        Text(Self.gaps[i].short).font(Theme.small).foregroundStyle(Theme.muted)
+            if overview.perStage.contains(where: { $0 > 0 }) {
+                HStack(spacing: 0) {
+                    ForEach(0..<8, id: \.self) { i in
+                        VStack(spacing: 6) {
+                            StageRing(stage: i + 1, size: 24)
+                            Text("\(overview.perStage[i])").font(.system(size: 14, weight: .semibold, design: .rounded))
+                            Text(Self.gaps[i].short).font(Theme.small).foregroundStyle(Theme.muted)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .help("Stage \(i + 1): back after \(Self.gaps[i].long)")
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Stage \(i + 1), back after \(Self.gaps[i].long): \(inflected("^[\(overview.perStage[i]) word](inflect: true)"))")
                     }
-                    .frame(maxWidth: .infinity)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Stage \(i + 1), back after \(Self.gaps[i].long): \(inflected("^[\(overview.perStage[i]) word](inflect: true)"))")
                 }
+                Text("Get a word right to move it forward. Miss it and it moves back. After the last stage it is finished. Under each ring is how long until that stage comes back.")
+                    .font(Theme.small).foregroundStyle(Theme.muted)
             }
-            Text("Under each ring: how long until a word at that stage comes back. Get it right to move up a stage, miss it to drop one; after stage 8 a word is Finished and no longer comes back for review.")
-                .font(Theme.small).foregroundStyle(Theme.muted)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .panel()
