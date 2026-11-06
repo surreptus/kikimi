@@ -20,8 +20,13 @@ struct VideosView: View {
     @State private var renaming: Video?
     @State private var newTitle = ""
     @State private var renameError: String?
-    /// The first video gets one card of next steps, until it is used or there is a second video.
-    @AppStorage("firstVideoCardDone") private var firstVideoCardDone = false
+    /// The first video of each language gets one card of next steps, until it is used or there is a second video.
+    /// The languages that have had it, as codes joined by commas.
+    @AppStorage("firstVideoCardLanguages") private var firstVideoCardLanguages = ""
+    private var firstVideoCardDone: Bool {
+        get { firstVideoCardLanguages.split(separator: ",").contains { $0 == app.languageCode } }
+        nonmutating set { if newValue, !firstVideoCardDone { firstVideoCardLanguages += (firstVideoCardLanguages.isEmpty ? "" : ",") + app.languageCode } }
+    }
     @State private var firstGoal: CoverageGoal?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
