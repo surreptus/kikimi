@@ -155,7 +155,7 @@ struct AboutView: View {
                 bullet("Around 90% of the counted words is where following along gets comfortable.")
                 bullet("A word counts as known if you marked it known, it is finished, or it is at Stage 5 or above.")
                 bullet("Sort by Closest to my level to see what to watch next.")
-                bullet("Open a video's Info to start learning its commonest new words at once.")
+                bullet("Open a video's Info to learn its commonest new words in lessons: you are taught them five at a time, and can ignore or skip any that don't belong.")
                 bullet("In Settings, under Data, you can mark a list of words you already know.")
             }
         }

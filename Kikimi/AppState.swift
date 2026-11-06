@@ -39,6 +39,8 @@ final class AppState {
     var findWordsPending = false
     /// Set by "Play" buttons elsewhere; the Videos screen consumes it.
     var pendingPlayback: PlaybackRequest?
+    /// Words a button elsewhere (a video's "Learn N words") wants taught: the Learn page takes them and teaches them as lessons.
+    var pendingLesson: [Int64] = []
     /// Where the player's back button goes: the screen that sent you to the video, or Videos if none.
     var returnSection: SidebarItem?
 
@@ -201,6 +203,13 @@ final class AppState {
     func refreshDue() async {
         guard case .ready(let env) = phase else { return }
         dueCount = (try? await env.database.dueCount(language: languageCode)) ?? 0
+    }
+
+    /// Shows the Learn page and teaches these words there, five at a time, like the day's lessons: each can be ignored or
+    /// marked known as it comes, and only the ones that are taught and quizzed join your reviews.
+    func learnInLessons(_ wordIDs: [Int64]) {
+        pendingLesson = wordIDs
+        select(.review)
     }
 
     func openVideo(id: Int64, at time: Double) {

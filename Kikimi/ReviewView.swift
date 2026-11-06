@@ -72,6 +72,7 @@ struct ReviewView: View {
         .task(id: app.languageCode) { await loadOverview() }
         .task(id: app.dataVersion) { if card == nil { await loadOverview(keepingSummary: true) } }
         .task(id: app.languageCode) { style = env.reviewStyle.style(for: app.profile) }
+        .task(id: app.pendingLesson) { await takePendingLesson() }
         .onDisappear { audio?.stop(); voice.discard() }
         // Having said it, the answer is what you want next.
         .onChange(of: voice.state) { _, state in if state == .recorded, shadowing(for: card) { revealed = true } }
@@ -624,6 +625,23 @@ struct ReviewView: View {
     private func startLessons() {
         lessonQueue = lessons?.batches ?? []
         teachNext()
+    }
+
+    /// Words sent here by another page, taught like the day's lessons. Only the ones still new are taught: a word you have
+    /// ignored, marked known or started since the list was made is left out.
+    private func takePendingLesson() async {
+        let wanted = app.pendingLesson
+        guard !wanted.isEmpty else { return }
+        app.pendingLesson = []
+        do {
+            let ids = try await env.database.stillNew(wanted)
+            guard !ids.isEmpty else {
+                app.showToast(String(localized: "Those words are already known, set aside or in your reviews."))
+                return
+            }
+            lessonQueue = stride(from: 0, to: ids.count, by: DailyLessons.batchSize).map { Array(ids[$0..<min($0 + DailyLessons.batchSize, ids.count)]) }
+            teachNext()
+        } catch { self.error = error.localizedDescription }
     }
 
     private func teachNext() {

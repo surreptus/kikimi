@@ -70,6 +70,20 @@ final class AppSupportTests: XCTestCase {
         XCTAssertNil(reset.stage)
     }
 
+    func testOnlyWordsStillNewMayBeTaught() async throws {
+        let (db, _) = try await seededDatabase()
+        let casa = try await wordID(db, "casa"), grande = try await wordID(db, "grande"), correr = try await wordID(db, "correr")
+        try await db.markKnown(wordID: casa)
+        try await db.markIgnored(wordIDs: [grande])
+        let before = try await db.stillNew([correr, casa, grande, 99_999])
+        XCTAssertEqual(before, [correr], "known, ignored and missing words are left out")
+        try await db.startLearning(wordID: correr, now: now)
+        let after = try await db.stillNew([correr, casa, grande])
+        XCTAssertEqual(after, [], "a word already in your reviews is not new")
+        let order = try await db.stillNew([])
+        XCTAssertEqual(order, [])
+    }
+
     func testExamplesComeFromYourVideos() async throws {
         let (db, _) = try await seededDatabase()
         let id = try await wordID(db, "casa")

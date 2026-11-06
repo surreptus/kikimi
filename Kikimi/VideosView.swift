@@ -240,27 +240,17 @@ struct VideosView: View {
                     .buttonStyle(.pill(compact: true))
                     .accessibilityLabel("Watch \(item.video.title)")
                 if !goal.isReached, !fresh.isEmpty {
-                    Button(inflected("Start learning ^[\(fresh.count) word](inflect: true)")) { startLearning(fresh) }
-                        .buttonStyle(.pill(.secondary, compact: true))
+                    Button(inflected("Learn ^[\(fresh.count) word](inflect: true) in lessons")) {
+                        firstVideoCardDone = true
+                        app.learnInLessons(fresh.map(\.wordID))
+                    }
+                    .buttonStyle(.pill(.secondary, compact: true))
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .panel()
         .accessibilityElement(children: .contain)
-    }
-
-    private func startLearning(_ entries: [CoverageGoal.Entry]) {
-        Task {
-            do {
-                let added = try await env.database.startLearning(wordIDs: entries.map(\.wordID))
-                firstVideoCardDone = true
-                app.dataChanged()
-                app.showToast(inflected("Added ^[\(added) word](inflect: true) to your reviews."))
-            } catch {
-                app.showToast(error.localizedDescription)
-            }
-        }
     }
 
     /// The list in the chosen order. "Best fit" uses coverage; videos with nothing to judge by go last.
@@ -327,7 +317,7 @@ private struct VideoInfoSheet: View {
             Text(video.title).font(Theme.title(22)).lineLimit(2)
 
             if let goal, goal.current.totalWords > 0 {
-                CoverageGoalView(goal: goal, startLearning: startLearning)
+                CoverageGoalView(goal: goal, learn: learnInLessons)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .panel()
             }
@@ -415,17 +405,10 @@ private struct VideoInfoSheet: View {
         goal = try? await env.database.wordsToReach(target: 0.90, inVideo: id)
     }
 
-    private func startLearning(_ entries: [CoverageGoal.Entry]) {
-        Task {
-            do {
-                let added = try await env.database.startLearning(wordIDs: entries.map(\.wordID))
-                app.dataChanged()
-                await loadGoal()
-                app.showToast(inflected("Added ^[\(added) word](inflect: true) to your reviews."))
-            } catch {
-                self.error = error.localizedDescription
-            }
-        }
+    /// Teaches this video's words on the Learn page, where each can be ignored or marked known first.
+    private func learnInLessons(_ entries: [CoverageGoal.Entry]) {
+        app.learnInLessons(entries.map(\.wordID))
+        dismiss()
     }
 
     private func delete() {

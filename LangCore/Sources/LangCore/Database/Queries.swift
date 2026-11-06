@@ -175,6 +175,19 @@ extension LangDatabase {
         }
     }
 
+    /// Of `ids`, the words that are still new, in the order given: the only ones a lesson may teach. A word that was ignored,
+    /// marked known or started since the list was made is left out, as it is from the day's lessons.
+    public func stillNew(_ ids: [Int64]) async throws -> [Int64] {
+        let found: Set<Int64> = try await writer.read { [chunks] db in
+            var found = Set<Int64>()
+            for part in chunks(ids) {
+                found.formUnion(try Word.filter(keys: part).filter(Column("status") == WordStatus.new.rawValue).fetchAll(db).compactMap(\.id))
+            }
+            return found
+        }
+        return ids.filter { found.contains($0) }
+    }
+
     /// Marks words as known and takes them out of the review queue.
     @discardableResult
     public func markKnown(wordIDs: [Int64]) async throws -> Int {

@@ -28,10 +28,10 @@ struct CoverageBadge: View {
     private func percent(_ coverage: VideoCoverage) -> String { "\(Int((coverage.fraction * 100).rounded()))%" }
 }
 
-/// What it would take to reach a coverage: the words, and a button to start learning the ones not started yet.
+/// What it would take to reach a coverage: the words, and a button to learn the ones not started yet, in lessons.
 struct CoverageGoalView: View {
     let goal: CoverageGoal
-    let startLearning: ([CoverageGoal.Entry]) -> Void
+    let learn: ([CoverageGoal.Entry]) -> Void
 
     private var targetPercent: String { "\(Int((goal.target * 100).rounded()))%" }
     private var currentPercent: String { "\(Int((goal.current.fraction * 100).rounded()))%" }
@@ -59,7 +59,7 @@ struct CoverageGoalView: View {
                 if !fresh.isEmpty {
                     Text(fresh.prefix(8).map { "\($0.lemma) ×\($0.occurrences)" }.joined(separator: "   ") + (fresh.count > 8 ? "   " + String(localized: "and \(fresh.count - 8) more") : ""))
                         .font(Theme.small).foregroundStyle(Theme.ink)
-                    Button(inflected("Start learning ^[\(fresh.count) word](inflect: true)")) { startLearning(fresh) }
+                    Button(inflected("Learn ^[\(fresh.count) word](inflect: true) in lessons")) { learn(fresh) }
                         .buttonStyle(.pill(compact: true))
                 }
             }
