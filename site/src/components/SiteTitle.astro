@@ -1,15 +1,15 @@
 ---
-// Starlight's own site title, with a link to the guide beside it, so every page (the homepage too, which has no sidebar)
-// has a way in.
+// Starlight's own site title. On a narrow window the toolbar's right-hand group (which holds the Guide link) is hidden,
+// so the link sits beside the title instead, and only there.
 import Default from '@astrojs/starlight/components/SiteTitle.astro';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const onGuide = Astro.url.pathname.startsWith(`${base}/guide/`);
 ---
 <Default><slot /></Default>
-<a class="guide-link" href={`${base}/guide/`} aria-current={onGuide ? 'page' : undefined}>Guide</a>
+<a class="guide-link-narrow" href={`${base}/guide/`} aria-current={onGuide ? 'page' : undefined}>Guide</a>
 
 <style>
-  .guide-link {
+  .guide-link-narrow {
     margin-inline-start: 1.25rem;
     align-self: center;
     font-size: var(--sl-text-sm);
@@ -17,5 +17,6 @@ const onGuide = Astro.url.pathname.startsWith(`${base}/guide/`);
     color: var(--sl-color-text);
     text-decoration: none;
   }
-  .guide-link:hover, .guide-link[aria-current='page'] { text-decoration: underline; text-underline-offset: 4px; }
+  .guide-link-narrow:hover, .guide-link-narrow[aria-current='page'] { text-decoration: underline; text-underline-offset: 4px; }
+  @media (min-width: 50rem) { .guide-link-narrow { display: none; } }
 </style>
