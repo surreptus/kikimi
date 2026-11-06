@@ -16,6 +16,17 @@ final class DictionaryTests: XCTestCase {
         XCTAssertTrue(none.isEmpty)
     }
 
+    func testAnAbbreviationInCapitalsComesAfterTheWordItself() async throws {
+        // "NO" (northwest) is listed before "no" (not) in the file, but is the rarer thing for the word the tokenizer gives.
+        let db = try LangDatabase(dictionaries: TestDictionaries.store(["es": [
+            ("NO", nil, "1. (noun) northwest"), ("no", nil, "1. (adv) not"),
+        ]]))
+        let hits = try await db.lookup(language: "es", term: "no")
+        XCTAssertEqual(hits.map(\.headword), ["no", "NO"], "the word first; the abbreviation is still found")
+        let asked = try await db.lookup(language: "es", term: "NO")
+        XCTAssertEqual(asked.first?.headword, "NO", "asked for in capitals, it is the match")
+    }
+
     func testASenseKeptUnderAnotherCapitalisationIsFoundToo() async throws {
         let db = try LangDatabase(dictionaries: TestDictionaries.store(["es": [
             ("nochebuena", nil, "1. (noun) poinsettia"),
