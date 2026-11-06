@@ -12,6 +12,7 @@ export default defineConfig({
       description: 'Learn a language from videos you already own. Private, on your Mac.',
       favicon: '/favicon.svg',
       customCss: ['./src/styles/starlight.css'],
+      components: { SiteTitle: './src/components/SiteTitle.astro' },
       social: [{ icon: 'github', label: 'Source on GitHub', href: 'https://github.com/surreptus/kikimi' }],
       lastUpdated: false,
       sidebar: [
