@@ -267,6 +267,15 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [ ] **Resurface finished words** now and then (a sparse, rare review, or a nudge when one appears in a video), since
       stopping at the last interval can let words fade. Practice finished on the Learn page (see Practising) is the way to
       choose to do this; a sparse automatic nudge would be on top of it.
+- [ ] **Benchmark NVIDIA Nemotron 3.5 ASR (0.6B) against Whisper turbo** (looked at 5 Nov 2026, **not started**). The model
+      (`nvidia/nemotron-3.5-asr-streaming-0.6b`, OpenMDW-1.1 licence, which we haven't read in full) lists Japanese,
+      Spanish, French, German, Italian, Portuguese and Dutch as transcription-ready and Mandarin as broad-coverage, adds
+      punctuation, and is small. Against it: it is a NeMo model built for live streaming, and the app runs WhisperKit on Core ML,
+      so using it means another runtime and a dependency (ask first); community Core ML and MLX conversions exist but are
+      untested here; and we need accurate start and end times for each line, which we haven't confirmed. The yardstick is
+      the opt-in `ImportTimingTests` on a video with a human `.srt` (large-v3 took 312 s and turbo 62 s on a 334 s Japanese
+      video). The 30B Nemotron is too large to ship. Whisper large-v3 turbo is the default for Japanese as of 5 Nov 2026;
+      Spanish, French and German still use `medium` and haven't been compared with turbo (needs a video and `.srt` in each).
 - [ ] **Smarter review timing** (FSRS-style scheduling): low priority; the evidence is benchmark data, not trials.
 
 ### More languages
