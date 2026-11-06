@@ -11,6 +11,7 @@ What changed in each version of Kikimi, newest first. Every release's page on Gi
 - **Spanish verbs are read correctly.** Apple's word-splitting read every present-tense form of *poder* as *podar* (puedo, puede, pueden), *sale* as *salar*, *venga* as *vengar* and *creo* as *crear*. The Spanish dictionary now carries a table of common verbs' spellings that corrects these. It applies to videos you import from now on, not to words already imported.
 - **A quieter Learn page.** Coming up, the stage rings and the weekly chart appear only once there is something in them, and the stage explanation is shorter.
 - **The Words page with no words** shows only the way to Videos. In the word panel, an example sentence's video title and time open the video.
+- **"Videos on your Mac"** replaces "videos you own" on the welcome page, the Videos page, the About window and in Settings. The Terms still say to use only videos you own or may copy and study.
 
 ### Fixed
 
