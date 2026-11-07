@@ -13,7 +13,8 @@ public struct GermanProfile: LanguageProfile {
     public let tokenizer: any WordTokenizer = NLTaggerTokenizer(
         language: .german,
         // For "kann", "musst" and "darf" the tagger answers with the ASCII spelling, which no dictionary has.
-        lemmaFixes: ["koennen": "können", "muessen": "müssen", "duerfen": "dürfen"])
+        lemmaFixes: ["koennen": "können", "muessen": "müssen", "duerfen": "dürfen"],
+        verbForms: VerbForms(resource: "dictionary-de"))
     public let dictionarySource = DictionarySource(
         resourceName: "dictionary-de",
         attribution: "Wiktionary via kaikki.org (CC BY-SA 4.0)")

@@ -68,12 +68,19 @@ public struct NLTaggerTokenizer: WordTokenizer {
             let surface = String(text[range])
             let lemma = (tagger.tag(at: range.lowerBound, unit: .word, scheme: .lemma).0?.rawValue ?? surface).lowercased()
             let spelling = surface.lowercased().precomposedStringWithCanonicalMapping
-            let pos = Self.map(tag)
+            var pos = Self.map(tag)
             var chosen = spellingFixes[spelling] ?? lemmaFixes[lemma] ?? lemma
-            // Only for a verb: the same spelling as a noun (cuenta) is a word of its own, and the tagger may be right.
-            if pos == .verb, spellingFixes[spelling] == nil, let forms = verbForms?.lemmas(for: spelling),
-               let best = forms.first, !forms.contains(chosen) {
-                chosen = best
+            if spellingFixes[spelling] == nil, let verbForms {
+                let forms = verbForms.lemmas(for: spelling)
+                if pos == .verb {
+                    // The same spelling as a noun (cuenta) is a word of its own, and the tagger may be right: so only a verb.
+                    if let best = forms.first, !forms.contains(chosen) { chosen = best }
+                } else if let best = forms.first, verbForms.isOnlyAVerbForm(spelling) {
+                    // No word of its own is spelt like this, so whatever the tagger made of it, it is that verb (richtest, which a
+                    // tagger can call an adverb).
+                    pos = .verb
+                    chosen = forms.contains(chosen) ? chosen : best
+                }
             }
             result.append(Token(surface: surface, lemma: chosen, pos: pos))
             return true

@@ -43,50 +43,88 @@ final class DictionaryAuditTests: XCTestCase {
         }
     }
 
-    /// Spellings of a common Spanish verb (3,000 spread through the dictionary's forms table, which says which verb each is;
-    /// LANGCORE_AUDIT=1 tries 15,000 and prints what it finds). Every spelling (the dictionary's forms table, which says
-    /// which verb each is) goes through the tokenizer in a short sentence, and the result is sorted:
+    private struct VerbAudit {
+        var tried = 0, right = 0, lemmaRight = 0
+        var otherVerb: [String] = [], missed: [String] = []
+        var notVerb: [String: Int] = [:]
+    }
+
+    /// Spellings of a common verb (3,000 spread through the dictionary's forms table, which says which verb each is;
+    /// LANGCORE_AUDIT=1 tries many more and prints what it finds). Every spelling goes through the tokenizer in a short
+    /// sentence, and the result is sorted:
     ///  - read as a verb, and the right one: fine;
     ///  - read as a verb, but another verb (what the table was built to prevent): a failure;
     ///  - not read as a verb at all: counted, with examples, since a verb stored as a noun has the wrong lemma and kind.
-    /// LANGCORE_AUDIT_SAMPLE sets the number. Last measured (6 Nov 2026, 15,741 spellings): 99.85% read as the right verb, none
-    /// as another verb, and 24 not as a verb at all, all rare (voseo forms such as tamizás, forms with a pronoun attached).
-    func testSpanishVerbFormsAreReadAsTheirVerbs() throws {
+    /// LANGCORE_AUDIT_SAMPLE sets the number.
+    private func auditVerbForms(_ profile: any LanguageProfile, carrier: (String) -> String, fullSample: Int) throws -> VerbAudit {
         let env = ProcessInfo.processInfo.environment
         let full = env["LANGCORE_AUDIT"] == "1"
-        let sample = Int(env["LANGCORE_AUDIT_SAMPLE"] ?? "") ?? (full ? 15_000 : 3_000)
-        let forms: [(spelling: String, lemmas: [String])] = try read("dictionary-es") { db in
+        let sample = Int(env["LANGCORE_AUDIT_SAMPLE"] ?? "") ?? (full ? fullSample : 3_000)
+        let resource = profile.dictionarySource.resourceName
+        let forms: [(spelling: String, lemmas: [String])] = try read(resource) { db in
             try Row.fetchAll(db, sql: "SELECT form, lemmas FROM forms ORDER BY form").map {
                 let lemmas: String = $0["lemmas"]
                 return ($0["form"], lemmas.split(separator: ",").map { String($0.split(separator: ":")[0]) })
             }
         }
-        let headwords: Set<String> = try read("dictionary-es") { db in Set(try String.fetchAll(db, sql: "SELECT headword FROM entries")) }
+        // Lower case: German nouns are capitalised in text, so "Stich" is a word of its own where the test sentence has "stich".
+        let headwords: Set<String> = try read(resource) { db in Set(try String.fetchAll(db, sql: "SELECT headword FROM entries").map { $0.lowercased() }) }
         let step = max(1, forms.count / sample)
-        let tokenizer = SpanishProfile().tokenizer
-        var tried = 0, right = 0, otherVerb: [String] = [], notVerb: [String: Int] = [:], missed: [String] = []
+        var audit = VerbAudit()
         for index in stride(from: 0, to: forms.count, by: step) {
             let (spelling, lemmas) = forms[index]
             guard !spelling.contains(" ") else { continue }
-            tried += 1
-            guard let token = tokenizer.tokens(in: "Él \(spelling) aquí.").first(where: { $0.surface.lowercased() == spelling }) else { continue }
+            audit.tried += 1
+            guard let token = profile.tokenizer.tokens(in: carrier(spelling)).first(where: { $0.surface.lowercased() == spelling }) else { continue }
+            if lemmas.contains(token.lemma) { audit.lemmaRight += 1 }
             if token.pos == .verb {
-                if lemmas.contains(token.lemma) { right += 1 } else { otherVerb.append("\(spelling)→\(token.lemma) (want \(lemmas[0]))") }
+                if lemmas.contains(token.lemma) { audit.right += 1 } else { audit.otherVerb.append("\(spelling)→\(token.lemma) (want \(lemmas[0]))") }
             } else {
-                notVerb[String(describing: token.pos), default: 0] += 1
+                audit.notVerb[String(describing: token.pos), default: 0] += 1
                 // A spelling that is not a word of its own can only be a verb form: reading it as anything else is a miss.
-                if !headwords.contains(spelling) { missed.append("\(spelling) read as \(token.pos) \(token.lemma) (want \(lemmas[0]))") }
+                if !headwords.contains(spelling) { audit.missed.append("\(spelling) read as \(token.pos) \(token.lemma) (want \(lemmas[0]))") }
             }
         }
         if full {
-            print("AUDIT forms in the table: \(forms.count); tried \(tried)")
-            print("AUDIT read as the right verb: \(right); as another verb: \(otherVerb.count); not as a verb: \(notVerb.values.reduce(0, +)) \(notVerb)")
-            print("AUDIT not a headword of its own yet not read as a verb: \(missed.count)")
-            for line in otherVerb.prefix(30) { print("AUDIT OTHER VERB \(line)") }
-            for line in missed.shuffled().prefix(40) { print("AUDIT MISSED \(line)") }
+            print("AUDIT \(profile.code): forms in the table \(forms.count); tried \(audit.tried)")
+            print("AUDIT \(profile.code): lemma right \(audit.lemmaRight); right verb \(audit.right); another verb \(audit.otherVerb.count); not a verb \(audit.notVerb.values.reduce(0, +)) \(audit.notVerb); not a headword either \(audit.missed.count)")
+            for line in audit.otherVerb.prefix(30) { print("AUDIT \(profile.code) OTHER VERB \(line)") }
+            for line in audit.missed.shuffled().prefix(40) { print("AUDIT \(profile.code) MISSED \(line)") }
         }
-        XCTAssertGreaterThan(tried, 1_000)
-        XCTAssertEqual(otherVerb, [], "a verb form read as a different verb")
-        XCTAssertGreaterThan(Double(right) / Double(tried), 0.99, "nearly every form of a common verb is read as that verb")
+        return audit
+    }
+
+    /// `minimum` is the share of spellings whose lemma comes out right. Where the tagger calls a form something other than a
+    /// verb (a participle used as an adjective or an adverb, which is often right) the lemma can still be the verb.
+    private func check(_ audit: VerbAudit, minimum: Double = 0.99) {
+        XCTAssertGreaterThan(audit.tried, 1_000)
+        XCTAssertEqual(audit.otherVerb, [], "a verb form read as a different verb")
+        XCTAssertGreaterThan(Double(audit.lemmaRight) / Double(audit.tried), minimum, "nearly every form of a common verb gets that verb as its lemma")
+    }
+
+    /// A pronoun that goes with the ending, so the sentence is one a person could say: "Er richtest" is not.
+    private static func germanCarrier(_ form: String) -> String {
+        let pronoun: String
+        switch true {
+        case form.hasSuffix("st"): pronoun = "Du"
+        case form.hasSuffix("en") || form.hasSuffix("ern") || form.hasSuffix("eln"): pronoun = "Wir"
+        case form.hasSuffix("e"): pronoun = "Ich"
+        default: pronoun = "Er"
+        }
+        return "\(pronoun) \(form) hier."
+    }
+
+    /// Last measured (6 Nov 2026): Spanish 99.85% read as the right verb (15,741 spellings, none as another verb; the rest are
+    /// rare, such as voseo forms like tamizás), French 99.8% (17,671) and German 99.2% for the lemma (14,148).
+    func testSpanishVerbFormsAreReadAsTheirVerbs() throws {
+        check(try auditVerbForms(SpanishProfile(), carrier: { "Él \($0) aquí." }, fullSample: 15_000))
+    }
+
+    func testFrenchVerbFormsAreReadAsTheirVerbs() throws {
+        check(try auditVerbForms(FrenchProfile(), carrier: { "Il \($0) ici." }, fullSample: 15_000), minimum: 0.99)
+    }
+
+    func testGermanVerbFormsAreReadAsTheirVerbs() throws {
+        check(try auditVerbForms(GermanProfile(), carrier: Self.germanCarrier, fullSample: 15_000), minimum: 0.98)
     }
 }

@@ -301,13 +301,15 @@ Ordered by how much each helps comprehensible input per unit of effort.
       mistakes (`restaurant` as a verb, `faut` as `faillir`, `commence` as a noun). Known gaps: a German separable verb
       ("ruf ... an") is learned as `rufen` and the particle is lost, and compound nouns missing from Wiktionary have no
       meaning. Not yet tried on a real French or German video, and `medium` is not benchmarked for either.
-- [x] **Spanish verb forms** (6 Nov 2026): Apple's tagger read every present-tense form of poder as podar (puedo, puede,
-      pueden...), sale as salar, venga as vengar, creo as crear. The Spanish dictionary now carries a `forms` table (the
-      spellings of verbs with at least two Wiktionary meanings, 5.8 MB), and the tokenizer overrules a verb the spelling
-      cannot be a form of. Running forms of 40 common verbs through it, 32 wrong lemmas became 3, all real ambiguity (fue,
-      sienta, podamos); siento and its forms are fixed by hand because sentar and sentir share them. It applies to videos
-      imported from now on: words already imported keep their old lemmas until there is a way to re-read a video (there is
-      not yet). French and German are not done, nor are other parts of speech.
+- [x] **Verb forms for Spanish, French and German** (6 Nov 2026): Apple's tagger read every present-tense form of poder as podar
+      (puedo, puede, pueden...), sale as salar, venga as vengar, creo as crear. Each dictionary now carries a `forms` table (the
+      spellings of verbs with at least two Wiktionary meanings: 220,000 for Spanish, 88,000 for French, 37,000 for German, about
+      +6, +2.5 and +1 MB), and the tokenizer overrules a verb the spelling cannot be a form of, and reads a spelling that is no word
+      of its own as the verb it is. Checked by running every sampled spelling through the tokenizer (an audit test, in the suite):
+      99.97% of Spanish (15,741), 99.8% of French (17,671) and 99.2% of German lemmas (14,148) come out right, none as another
+      verb. Spanish siento and its forms are fixed by hand because sentar and sentir share them. It applies to videos imported from
+      now on: words already imported keep their old lemmas until there is a way to re-read a video (there is not yet). Other parts
+      of speech are not covered; neither is Japanese, which uses MeCab.
 - [ ] **More languages**: Italian, Portuguese and Dutch. **Correction, 5 Nov 2026:** this item used to say Italian is next because
       Apple's tagger handles it. It does not: on macOS 27 `NLTagger` offers no lexical class and no lemma for Italian,
       Portuguese or Dutch (only language, script and token type; checked with `availableTagSchemes`, and a probe of ten

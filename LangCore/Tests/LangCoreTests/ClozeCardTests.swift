@@ -140,6 +140,17 @@ final class SpanishLemmaFixTests: XCTestCase {
 }
 
 final class VerbFormsTests: XCTestCase {
+    /// A file in the earlier format, without the `sole` column.
+    private func forms2(rows: [(String, String)]) throws -> VerbForms {
+        let url = FileManager.default.temporaryDirectory.appending(path: "forms-\(UUID().uuidString).sqlite")
+        let queue = try DatabaseQueue(path: url.path)
+        try queue.write { db in
+            try db.execute(sql: "CREATE TABLE forms (form TEXT PRIMARY KEY, lemmas TEXT NOT NULL) WITHOUT ROWID")
+            for (form, lemmas) in rows { try db.execute(sql: "INSERT INTO forms VALUES (?, ?)", arguments: [form, lemmas]) }
+        }
+        return VerbForms(url: url)
+    }
+
     private func forms(_ rows: [(String, String)]) throws -> VerbForms {
         let url = FileManager.default.temporaryDirectory.appending(path: "forms-\(UUID().uuidString).sqlite")
         let queue = try DatabaseQueue(path: url.path)
@@ -161,6 +172,40 @@ final class VerbFormsTests: XCTestCase {
     func testTheTaggersVerbIsKeptWhenTheSpellingCanBeAFormOfIt() throws {
         let tokenizer = NLTaggerTokenizer(language: .spanish, verbForms: try forms([("puede", "podar:3,poder:2")]))
         XCTAssertEqual(tokenizer.tokens(in: "Ella puede venir.").first { $0.surface == "puede" }?.lemma, "podar")
+    }
+
+    func testASpellingNoWordOwnsIsOnlyAVerbForm() throws {
+        let url = FileManager.default.temporaryDirectory.appending(path: "forms-\(UUID().uuidString).sqlite")
+        let queue = try DatabaseQueue(path: url.path)
+        try queue.write { db in
+            try db.execute(sql: "CREATE TABLE forms (form TEXT PRIMARY KEY, lemmas TEXT NOT NULL, sole INTEGER NOT NULL) WITHOUT ROWID")
+            try db.execute(sql: "INSERT INTO forms VALUES ('richtest', 'richten:2', 1), ('canto', 'cantar:2', 0)")
+        }
+        let forms = VerbForms(url: url)
+        XCTAssertTrue(forms.isOnlyAVerbForm("richtest"))
+        XCTAssertFalse(forms.isOnlyAVerbForm("canto"), "canto is a word of its own too")
+        XCTAssertFalse(forms.isOnlyAVerbForm("unknown"))
+        // A file built before the table carried the flag still works, and says no.
+        let old = try forms2(rows: [("richtest", "richten:2")])
+        XCTAssertEqual(old.lemmas(for: "richtest"), ["richten"])
+        XCTAssertFalse(old.isOnlyAVerbForm("richtest"))
+    }
+
+    func testAFormNoWordOwnsIsAVerbWhateverTheTaggerCalledIt() throws {
+        let url = FileManager.default.temporaryDirectory.appending(path: "forms-\(UUID().uuidString).sqlite")
+        let queue = try DatabaseQueue(path: url.path)
+        try queue.write { db in
+            try db.execute(sql: "CREATE TABLE forms (form TEXT PRIMARY KEY, lemmas TEXT NOT NULL, sole INTEGER NOT NULL) WITHOUT ROWID")
+            try db.execute(sql: "INSERT INTO forms VALUES ('richtest', 'richten:2', 1)")
+        }
+        let bare = NLTaggerTokenizer(language: .german)
+        let withTable = NLTaggerTokenizer(language: .german, verbForms: VerbForms(url: url))
+        let text = "Du richtest hier."
+        let before = try XCTUnwrap(bare.tokens(in: text).first { $0.surface == "richtest" })
+        XCTAssertNotEqual(before.pos, .verb, "the tagger alone calls this something else (an adverb), which is the mistake")
+        let after = try XCTUnwrap(withTable.tokens(in: text).first { $0.surface == "richtest" })
+        XCTAssertEqual(after.pos, .verb)
+        XCTAssertEqual(after.lemma, "richten")
     }
 
     func testAFileWithoutTheTableKnowsNoForms() {

@@ -20,7 +20,7 @@ public struct FrenchProfile: LanguageProfile {
         return "\(article) \(headword)"
     }
     public let defaultModel = "openai_whisper-medium"
-    public let tokenizer: any WordTokenizer = NLTaggerTokenizer(language: .french)
+    public let tokenizer: any WordTokenizer = NLTaggerTokenizer(language: .french, verbForms: VerbForms(resource: "dictionary-fr"))
     public let dictionarySource = DictionarySource(
         resourceName: "dictionary-fr",
         attribution: "Wiktionary via kaikki.org (CC BY-SA 4.0)")
