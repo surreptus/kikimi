@@ -128,6 +128,20 @@ final class AppSupportTests: XCTestCase {
         XCTAssertEqual(back.first?.id, orphan)
     }
 
+    func testOnlyNewWordsOfTheVideoAreOfferedForCalibration() async throws {
+        let (db, _) = try await seededDatabase()
+        let video = try await db.writer.read { try XCTUnwrap(try Video.fetchOne($0)).id! }
+        let all = try await db.calibrationWords(videoID: video)
+        XCTAssertFalse(all.isEmpty)
+        XCTAssertEqual(all.map(\.seen), all.map(\.seen).sorted(by: >), "most-seen first")
+        let first = all[0].id, second = all[1].id
+        try await db.markKnown(wordID: first)
+        try await db.markIgnored(wordIDs: [second])
+        let after = try await db.calibrationWords(videoID: video)
+        XCTAssertFalse(after.contains { $0.id == first || $0.id == second }, "known and ignored words are not offered")
+        XCTAssertEqual(after.count, all.count - 2)
+    }
+
     func testExamplesComeFromYourVideos() async throws {
         let (db, _) = try await seededDatabase()
         let id = try await wordID(db, "casa")
@@ -621,5 +635,34 @@ final class ProblemReportTests: XCTestCase {
         XCTAssertTrue(body.contains("Kikimi 0.15.2 (12) · macOS 27.2"))
         XCTAssertTrue(body.contains("What happened?"))
         XCTAssertTrue(body.contains("leave out personal details"))
+    }
+}
+
+final class CalibrationTests: XCTestCase {
+    private func word(_ id: Int64, seen: Int = 1) -> CalibrationWord { CalibrationWord(id: id, lemma: "w\(id)", seen: seen) }
+
+    func testWordsAreShownInBatchesOfTwentyUpToSix() {
+        let words = (1...200).map { word(Int64($0)) }
+        let batches = Calibration.batches(of: words)
+        XCTAssertEqual(batches.count, 6)
+        XCTAssertEqual(batches.map(\.count), [20, 20, 20, 20, 20, 20], "120 words at most")
+        XCTAssertEqual(batches[1].first?.id, 21)
+        XCTAssertEqual(Calibration.batches(of: (1...25).map { word(Int64($0)) }).map(\.count), [20, 5])
+        XCTAssertTrue(Calibration.batches(of: []).isEmpty)
+    }
+
+    func testThePassEndsWhenHalfOfABatchIsUnknown() {
+        let batch = (1...20).map { word(Int64($0)) }
+        XCTAssertFalse(Calibration.endsAfter(batch, unknown: Set(1...9)), "9 of 20 is less than half")
+        XCTAssertTrue(Calibration.endsAfter(batch, unknown: Set(1...10)), "10 of 20 is half")
+        XCTAssertFalse(Calibration.endsAfter(batch, unknown: []), "all known: go on")
+        XCTAssertTrue(Calibration.endsAfter([], unknown: []), "nothing left to ask")
+    }
+
+    func testEverythingShownAndNotPointedAtIsKnown() {
+        let first = (1...3).map { word(Int64($0)) }, second = (4...6).map { word(Int64($0)) }
+        XCTAssertEqual(Calibration.known(shown: [first, second], unknown: [2, 5]), [1, 3, 4, 6])
+        XCTAssertEqual(Calibration.known(shown: [first], unknown: [1, 2, 3]), [])
+        XCTAssertEqual(Calibration.known(shown: [], unknown: [1]), [])
     }
 }
