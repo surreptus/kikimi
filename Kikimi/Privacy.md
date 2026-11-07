@@ -2,7 +2,7 @@
 
 Kikimi is built so that your videos, and what you learn from them, stay on your Mac.
 
-_Last updated: 5 November 2026._
+_Last updated: 6 November 2026._
 
 ## The short version
 
@@ -48,6 +48,8 @@ The recording is kept in a temporary file only so you can play it beside the ori
 > Kikimi goes online only to download a speech model and, when you ask, to check for a new version. It sends nothing else.
 
 A few links open a web page in your browser, such as a Japanese grammar guide. That is your browser visiting the page, as when you click any link: Kikimi sends nothing, and the site sees your visit as any website would.
+
+**Report a Problem.** Choose Report a Problem in the Help menu and your browser opens a new issue on GitHub with the Kikimi and macOS version numbers already typed in, where you can read and change them. Nothing is sent from Kikimi, and nothing is sent at all until you submit the issue there. Issues on GitHub are public, and GitHub handles them under its own privacy policy, so leave out anything personal.
 
 The first time you need a speech model, Kikimi downloads it from Hugging Face (huggingface.co), a service that hosts it. When it does, Hugging Face can see your internet address and which model files you asked for, as any website would, and handles that under its own privacy policy. Kikimi sends nothing else: not your videos, transcripts, words or how you use the app.
 
