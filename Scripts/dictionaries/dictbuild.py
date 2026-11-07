@@ -46,13 +46,16 @@ def write_database(path, rows, meta):
     return count
 
 
-def add_forms(path, forms):
+def add_forms(path, forms, headwords=frozenset()):
     """Adds a `forms` table to a built dictionary: forms maps a spelling to [(lemma, meanings)], the lemma with the most
-    meanings first. The app uses it to check a tagger's idea of which verb a spelling belongs to."""
+    meanings first. The app uses it to check a tagger's idea of which verb a spelling belongs to. `sole` is 1 when the
+    spelling is not a headword of its own (in any capitalisation), so it can only be a form of a verb: a tagger that calls
+    it an adverb or a noun is wrong."""
     db = sqlite3.connect(path)
-    db.execute("CREATE TABLE forms (form TEXT PRIMARY KEY, lemmas TEXT NOT NULL) WITHOUT ROWID")
-    db.executemany("INSERT INTO forms VALUES (?, ?)",
-                   ((form, ",".join(f"{lemma}:{count}" for lemma, count in lemmas)) for form, lemmas in sorted(forms.items())))
+    db.execute("CREATE TABLE forms (form TEXT PRIMARY KEY, lemmas TEXT NOT NULL, sole INTEGER NOT NULL) WITHOUT ROWID")
+    db.executemany("INSERT INTO forms VALUES (?, ?, ?)",
+                   ((form, ",".join(f"{lemma}:{count}" for lemma, count in lemmas), 0 if form.lower() in headwords else 1)
+                    for form, lemmas in sorted(forms.items())))
     db.commit()
     db.execute("VACUUM")
     db.close()

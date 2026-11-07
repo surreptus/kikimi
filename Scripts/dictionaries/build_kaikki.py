@@ -2,7 +2,7 @@
 (that language's words, English definitions).
 
 Usage: python3 -I build_kaikki.py kaikki.org-dictionary-Spanish.jsonl dictionary-es.sqlite es Spanish [--forms]
---forms also writes a table of the spellings of common verbs, for checking a tagger's lemmas (Spanish uses it).
+--forms also writes a table of the spellings of common verbs, for checking a tagger's lemmas (Spanish, French and German use it).
 Wiktionary content is CC BY-SA 4.0 (and GFDL); extraction by Tatu Ylonen's wiktextract.
 """
 import json
@@ -154,7 +154,8 @@ def build(input_path, output_path, code, name, with_forms=False):
     }
     count = dictbuild.write_database(output_path, rows, meta)
     if with_forms:
-        print(f"{dictbuild.add_forms(output_path, verb_forms(form_pairs, verb_meanings))} verb spellings in the forms table")
+        headwords = {word.lower() for word in by_word}
+        print(f"{dictbuild.add_forms(output_path, verb_forms(form_pairs, verb_meanings), headwords)} verb spellings in the forms table")
     return count
 
 

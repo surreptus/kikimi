@@ -186,6 +186,23 @@ class KaikkiTests(unittest.TestCase):
             build_kaikki.build(src, out, "es", "Spanish", with_forms=True)
             found = dict(sqlite3.connect(out).execute("SELECT form, lemmas FROM forms").fetchall())
             self.assertEqual(found, {"puede": "poder:2", "podáis": "poder:2"}, "podar has one meaning, so its forms are left out")
+            sole = dict(sqlite3.connect(out).execute("SELECT form, sole FROM forms").fetchall())
+            self.assertEqual(sole, {"puede": 1, "podáis": 1}, "neither is a headword, so each can only be a verb form")
+
+    def test_a_form_that_is_also_a_word_is_not_sole(self):
+        lines = [
+            {"word": "cantar", "lang_code": "es", "pos": "verb", "senses": [{"glosses": ["to sing"]}, {"glosses": ["to tell"]}]},
+            {"word": "canto", "lang_code": "es", "pos": "verb", "senses": [{"glosses": ["first-person of cantar"], "form_of": [{"word": "cantar"}]}]},
+            {"word": "canto", "lang_code": "es", "pos": "noun", "senses": [{"glosses": ["song"]}]},
+            {"word": "cantáis", "lang_code": "es", "pos": "verb", "senses": [{"glosses": ["second-person of cantar"], "form_of": [{"word": "cantar"}]}]},
+        ]
+        with tempfile.TemporaryDirectory() as d:
+            src, out = os.path.join(d, "k.jsonl"), os.path.join(d, "es.sqlite")
+            with open(src, "w", encoding="utf-8") as f:
+                f.write("\n".join(json.dumps(x) for x in lines))
+            build_kaikki.build(src, out, "es", "Spanish", with_forms=True)
+            sole = dict(sqlite3.connect(out).execute("SELECT form, sole FROM forms").fetchall())
+            self.assertEqual(sole, {"canto": 0, "cantáis": 1}, "canto is also a noun, so a tagger may be right to say so")
 
     def test_a_meaning_repeated_across_senses_is_kept_once(self):
         # Wiktionary's senses often restate each other: "to have; to possess" then "to have; to possess; to be ...".
