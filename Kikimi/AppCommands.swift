@@ -59,6 +59,7 @@ struct AppCommands: Commands {
                 .disabled(!app.isReady)
             Button("Keyboard Shortcuts") { app.aboutAtKeyboard = true; app.showAbout = true }
                 .disabled(!app.isReady)
+            Button("Report a Problem…") { app.reportProblem() }
             Divider()
             Button("Privacy Policy") { app.showPrivacy = true }
                 .disabled(!app.isReady)

@@ -222,6 +222,15 @@ final class AppState {
         select(.review)
     }
 
+    /// Help > Report a Problem…: opens a new issue on GitHub in the browser with the versions filled in. Nothing is sent from here.
+    func reportProblem() {
+        let info = Bundle.main.infoDictionary
+        let version = "\(info?["CFBundleShortVersionString"] as? String ?? "?") (\(info?["CFBundleVersion"] as? String ?? "?"))"
+        let os = ProcessInfo.processInfo.operatingSystemVersion
+        let system = "macOS \(os.majorVersion).\(os.minorVersion)"
+        if let url = ProblemReport.url(app: version, system: system) { NSWorkspace.shared.open(url) }
+    }
+
     func openVideo(id: Int64, at time: Double) {
         pendingPlayback = PlaybackRequest(videoID: id, time: time)
         returnSection = section == .videos ? nil : section

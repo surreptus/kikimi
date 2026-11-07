@@ -609,3 +609,17 @@ final class LibraryResetTests: XCTestCase {
     }
 }
 #endif
+
+final class ProblemReportTests: XCTestCase {
+    func testTheIssueIsPrefilledWithOnlyTheVersions() throws {
+        let url = try XCTUnwrap(ProblemReport.url(app: "0.15.2 (12)", system: "macOS 27.2"))
+        XCTAssertEqual(url.host, "github.com")
+        XCTAssertEqual(url.path, "/surreptus/kikimi/issues/new")
+        let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+        XCTAssertEqual(items.map(\.name), ["body"], "only the body is filled in, not a title or labels")
+        let body = try XCTUnwrap(items.first?.value)
+        XCTAssertTrue(body.contains("Kikimi 0.15.2 (12) · macOS 27.2"))
+        XCTAssertTrue(body.contains("What happened?"))
+        XCTAssertTrue(body.contains("leave out personal details"))
+    }
+}
