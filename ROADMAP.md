@@ -47,10 +47,9 @@ machine, release plumbing, and a few promises we have made but not kept (below).
 - [ ] The website (`site/`, Astro, GitHub Pages): scaffolded with the home, privacy and terms pages. To do: switch on
       Pages (Settings > Pages > Source: GitHub Actions), a screenshot, and the Download link once there is a notarized
       release. The privacy and terms pages give the GitHub issues page as the contact.
-- [ ] **How people get updates.** Direct download has no App Store to do it. Options: tell people to download again
-      (nothing to build), a manual "Check for updates" that reads a small file from the download page (no new
-      dependency; a network request to our own page, which the privacy policy must then mention), or Sparkle
-      (a dependency, so ask first). Recommendation: the manual check.
+- [x] **How people get updates** (6 Nov 2026, in 0.14.1): Kikimi > Check for Updates reads one small file from the website, only
+      when chosen (the privacy policy says so). No Sparkle and no automatic checking; a release raises `site/public/latest.json`
+      after it is published.
 
 ### Quality
 - [x] **Readings and kanji for Japanese** (30 Oct 2026): a word with several readings (月: つき, がつ, げつ) lists them in the word bar
@@ -71,7 +70,9 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       Access, in Light and Dark.
 - [x] A full backup (Settings > Data > Include my videos and transcripts) saves a folder with the compressed videos, their
       transcripts and where you stopped. The small progress-only file still leaves out where you stopped; decide if it should.
-- [ ] Help and feedback: a "Report a problem" route (a mailto link with the app version, no data attached).
+- [x] Help and feedback (6 Nov 2026): Help > Report a Problem… opens a new GitHub issue in the browser with the Kikimi and macOS
+      versions typed in, nothing else attached and nothing sent until the person submits it (a mailto link was dropped, since
+      we publish no email address). The privacy policy says so.
 - [ ] App-wide text size. Today the setting covers only the transcript; macOS has no system text-size setting for
       apps to follow.
 
@@ -104,8 +105,8 @@ Ordered by how much each helps comprehensible input per unit of effort.
 - [x] **Grammar link-out for Japanese** (27 Oct 2026): the word bar names a verb's or adjective's form (from MeCab's inflection) and
       links to its Tsumiki page. Next, if wanted: map the auxiliary morphemes (させ, られ, た) to Tsumiki's suffix pages
       and show the whole derivation in the app from Tsumiki's data (CC BY-SA, so credited in the Acknowledgements).
-- [ ] **Subtitle modes**: target language only, target plus translation, none (listening practice), and a
-      reveal-on-click mode.
+- [x] **Subtitle modes** (0.15.0): H hides the subtitles for listening (a plain bar per line, with a translation waiting too), and
+      S shows one line, which is the reveal-on-click mode. Target language only and target plus translation (T) were already there.
 - [x] **Pause after each line** (P) and **loop this line** (R), with a 1×, 0.75× or 0.5× speed for loops.
 - [x] **Import subtitles** (.srt / .vtt, 4 Nov 2026): drop a subtitle file with its video (or choose both together) and its cues
       are used instead of transcribing, so the import needs no speech model and is quick. Files are paired by name (`film.mp4`
@@ -125,7 +126,10 @@ Ordered by how much each helps comprehensible input per unit of effort.
       marked finished and replays are not marked down. It is hidden with one video, or when every video is still hard.
 - [ ] **Frequency-list bootstrap**: mark the most common words as known for a beginner who has nothing yet. Needs
       a data source and a licence decision first.
-- [ ] **Calibrate on the first video** (proposed 6 Nov 2026, **not started**): a new learner has nothing marked known, so every
+- [x] **Calibrate on the first video** (6 Nov 2026, **not yet seen in the running app**): "Mark the words I know" on the first-video card
+      and in a video's Info sheet opens the pass described here: 20 words at a time, up to 120, tap the ones you don't know, it stops
+      when half a batch is unknown, a final screen says how many will be marked known, and Undo is offered afterwards. The rules
+      are in `Calibration` (tested). A new learner has nothing marked known, so every
       video reads as mostly unknown and the first lessons teach words they already know. Offer a short pass from the
       first-video card: show that video's most-seen new content words in batches of about 20, the learner taps the ones
       they *don't* know, and it stops when most of a batch is unknown (or after about 120 words). Nothing changes until a
@@ -336,8 +340,7 @@ Made:
 3. **More languages after Spanish and Japanese**: French and German are done; Italian, Portuguese and Dutch are next (see After 1.0).
 
 Open:
-1. How people get updates (see Release readiness).
-2. Whether an always-visible translation should exist at all (see After 1.0).
+1. Whether an always-visible translation should exist at all (see After 1.0).
 
 ## Not doing
 - Downloading from YouTube or any video site. Ever.

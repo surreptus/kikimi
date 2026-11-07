@@ -32,6 +32,8 @@ struct CoverageBadge: View {
 struct CoverageGoalView: View {
     let goal: CoverageGoal
     let learn: ([CoverageGoal.Entry]) -> Void
+    /// Opens the pass where you tap the words you don't know and the rest are marked known.
+    var markKnown: (() -> Void)?
 
     private var targetPercent: String { "\(Int((goal.target * 100).rounded()))%" }
     private var currentPercent: String { "\(Int((goal.current.fraction * 100).rounded()))%" }
@@ -59,8 +61,13 @@ struct CoverageGoalView: View {
                 if !fresh.isEmpty {
                     Text(fresh.prefix(8).map { "\($0.lemma) ×\($0.occurrences)" }.joined(separator: "   ") + (fresh.count > 8 ? "   " + String(localized: "and \(fresh.count - 8) more") : ""))
                         .font(Theme.small).foregroundStyle(Theme.ink)
-                    Button(inflected("Learn ^[\(fresh.count) word](inflect: true) in lessons")) { learn(fresh) }
-                        .buttonStyle(.pill(compact: true))
+                    HStack(spacing: 10) {
+                        Button(inflected("Learn ^[\(fresh.count) word](inflect: true) in lessons")) { learn(fresh) }
+                            .buttonStyle(.pill(compact: true))
+                        if let markKnown {
+                            Button("Mark the words I know…", action: markKnown).buttonStyle(.pill(.quiet, compact: true))
+                        }
+                    }
                 }
             }
         }

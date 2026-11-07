@@ -17,6 +17,7 @@ struct VideosView: View {
     @State private var playing: Video?
     @State private var startAt: Double?
     @State private var info: Video?
+    @State private var calibrating: Video?
     @State private var renaming: Video?
     @State private var newTitle = ""
     @State private var renameError: String?
@@ -49,8 +50,12 @@ struct VideosView: View {
         }
         .modal(isPresented: Binding(get: { info != nil }, set: { if !$0 { info = nil } })) {
             if let video = info {
-                VideoInfoSheet(env: env, video: video, play: { open(video, at: nil) }, rename: { startRename(video) })
+                VideoInfoSheet(env: env, video: video, play: { open(video, at: nil) }, rename: { startRename(video) },
+                               calibrate: { calibrating = video })
             }
+        }
+        .modal(isPresented: Binding(get: { calibrating != nil }, set: { if !$0 { calibrating = nil } })) {
+            if let video = calibrating { CalibrationSheet(env: env, video: video) }
         }
         .alert("Rename video", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Title", text: $newTitle)
@@ -246,6 +251,9 @@ struct VideosView: View {
                     }
                     .buttonStyle(.pill(.secondary, compact: true))
                 }
+                Button("Mark the words I know") { calibrating = item.video }
+                    .buttonStyle(.pill(.quiet, compact: true))
+                    .help("Go through this video's commonest new words and tap the ones you don't know. The rest are marked known.")
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -303,6 +311,7 @@ private struct VideoInfoSheet: View {
     let video: Video
     let play: () -> Void
     let rename: () -> Void
+    let calibrate: () -> Void
     @Environment(AppState.self) private var app
     @Environment(\.dismissModal) private var dismiss
 
@@ -317,7 +326,7 @@ private struct VideoInfoSheet: View {
             Text(video.title).font(Theme.title(22)).lineLimit(2)
 
             if let goal, goal.current.totalWords > 0 {
-                CoverageGoalView(goal: goal, learn: learnInLessons)
+                CoverageGoalView(goal: goal, learn: learnInLessons, markKnown: { dismiss(); calibrate() })
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .panel()
             }
