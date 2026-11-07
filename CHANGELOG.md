@@ -2,6 +2,26 @@
 
 What changed in each version of Kikimi, newest first. Every release's page on GitHub has these notes with its download and checksum.
 
+## 0.15.2
+
+*6 November 2026.* A clearer Words page with Undo, better dictionary meanings, French and German verbs read correctly, and a fix for a lesson that could stick.
+
+### New
+
+- **The Words page bar** appears only when words are selected, and each button only when it would change one of them: Reset for words that aren't new, Known for words you don't already know, Learn for new words, Ignore unless they are all ignored. The buttons are in the same order and styles in the bar and in a word's panel.
+- **Undo for each of them.** A message at the top of the window offers Undo for eight seconds. It puts each word back exactly as it was, including its stage and next review. The Reset and Ignore confirmation questions are gone, since you can undo.
+- **"Learn N words in lessons"** on a video's first-use card and its Info sheet teaches those words as lessons, five at a time, so you can ignore names and mistakes or mark words you know before any join your reviews. It used to add them all at once.
+- **French and German verbs are read correctly.** The Spanish fix from 0.15.1, now for all three languages, plus a rule for forms that no other word is spelt like (German "richtest" was being read as an adverb). In our checks 99.97% of Spanish, 99.8% of French and 99.2% of German verb forms get the right verb. It applies to videos you import from now on.
+
+### Changed
+
+- **Export to Anki is no longer offered in the app.** Its button came off the Words page. The export code is still in the project.
+
+### Fixed
+
+- **Dictionary meanings.** A word that has a capitalised twin in the dictionary showed the wrong one first. Spanish "no" showed "northwest" (the abbreviation NO), "dorado" showed a constellation, and the same happened to "se", "me", "si", "pan" and about 300 other Spanish words, and many in French and German. The meaning now follows how the word is spelt in your videos: "Navidad" still shows Christmas.
+- **A lesson batch where every word is marked known or ignored** left the next batch on a spinner.
+
 ## 0.15.1
 
 *6 November 2026.* Spanish verbs are read correctly, a quieter Learn page, and fixes to hidden subtitles and the first-video card.
