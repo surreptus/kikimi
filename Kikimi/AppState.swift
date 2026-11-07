@@ -37,6 +37,8 @@ final class AppState {
     /// Asked for by the menu bar; the Videos page and the Words page act on them when they show.
     var addVideosPending = false
     var findWordsPending = false
+    /// File > Export Words to Anki… was chosen: the window asks how, and for a folder.
+    var ankiExportRequested = false
     /// Set by "Play" buttons elsewhere; the Videos screen consumes it.
     var pendingPlayback: PlaybackRequest?
     /// Words a button elsewhere (a video's "Learn N words") wants taught: the Learn page takes them and teaches them as lessons.

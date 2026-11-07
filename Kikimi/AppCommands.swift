@@ -27,6 +27,9 @@ struct AppCommands: Commands {
             Button("Import Progress…") { app.backup.request = .chooseFile; app.openSettings(.data) }
                 .keyboardShortcut("i", modifiers: [.command, .shift])
                 .disabled(!app.isReady)
+            Divider()
+            Button("Export Words to Anki…") { app.ankiExportRequested = true }
+                .disabled(!app.isReady)
         }
 
         CommandMenu("Go") {

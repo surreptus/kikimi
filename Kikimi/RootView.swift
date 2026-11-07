@@ -18,7 +18,7 @@ struct RootView: View {
             case .failed(let message):
                 FailureView(title: "Couldn't start", detail: message)
             case .ready(let env):
-                if app.needsOnboarding { OnboardingView(env: env) } else { layout(env) }
+                if app.needsOnboarding { OnboardingView(env: env) } else { layout(env).modifier(AnkiExportFlow(env: env)) }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
