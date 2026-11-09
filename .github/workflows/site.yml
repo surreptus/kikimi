@@ -1,11 +1,15 @@
 # Builds the website (site/) and publishes it to GitHub Pages. Needs Pages switched on once:
 # Settings > Pages > Source: GitHub Actions.
+# On a pull request it only builds, so a broken site is found before the merge; it has no path filter, so it always runs
+# and can be a required check (a filtered check that doesn't run would block the merge for ever). Only a push to main deploys.
 name: Site
 
 on:
   push:
     branches: [main]
-    paths: ['site/**', 'Kikimi/Privacy.md', 'Kikimi/Terms.md', '.github/workflows/site.yml']
+    paths: ['site/**', 'Kikimi/Privacy.md', 'Kikimi/Terms.md', 'CHANGELOG.md', '.github/workflows/site.yml']
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -14,7 +18,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  # A pull request's build must not cancel a deploy that is running, or the other way round.
+  group: ${{ github.event_name == 'pull_request' && format('site-pr-{0}', github.ref) || 'pages' }}
   cancel-in-progress: true
 
 jobs:
@@ -32,11 +37,13 @@ jobs:
       - run: npm run build
         working-directory: site
       - uses: actions/upload-pages-artifact@v5
+        if: github.event_name != 'pull_request'
         with:
           path: site/dist
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
