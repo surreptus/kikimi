@@ -34,7 +34,7 @@ struct IconSegmentedPicker<Value: Hashable>: View {
         return Button { selection = option.value } label: {
             Label(option.title, systemImage: option.symbol)
                 .labelStyle(.titleAndIcon)
-                .font(.system(size: 13, weight: selected ? .semibold : .medium, design: .rounded))
+                .font(Theme.sized(size: 13, weight: selected ? .semibold : .medium, design: .rounded))
                 .lineLimit(1)
                 .padding(.horizontal, 10).padding(.vertical, 7)
                 .frame(maxWidth: .infinity)

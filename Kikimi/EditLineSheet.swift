@@ -40,7 +40,7 @@ struct EditLineSheet: View {
             Text("Fix what the transcript got wrong. The words in this line are found again.")
                 .font(Theme.small).foregroundStyle(Theme.muted)
             TextEditor(text: $text)
-                .font(.system(size: 17, design: .rounded))
+                .font(Theme.sized(size: 17, design: .rounded))
                 .scrollContentBackground(.hidden)
                 .padding(10)
                 .frame(height: 120)

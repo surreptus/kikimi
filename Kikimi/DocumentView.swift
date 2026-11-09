@@ -67,7 +67,7 @@ struct DocumentView: View {
                             HStack(spacing: 10) {
                                 Capsule().fill(Theme.ink).frame(width: 3).accessibilityHidden(true)
                                 Text((try? AttributedString(markdown: text)) ?? AttributedString(text))
-                                    .font(.system(.body, design: .rounded, weight: .semibold))
+                                    .font(Theme.styled(.body, design: .rounded, weight: .semibold))
                                     .foregroundStyle(Theme.ink)
                                     .fixedSize(horizontal: false, vertical: true)
                             }

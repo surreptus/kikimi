@@ -32,6 +32,16 @@ struct AppCommands: Commands {
                 .disabled(!app.isReady)
         }
 
+        CommandGroup(after: .toolbar) {
+            Divider()
+            Button("Larger Text") { TextScaleModel.shared.scale = TextScaleModel.shared.scale.larger }
+                .keyboardShortcut("+")
+            Button("Smaller Text") { TextScaleModel.shared.scale = TextScaleModel.shared.scale.smaller }
+                .keyboardShortcut("-")
+            Button("Standard Text Size") { TextScaleModel.shared.scale = .standard }
+                .keyboardShortcut("0")
+        }
+
         CommandMenu("Go") {
             ForEach(Array(SidebarItem.allCases.enumerated()), id: \.element) { index, item in
                 Button(item.title) { app.select(item) }

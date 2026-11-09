@@ -76,10 +76,10 @@ struct WordDetail: View {
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(kanji) { info in
                     HStack(alignment: .top, spacing: 14) {
-                        Text(info.literal).font(.system(size: 34, design: .rounded))
+                        Text(info.literal).font(Theme.sized(size: 34, design: .rounded))
                         VStack(alignment: .leading, spacing: 4) {
                             if !info.meanings.isEmpty {
-                                Text(info.meanings.joined(separator: "; ")).font(.callout)
+                                Text(info.meanings.joined(separator: "; ")).font(Theme.styled(.callout))
                             }
                             if let level = levelLine(info) {
                                 Text(level).font(Theme.small).foregroundStyle(Theme.muted)
@@ -88,18 +88,18 @@ struct WordDetail: View {
                             Grid(alignment: .topLeading, horizontalSpacing: 8, verticalSpacing: 2) {
                                 if !info.onReadings.isEmpty {
                                     GridRow {
-                                        Text("On'yomi").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                                        Text("On'yomi").font(Theme.sized(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
                                         Text(info.onReadings.joined(separator: "、"))
                                     }
                                 }
                                 if !info.kunReadings.isEmpty {
                                     GridRow {
-                                        Text("Kun'yomi").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                                        Text("Kun'yomi").font(Theme.sized(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
                                         Text(info.kunReadings.joined(separator: "、"))
                                     }
                                 }
                             }
-                            .font(.callout)
+                            .font(Theme.styled(.callout))
                         }
                         Spacer(minLength: 0)
                     }
@@ -149,7 +149,7 @@ struct WordDetail: View {
                         Button("Export video clips…") { exportExamples(.video) }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .font(.system(size: 14, weight: .medium))
+                            .font(Theme.sized(size: 14, weight: .medium))
                             .frame(width: PillIconStyle.width)
                     }
                     .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
@@ -198,7 +198,7 @@ struct WordDetail: View {
     private func exampleRow(_ line: ExampleLine) -> some View {
         let isPlaying = audio?.playingLineID == line.id
         return VStack(alignment: .leading, spacing: 4) {
-            Text(line.text).font(.system(.body, design: .rounded)).textSelection(.enabled)
+            Text(line.text).font(Theme.styled(.body, design: .rounded)).textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 4) {
                 // The source is a way back to the video, as well as the small button beside it.
@@ -225,7 +225,7 @@ struct WordDetail: View {
                 .help("Open the video at this moment")
                 .accessibilityLabel("Open the video at this sentence")
             }
-            .labelStyle(.iconOnly).foregroundStyle(Theme.muted).font(.system(size: 13))
+            .labelStyle(.iconOnly).foregroundStyle(Theme.muted).font(Theme.sized(size: 13))
             // Speaker and stop are different widths; a fixed box keeps the icons, and the text beside them, still.
             .buttonStyle(IconSlotStyle())
         }
@@ -284,12 +284,12 @@ struct EntryView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 6) {
-                Text(title).font(.headline)
+                Text(title).font(Theme.styled(.headline))
                 if showsReading, let reading = entry.reading, reading != entry.headword {
                     Text(reading).foregroundStyle(Theme.muted)
                 }
             }
-            Text(entry.gloss).font(.callout).textSelection(.enabled)
+            Text(entry.gloss).font(Theme.styled(.callout)).textSelection(.enabled)
         }
     }
 }

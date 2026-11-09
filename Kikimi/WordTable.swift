@@ -85,7 +85,7 @@ struct WordTable: View {
             headerCell("Status", .status).frame(width: Self.statusWidth, alignment: .leading)
             if showsNext { Text("Next review").frame(width: Self.nextWidth, alignment: .leading) }
         }
-        .font(.system(size: 12, weight: .medium, design: .rounded))
+        .font(Theme.sized(size: 12, weight: .medium, design: .rounded))
         .foregroundStyle(Theme.muted)
         .padding(.horizontal, Theme.screenPadding).padding(.vertical, 8)
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.line).frame(height: 1) }
@@ -98,7 +98,7 @@ struct WordTable: View {
             HStack(spacing: 3) {
                 Text(title)
                 if sort.column == column {
-                    Image(systemName: sort.ascending ? "chevron.up" : "chevron.down").font(.system(size: 9, weight: .bold))
+                    Image(systemName: sort.ascending ? "chevron.up" : "chevron.down").font(Theme.sized(size: 9, weight: .bold))
                 }
             }
             .foregroundStyle(sort.column == column ? Theme.ink : Theme.muted)
@@ -150,7 +150,7 @@ private struct WordTableRow: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            Text(row.word.lemma).font(.system(.body, design: .rounded, weight: .medium)).lineLimit(1)
+            Text(row.word.lemma).font(Theme.styled(.body, design: .rounded, weight: .medium)).lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if showsType { Text(row.word.pos.title).foregroundStyle(secondary).frame(width: 80, alignment: .leading) }
             Text("\(row.occurrenceCount)×").foregroundStyle(secondary).monospacedDigit().frame(width: 60, alignment: .leading)

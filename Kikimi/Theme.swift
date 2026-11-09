@@ -71,10 +71,33 @@ enum Theme {
     static func screenChange(_ reduceMotion: Bool) -> Animation { easeOut(reduceMotion ? 0.12 : 0.35) }
 
     /// Captions and explanatory text: the body size of the app. Furigana over subtitle words is the one thing smaller (see `SubtitleRow`).
-    static let small = Font.system(size: 14, design: .rounded)
+    static var small: Font { sized(size: 14, design: .rounded) }
 
     /// Large headings are light; small ones need a little weight to stay readable.
-    static func title(_ size: CGFloat = 24) -> Font { .system(size: size, weight: size >= 30 ? .regular : .semibold, design: .rounded) }
+    static func title(_ size: CGFloat = 24) -> Font { sized(size: size, weight: size >= 30 ? .regular : .semibold, design: .rounded) }
+
+    /// A font of `size` points at the chosen text size (Settings > General). Every font in the app is made here or in
+    /// `styled`, which is how the setting reaches all of it. Reading the scale in a view's body is what redraws the view
+    /// when the setting changes.
+    static func sized(size: CGFloat, weight: Font.Weight = .regular, design: Font.Design = .default) -> Font {
+        .system(size: TextScaleModel.shared.scale.scaled(Double(size)), weight: weight, design: design)
+    }
+
+    /// The system's text styles at the chosen size. macOS does not scale these itself, so each has its usual size here, and
+    /// the smallest are raised to 12 pt, the least the app uses.
+    static func styled(_ style: Font.TextStyle, design: Font.Design = .default, weight: Font.Weight? = nil) -> Font {
+        let (points, usual): (CGFloat, Font.Weight) = switch style {
+        case .largeTitle: (26, .regular)
+        case .title: (22, .regular)
+        case .title2: (17, .regular)
+        case .title3: (15, .regular)
+        case .headline: (13, .bold)
+        case .body: (13, .regular)
+        case .callout: (12, .regular)
+        default: (12, .regular)   // subheadline, footnote, caption: the system's 10 and 11 pt are below the least we use
+        }
+        return sized(size: points, weight: weight ?? usual, design: design)
+    }
 }
 
 // MARK: Buttons

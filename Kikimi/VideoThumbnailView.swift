@@ -16,7 +16,7 @@ struct VideoThumbnailView: View {
             if let image {
                 Image(nsImage: image).resizable().scaledToFill()
             } else {
-                Image(systemName: "film").font(.system(size: 18)).foregroundStyle(Theme.faint)
+                Image(systemName: "film").font(Theme.sized(size: 18)).foregroundStyle(Theme.faint)
             }
         }
         .frame(width: 112, height: 63)

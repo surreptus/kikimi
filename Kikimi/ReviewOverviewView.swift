@@ -112,7 +112,7 @@ struct ReviewOverviewView: View {
     /// The number beside a panel's title: filled when there is something to do.
     private func count(_ n: Int, onAccent: Bool = false) -> some View {
         Text("\(n)")
-            .font(.system(size: 14, weight: .semibold, design: .rounded))
+            .font(Theme.sized(size: 14, weight: .semibold, design: .rounded))
             .foregroundStyle(onAccent ? Theme.accent : (n == 0 ? Theme.ink : Theme.onAccent))
             .padding(.horizontal, 10).padding(.vertical, 2)
             .background(Capsule().fill(onAccent ? Theme.onAccent : (n == 0 ? Theme.ink.opacity(0.12) : Theme.accent)))
@@ -205,8 +205,8 @@ struct ReviewOverviewView: View {
                     HStack(spacing: 12) {
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(spacing: 8) {
-                                Text(kind.title).font(.system(size: 14, weight: .semibold, design: .rounded))
-                                Text("\(count(kind))").font(.system(size: 14, design: .rounded)).foregroundStyle(Theme.muted)
+                                Text(kind.title).font(Theme.sized(size: 14, weight: .semibold, design: .rounded))
+                                Text("\(count(kind))").font(Theme.sized(size: 14, design: .rounded)).foregroundStyle(Theme.muted)
                             }
                             Text(kind.summary).font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
                         }
@@ -308,7 +308,7 @@ struct ReviewOverviewView: View {
 
     private func figure(_ value: String, _ label: LocalizedStringKey) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(value).font(.system(size: 24, weight: .semibold, design: .rounded))
+            Text(value).font(Theme.sized(size: 24, weight: .semibold, design: .rounded))
             Text(label).font(Theme.small).foregroundStyle(Theme.muted)
         }
         .accessibilityElement(children: .combine)
@@ -367,7 +367,7 @@ struct ReviewOverviewView: View {
                     ForEach(0..<8, id: \.self) { i in
                         VStack(spacing: 6) {
                             StageRing(stage: i + 1, size: 24)
-                            Text("\(overview.perStage[i])").font(.system(size: 14, weight: .semibold, design: .rounded))
+                            Text("\(overview.perStage[i])").font(Theme.sized(size: 14, weight: .semibold, design: .rounded))
                             Text(Self.gaps[i].short).font(Theme.small).foregroundStyle(Theme.muted)
                         }
                         .frame(maxWidth: .infinity)

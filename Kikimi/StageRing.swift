@@ -60,13 +60,13 @@ struct StatusIndicator: View {
         case .learning: StageRing(stage: max(1, stage ?? 1), size: size)
         case .finished: StageRing(stage: 9, size: size)
         case .ignored:
-            Image(systemName: "eye.slash").font(.system(size: size * 0.7, weight: .medium)).foregroundStyle(Theme.muted)
+            Image(systemName: "eye.slash").font(Theme.sized(size: size * 0.7, weight: .medium)).foregroundStyle(Theme.muted)
                 .frame(width: size, height: size)
                 .accessibilityLabel("Ignored")
         case .known:
             ZStack {
                 Circle().fill(Theme.green)
-                Image(systemName: "checkmark").font(.system(size: size * 0.55, weight: .bold))
+                Image(systemName: "checkmark").font(Theme.sized(size: size * 0.55, weight: .bold))
                     .foregroundStyle(Color(light: .white, dark: Color(hex: 0x0F2A1C)))
             }
             .frame(width: size, height: size)
@@ -85,7 +85,7 @@ struct StatusBadge: View {
             StatusIndicator(status: status, stage: stage?.rawValue, size: 18)
             Text(status.title)
         }
-        .font(.system(size: 12, weight: .medium, design: .rounded))
+        .font(Theme.sized(size: 12, weight: .medium, design: .rounded))
         .padding(.leading, 6).padding(.trailing, 10).padding(.vertical, 3)
         .background(Capsule().fill(Theme.softStrong))
         .foregroundStyle(Theme.ink)
