@@ -61,6 +61,7 @@ struct SettingsView: View {
             }
         }
         .preferredColorScheme(appearance.colorScheme)
+        .font(Theme.styled(.body, design: .rounded))   // the window is its own scene, so it sets the text size itself
     }
 }
 
@@ -83,6 +84,13 @@ private struct GeneralTab: View {
                 }
             } footer: {
                 Text("Match system follows your Mac's Light or Dark setting.")
+            }
+            Section {
+                Picker("Text size", selection: Binding(get: { TextScaleModel.shared.scale }, set: { TextScaleModel.shared.scale = $0 })) {
+                    ForEach(TextScale.allCases, id: \.self) { Text($0.title).tag($0) }
+                }
+            } footer: {
+                Text("Makes the app's text larger, for the windows and the Learn cards. The transcript has its own size below, and menus and system controls keep the system's size. View > Larger Text and Smaller Text do the same.")
             }
             Section {
                 Picker("Transcript text", selection: $transcriptSize) {
@@ -309,7 +317,7 @@ private struct DataTab: View {
             previewContent(pending, backup)
         case .restored(let report, let settingsRestored, let videos):
             VStack(alignment: .leading, spacing: 8) {
-                Text("Restored").font(.headline)
+                Text("Restored").font(Theme.styled(.headline))
                 Text((videos > 0 ? inflected("^[\(videos) video](inflect: true) added. ") : "")
                      + restoredLine(report) + (settingsRestored ? " Settings restored too." : ""))
                     .foregroundStyle(.secondary)
@@ -330,7 +338,7 @@ private struct DataTab: View {
         let total = preview.learning + preview.known + preview.finished
         let languages = preview.languages.compactMap { LanguageProfiles.profile(for: $0)?.displayName }.joined(separator: ", ")
         return VStack(alignment: .leading, spacing: 8) {
-            Text("Backup from \(preview.createdAt.formatted(date: .abbreviated, time: .omitted))").font(.headline)
+            Text("Backup from \(preview.createdAt.formatted(date: .abbreviated, time: .omitted))").font(Theme.styled(.headline))
             Text("^[\(total) word](inflect: true): \(preview.learning) learning, \(preview.known) known, \(preview.finished) finished"
                  + (languages.isEmpty ? "" : " · \(languages)"))
                 .foregroundStyle(.secondary)
@@ -386,7 +394,7 @@ private struct DataTab: View {
             Button("Choose word list…") { Task { await chooseKnownList() } }
         case .previewing(let words, let report):
             VStack(alignment: .leading, spacing: 8) {
-                Text("^[\(report.listed) word](inflect: true) in the list").font(.headline)
+                Text("^[\(report.listed) word](inflect: true) in the list").font(Theme.styled(.headline))
                 VStack(alignment: .leading, spacing: 4) {
                     if report.marked > 0 {
                         Text("• ^[\(report.marked) word](inflect: true) in your \(app.profile.displayName) library will be marked known."
@@ -410,7 +418,7 @@ private struct DataTab: View {
             }
         case .done(let report):
             VStack(alignment: .leading, spacing: 8) {
-                Text("Marked ^[\(report.marked) word](inflect: true) as known.").font(.headline)
+                Text("Marked ^[\(report.marked) word](inflect: true) as known.").font(Theme.styled(.headline))
                 Button("Done") { known = .idle }
             }
         case .failed(let message):

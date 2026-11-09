@@ -73,8 +73,12 @@ machine, release plumbing, and a few promises we have made but not kept (below).
 - [x] Help and feedback (6 Nov 2026): Help > Report a Problem… opens a new GitHub issue in the browser with the Kikimi and macOS
       versions typed in, nothing else attached and nothing sent until the person submits it (a mailto link was dropped, since
       we publish no email address). The privacy policy says so.
-- [ ] App-wide text size. Today the setting covers only the transcript; macOS has no system text-size setting for
-      apps to follow.
+- [x] App-wide text size (8 Nov 2026, **not yet seen in the running app**): Settings > General > Text size (Standard, Large,
+      Larger, Largest: 1, 1.15, 1.3 and 1.5 times), and View > Larger Text, Smaller Text and Standard Text Size (⌘+, ⌘-, ⌘0).
+      macOS ignores SwiftUI's own text-size setting (measured), so every font is made in `Theme` (`sized`, `styled`) and scaled by
+      `TextScale`. Not scaled: the transcript, which keeps its own size, and menus, system controls and tooltips. No step below
+      the usual size, since the smallest text is already 12 pt. To check by eye at Largest: the player's control row, the Learn
+      cards, the Settings window (it scrolls), and the Words table's fixed-width columns.
 
 ### Already done for 1.0
 Import with progress and cancel; language check before transcribing; idempotent, non-destructive pipeline; word

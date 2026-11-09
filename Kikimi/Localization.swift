@@ -25,6 +25,17 @@ extension WordStatus {
     }
 }
 
+extension TextScale {
+    var title: LocalizedStringKey {
+        switch self {
+        case .standard: "Standard"
+        case .large: "Large"
+        case .larger: "Larger"
+        case .largest: "Largest"
+        }
+    }
+}
+
 extension ReviewPrompt {
     var title: String {
         switch self {

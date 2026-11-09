@@ -33,6 +33,7 @@ struct RootView: View {
         .toolbar(removing: .title)
         .toolbarBackground(.hidden, for: .windowToolbar)
         .tint(Theme.accent)
+        .font(Theme.styled(.body, design: .rounded))   // text with no font of its own, at the chosen size (Settings > General)
         .fontDesign(.rounded)
         .modal(isPresented: Binding(get: { app.showAcknowledgements }, set: { app.showAcknowledgements = $0 })) { AcknowledgementsView() }
         #if DEBUG

@@ -65,7 +65,7 @@ struct StorageView: View {
             HStack {
                 Text(title).font(Theme.title(16))
                 Spacer()
-                Text(format(bytes)).font(.system(.callout, design: .rounded, weight: .semibold)).foregroundStyle(Theme.muted)
+                Text(format(bytes)).font(Theme.styled(.callout, design: .rounded, weight: .semibold)).foregroundStyle(Theme.muted)
             }
             content()
         }
@@ -75,7 +75,7 @@ struct StorageView: View {
     private func modelRow(_ model: InstalledModel) -> some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(ModelCatalog.name(for: model.variant)).font(.system(.headline, design: .rounded))
+                Text(ModelCatalog.name(for: model.variant)).font(Theme.styled(.headline, design: .rounded))
                 Text(detail(for: model)).font(Theme.small).foregroundStyle(Theme.muted)
             }
             Spacer()

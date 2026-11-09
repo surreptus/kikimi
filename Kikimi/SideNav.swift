@@ -59,9 +59,9 @@ struct SideNav: View {
                     Image(systemName: "globe")
                     Text(languages.first { $0.code == language }?.name ?? language)
                     Spacer()
-                    Image(systemName: "chevron.up.chevron.down").font(.caption2)
+                    Image(systemName: "chevron.up.chevron.down").font(Theme.styled(.caption2))
                 }
-                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .font(Theme.sized(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(Theme.ink)
                 .padding(.horizontal, 12).padding(.vertical, 10)
                 .background(Capsule().fill(Theme.ink.opacity(0.07)))
@@ -75,7 +75,7 @@ struct SideNav: View {
                 Button("How it works", action: showAbout)
             }
             .buttonStyle(.plain)
-            .font(.system(size: 12, design: .rounded))
+            .font(Theme.sized(size: 12, design: .rounded))
             .foregroundStyle(Theme.ink)
             .padding(.horizontal, 6).padding(.top, 4)
         }
@@ -91,13 +91,13 @@ struct SideNav: View {
             selection = item
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: item.symbol).font(.system(size: 15, weight: .medium)).frame(width: 22)
+                Image(systemName: item.symbol).font(Theme.sized(size: 15, weight: .medium)).frame(width: 22)
                 Text(item.title)
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .font(Theme.sized(size: 15, weight: .medium, design: .rounded))
                 Spacer()
                 if item == .review, dueCount > 0 {
                     Text("\(dueCount)")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .font(Theme.sized(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(Theme.onAccent)
                         .padding(.horizontal, 8).padding(.vertical, 2)
                         .background(Capsule().fill(Theme.accent))

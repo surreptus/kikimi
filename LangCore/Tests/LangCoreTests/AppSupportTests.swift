@@ -666,3 +666,31 @@ final class CalibrationTests: XCTestCase {
         XCTAssertEqual(Calibration.known(shown: [], unknown: [1]), [])
     }
 }
+
+final class TextScaleTests: XCTestCase {
+    func testTheUsualSizeChangesNothingAndEachStepIsLarger() {
+        XCTAssertEqual(TextScale.standard.scaled(14), 14)
+        let sizes = TextScale.allCases.map { $0.scaled(14) }
+        XCTAssertEqual(sizes, sizes.sorted())
+        XCTAssertEqual(sizes, [14, 16, 18, 21])
+        XCTAssertGreaterThanOrEqual(TextScale.standard.scaled(12), 12, "the smallest text is never made smaller")
+    }
+
+    func testTheChoiceIsRememberedAndTheUsualSizeIsNoChoice() {
+        let defaults = UserDefaults(suiteName: "ts-\(UUID().uuidString)")!
+        XCTAssertEqual(TextScale.stored(in: defaults), .standard)
+        TextScale.larger.store(in: defaults)
+        XCTAssertEqual(TextScale.stored(in: defaults), .larger)
+        TextScale.standard.store(in: defaults)
+        XCTAssertNil(defaults.string(forKey: TextScale.key))
+        defaults.set("huge", forKey: TextScale.key)
+        XCTAssertEqual(TextScale.stored(in: defaults), .standard, "a size this version doesn't know is the usual one")
+    }
+
+    func testStepsStopAtTheEnds() {
+        XCTAssertEqual(TextScale.standard.smaller, .standard)
+        XCTAssertEqual(TextScale.standard.larger, .large)
+        XCTAssertEqual(TextScale.largest.larger, .largest)
+        XCTAssertEqual(TextScale.largest.smaller, .larger)
+    }
+}

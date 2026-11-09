@@ -65,10 +65,10 @@ struct ImportSection: View {
         if modelInstalled == true, downloadProgress == nil, !changingModel {
             HStack(spacing: 8) {
                 Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.green)
-                Text("Speech model ready: \(modelShortName)").font(.callout).foregroundStyle(Theme.muted)
+                Text("Speech model ready: \(modelShortName)").font(Theme.styled(.callout)).foregroundStyle(Theme.muted)
                 Button("Change") { changingModel = true }
                     .buttonStyle(.plain)
-                    .font(.system(.callout, design: .rounded, weight: .semibold))
+                    .font(Theme.styled(.callout, design: .rounded, weight: .semibold))
                     .foregroundStyle(Theme.ink)
                 Spacer()
             }
@@ -91,9 +91,9 @@ struct ImportSection: View {
     private var modelExplanation: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 14) {
-                Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.ink)
+                Image(systemName: "waveform.and.mic").font(Theme.sized(size: 20, weight: .bold)).foregroundStyle(Theme.ink)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Only for videos without subtitles").font(.system(.headline, design: .rounded))
+                    Text("Only for videos without subtitles").font(Theme.styled(.headline, design: .rounded))
                     Text("A video that comes with a subtitle file (.srt or .vtt) needs no download. To write out what is said in any other, Kikimi needs a speech model (\(modelSize)), downloaded once and saved on this Mac. Nothing is uploaded.")
                         .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
                     Button("Choose a different model") { changingModel = true }
@@ -123,8 +123,8 @@ struct ImportSection: View {
     private var modelChooser: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 14) {
-                Image(systemName: "waveform.and.mic").font(.system(size: 20, weight: .bold)).foregroundStyle(Theme.ink)
-                Text("Speech model").font(.system(.headline, design: .rounded))
+                Image(systemName: "waveform.and.mic").font(Theme.sized(size: 20, weight: .bold)).foregroundStyle(Theme.ink)
+                Text("Speech model").font(Theme.styled(.headline, design: .rounded))
                 if model.isEmpty {
                     ProgressView().controlSize(.small)   // selection not loaded yet; a Picker would warn about ""
                 } else {
@@ -221,14 +221,14 @@ struct ImportSection: View {
             // Only worth saying when there is a choice of language to import as.
             if app.learning.count > 1 {
                 Text("Importing as \(app.profile.displayName). Change the language in the sidebar.")
-                    .font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.ink)
+                    .font(Theme.sized(size: 13, weight: .bold, design: .rounded)).foregroundStyle(Theme.ink)
             }
             Text(canImport
                  ? String(localized: "Got a subtitle file (.srt or .vtt) for it? Add it in the next step and Kikimi skips transcribing.")
                  : String(localized: "A video with a subtitle file (.srt or .vtt) can be imported right away. For the rest, download the speech model below, once."))
-                .font(.callout).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+                .font(Theme.styled(.callout)).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
             Text("Your original files are never changed or deleted.")
-                .font(.callout).foregroundStyle(Theme.muted)
+                .font(Theme.styled(.callout)).foregroundStyle(Theme.muted)
             Button("Choose files") { showImporter = true }
                 .buttonStyle(.pill)
                 .padding(.top, 4)
@@ -323,7 +323,7 @@ struct ImportSection: View {
         let name = item.video.lastPathComponent
         return HStack(alignment: .center, spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(name).font(.system(.body, design: .rounded, weight: .semibold)).lineLimit(1).truncationMode(.middle)
+                Text(name).font(Theme.styled(.body, design: .rounded, weight: .semibold)).lineLimit(1).truncationMode(.middle)
                 if let subtitles = item.subtitles {
                     Text("Subtitles: \(subtitles.lastPathComponent)").font(Theme.small).foregroundStyle(Theme.muted)
                         .lineLimit(1).truncationMode(.middle)
@@ -364,7 +364,7 @@ struct ImportSection: View {
             ForEach(queue.jobs) { job in
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        Text(job.fileName).font(.system(.body, design: .rounded, weight: .semibold))
+                        Text(job.fileName).font(Theme.styled(.body, design: .rounded, weight: .semibold))
                             .lineLimit(1).truncationMode(.middle)
                         Spacer()
                         StatusPill(text: statusText(job), color: statusColor(job.status))
@@ -403,7 +403,7 @@ struct ImportSection: View {
     private func languagePrompt(job: ImportQueue.Job, detected other: any LanguageProfile) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("This sounds like \(other.displayName), but you're importing as \(job.profile.displayName). Nothing has been imported yet.")
-                .font(.callout)
+                .font(Theme.styled(.callout))
             HStack(spacing: 10) {
                 Button("Import as \(other.displayName)") {
                     queue.retry(job.id, as: other, model: env.preferences.model(for: other))

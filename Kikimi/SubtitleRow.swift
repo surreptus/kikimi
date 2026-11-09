@@ -105,7 +105,7 @@ struct SubtitleRow: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
             Text(stamp(line.startTime))
-                .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
+                .font(Theme.sized(size: 12, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(active ? Theme.ink : Theme.muted)
             VStack(alignment: .leading, spacing: 3) {
                 Group {
@@ -209,7 +209,7 @@ struct SubtitleRow: View {
                 .accessibilityLabel("Translation: \(translation)")
         } else if translationWaiting {
             Text("Translating…")
-                .font(.system(size: 12, design: .rounded)).foregroundStyle(Theme.faint)
+                .font(Theme.sized(size: 12, design: .rounded)).foregroundStyle(Theme.faint)
         }
     }
 
@@ -234,7 +234,7 @@ struct SubtitleRow: View {
     private var lineMenu: some View {
         if rowHovered || isFocused {
             Menu { lineActions } label: {
-                Image(systemName: "ellipsis").font(.system(size: 13, weight: .semibold)).frame(width: 22, height: 22)
+                Image(systemName: "ellipsis").font(Theme.sized(size: 13, weight: .semibold)).frame(width: 22, height: 22)
             }
             .menuStyle(.button).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
             .foregroundStyle(Theme.muted)

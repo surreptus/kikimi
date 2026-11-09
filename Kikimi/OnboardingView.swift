@@ -68,7 +68,7 @@ private struct LanguageTile: View {
                     if let region = profile.flagRegion { Flag(region: region) }
                     Spacer()
                     Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                        .font(.system(size: 20))
+                        .font(Theme.sized(size: 20))
                         .foregroundStyle(selected ? Theme.ink : Theme.muted)
                 }
                 Spacer(minLength: 0)

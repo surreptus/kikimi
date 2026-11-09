@@ -38,7 +38,7 @@ struct LessonView: View {
                     .help("Back to the Learn page (Esc). Words you were taught but not yet quizzed on are not started.")
                 ProgressView(value: Double(index), total: Double(max(1, wordIDs.count)))
                     .progressViewStyle(.thin)
-                Text("\(max(0, wordIDs.count - index)) left").font(.system(size: 12, weight: .medium, design: .rounded))
+                Text("\(max(0, wordIDs.count - index)) left").font(Theme.sized(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(Theme.muted)
             }
             .padding(.horizontal, 28).padding(.top, 20)
@@ -61,15 +61,15 @@ struct LessonView: View {
     private func face(_ card: ReviewCard) -> some View {
         VStack(spacing: 22) {
             VStack(spacing: 12) {
-                Text(lemma(card)).font(.system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
+                Text(lemma(card)).font(Theme.sized(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
                 StatusPill(text: card.word.pos.title)
                 if app.profile.display.showsReadings, let reading = card.entries.readings(of: card.word.lemma, first: card.entries.first?.reading).first {
                     Text(reading).font(Theme.title(22))
                 }
                 Text(card.entries.first?.gloss ?? String(localized: "No dictionary entry"))
-                    .font(.system(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
+                    .font(Theme.styled(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
                 if let example = card.example {
-                    Text(example.highlighted).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                    Text(example.highlighted).font(Theme.styled(.body, design: .rounded)).foregroundStyle(Theme.muted)
                         .multilineTextAlignment(.center).padding(.top, 6)
                     Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint)
                     Button { play() } label: { KeyedLabel(title: "Play sentence", systemImage: "speaker.wave.2.fill", key: "R") }

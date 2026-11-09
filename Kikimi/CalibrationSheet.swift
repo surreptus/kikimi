@@ -87,8 +87,8 @@ struct CalibrationSheet: View {
             if isNew { unknown.remove(word.id) } else { unknown.insert(word.id) }
         } label: {
             HStack(spacing: 5) {
-                Text(word.lemma).font(.system(size: 16, weight: .medium, design: .rounded))
-                if isNew { Image(systemName: "xmark").font(.system(size: 10, weight: .bold)).accessibilityHidden(true) }
+                Text(word.lemma).font(Theme.sized(size: 16, weight: .medium, design: .rounded))
+                if isNew { Image(systemName: "xmark").font(Theme.sized(size: 10, weight: .bold)).accessibilityHidden(true) }
             }
             .foregroundStyle(isNew ? Theme.onAccent : Theme.ink)
             .padding(.horizontal, 13).padding(.vertical, 7)

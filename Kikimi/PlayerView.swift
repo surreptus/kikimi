@@ -361,7 +361,7 @@ struct PlayerView: View {
             Spacer()
             Toggle("Highlight", isOn: $highlightWords)
                 .toggleStyle(.switch).controlSize(.mini)
-                .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                .font(Theme.sized(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
         }
         .padding(.horizontal, 16).padding(.vertical, 8)
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.line).frame(height: 1) }
@@ -370,7 +370,7 @@ struct PlayerView: View {
     /// The same marks the subtitles use, so the legend is a true sample, not a description.
     private func legendSample<V: View>(_ label: LocalizedStringKey, mark: (Text) -> V) -> some View {
         mark(Text(label))
-            .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+            .font(Theme.sized(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
     }
 
     private func subtitleList(_ controller: PlaybackController) -> some View {
@@ -420,7 +420,7 @@ struct PlayerView: View {
                     HStack(spacing: 8) { wordInfo(token); Spacer(); wordActions }
                     VStack(alignment: .leading, spacing: 8) { HStack(spacing: 8) { wordInfo(token) }; HStack(spacing: 8) { wordActions } }
                 }
-                Text(hint?.gloss ?? "No dictionary entry").font(.system(.callout, design: .rounded)).lineLimit(2)
+                Text(hint?.gloss ?? "No dictionary entry").font(Theme.styled(.callout, design: .rounded)).lineLimit(2)
                     .foregroundStyle(hint?.gloss == nil ? Theme.muted : Theme.ink)
                 if hint?.wordID != nil, hint?.status == .new {
                     Text("Learn adds it to your reviews. Known means you already know it.")
@@ -428,7 +428,7 @@ struct PlayerView: View {
                 }
             } else {
                 Text("Point at a word, or use ← → on a line, to see what it means. Click it or press Return to keep its meaning open.")
-                    .font(.system(.callout, design: .rounded)).foregroundStyle(Theme.faint)
+                    .font(Theme.styled(.callout, design: .rounded)).foregroundStyle(Theme.faint)
             }
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
@@ -454,17 +454,17 @@ struct PlayerView: View {
     private func wordInfo(_ token: Token) -> some View {
         Text(hint?.nounPhrase ?? hint?.lemma ?? token.lemma).font(Theme.title(17))
         if let reading = hint?.reading ?? token.reading {
-            Text(reading).font(.system(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
+            Text(reading).font(Theme.styled(.callout, design: .rounded, weight: .bold)).foregroundStyle(Theme.ink)
         }
         if let others = hint?.otherReadings, !others.isEmpty {
-            Text(others.joined(separator: "・")).font(.system(.callout, design: .rounded)).foregroundStyle(Theme.muted)
+            Text(others.joined(separator: "・")).font(Theme.styled(.callout, design: .rounded)).foregroundStyle(Theme.muted)
                 .accessibilityLabel("Also read \(listed(others))")
         }
         StatusPill(text: token.pos.title)
         // Japanese verbs and adjectives show the form they are in; the link opens the page on how it is built.
         if let stem = TsumikiStem.stem(for: token) {
             Link(destination: stem.url) {
-                Text("\(stem.name) ↗").font(.system(size: 12, weight: .semibold, design: .rounded))
+                Text("\(stem.name) ↗").font(Theme.sized(size: 12, weight: .semibold, design: .rounded))
             }
             .foregroundStyle(Theme.ink)
             .help("How \(stem.label) is built (opens Tsumiki, a Japanese grammar guide, in your browser)")

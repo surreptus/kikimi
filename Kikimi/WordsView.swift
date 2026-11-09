@@ -124,11 +124,11 @@ struct WordsView: View {
             }
             HStack(spacing: 10) {
                 HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass").foregroundStyle(Theme.ink).font(.system(size: 14, weight: .bold))
+                    Image(systemName: "magnifyingglass").foregroundStyle(Theme.ink).font(Theme.sized(size: 14, weight: .bold))
                     TextField("Search words", text: searchBinding)
                         .focused($searchFocused)
                         .textFieldStyle(.plain)
-                        .font(.system(.body, design: .rounded))
+                        .font(Theme.styled(.body, design: .rounded))
                     if !search.isEmpty {
                         Button("Clear search", systemImage: "xmark.circle.fill") { search = "" }
                             .labelStyle(.iconOnly).buttonStyle(.plain).foregroundStyle(Theme.muted)
@@ -294,13 +294,13 @@ struct WordsView: View {
             WordDetail(env: env, row: row)
         } else if selection.count > 1 {
             VStack(alignment: .leading, spacing: 10) {
-                Text("\(selection.count) words selected").font(.title2.bold())
+                Text("\(selection.count) words selected").font(Theme.styled(.title2, weight: .bold))
                 ForEach([WordStatus.new, .learning, .known, .finished, .ignored], id: \.self) { status in
                     let count = selectedRows.filter { $0.word.status == status }.count
                     if count > 0 { HStack { StatusPill(text: status.title, color: summaryColor(status)); Text("\(count)") } }
                 }
                 Text("Use the buttons below the list to learn, mark as known, or reset them all at once.")
-                    .font(.callout).foregroundStyle(Theme.muted)
+                    .font(Theme.styled(.callout)).foregroundStyle(Theme.muted)
                 Spacer()
             }
             .padding()

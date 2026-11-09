@@ -29,12 +29,12 @@ struct ToastHost: View {
                         Button(action.title) { action.run(); app.dismissToast() }
                             .buttonStyle(.plain).fontWeight(.bold).underline()
                     }
-                    Button { app.dismissToast() } label: { Image(systemName: "xmark").font(.system(size: 11, weight: .semibold)) }
+                    Button { app.dismissToast() } label: { Image(systemName: "xmark").font(Theme.sized(size: 11, weight: .semibold)) }
                         .buttonStyle(.plain).foregroundStyle(Theme.muted)
                         .accessibilityLabel("Dismiss")
                         .help("Dismiss")
                 }
-                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .font(Theme.sized(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(Theme.ink)
                 .padding(.horizontal, 16).padding(.vertical, 10)
                 .background(Capsule().fill(Theme.card))

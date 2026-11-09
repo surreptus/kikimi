@@ -71,11 +71,11 @@ struct AboutView: View {
 
     private func step(_ number: Int, _ title: LocalizedStringKey, _ text: LocalizedStringKey) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text("\(number)").font(.system(size: 14, weight: .semibold, design: .rounded))
+            Text("\(number)").font(Theme.sized(size: 14, weight: .semibold, design: .rounded))
                 .frame(width: 26, height: 26).background(Circle().fill(Theme.softStrong))
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 3) {
-                Text(title).font(.system(.body, design: .rounded, weight: .semibold))
+                Text(title).font(Theme.styled(.body, design: .rounded, weight: .semibold))
                 paragraph(text)
             }
         }
@@ -100,7 +100,7 @@ struct AboutView: View {
 
     private func row(_ name: LocalizedStringKey, _ text: LocalizedStringKey) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text(name).font(.system(.body, design: .rounded, weight: .medium)).frame(width: 150, alignment: .leading)
+            Text(name).font(Theme.styled(.body, design: .rounded, weight: .medium)).frame(width: 150, alignment: .leading)
             paragraph(text)
         }
         .accessibilityElement(children: .combine)
@@ -192,7 +192,7 @@ struct AboutView: View {
 
     private func shortcutGroup(_ place: LocalizedStringKey, _ items: [(key: String, action: String)]) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(place).font(.system(.body, design: .rounded, weight: .medium))
+            Text(place).font(Theme.styled(.body, design: .rounded, weight: .medium))
             ShortcutHints(items: items)
         }
     }

@@ -85,7 +85,7 @@ struct ReviewView: View {
         VStack(spacing: 12) {
             Text(extra == nil ? "All done for now" : extra == .lesson ? "Lesson done" : "Practice done").font(Theme.title(30))
             Text(summaryText(summary))
-                .font(.system(.title3, design: .rounded)).foregroundStyle(Theme.muted)
+                .font(Theme.styled(.title3, design: .rounded)).foregroundStyle(Theme.muted)
             if extra == .lesson {
                 HStack(spacing: 12) {
                     if !lessonQueue.isEmpty {
@@ -179,7 +179,7 @@ struct ReviewView: View {
                     .help("Back to the overview (Esc). Your answers so far are kept.")
                 ProgressView(value: Double(max(0, total - remaining)), total: Double(max(1, total)))
                     .progressViewStyle(.thin)
-                Text("\(remaining) left").font(.system(size: 12, weight: .medium, design: .rounded)).foregroundStyle(Theme.muted)
+                Text("\(remaining) left").font(Theme.sized(size: 12, weight: .medium, design: .rounded)).foregroundStyle(Theme.muted)
                 // In the page, not the window toolbar: a toolbar item here changes how the title bar looks on this screen only.
                 Menu {
                     Picker("Play the sentence", selection: $mode) {
@@ -187,7 +187,7 @@ struct ReviewView: View {
                     }
                     .pickerStyle(.inline)
                 } label: {
-                    Image(systemName: "speaker.wave.2.fill").font(.system(size: 13, weight: .medium)).frame(width: PillIconStyle.width)
+                    Image(systemName: "speaker.wave.2.fill").font(Theme.sized(size: 13, weight: .medium)).frame(width: PillIconStyle.width)
                 }
                 .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
                 .help("When to play the sentence audio")
@@ -204,12 +204,12 @@ struct ReviewView: View {
                 } else if shadowing(for: card) {
                     shadowFace(card)
                 } else {
-                lemmaText(card, font: .system(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
+                lemmaText(card, font: Theme.sized(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
                 StatusPill(text: card.word.pos.title)
 
                 // The word as it was said in your video: the context is part of the question, the translation is not.
                 if let example = card.example {
-                    Text(example.highlighted).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                    Text(example.highlighted).font(Theme.styled(.body, design: .rounded)).foregroundStyle(Theme.muted)
                         .multilineTextAlignment(.center)
                         .padding(.top, 4)
                 }
@@ -220,7 +220,7 @@ struct ReviewView: View {
                             Text(reading).font(Theme.title(22)).foregroundStyle(Theme.ink)
                         }
                         Text(card.entries.first?.gloss ?? "No dictionary entry")
-                            .font(.system(.title3, design: .rounded)).lineSpacing(4)
+                            .font(Theme.styled(.title3, design: .rounded)).lineSpacing(4)
                             .multilineTextAlignment(.center)
                             .textSelection(.enabled)
                         if let example = card.example {
@@ -252,7 +252,7 @@ struct ReviewView: View {
                                 }
                                 Button("Edit sentence…", action: editSentence)
                             } label: {
-                                Image(systemName: "ellipsis").font(.system(size: 13, weight: .medium)).frame(width: PillIconStyle.width)
+                                Image(systemName: "ellipsis").font(Theme.sized(size: 13, weight: .medium)).frame(width: PillIconStyle.width)
                             }
                             .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
                             .help("Translate or fix this sentence")
@@ -327,11 +327,11 @@ struct ReviewView: View {
     private func listenFace(_ card: ReviewCard) -> some View {
         if revealed {
             if let example = card.example {
-                Text(example.highlighted).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
+                Text(example.highlighted).font(Theme.sized(size: 26, design: .rounded)).multilineTextAlignment(.center)
             }
             answerBlock(card)
         } else {
-            Image(systemName: "ear").font(.system(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
+            Image(systemName: "ear").font(Theme.sized(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
             Text("Listen").font(Theme.title(26))
             Text("What does the sentence say? Play it as often as you like, then show the answer.")
                 .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
@@ -346,12 +346,12 @@ struct ReviewView: View {
     @ViewBuilder
     private func clozeFace(_ cloze: ClozeCard, _ card: ReviewCard) -> some View {
         if revealed {
-            Text(filled(cloze)).font(.system(size: 28, design: .rounded)).multilineTextAlignment(.center)
+            Text(filled(cloze)).font(Theme.sized(size: 28, design: .rounded)).multilineTextAlignment(.center)
             answerBlock(card)
         } else {
-            Text(cloze.prompt).font(.system(size: 28, design: .rounded)).multilineTextAlignment(.center)
+            Text(cloze.prompt).font(Theme.sized(size: 28, design: .rounded)).multilineTextAlignment(.center)
             if !cloze.hint.isEmpty {
-                Text(cloze.hint).font(.system(.title3, design: .rounded)).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+                Text(cloze.hint).font(Theme.styled(.title3, design: .rounded)).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
             }
             StatusPill(text: card.word.pos.title)
         }
@@ -365,7 +365,7 @@ struct ReviewView: View {
                 Text(reading).font(Theme.title(18)).foregroundStyle(Theme.ink)
             }
             Text(card.entries.first?.gloss ?? "No dictionary entry")
-                .font(.system(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
+                .font(Theme.styled(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
             if let example = card.example { Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint) }
         }
         .padding(.top, 6)
@@ -383,9 +383,9 @@ struct ReviewView: View {
     @ViewBuilder
     private func shadowFace(_ card: ReviewCard) -> some View {
         if let example = card.example {
-            Image(systemName: "mic").font(.system(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
+            Image(systemName: "mic").font(Theme.sized(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
             if revealed {
-                Text(example.highlighted).font(.system(size: 26, design: .rounded)).multilineTextAlignment(.center)
+                Text(example.highlighted).font(Theme.sized(size: 26, design: .rounded)).multilineTextAlignment(.center)
                 lemmaText(card, font: Theme.title(20))
                 if app.profile.display.showsReadings, let reading = readings(of: card) {
                     Text(reading).font(Theme.title(16)).foregroundStyle(Theme.ink)
@@ -394,7 +394,7 @@ struct ReviewView: View {
                 Text("Say it aloud").font(Theme.title(26))
             }
             Text(card.entries.first.flatMap { ClozeCard.shortGloss($0.gloss) } ?? card.entries.first?.gloss ?? "No dictionary entry")
-                .font(.system(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
+                .font(Theme.styled(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
             HStack(spacing: 10) {
                 Button { playSentence() } label: { KeyedLabel(title: "Hear it", systemImage: "speaker.wave.2.fill", key: "R") }
                     .buttonStyle(.pill(.secondary, compact: true))
@@ -455,14 +455,14 @@ struct ReviewView: View {
                 .accessibilityLabel(dictationSpoken(result))
             answerBlock(card)
         } else {
-            Image(systemName: "keyboard").font(.system(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
+            Image(systemName: "keyboard").font(Theme.sized(size: 44, weight: .regular)).foregroundStyle(Theme.ink).accessibilityHidden(true)
             Text("Type what you hear").font(Theme.title(26))
             Text("Play it as often as you like. Accents count; capitals and punctuation don't.")
                 .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
             TextField("What did you hear?", text: $typed, axis: .vertical)
                 .textFieldStyle(.plain)
                 .lineLimit(1...3)
-                .font(.system(size: 20, design: .rounded))
+                .font(Theme.sized(size: 20, design: .rounded))
                 .padding(12)
                 .background(RoundedRectangle(cornerRadius: 14).fill(Theme.soft))
                 .focused($typingFocused)
@@ -504,7 +504,7 @@ struct ReviewView: View {
         var text = AttributedString()
         for (index, piece) in result.pieces.enumerated() {
             var part = AttributedString(piece.text)
-            part.font = .system(size: 26, weight: piece.kind == .missed ? .bold : .regular, design: .rounded)
+            part.font = Theme.sized(size: 26, weight: piece.kind == .missed ? .bold : .regular, design: .rounded)
             switch piece.kind {
             case .same: break
             case .missed: part.underlineStyle = .single
@@ -530,7 +530,7 @@ struct ReviewView: View {
     private func filled(_ cloze: ClozeCard) -> AttributedString {
         var text = AttributedString(cloze.before)
         var answer = AttributedString(cloze.answer)
-        answer.font = .system(size: 28, weight: .semibold, design: .rounded)
+        answer.font = Theme.sized(size: 28, weight: .semibold, design: .rounded)
         answer.foregroundColor = Color(Theme.highlight)
         text.append(answer)
         text.append(AttributedString(cloze.after))
@@ -564,7 +564,7 @@ struct ReviewView: View {
     @ViewBuilder
     private func translationLine(_ card: ReviewCard) -> some View {
         if let example = card.example, let text = translations?.texts[example.id] {
-            Text(text).font(.system(.callout, design: .rounded)).foregroundStyle(Theme.muted)
+            Text(text).font(Theme.styled(.callout, design: .rounded)).foregroundStyle(Theme.muted)
                 .multilineTextAlignment(.center).textSelection(.enabled)
                 .accessibilityLabel("Translation: \(text)")
         } else if let problem = translations?.problem {

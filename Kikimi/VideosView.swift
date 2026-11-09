@@ -99,7 +99,7 @@ struct VideosView: View {
         HStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Next up").font(Theme.title(17))
-                Text(item.video.title).font(.system(.headline, design: .rounded)).lineLimit(2)
+                Text(item.video.title).font(Theme.styled(.headline, design: .rounded)).lineLimit(2)
                 Text("You know \(Int((coverage.fraction * 100).rounded()))% of its words.")
                     .font(Theme.small).foregroundStyle(Theme.muted)
             }
@@ -119,10 +119,10 @@ struct VideosView: View {
             Text("The goal: understand more of what you watch").font(Theme.title(17))
             ForEach(Array(steps.enumerated()), id: \.offset) { index, text in
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    Text("\(index + 1)").font(.system(size: 13, weight: .semibold, design: .rounded))
+                    Text("\(index + 1)").font(Theme.sized(size: 13, weight: .semibold, design: .rounded))
                         .frame(width: 24, height: 24).background(Circle().fill(Theme.ink.opacity(0.1)))
                         .accessibilityHidden(true)
-                    Text(text).font(.system(.body, design: .rounded)).foregroundStyle(Theme.ink)
+                    Text(text).font(Theme.styled(.body, design: .rounded)).foregroundStyle(Theme.ink)
                 }
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Step \(index + 1): \(text)")
@@ -166,7 +166,7 @@ struct VideosView: View {
         HStack(spacing: 14) {
             VideoThumbnailView(url: env.fileURL(for: item.video), duration: item.video.duration)
             VStack(alignment: .leading, spacing: 4) {
-                Text(item.video.title).font(.system(.headline, design: .rounded)).lineLimit(2)
+                Text(item.video.title).font(Theme.styled(.headline, design: .rounded)).lineLimit(2)
                 Text("\(duration(item.video.duration)) · added \(item.video.importedAt.formatted(date: .abbreviated, time: .omitted))")
                     .font(Theme.small).foregroundStyle(Theme.muted)
                 CoverageBadge(coverage: coverages[item.id]).padding(.top, 2)
@@ -175,12 +175,12 @@ struct VideosView: View {
             Button("Info", systemImage: "info.circle") { info = item.video }
                 .accessibilityLabel("Info for \(item.video.title)")
                 .labelStyle(.iconOnly).buttonStyle(.plain)
-                .font(.system(size: 20)).foregroundStyle(Theme.muted)
+                .font(Theme.sized(size: 20)).foregroundStyle(Theme.muted)
                 .help("Size, location, rename and delete")
             Button("Play", systemImage: "play.circle.fill") { open(item.video, at: nil) }
                 .accessibilityLabel("Play \(item.video.title)")
                 .labelStyle(.iconOnly).buttonStyle(.plain)
-                .font(.system(size: 28)).foregroundStyle(Theme.ink)
+                .font(Theme.sized(size: 28)).foregroundStyle(Theme.ink)
                 .help("Play")
         }
         .panel()
@@ -345,7 +345,7 @@ private struct VideoInfoSheet: View {
                     }
                     GridRow(alignment: .top) {
                         Text("Location").foregroundStyle(Theme.muted).gridColumnAlignment(.trailing)
-                        Text(details.folder.path).textSelection(.enabled).font(.callout)
+                        Text(details.folder.path).textSelection(.enabled).font(Theme.styled(.callout))
                     }
                 }
                 .panel()
@@ -404,7 +404,7 @@ private struct VideoInfoSheet: View {
     private func row(_ label: LocalizedStringKey, _ value: String) -> some View {
         GridRow {
             Text(label).foregroundStyle(Theme.muted).gridColumnAlignment(.trailing)
-            Text(value).font(.system(.body, design: .rounded, weight: .semibold))
+            Text(value).font(Theme.styled(.body, design: .rounded, weight: .semibold))
         }
     }
 
