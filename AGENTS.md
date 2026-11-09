@@ -44,6 +44,10 @@ How we build Kikimi. Read this before changing anything; update it when we agree
   Approval for one push is not approval for the next.
 - **Commits** are conventional (`feat(scope):`, `fix(scope):`, `docs:`, `refactor:`), small, and one idea each.
   Commit when asked; do not push until told.
+- **Everything goes through a pull request.** `main` is protected. A feature or fix is a branch (`feat/…`, `fix/…`,
+  `chore/…`) with its commits, pushed when told, and a pull request whose description says what changed, what was
+  checked and what was not (the template asks). The owner merges it. Never commit to `main`, and never push to it.
+  A release is a pull request too (see [Release/CHECKLIST.md](Release/CHECKLIST.md)).
 - **Shared code asks the profile.** Language-specific behaviour lives in a `LanguageProfile`; shared code never
   checks a language code. Adding a language is a contained job.
 - **Schema changes only through GRDB migrations**, never edits to an existing one. Derived data (dictionaries,
