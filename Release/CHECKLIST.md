@@ -16,6 +16,10 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       (uses an app-specific password from appleid.apple.com).
 
 ## Every release
+- [ ] **Releases go through pull requests, since `main` is protected.** The version bump, the changelog entry and the guide
+      changes are one release PR. After it is merged, build from the merge commit (not the branch), tag that commit, and
+      publish. `site/public/latest.json` is raised in a second small PR after the release is published, since it must not
+      move before then.
 - [ ] `Scripts/build_ipadic.sh` and `Scripts/build_dictionaries.sh` have been run (the build refuses otherwise).
 - [ ] `cd LangCore && swift test` passes (the script runs it unless `--skip-tests`).
 - [ ] **Run the model-based tests**, which the normal run skips because they need real models (coverage of
