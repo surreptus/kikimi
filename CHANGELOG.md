@@ -2,6 +2,17 @@
 
 What changed in each version of Kikimi, newest first. Every release's page on GitHub has these notes with its download and checksum.
 
+## 0.16.0
+
+*8 November 2026.* Text size you can change, a quicker way to tell Kikimi which words you know, Anki export back in the File menu, and a way to report a problem.
+
+### New
+
+- **Text size.** **Settings > General > Text size** makes the whole app's text larger in three steps above Standard, and **View > Larger Text** (⌘+), **Smaller Text** (⌘-) and **Standard Text Size** (⌘0) do the same from the keyboard. The transcript keeps its own size setting. Menus and system controls keep the size your Mac gives them.
+- **Mark the words I know.** On a video's card and Info sheet, Kikimi shows its commonest new words a few at a time and you tap the ones you *don't* know. The rest are marked known, with Undo, which makes the video's figure and your lessons truer.
+- **Help > Report a Problem…** opens a new issue on GitHub with the Kikimi and macOS versions filled in. Nothing is sent until you submit it there.
+- **File > Export Words to Anki…** is back, for the selected words or the ones you are learning. It makes a file Anki can import.
+
 ## 0.15.2
 
 *6 November 2026.* A clearer Words page with Undo, better dictionary meanings, French and German verbs read correctly, and a fix for a lesson that could stick.

@@ -957,7 +957,6 @@
       }
     },
     "^[%lld card](inflect: true)" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2780,7 +2779,6 @@
       }
     },
     "Anki file saved" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2891,6 +2889,9 @@
           }
         }
       }
+    },
+    "Back" : {
+
     },
     "Back to %@" : {
       "localizations" : {
@@ -3515,7 +3516,6 @@
       }
     },
     "Choose a folder for the Anki file" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3968,7 +3968,6 @@
       }
     },
     "Copy the files in the media folder into Anki's collection.media folder first, so the sentence audio plays." : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4797,6 +4796,9 @@
         }
       }
     },
+    "Every word in this video has already been set, whether learning, known or ignored." : {
+
+    },
     "Everything in this file is already here, so nothing would change." : {
       "localizations" : {
         "de" : {
@@ -4938,7 +4940,6 @@
       }
     },
     "Export text only" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4995,7 +4996,6 @@
       }
     },
     "Export to Anki" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5081,7 +5081,6 @@
       }
     },
     "Export with sentence audio" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5108,6 +5107,9 @@
           }
         }
       }
+    },
+    "Export Words to Anki…" : {
+
     },
     "Exporting…" : {
       "localizations" : {
@@ -5138,7 +5140,6 @@
       }
     },
     "Exports the %lld selected words, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once." : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5167,7 +5168,6 @@
       }
     },
     "Exports the words you are learning, each with its meaning and a sentence from your videos. Sentence audio makes a media folder you copy into Anki once." : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5710,6 +5710,9 @@
           }
         }
       }
+    },
+    "Go through this video's commonest new words and tap the ones you don't know. The rest are marked known." : {
+
     },
     "Go to Videos" : {
 
@@ -7180,6 +7183,12 @@
         }
       }
     },
+    "Larger Text" : {
+
+    },
+    "Largest" : {
+
+    },
     "Learn" : {
       "localizations" : {
         "de" : {
@@ -8059,6 +8068,9 @@
         }
       }
     },
+    "Makes the app's text larger, for the windows and the Learn cards. The transcript has its own size below, and menus and system controls keep the system's size. View > Larger Text and Smaller Text do the same." : {
+
+    },
     "Manage storage…" : {
       "localizations" : {
         "de" : {
@@ -8087,6 +8099,9 @@
         }
       }
     },
+    "Mark %@ as known?" : {
+
+    },
     "Mark as known" : {
       "localizations" : {
         "de" : {
@@ -8114,6 +8129,15 @@
           }
         }
       }
+    },
+    "Mark known" : {
+
+    },
+    "Mark the words I know" : {
+
+    },
+    "Mark the words I know…" : {
+
     },
     "Mark this word as known" : {
       "localizations" : {
@@ -8351,6 +8375,9 @@
     "More actions for this sentence" : {
 
     },
+    "Most of these are new to you, so that is enough." : {
+
+    },
     "Move" : {
       "localizations" : {
         "de" : {
@@ -8406,6 +8433,9 @@
           }
         }
       }
+    },
+    "New to you" : {
+
     },
     "New words a day" : {
 
@@ -8747,7 +8777,6 @@
       }
     },
     "No words to export." : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8977,6 +9006,12 @@
         }
       }
     },
+    "Nothing to ask" : {
+
+    },
+    "Nothing to mark" : {
+
+    },
     "Nothing to review yet" : {
       "localizations" : {
         "de" : {
@@ -9062,7 +9097,6 @@
       }
     },
     "OK" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10689,6 +10723,9 @@
     "Report a problem" : {
 
     },
+    "Report a Problem…" : {
+
+    },
     "Reset" : {
       "localizations" : {
         "de" : {
@@ -11205,7 +11242,6 @@
       }
     },
     "Saved %@ to %@. In Anki, choose File > Import and pick %@." : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -12035,6 +12071,9 @@
         }
       }
     },
+    "Smaller Text" : {
+
+    },
     "Smallest compresses the copy Kikimi keeps (in our tests 161 MB became 29 MB), plenty to study from. Your own files are never changed. Applies to videos you add from now on." : {
 
     },
@@ -12676,6 +12715,9 @@
         }
       }
     },
+    "Standard Text Size" : {
+
+    },
     "Start" : {
       "localizations" : {
         "de" : {
@@ -13279,6 +13321,9 @@
     "Take this video off the list. Your file is not touched." : {
 
     },
+    "Tap the ones that are new to you. The rest are marked as known, which makes this video's figure and your lessons truer." : {
+
+    },
     "Terms of use" : {
       "localizations" : {
         "de" : {
@@ -13334,6 +13379,9 @@
           }
         }
       }
+    },
+    "Text size" : {
+
     },
     "That audio file is missing from the library." : {
       "localizations" : {
@@ -13603,6 +13651,9 @@
       }
     },
     "The words you were just taught, asked at once." : {
+
+    },
+    "These are the words shown that you didn't tap. They are marked as known, so they are left out of lessons and count toward how much of each video you know. You can undo it right after." : {
 
     },
     "This is the app's own copy. Your original file, wherever you imported it from, is not touched by the app." : {
@@ -14677,6 +14728,9 @@
         }
       }
     },
+    "Which of these words don't you know?" : {
+
+    },
     "Word" : {
       "localizations" : {
         "de" : {
@@ -14785,6 +14839,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "単語"
+          }
+        }
+      }
+    },
+    "Words %lld to %lld, the most common in this video." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Words %1$lld to %2$lld, the most common in this video."
           }
         }
       }
@@ -15187,6 +15251,9 @@
       }
     },
     "You know %lld%% of its words." : {
+
+    },
+    "You said every word shown is new to you, so none are marked known." : {
 
     },
     "You started ^[%lld new word](inflect: true) today. More tomorrow." : {
