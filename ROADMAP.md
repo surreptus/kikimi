@@ -120,6 +120,22 @@ Ordered by how much each helps comprehensible input per unit of effort.
       other language offers the same switch as for audio; any other, such as English subtitles, is refused), and a file
       whose cues all start after the video ends is refused before anything is copied. Not done: choosing a subtitle file for
       a video already in the library, subtitles inside a video file (embedded tracks), and other formats (.ass, .ttml).
+- [ ] **Subtitles inside a video file, with a way to choose the track** (scoped 11 Nov 2026, **not started**): an MP4 or MOV can
+      carry several subtitle tracks (often one per language), and today Kikimi reads only a separate `.srt` / `.vtt`.
+      - Choosing is the point: a file may hold English, Spanish and a commentary track, and the wrong one is refused or, worse,
+        taken. Adding a video with more than one text track asks which to use, listing each by its language and name (the
+        file's own labels), with the track in the video's language ticked first. One text track in the right language is used
+        without asking. The chosen track is checked like a subtitle file (language from the text, refused if another).
+      - The same choice is offered for a video already in the library (the Info sheet's "Add subtitles", which is also the
+        "choose a subtitle file for a video already in the library" item above), as one menu: a file from disk, or a track
+        inside the video. Keyboard and VoiceOver reach every row.
+      - How: AVFoundation lists a file's subtitle and caption tracks and its reader gives each cue's text and time, so it is
+        MP4, MOV and M4V. Cue text is stored as a text sample and needs unwrapping (a `mov_text` sample is a length-prefixed
+        string with style boxes after it). **MKV is not readable by AVFoundation**, and MKV is where most embedded tracks are, so
+        most of those files still need the ffmpeg step in the guide; supporting them would mean a demuxer, which is a dependency
+        and not offered here without asking first. Picture-based tracks (DVD, Blu-ray) are not text and are not offered.
+      - Check with real files: an MP4 with one `mov_text` track, with two, with none, and a track whose language tag is missing or
+        wrong. Add the test that fails on a cue time offset (a track often starts after the video does).
 - [x] **Edit a transcript line** (right-click a line > Edit line…): fixes the text and its timing (with a preview), and
       finds its words again.
 - [ ] **Word-level timestamps**, so a single word can be played and clips are tighter.
