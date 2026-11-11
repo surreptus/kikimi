@@ -24,6 +24,16 @@ final class JapaneseTokenizerTests: XCTestCase {
         }
     }
 
+    func testWordsInAnotherScriptAreNotWords() {
+        for text in ["今日はYouTubeを見た", "OKです", "これはPCとコーヒーの話", "He said hello 本当に"] {
+            let tokens = ja.tokenizer.tokens(in: text)
+            XCTAssertFalse(tokens.contains { $0.surface.contains(where: { $0.isASCII && $0.isLetter }) }, "\(text): \(tokens.map(\.surface))")
+            XCTAssertEqual(ja.lineSegments(in: text).map(\.text).joined(), text, "the pieces still add up to the line")
+        }
+        XCTAssertNotNil(content("これはPCとコーヒーの話")["コーヒー"], "a katakana loan word is still Japanese")
+        XCTAssertNotNil(content("He said hello 本当に")["本当に"])
+    }
+
     func testTheVerbHaneruIsStillFoundWhereItIsTheVerb() {
         XCTAssertNotNil(content("鯉が水面をはねる")["はねる"])
         XCTAssertNotNil(content("水をはねて遊んだ")["はねる"])

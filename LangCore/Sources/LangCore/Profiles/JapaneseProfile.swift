@@ -38,6 +38,8 @@ public struct JapaneseProfile: LanguageProfile {
         guard f.count >= 7 else { return nil }
         // IPADIC calls a plain ASCII "!" or "?" a noun, so a subtitle file's punctuation would become words.
         guard surface.contains(where: { $0.isLetter || $0.isNumber }) else { return nil }
+        // Words in another script ("YouTube", "OK") are not Japanese: the learner reads them already, so they are plain text.
+        guard hasJapaneseScript(surface) || !surface.contains(where: \.isLetter) else { return nil }
         let lemma = f[6] == "*" ? surface : f[6]
         let pos: PartOfSpeech
         switch (f[0], f[1]) {
@@ -51,6 +53,16 @@ public struct JapaneseProfile: LanguageProfile {
         // f[7] is the katakana reading of this exact surface form (so inflected 行き is いき, not いく).
         let reading = f.count > 7 && f[7] != "*" && Self.containsKanji(surface) ? Self.hiragana(fromKatakana: f[7]) : nil
         return Token(surface: surface, lemma: lemma, pos: pos, reading: reading, inflection: f[5] == "*" ? nil : f[5])
+    }
+
+    /// Hiragana, katakana (including the long-vowel mark and half-width forms) or kanji.
+    static func hasJapaneseScript(_ text: String) -> Bool {
+        text.unicodeScalars.contains {
+            switch $0.value {
+            case 0x3041...0x30FF, 0xFF66...0xFF9F, 0x4E00...0x9FFF, 0x3400...0x4DBF, 0x3005: true
+            default: false
+            }
+        }
     }
 
     static func containsKanji(_ text: String) -> Bool {
