@@ -145,7 +145,25 @@ Ordered by how much each helps comprehensible input per unit of effort.
       sends a missed word back to learning) and a single short video gives a noisy ranking. Today's manual way, hidden: Words >
       Select > "250 most-seen new words" > Known. Needs the chips to work by keyboard and VoiceOver, and its strings to be
       localisable.
-- [ ] **Audio-only import** (podcasts) for material with no picture.
+- [ ] **Audio files** (podcasts you have downloaded; scoped 11 Nov 2026, **not started**): import an MP3, M4A or similar as
+      you import a video, with or without a transcript. Everything after import (transcript, word lookup, coverage, lessons,
+      the Hear buttons) already works from the text and its times, so the work is at the two ends. About a few days, one pull
+      request.
+      - Import: today the pipeline re-encodes to HEVC and rejects a file with no video track (`AVFoundationTranscoder`). Audio
+        gets its own path: re-encode to AAC (or keep the file), skip the video checks, keep the same order, atomic move and
+        clean-up after failure. The file picker adds `.audio`. A supplied `.srt` / `.vtt` already needs no speech model.
+      - Player: `PlayerView` assumes a picture. An audio layout with the transcript large, and no empty video pane. Check
+        loop, pause after each line, hide subtitles and clip export (audio clips) work from audio.
+      - Small things: a thumbnail for an episode with no frame (the file's cover art if it has one, else a plain tile),
+        a video's length and coverage shown the same way, and the Info sheet, backup and restore carrying audio like video.
+      - Transcripts without times (plain text, HTML, Podcasting 2.0 JSON) are not supported by the subtitle importer; those
+        episodes are transcribed as any file with no subtitles is. Aligning a supplied text to the audio is a separate, later job.
+      - **Not included, on purpose: subscribing to feeds or downloading episodes.** AGENTS.md principle 7 makes the network
+        only for speech models and update checks, and a downloader would change the privacy policy, need a feed parser and
+        probably a dependency. Dropping in a file you downloaded yourself gives most of the benefit. If we ever want feeds, it
+        is a separate decision that starts with the privacy policy.
+      - Wording to settle: the app says "videos" throughout; audio files would need a word that covers both ("media"), kept out of
+        the UI until the feature lands.
 
 ### Practising
 - [x] **A Learn page with three paths** (suggested 4 Nov 2026, in the style of WaniKani's dashboard; built 5 Nov 2026 with Lessons, Reviews and Practice; seen on screen 6 Nov 2026): the Review page becomes
