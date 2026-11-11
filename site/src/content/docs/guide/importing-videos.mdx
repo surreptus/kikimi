@@ -13,6 +13,14 @@ Add videos by dropping them on **Videos**, by pressing **Choose files**, or with
 
 If you have an `.srt` or `.vtt` file for the video, add it and Kikimi uses its text and times instead of transcribing. A subtitle file with the same name as the video (such as `film.mp4` and `film.srt`) is paired with it automatically; otherwise press **Add subtitles** on the video's row. No speech model is needed, and it is the quickest way to start.
 
+Subtitles stored *inside* a video file (an MP4 or MKV can hold several tracks, often in more than one language) are not read yet. To use one, pull it out into its own file first. With [ffmpeg](https://ffmpeg.org), which is free, this saves the first subtitle track of `film.mp4` as `film.srt`:
+
+```sh
+ffmpeg -i film.mp4 -map 0:s:0 film.srt
+```
+
+Change `0:s:0` to `0:s:1` for the second track, and so on. `ffmpeg -i film.mp4` lists the tracks and their languages. Put the `.srt` beside the video and Kikimi pairs them.
+
 ## Without subtitles: the speech model
 
 Kikimi writes out what is said using a speech model that runs on your Mac. You download it once, from the Videos page:
