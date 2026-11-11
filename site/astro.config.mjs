@@ -19,7 +19,7 @@ export default defineConfig({
         { label: 'Kikimi', items: [
           { label: 'Home', link: '/' }, { slug: 'download' }, { slug: 'faq' }, { slug: 'changelog' },
         ] },
-        { label: 'Start here', items: [{ slug: 'guide/getting-started' }, { slug: 'guide/importing-videos' }] },
+        { label: 'Start here', items: [{ slug: 'guide/getting-started' }, { slug: 'guide/importing-videos' }, { slug: 'guide/finding-material' }] },
         { label: 'Using Kikimi', items: [{ slug: 'guide/player' }, { slug: 'guide/words' }, { slug: 'guide/lessons-and-reviews' }, { slug: 'guide/shadowing' }] },
         { label: 'Looking after it', items: [{ slug: 'guide/backups' }, { slug: 'guide/troubleshooting' }] },
         { label: 'About', items: [
