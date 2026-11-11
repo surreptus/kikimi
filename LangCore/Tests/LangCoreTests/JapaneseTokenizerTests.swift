@@ -34,6 +34,13 @@ final class JapaneseTokenizerTests: XCTestCase {
         XCTAssertNotNil(content("He said hello 本当に")["本当に"])
     }
 
+    func testPronounsAreWordsToLearnButNotContractions() {
+        let words = content("彼は誰とどこへ行った")
+        for pronoun in ["彼", "誰", "どこ"] { XCTAssertEqual(words[pronoun], .noun, "\(pronoun): \(words)") }
+        XCTAssertNil(content("そりゃそうだ")["そりゃ"], "a contraction of それは is grammar")
+        XCTAssertNil(content("彼は学生だ")["は"], "particles are still not words")
+    }
+
     func testTheVerbHaneruIsStillFoundWhereItIsTheVerb() {
         XCTAssertNotNil(content("鯉が水面をはねる")["はねる"])
         XCTAssertNotNil(content("水をはねて遊んだ")["はねる"])

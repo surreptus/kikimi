@@ -45,6 +45,7 @@ public struct JapaneseProfile: LanguageProfile {
         switch (f[0], f[1]) {
         case ("名詞", "一般"), ("名詞", "固有名詞"), ("名詞", "サ変接続"), ("名詞", "副詞可能"): pos = .noun
         case ("名詞", "形容動詞語幹"), ("名詞", "ナイ形容詞語幹"): pos = .adjective   // 静か, きれい
+        case ("名詞", "代名詞") where f[2] != "縮約": pos = .noun   // 彼, 私, 誰, どこ: words to look up. Not そりゃ, a contraction of それは.
         case ("動詞", "自立"): pos = .verb
         case ("形容詞", "自立"): pos = .adjective
         case ("副詞", _): pos = .adverb
