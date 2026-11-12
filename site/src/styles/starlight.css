@@ -110,42 +110,55 @@ site-search button { border-radius: 999px; }
 .licence summary { cursor: pointer; font-weight: 600; }
 .licence pre { white-space: pre-wrap; font-size: var(--sl-text-xs); margin: 0.75rem 0 0; }
 
-/* The download and hero buttons. */
-.sl-link-button { font-weight: 600; transition: transform 0.14s cubic-bezier(0.23, 1, 0.32, 1), background-color 0.15s, border-color 0.15s; }
+/* The download and hero buttons.
+   The primary one is slightly raised, as in the app: a gradient that is a touch lighter at the top, a bright edge inside it and
+   a soft shadow; the others stay flat. Hover brightens it and lifts the shadow; pressed sinks it (the shade moves to the top and
+   the shadow tightens) and, with motion allowed, dips it. The secondary one, which has no fill, gets a faint tint.
+   Everything eases over 0.15 s on the app's curve. A gradient cannot be animated, so its two ends are colours held in
+   registered custom properties, which can. With Increase Contrast the primary button is flat. */
+@property --sheen-top { syntax: '<color>'; inherits: false; initial-value: transparent; }
+@property --sheen-bottom { syntax: '<color>'; inherits: false; initial-value: transparent; }
+
+.sl-link-button {
+  font-weight: 600;
+  transition: transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), background-color 0.15s cubic-bezier(0.23, 1, 0.32, 1),
+    border-color 0.15s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.15s cubic-bezier(0.23, 1, 0.32, 1),
+    --sheen-top 0.15s cubic-bezier(0.23, 1, 0.32, 1), --sheen-bottom 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+}
 @media (prefers-reduced-motion: no-preference) { .sl-link-button:active { transform: scale(0.98); } }
 
 /* The home page title: a little tighter, as large type needs. */
 .hero h1 { letter-spacing: -0.03em; line-height: 1.04; text-wrap: balance; }
 
-/* The primary button is slightly raised, as in the app: lighter at the top, a bright edge inside it and a soft shadow. The
-   others stay flat. With Increase Contrast it is flat. */
 .sl-link-button.primary {
-  background-image: linear-gradient(rgb(255 255 255 / 0.10), transparent);
+  --sheen-top: rgb(255 255 255 / 0.1);
+  --sheen-bottom: transparent;
+  background-image: linear-gradient(var(--sheen-top), var(--sheen-bottom));
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), 0 1px 2px rgb(21 58 11 / 0.14), 0 3px 5px rgb(21 58 11 / 0.1);
 }
-:root[data-theme='dark'] .sl-link-button.primary {
-  background-image: linear-gradient(transparent, rgb(0 0 0 / 0.06));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(0 0 0 / 0.3), 0 3px 5px rgb(0 0 0 / 0.25);
-}
-@media (prefers-contrast: more) { .sl-link-button.primary { background-image: none; box-shadow: none; } }
-
-/* Hover and pressed. Hover brightens the button a little and lifts its shadow; pressed sinks it: the shade moves to the top, the
-   shadow tightens, and (with motion allowed) it dips. The secondary button, which has no fill, gets a faint tint. These are
-   plain colour changes, so they also work with Increase Contrast and Reduce Motion. */
 .sl-link-button.primary:hover {
-  background-image: linear-gradient(rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.06));
+  --sheen-top: rgb(255 255 255 / 0.2);
+  --sheen-bottom: rgb(255 255 255 / 0.06);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 1px 2px rgb(21 58 11 / 0.18), 0 4px 8px rgb(21 58 11 / 0.14);
 }
 .sl-link-button.primary:active {
-  background-image: linear-gradient(rgb(0 0 0 / 0.12), transparent);
+  --sheen-top: rgb(0 0 0 / 0.12);
+  --sheen-bottom: transparent;
   box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 1px rgb(21 58 11 / 0.1);
 }
+:root[data-theme='dark'] .sl-link-button.primary {
+  --sheen-top: transparent;
+  --sheen-bottom: rgb(0 0 0 / 0.06);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(0 0 0 / 0.3), 0 3px 5px rgb(0 0 0 / 0.25);
+}
 :root[data-theme='dark'] .sl-link-button.primary:hover {
-  background-image: linear-gradient(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.25));
+  --sheen-top: rgb(255 255 255 / 0.55);
+  --sheen-bottom: rgb(255 255 255 / 0.25);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 1px 2px rgb(0 0 0 / 0.35), 0 4px 8px rgb(0 0 0 / 0.3);
 }
 :root[data-theme='dark'] .sl-link-button.primary:active {
-  background-image: linear-gradient(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.04));
+  --sheen-top: rgb(0 0 0 / 0.14);
+  --sheen-bottom: rgb(0 0 0 / 0.04);
   box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.35), 0 1px 1px rgb(0 0 0 / 0.2);
 }
 .sl-link-button.secondary:hover { background-color: rgb(21 58 11 / 0.07); }
@@ -153,6 +166,7 @@ site-search button { border-radius: 999px; }
 :root[data-theme='dark'] .sl-link-button.secondary:hover { background-color: rgb(255 255 255 / 0.09); }
 :root[data-theme='dark'] .sl-link-button.secondary:active { background-color: rgb(255 255 255 / 0.16); }
 @media (prefers-contrast: more) {
-  .sl-link-button.primary:hover, .sl-link-button.primary:active, :root[data-theme='dark'] .sl-link-button.primary:hover,
+  .sl-link-button.primary, .sl-link-button.primary:hover, .sl-link-button.primary:active,
+  :root[data-theme='dark'] .sl-link-button.primary, :root[data-theme='dark'] .sl-link-button.primary:hover,
   :root[data-theme='dark'] .sl-link-button.primary:active { background-image: none; box-shadow: none; }
 }
