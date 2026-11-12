@@ -12,6 +12,7 @@
 </p>
 
 <p align="center">
+  <a href="https://surreptus.github.io/kikimi/">Website</a> ·
   <a href="#install">Install</a> ·
   <a href="#what-it-does">What it does</a> ·
   <a href="#build-from-source">Build from source</a> ·
