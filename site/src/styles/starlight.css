@@ -15,6 +15,10 @@
 .sidebar-content a { border-radius: 999px; padding-inline: 0.75rem; }
 site-search button { border-radius: 999px; }
 .card { border-radius: 16px; }
+/* Starlight lays cards out two across, which leaves a lone third card on its own line: three cards sit in one row. */
+@media (min-width: 50rem) {
+  .card-grid:has(> :nth-child(3):last-child) { grid-template-columns: repeat(3, 1fr); }
+}
 .starlight-aside { border-radius: 12px; }
 .expressive-code { --ec-brdRad: 0.75rem; }
 
