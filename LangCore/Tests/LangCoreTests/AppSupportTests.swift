@@ -587,7 +587,6 @@ final class VideoThumbnailTests: XCTestCase {
     }
 }
 
-#if DEBUG
 final class LibraryResetTests: XCTestCase {
     private func fixture() throws -> URL {
         let root = FileManager.default.temporaryDirectory.appending(path: "reset-\(UUID().uuidString)")
@@ -615,6 +614,17 @@ final class LibraryResetTests: XCTestCase {
         XCTAssertEqual(folder.deletingLastPathComponent().lastPathComponent, "Set Aside")
     }
 
+    func testTheSetAsideFolderIsOnlyReportedOnceSomethingIsInIt() throws {
+        let root = try fixture()
+        defer { try? FileManager.default.removeItem(at: root) }
+        XCTAssertNil(LibraryReset.setAsideFolder(root: root), "nothing set aside yet, so there is nothing to show")
+        let folder = try XCTUnwrap(try LibraryReset.setAside(root: root, now: Date(timeIntervalSince1970: 0)))
+        XCTAssertEqual(LibraryReset.setAsideFolder(root: root), folder.deletingLastPathComponent())
+        // An empty folder (everything was moved back or deleted by hand) is not worth showing.
+        try FileManager.default.removeItem(at: folder)
+        XCTAssertNil(LibraryReset.setAsideFolder(root: root))
+    }
+
     func testNothingToMoveIsNotAnError() throws {
         let root = FileManager.default.temporaryDirectory.appending(path: "reset-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -622,7 +632,6 @@ final class LibraryResetTests: XCTestCase {
         XCTAssertNil(try LibraryReset.setAside(root: root))
     }
 }
-#endif
 
 final class ProblemReportTests: XCTestCase {
     func testTheIssueIsPrefilledWithOnlyTheVersions() throws {
