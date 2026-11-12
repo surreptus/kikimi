@@ -21,6 +21,12 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       publish. `site/public/latest.json` is raised in a second small PR after the release is published, since it must not
       move before then.
 - [ ] `Scripts/build_ipadic.sh` and `Scripts/build_dictionaries.sh` have been run (the build refuses otherwise).
+- [ ] **Refresh the dictionary data for this release**: rerun `Scripts/build_dictionaries.sh` so JMdict and KANJIDIC2 are the
+      current EDRDG files, not the ones from the last release. The EDRDG licence requires "a procedure for regular updating" and
+      calls failing to keep the data up to date a violation of it; this is that procedure, and `check_release_sync.py` (below)
+      fails when the data is over 31 days old. The same run takes the newest Wiktionary extracts, which can change meanings and
+      verb forms, so then run `python3 Scripts/dictionaries/test_builders.py`, `swift test` and the opt-in dictionary audits
+      (`LANGCORE_AUDIT=1 swift test --filter DictionaryAuditTests`) before building.
 - [ ] `cd LangCore && swift test` passes (the script runs it unless `--skip-tests`).
 - [ ] **Run the model-based tests**, which the normal run skips because they need real models (coverage of
       `WhisperKitTranscriber` is only 6% without them). With a network connection:
@@ -36,7 +42,7 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       and push, so Check for Updates in older copies finds it. Do it only once the release is published, not before.
 - [ ] **Write the version's section in `CHANGELOG.md`** (a summary line, then New and Fixed), and run
       `python3 -I Scripts/check_release_sync.py`: it fails if the changelog's newest section isn't the Xcode project's version,
-      or if `site/public/latest.json` is ahead of it. The changelog is the one source: the website's changelog page imports it,
+      if `site/public/latest.json` is ahead of it, or if the built JMdict or KANJIDIC2 data is over 31 days old. The changelog is the one source: the website's changelog page imports it,
       and the release notes are made from it.
 - [ ] **Publish a checksum with every download.** Make the notes with
       `python3 -I Scripts/release_notes.py X.Y.Z --zip <the zip> --commit <the tagged commit> --out build/notes-X.Y.Z.md --tests "N automated tests pass."`
@@ -64,7 +70,8 @@ Work top to bottom. `Scripts/release.sh --help` shows how to run the build.
       first use, and works only on files the user provides.
 
 ## Licences to confirm before publishing
-- [x] Whisper model card on Hugging Face (`argmaxinc/whisperkit-coreml`) says MIT (checked 25 Oct 2026; check again when the model changes).
+- [x] Whisper model card on Hugging Face (`argmaxinc/whisperkit-coreml`) says MIT (checked 25 Oct and again 12 Nov 2026; check again when the model changes). OpenAI's own cards differ: `openai/whisper-large-v3-turbo` says MIT, `openai/whisper-medium` says Apache 2.0 (the Whisper repository says MIT); all are permissive, and the models are downloaded by the person, not bundled.
 - [x] JMdict and Wiktionary data stay under CC BY-SA 4.0 with attribution; the Acknowledgements say they were adapted and are shared under the same licence, and point to the build scripts. Do not commit the built dictionaries.
 - [x] The SRS stages are plain "Stage 1" to "Stage 8" and "Finished" (the WaniKani names are gone from the app, code and docs). Still do not use the name "WaniKani" in marketing.
+- [x] Audited 12 Nov 2026 (read against the upstream licence texts): GRDB, WhisperKit, MeCab (BSD), IPADIC and swift-transformers licence files are the upstream texts, with only our explanatory headers added; the EDRDG licence's acknowledgement terms are met (an "About"-reachable Acknowledgements screen with the licence link, the website page, and the data credited as adapted under the same licence); `THIRD_PARTY_NOTICES.md` matches. Not a lawyer's review.
 - [ ] When a package is added or updated, check `Package.resolved` against Acknowledgements (today: GRDB, WhisperKit and the swift-transformers code inside it; swift-argument-parser is resolved but not linked).
