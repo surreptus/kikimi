@@ -11,6 +11,24 @@
   --sl-text-6xl: 3rem;   /* the homepage title */
 }
 
+/* A very faint paper grain, as in the app: the app's own 256-pixel tile (same seed) at half size, laid over the page in
+   soft light. Soft light changes a pale colour much less than a mid one, so the strength is set per theme to give about the
+   same variation (a few of 255 levels): 0.6 on the cream page, 0.25 on the dark one. It only nudges the colour, and it goes
+   away with Increase Contrast. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  pointer-events: none;
+  background-image: url('../assets/noise.png');
+  background-size: 128px 128px;
+  mix-blend-mode: soft-light;
+  opacity: 0.25;
+}
+:root[data-theme='light'] body::before { opacity: 0.6; }
+@media (prefers-contrast: more) { body::before { display: none; } }
+
 /* The rounded look of the app: pills for the sidebar's links and the search box, rounded corners on cards and notes. */
 .sidebar-content a { border-radius: 999px; padding-inline: 0.75rem; }
 site-search button { border-radius: 999px; }
