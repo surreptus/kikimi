@@ -1,16 +1,17 @@
 ---
-// A screenshot from public/screenshots, with a caption. Until the file is there nothing is drawn, so a page reads
+// A screenshot from public/screenshots, with a caption (our own text, so it may hold a link). Until the file is there nothing is drawn, so a page reads
 // correctly without it and the picture appears when the file is added.
 import { existsSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 interface Props { name: string; alt: string; caption?: string; width?: number; height?: number }
 const { name, alt, caption, width, height } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const present = existsSync(fileURLToPath(new URL(`../../public/screenshots/${name}`, import.meta.url)));
+// From the project folder (where the build runs), not from this file: in a build this file is bundled elsewhere.
+const present = existsSync(join(process.cwd(), 'public', 'screenshots', name));
 ---
 {present && (
   <figure class="shot">
     <img src={`${base}/screenshots/${name}`} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
-    {caption && <figcaption>{caption}</figcaption>}
+    {caption && <figcaption set:html={caption} />}
   </figure>
 )}
