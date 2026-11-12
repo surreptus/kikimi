@@ -11,24 +11,22 @@
   --sl-text-6xl: 3rem;   /* the homepage title */
 }
 
-/* A very faint paper grain, as in the app: random grey pixels from the same generator and seed, a 128-pixel tile in 16 grey
-   levels (8 KB; the app's is 256 pixels in 256 levels, which weighs 66 KB as a file) shown at half size, laid over the page in
-   soft light. Soft light changes a pale colour much less than a mid one, so the strength is set per theme to give about the
-   same variation (a few of 255 levels): 0.6 on the cream page, 0.25 on the dark one. It only nudges the colour, and it goes
-   away with Increase Contrast. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 99;
-  pointer-events: none;
-  background-image: url('../assets/noise.png');
+/* A very faint paper grain, as in the app, on the surfaces that paint the page colour (the page, the header bar and the sidebar), and
+   nowhere else: buttons, text and pictures sit above it, untouched. Random grey pixels from the app's generator and seed, a
+   128-pixel tile in 16 grey levels shown at half size, blended in soft light with the colour beneath. Soft light changes a pale
+   colour much less than a dark one, so each theme has its own tile with the strength built in (0.6 on the cream, 0.25 on the
+   dark): about the same variation, a few of 255 levels. Each tile is about 9 KB. Gone with Increase Contrast. */
+body, header.header, .sidebar-pane {
+  background-image: url('../assets/noise-light.png');
   background-size: 64px 64px;
-  mix-blend-mode: soft-light;
-  opacity: 0.25;
+  background-blend-mode: soft-light;
 }
-:root[data-theme='light'] body::before { opacity: 0.6; }
-@media (prefers-contrast: more) { body::before { display: none; } }
+:root[data-theme='dark'] body, :root[data-theme='dark'] header.header, :root[data-theme='dark'] .sidebar-pane {
+  background-image: url('../assets/noise-dark.png');
+}
+@media (prefers-contrast: more) {
+  body, .header, .sidebar-pane, :root[data-theme='dark'] body, :root[data-theme='dark'] header.header, :root[data-theme='dark'] .sidebar-pane { background-image: none; }
+}
 
 /* The rounded look of the app: pills for the sidebar's links and the search box, rounded corners on cards and notes. */
 .sidebar-content a { border-radius: 999px; padding-inline: 0.75rem; }
