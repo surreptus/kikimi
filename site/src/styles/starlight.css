@@ -128,3 +128,31 @@ site-search button { border-radius: 999px; }
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(0 0 0 / 0.3), 0 3px 5px rgb(0 0 0 / 0.25);
 }
 @media (prefers-contrast: more) { .sl-link-button.primary { background-image: none; box-shadow: none; } }
+
+/* Hover and pressed. Hover brightens the button a little and lifts its shadow; pressed sinks it: the shade moves to the top, the
+   shadow tightens, and (with motion allowed) it dips. The secondary button, which has no fill, gets a faint tint. These are
+   plain colour changes, so they also work with Increase Contrast and Reduce Motion. */
+.sl-link-button.primary:hover {
+  background-image: linear-gradient(rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.06));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 1px 2px rgb(21 58 11 / 0.18), 0 4px 8px rgb(21 58 11 / 0.14);
+}
+.sl-link-button.primary:active {
+  background-image: linear-gradient(rgb(0 0 0 / 0.12), transparent);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 1px rgb(21 58 11 / 0.1);
+}
+:root[data-theme='dark'] .sl-link-button.primary:hover {
+  background-image: linear-gradient(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.25));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 1px 2px rgb(0 0 0 / 0.35), 0 4px 8px rgb(0 0 0 / 0.3);
+}
+:root[data-theme='dark'] .sl-link-button.primary:active {
+  background-image: linear-gradient(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.04));
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.35), 0 1px 1px rgb(0 0 0 / 0.2);
+}
+.sl-link-button.secondary:hover { background-color: rgb(21 58 11 / 0.07); }
+.sl-link-button.secondary:active { background-color: rgb(21 58 11 / 0.13); }
+:root[data-theme='dark'] .sl-link-button.secondary:hover { background-color: rgb(255 255 255 / 0.09); }
+:root[data-theme='dark'] .sl-link-button.secondary:active { background-color: rgb(255 255 255 / 0.16); }
+@media (prefers-contrast: more) {
+  .sl-link-button.primary:hover, .sl-link-button.primary:active, :root[data-theme='dark'] .sl-link-button.primary:hover,
+  :root[data-theme='dark'] .sl-link-button.primary:active { background-image: none; box-shadow: none; }
+}
