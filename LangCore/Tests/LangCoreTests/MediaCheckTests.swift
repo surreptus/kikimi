@@ -24,6 +24,15 @@ final class MediaCheckTests: XCTestCase {
         XCTAssertTrue(problem?.message(for: url).contains(url.lastPathComponent) == true)
     }
 
+    func testAFileThatCannotBeReadHereIsNotCalledDamaged() async throws {
+        // A sandboxed app without a file's security scope cannot read it, and a good file would then look damaged.
+        let url = temp("locked.mp4"); defer { try? FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: url.path); try? FileManager.default.removeItem(at: url) }
+        try await FixtureVideo.make(at: url)
+        try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: url.path)
+        let problem = await MediaCheck.problem(with: url)
+        XCTAssertNil(problem, "left for the import, which holds the scope and says what is wrong")
+    }
+
     func testADamagedFileOfAnotherKindDoesNotBlameWebM() {
         let url = URL(filePath: "/tmp/film.mp4")
         XCTAssertFalse(MediaProblem.cannotOpen.message(for: url).contains("WebM"))
