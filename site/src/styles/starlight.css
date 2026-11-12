@@ -95,11 +95,11 @@ site-search button { border-radius: 999px; }
 /* The primary button is slightly raised, as in the app: lighter at the top, a bright edge inside it and a soft shadow. The
    others stay flat. With Increase Contrast it is flat. */
 .sl-link-button.primary {
-  background-image: linear-gradient(rgb(255 255 255 / 0.14), transparent, rgb(0 0 0 / 0.12));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), 0 1px 2px rgb(21 58 11 / 0.2), 0 3px 5px rgb(21 58 11 / 0.12);
+  background-image: linear-gradient(rgb(255 255 255 / 0.26), transparent, rgb(0 0 0 / 0.24));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 1px 2px rgb(21 58 11 / 0.3), 0 4px 6px rgb(21 58 11 / 0.22);
 }
 :root[data-theme='dark'] .sl-link-button.primary {
-  background-image: linear-gradient(transparent, rgb(0 0 0 / 0.07));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), 0 1px 2px rgb(0 0 0 / 0.3), 0 3px 5px rgb(0 0 0 / 0.25);
+  background-image: linear-gradient(transparent, rgb(0 0 0 / 0.11));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 2px rgb(0 0 0 / 0.5), 0 4px 6px rgb(0 0 0 / 0.45);
 }
 @media (prefers-contrast: more) { .sl-link-button.primary { background-image: none; box-shadow: none; } }

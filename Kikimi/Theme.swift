@@ -137,9 +137,9 @@ struct PillButtonStyle: ButtonStyle {
         if kind == .primary, contrast == .standard {
             Capsule().fill(face)
                 .overlay(Capsule().fill(LinearGradient(colors: shading, startPoint: .top, endPoint: .bottom)))
-                .overlay(Capsule().strokeBorder(LinearGradient(colors: [.white.opacity(0.4), .clear], startPoint: .top, endPoint: .center), lineWidth: 1))
-                .shadow(color: Theme.raisedShadow.opacity(0.9), radius: 1.5, y: 1)
-                .shadow(color: Theme.raisedShadow.opacity(0.6), radius: 4, y: 3)
+                .overlay(Capsule().strokeBorder(LinearGradient(colors: [.white.opacity(scheme == .dark ? 0.9 : 0.55), .clear], startPoint: .top, endPoint: .center), lineWidth: 1))
+                .shadow(color: Theme.raisedShadow.opacity(1.2), radius: 2, y: 1)
+                .shadow(color: Theme.raisedShadow, radius: 6, y: 4)
         } else {
             Capsule().fill(face)
         }
@@ -147,7 +147,7 @@ struct PillButtonStyle: ButtonStyle {
 
     /// Light on top and dark below on the dark-green button; on the pale button in Dark, only a hint of shade below.
     private var shading: [Color] {
-        scheme == .dark ? [.clear, .black.opacity(0.07)] : [.white.opacity(0.14), .clear, .black.opacity(0.12)]
+        scheme == .dark ? [.clear, .black.opacity(0.11)] : [.white.opacity(0.26), .clear, .black.opacity(0.24)]
     }
 
     private var face: Color {
