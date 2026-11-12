@@ -43,6 +43,14 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       clip, quit and relaunch. The Release build has already shown a crash that Debug hid (AVKit not linked;
       fixed), so this is not a formality.
 - [ ] Walk through every screen in the final build: Videos, Words, Review, Player, Storage, Settings, About.
+- [ ] **Watch first sessions** (from outside feedback, 11 Nov 2026): three to five learners, each importing a short video (ideally one
+      with subtitles), learning a handful of words and watching it again, while someone watches and notes where they get stuck, then
+      asks how it went. Observed, not measured: no analytics, so we cannot and will not track whether they come back. This
+      is the proof the feature count has not had, and it comes before more features.
+- [ ] **Check the "how much you know" bands with learners.** The figure is vocabulary coverage only (nouns, verbs, adjectives and
+      adverbs; a word at Stage 5 counts as known; ignored words are left out). Where "Mostly familiar" (88 to 98%) really is
+      followable, and how it differs by language and level, rests on two transcripts; ask learners, and for Japanese around N4
+      look at what grammar and speed do to it.
 - [ ] Rebuild the shareable zip from the final build.
 - [ ] The website (`site/`, Astro, GitHub Pages): scaffolded with the home, privacy and terms pages. To do: switch on
       Pages (Settings > Pages > Source: GitHub Actions), a screenshot, and the Download link once there is a notarized
