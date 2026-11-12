@@ -1,117 +1,113 @@
 # Architecture
 
-A map for finding your way around. The [README](README.md) says what the app does and how to build it.
+This file shows where things live. The [README](README.md) says what the app does and how to build it.
 
 ## The one rule
 
-All logic lives in `LangCore/` (a Swift package with no UI). `Kikimi/` holds SwiftUI views only and calls into
-`LangCore` through one object, `LangEnvironment`. If you are adding behaviour, it almost certainly belongs in
-`LangCore`, with a test.
-
-Shared code never checks a language code such as `"ja"`. It asks the `LanguageProfile`.
+All logic is in `LangCore/`, a Swift package with no UI. `Kikimi/` holds SwiftUI views only, and calls `LangCore` through one object,
+`LangEnvironment`. New behaviour belongs in `LangCore`, with a test. Shared code never checks a language code such as `"ja"`. It
+asks the `LanguageProfile`.
 
 ## Where to start reading
 
-1. `LangCore/Sources/LangCore/Environment/LangEnvironment.swift`: the front door. It owns the database, the
-   dictionaries, the model manager and the import queue, and is what the views hold.
+1. `Environment/LangEnvironment.swift`: the front door. It owns the database, the dictionaries, the model manager and the import
+   queue. The views hold it.
 2. `Profiles/LanguageProfile.swift`: everything that differs between languages.
-3. `Import/ImportPipeline.swift`: the most important flow. `importVideo` reads as a list of steps.
-4. `Kikimi/RootView.swift`, then the view for the screen you care about.
+3. `Import/ImportPipeline.swift`: the main flow. `importVideo` is a list of steps.
+4. `Kikimi/RootView.swift`, then the view for the screen you need.
 
 ## LangCore, by folder
 
+Paths are under `LangCore/Sources/LangCore/`.
+
 | Folder | What it holds |
 |---|---|
-| `Profiles/` | `LanguageProfile` and the Spanish, French, German and Japanese profiles; `LanguageProfiles.all` is the registry; `LearningLanguages` is the subset the person chose. |
-| `Tokenizing/` | Turns a line of text into content words (lemma and part of speech). Spanish, French and German use Apple's `NaturalLanguage`; Japanese uses the vendored MeCab (`Sources/CMeCab`). |
-| `Dictionary/` | `DictionaryStore` and `KanjiStore` read the bundled dictionary and kanji files in place, read-only. They are never copied into the database. `VerbForms` reads a dictionary file's `forms` table (the spellings of common verbs, built from Wiktionary; Spanish, French and German), which `NLTaggerTokenizer` uses to overrule a verb the tagger names that the spelling cannot be a form of (Spanish: `puede` read as `podar`), and to read a spelling that is no word of its own as the verb it is (German `richtest`, which a tagger calls an adverb). |
-| `Database/` | GRDB records, migrations (`LangMigrations`) and queries. Schema changes are new migrations only. |
-| `Import/` | The import pipeline, queue, transcription, video compaction and the language check. `SubtitleParser.swift` reads .srt and .vtt files (and pairs them with their video by name) so a video with subtitles skips transcribing and the speech model. |
-| `Models/` | Speech-model download, listing and removal (`ModelManager`), plus `ModelCatalog` (sizes and notes). |
-| `SRS/`, `Review/` | The nine review stages and their intervals; review sessions and sentence audio; the overview (ready, coming up, words per stage). |
+| `Profiles/` | `LanguageProfile`, the four profiles, and the registry `LanguageProfiles.all`. |
+| `Tokenizing/` | Lines to content words (lemma, part of speech). Apple `NaturalLanguage` for Spanish, French and German. The vendored MeCab (`Sources/CMeCab`) for Japanese. |
+| `Dictionary/` | `DictionaryStore` and `KanjiStore` read the bundled files in place, read-only. `ReopeningReader` opens a file again, once, after a SQLite disk I/O error (the file changed while the app ran). `VerbForms` reads the `forms` table (verb spellings built from Wiktionary). The tokenizer uses it to correct verb lemmas (Spanish `puede` read as `podar`). |
+| `Database/` | GRDB records, migrations (`LangMigrations`) and queries. A schema change is always a new migration. |
+| `Import/` | The pipeline, queue, transcription and video compaction. `SubtitleParser` reads `.srt` and `.vtt`. `MediaCheck` refuses a file that macOS cannot open or that has no video. `SegmentSplitter` cuts a line longer than `maxSegmentSeconds` at its longest pause, using Whisper word times. |
+| `Models/` | Speech-model download, listing and removal (`ModelManager`, `ModelCatalog`). |
+| `SRS/`, `Review/` | The nine stages and their intervals. Review sessions. The cloze, typing and calibration logic. `ReviewShortcut` lists the keys a card offers. |
 | `Playback/` | The player controller, subtitle timeline and word hints. |
-| `Export/` | Audio and video clip export. |
-| `Resources/Localizable.xcstrings` | Strings shown to the user from this package (errors, titles). The app's own are in `Kikimi/Localizable.xcstrings`. |
-| `Database/LangDatabase+EditLine.swift` | Editing a subtitle line and re-finding its words. |
-| `Export/AnkiExport.swift` | The Anki import file (tab-separated text with header lines) and the export of a set of words, with optional sentence audio. File > Export Words to Anki… opens it (`AnkiExportFlow`): the selected words, or the ones you are learning. |
-| `Review/Calibration.swift` | Telling Kikimi which words of a video you know: the batches of twenty, when to stop (half a batch unknown), which words end up known, and the video's new words most-seen first. The sheet that draws it is `CalibrationSheet`. |
-| `Review/ClozeCard.swift` | The fill-in-the-blank card (the sentence with the word blanked, and its hint) and the per-language choice of review style (meaning, fill in, listening, typing). `Dictation.swift`: the comparison of what you typed with the line (a plain spelling diff), the per-language limits on how long a line may be to be offered, and `DictationCheck`. `KnownCheck.swift`: a sample of known words for the quick check. |
-| `Database/LangDatabase+Activity.swift` | The daily tally (`activity` table: listening seconds, lookups, words started or marked known, reviews) and the stats the Review page shows. |
-| `Translation/` | Translating a video's lines with macOS's on-device Translation framework: the translator (behind a protocol, so tests use a stand-in), the service that translates only what isn't kept yet, and the display and language preferences. Kept in the `translations` table. |
-| `Coverage/` | How much of a video you know (`VideoCoverage`, `LevelFit`), the shortest word list that reaches a target (`wordsToReach`), and marking a list of known words. |
-| `Backup/` | `ProgressBackup`: the `.kikimi` file (readable JSON), export, preview and merge-on-restore that never overwrites existing progress. `LibraryBackup`: the full-backup folder (progress file, `library.json` of transcripts, and the compressed videos), restored by adding the videos that aren't here yet. |
-| `Environment/` | `LangEnvironment` and where videos live on disk. `TextScale` is the app-wide text size: its four steps and how it is saved; `Theme.sized` and `Theme.styled` in the app make every font from it. `LibraryReset` (Debug builds only) moves the database, videos and staging into `Set Aside/` for the Debug menu's Reset Library, which runs at the next launch. |
+| `Export/` | Audio and video clips. `AnkiExport` writes the Anki import file. |
+| `Translation/` | On-device translation (macOS Translation framework, behind a protocol so tests use a stand-in). Results are in the `translations` table. |
+| `Coverage/` | How much of a video you know (`VideoCoverage`, `LevelFit`), and `wordsToReach`. |
+| `Backup/` | `ProgressBackup` (the `.kikimi` JSON file; a restore never overwrites progress) and `LibraryBackup` (the full-backup folder). |
+| `Environment/` | `LangEnvironment`, the video locations, `TextScale`, and `LibraryReset` (moves the database, videos and staging into `Set Aside/`). |
+| `Resources/` | Strings for this package, the built dictionaries, the IPADIC data and the licence texts. |
 
 ## The import pipeline
 
-`ImportPipeline.importVideo` calls one small method per step, in this order:
+`ImportPipeline.importVideo` calls one method for each step:
 
-`stage` (copy the original) → `confirmLanguage` → `transcribe` → `makeLibraryFiles` (compact video, verify) → `moveIntoLibrary` → `save` (one database transaction) → delete the staged copy.
+`stage` (copy the original) → `confirmLanguage` → `transcribe` → `makeLibraryFiles` (compact, verify) → `moveIntoLibrary` →
+`save` (one database transaction) → delete the staged copy.
 
-The original is only read. Any failure removes only what this import created. Tests inject a failure at each step
-and check the original is unchanged. `ImportQueue` runs imports one at a time for the UI and reports status.
+The original is only read. A failure removes only what this import made. Tests inject a failure at each step and check that the
+original is unchanged. `ImportQueue` runs imports one at a time for the UI.
 
-The library copy: small HEVC is kept as is, otherwise low-bitrate HEVC with the short side at most 480 px (the
-original streams are copied if re-encoding isn't smaller). Its sound is AAC, copied when already small, otherwise
-about 64 kbps (48 for mono). Sentence audio and audio clips play from this copy; there is no separate audio file.
-Settings > General > Video quality can keep the user's file as it is instead.
+Transcription asks Whisper for word times. `SegmentSplitter` then cuts long lines, and `TranscriptCleaner` removes sound tags and
+empty segments.
 
-The two hardest files are `AVFoundationTranscoder.swift` (it starts with a reading guide) and `ImportPipeline.swift`.
-
-## The website
-
-`site/` is an [Astro](https://astro.build) project of static pages (home, privacy, terms) in the app's colours, with no client
-script. The privacy and terms pages import `Kikimi/Privacy.md` and `Kikimi/Terms.md` directly, so there is one copy
-of each. `.github/workflows/site.yml` builds it and deploys to GitHub Pages.
+The library copy is HEVC with the short side at most 480 px (a small video is kept as is). Sound is AAC. Sentence audio and clips
+play from this copy. Settings > General > Video quality can keep the original file. The hardest files are
+`AVFoundationTranscoder.swift` (it starts with a reading guide) and `ImportPipeline.swift`.
 
 ## The app
 
-`KikimiApp` → `RootView` (floating nav plus the current section). `AppState` holds which section is showing and
-the Words screen's search, filter and selection, so they survive switching screens.
+`KikimiApp` → `RootView` (nav strip and current section). `AppState` holds the current section and the Words screen state.
 
 | View | Screen |
 |---|---|
-| `WordsView`, `WordTable`, `WordDetailView` | Search and bulk actions; the hand-built word table (square rows, keyboard selection); the inspector |
-| `ReviewView`, `ReviewOverviewView` | The review overview, then spaced-repetition cards |
-| `VideosView`, `ImportSection` | Add videos (drop zone, model choice and download, import progress), then your videos: details, delete |
-| `PlayerView`, `SubtitleRow` | Playback with clickable subtitles; one subtitle line |
-| `StorageView` | Downloaded models and videos, with removal |
-| `VoiceRecorder.swift` | Records the learner for the Shadow card into a temporary file, plays it back, and deletes it when the card ends or at the next launch. Needs the microphone entitlement and usage string. |
-| `KeyboardSwitch.swift` | Switches the typing exercise's text field to an installed keyboard that suits the language (the profile's `keyboardKeywords`), and restores the Mac's own afterwards. |
-| `IconSegmentedPicker.swift` | A row of choices with an icon and a short name each (the system segmented control on macOS shows only names). VoiceOver sees selectable buttons with their full names. Used for the card type on the Review page. |
-| `Toast.swift`, `AppState.showToast` | The short message over the window for something that just happened (started learning, exported, failed). It goes after four seconds (eight for an error), pointing at it holds it, and VoiceOver is told. Use it instead of a status line in a page. |
-| `OnboardingView` | First launch only (a library with videos skips it): the languages you are learning, the language you read, and a speech model download for each. Settings > Languages changes the first two later. |
-| `SettingsView`, `BackupModel` | The ⌘, window: a standard Mac settings window with icon tabs General, Languages, Data (save and restore progress, via LangCore's `ProgressBackup`), About |
-| `AppCommands` | The menu bar: Add Videos, Storage, the Go menu (pages and Find Words), Help pages; Export and Import Progress open Settings on the Data tab |
+| `WordsView`, `WordTable`, `WordDetailView` | Search and bulk actions, the word table, the word panel |
+| `ReviewView`, `ReviewOverviewView` | The Learn overview, then the cards |
+| `VideosView`, `ImportSection` | Add videos, then the video list |
+| `PlayerView`, `SubtitleRow` | Playback with clickable subtitles |
+| `StorageView` | Models and videos, with removal |
+| `SettingsView`, `BackupModel`, `StartOver` | The ⌘, window. The Data tab has backup, restore and the Danger zone (`StartOver` sets the library aside at the next launch). |
+| `OnboardingView` | First launch |
+| `AppCommands` | The menu bar |
+| `VoiceRecorder` | Records the Shadow card to a temporary file. It deletes the file when the card ends or at the next launch. |
+| `KeyboardSwitch` | Switches the typing card to a keyboard for the language, then restores the Mac keyboard |
+| `Toast`, `AppState.showToast` | A short message over the window (4 s; 8 s for an error). Use it instead of a status line. |
 
-`Theme.swift` is the design system: one colour field for the whole window, a monotone ink accent, pill buttons and flat panels. `SideNav` is the left strip, and `Modal.swift` shows panels that close on an outside click. Use these rather than styling views ad hoc.
+`Theme.swift` is the design system: one colour field, a monotone ink accent, pill buttons, flat panels. `Theme.sized` and
+`Theme.styled` make every font at the chosen text size. Use `Theme`, `SideNav` and `Modal.swift`. Do not style views one by one.
+
+## The website
+
+`site/` is an [Astro](https://astro.build) and [Starlight](https://starlight.astro.build) project: home, guide, FAQ, download and
+changelog. The privacy, terms, acknowledgements and changelog pages import files from the repo, so there is one copy of each. Search
+(Pagefind) is the only client script. The site loads nothing from other hosts. `.github/workflows/site.yml` builds it, and deploys
+it to GitHub Pages when `main` changes.
 
 ## Data on disk
 
-Everything is in the app container, never the repo: `Application Support/Kikimi/` holds `Library/` (videos and
-audio, one folder per content hash), `Staging/` (temporary), `models/` (speech models) and the SQLite database.
+All data is in the app container, never in the repo. `Application Support/Kikimi/` holds `Library/` (videos and audio), `Staging/`
+(temporary), `Models/` (speech models), `Set Aside/` (after Start over) and the SQLite database.
 
 ## Tests
 
-`cd LangCore && swift test`. The tests are the best examples of how each part is used. Anything needing a real
-model or file is opt-in through environment variables and skipped by default. There are no UI tests; the views are
-checked by building and by rendered previews.
+Run `cd LangCore && swift test`. A test that needs a real model or file is opt-in through an environment variable, and skipped by
+default. There are no UI tests. Check views by building and by rendering.
 
 | Variable | Runs |
 |---|---|
-| `LANGCORE_INTEGRATION=1` | Real WhisperKit transcription and language detection with the tiny model (downloads ~73 MB) |
-| `LANGCORE_BENCHMARK=1` | Accuracy and speed on synthesized speech; set `LANGCORE_MODEL` and `LANGCORE_MODELS_DIR` to choose the model |
-| `LANGCORE_FILE=<media>` | With the benchmark: transcribe or detect the language of one file (read-only) |
-| `LANGCORE_COMPACT_FILE=<video>` | Report what video compaction does to one file (read-only) |
+| `LANGCORE_INTEGRATION=1` | Real WhisperKit transcription and language detection (tiny model, about 73 MB download) |
+| `LANGCORE_BENCHMARK=1` | Accuracy and speed on synthesized speech. Set `LANGCORE_MODEL` and `LANGCORE_MODELS_DIR`. |
+| `LANGCORE_FILE=<media>` | With the benchmark: one file (read-only) |
+| `LANGCORE_COMPACT_FILE=<video>` | What video compaction does to one file (read-only) |
+| `LANGCORE_AUDIT=1` | The full dictionary audits (`DictionaryAuditTests`) |
 
-If `xcode-select` points at the Command Line Tools, prefix with `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`
-(XCTest needs Xcode's toolchain). The dictionary builders have their own tests:
-`python3 Scripts/dictionaries/test_builders.py`. `Scripts/check_leaks.sh` runs the `LangCore` tests under macOS's
-`leaks` tool and fails if anything leaked; it doesn't cover the SwiftUI app.
+If `xcode-select` points at the Command Line Tools, set `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`. Other tests:
+`python3 Scripts/dictionaries/test_builders.py`, `python3 -I Scripts/test_release_tools.py`, and `Scripts/check_leaks.sh` (the
+`LangCore` tests under `leaks`; it does not cover the SwiftUI app).
 
 ## Adding a language
 
-Write a profile, add it to `LanguageProfiles.all`, and add a script that builds its dictionary. The `words` and
-`dictionary` tables are keyed by language, so there is no schema change. Check the tokenizer first: Apple's
-`NaturalLanguage` gives good lemmas for Spanish, French and German, but none for Japanese, which is why Japanese
-uses MeCab.
+1. Write a profile and add it to `LanguageProfiles.all`.
+2. Add a script that builds its dictionary.
+
+The `words` and `dictionary` tables are keyed by language, so there is no schema change. Check the tokenizer first. Apple
+`NaturalLanguage` gives good lemmas for Spanish, French and German, but not for Japanese. This is why Japanese uses MeCab.

@@ -1,408 +1,280 @@
 # Roadmap
 
-What exists, what is left for 1.0, and what comes after. Measured against the principles in
-[AGENTS.md](AGENTS.md). Last updated 2026-11-06.
+This file lists what 1.0 needs and what comes after. The principles are in [AGENTS.md](AGENTS.md). Last updated 2026-11-12.
 
 ## Where we are
 
-The core loop works end to end: import a video you own, transcribe it on the Mac, find and look up its words,
-play it with synced and clickable subtitles, review words with spaced repetition, see how much of each video you
-already know, and back your progress up. Spanish, French, German and Japanese are supported. Spanish and Japanese have
-been used on real videos; French and German have been checked on sentences only (see More languages).
+The core loop works. You import a video. Kikimi transcribes it on the Mac and finds its words. You play it with clickable
+subtitles, learn the words with spaced repetition, see how much of each video you know, and back up your progress. Spanish,
+French, German and Japanese work. Spanish and Japanese were used on real videos. French and German were checked on sentences only.
 
-**Verdict: feature-complete for 1.0, not yet release-ready.** What remains is mostly proving the app on a clean
-machine, release plumbing, and a few promises we have made but not kept (below). New features can wait.
+The features for 1.0 are built. The app is not ready to release. What remains is proof (a clean-machine test, observed learner
+sessions), release work (signing, notarization) and a legal review. New features wait for these.
 
 ## Needed for 1.0
 
 ### Promises and paperwork
-- [x] **Terms of use** drafted (`Kikimi/Terms.md`, shown in the app beside the privacy policy).
-- [ ] **Finish the terms**: governing law is set to California and the contact is the GitHub issues page; have a lawyer
-      review them. They were not written by one, and what they can limit depends on where your users live.
-- [x] **Contact line** (4 Nov 2026): the privacy policy and the terms point to the GitHub issues page
-      (https://github.com/surreptus/kikimi/issues), and say issues there are public. No email address is published.
-- [x] **Name: keeping Kikimi, with the trademark risk known** (decision of 30 Oct 2026). KIKIMI is a live registered US mark (reg.
-      7139558, registered 15 Aug 2023, standard characters; owner KKLT Enterprises, LLC of San Francisco, which has a law
-      firm; Class 9 downloadable software to share photos, exchange information securely, store data and reach social
-      networks). The goods differ from a language-learning app, but an identical mark in the same class can draw a
-      demand letter, and the worst case is a forced rename once there are users. The app is free, so the risk is a
-      request to stop, not damages. To keep it small: position the app as education (not social or photo sharing), keep
-      it out of the App Store for now, and register no mark of our own. **Fallback:** the alternative name chosen in the earlier rename was checked in full (no App
-      Store app in the US or Japan, no USPTO result, `.app`, `.io`, `.dev` free by DNS). The whole rename is the commit
-      `71c93ff` (see its message); reverting this revert re-applies it in one step.
-- [ ] Ask the lawyer who reads the terms for a view on the KIKIMI registration, before any wider release.
-- [x] Confirm licences listed in the [release checklist](Release/CHECKLIST.md) (Whisper model card, JMdict and
-      Wiktionary attribution, no use of the name "WaniKani"). Audited 25 Oct 2026, and again **12 Nov 2026** against the upstream
-      licence texts: the bundled licence files are the upstream texts (with our headers), the credits meet the EDRDG
-      licence's acknowledgement terms, nothing linked is uncredited (`swift-argument-parser` and the server packages in WhisperKit's
-      manifest are not in the binary), and the speech-model cards say MIT (Argmax) with OpenAI's own saying MIT or Apache 2.0. **One real
-      gap found and closed:** the EDRDG licence requires regular updating of JMdict and KANJIDIC2 data and calls failing to
-      keep it up to date a violation. The checklist had no refresh step, and the data in 0.16.0 is from 3 Nov while EDRDG's files
-      changed on 12 Nov. Now a checklist step refreshes it before each release, and `check_release_sync.py` fails when it is over 31
-      days old. Not a lawyer's review; the terms and the name risk below still need one.
-- [ ] Privacy report (Xcode: Product > Archive > Generate Privacy Report) covered by `PrivacyInfo.xcprivacy`,
-      including third-party packages.
+- [x] **Terms of use** (`Kikimi/Terms.md`). The app shows them beside the privacy policy.
+- [ ] **Finish the terms.** The governing law is California. The contact is the GitHub issues page. A lawyer must review them,
+      because a lawyer did not write them and what they can limit depends on where users live.
+- [x] **Contact line** (4 Nov 2026). The privacy policy and the terms point to the GitHub issues page and say that issues there
+      are public. We publish no email address.
+- [x] **Name: keep Kikimi, with the trademark risk known** (decision of 30 Oct 2026). KIKIMI is a live US registered mark (reg.
+      7139558, 15 Aug 2023, owner KKLT Enterprises, LLC, which has a law firm). Its goods are downloadable software to share photos,
+      exchange information securely, store data and reach social networks. The goods differ from a language app, but an identical
+      mark in the same class can draw a demand letter. The worst case is a forced rename after we have users. The app is free, so
+      the risk is a request to stop, not damages. To keep the risk small: present the app as education, stay out of the App Store
+      for now, and register no mark of our own. **Fallback:** the earlier alternative name was checked fully. Commit `71c93ff` is the
+      whole rename. Reverting the revert applies it again.
+- [ ] Ask the lawyer for a view on the KIKIMI registration, before any wider release.
+- [x] **Licences confirmed** (25 Oct and 12 Nov 2026, against the upstream licence texts; details in the
+      [release checklist](Release/CHECKLIST.md)). One gap found and closed: the EDRDG licence requires regular updates of the
+      JMdict and KANJIDIC2 data. Each release now refreshes it, and `check_release_sync.py` fails if the data is more than 31 days
+      old. This is not a lawyer's review.
+- [ ] Privacy report (Xcode: Product > Archive > Generate Privacy Report). `PrivacyInfo.xcprivacy` must cover it, including the
+      third-party packages.
 
 ### Release readiness
-- [ ] Apple Developer membership, team ID, signing, notarization profile; set the version and build number.
-- [ ] **Clean-machine test** with a Release build: first launch, model download, import, play, review, export a
-      clip, quit and relaunch. The Release build has already shown a crash that Debug hid (AVKit not linked;
-      fixed), so this is not a formality.
+- [ ] Apple Developer membership, team ID, signing, notarization profile. Set the version and build number.
+- [ ] **Clean-machine test** with a Release build: first launch, model download, import, play, review, export a clip, quit and
+      open again. Release already showed a crash that Debug hid (AVKit was not linked; fixed), so this is not a formality.
 - [ ] Walk through every screen in the final build: Videos, Words, Review, Player, Storage, Settings, About.
-- [ ] **Watch first sessions** (from outside feedback, 11 Nov 2026): three to five learners, each importing a short video (ideally one
-      with subtitles), learning a handful of words and watching it again, while someone watches and notes where they get stuck, then
-      asks how it went. Observed, not measured: no analytics, so we cannot and will not track whether they come back. This
-      is the proof the feature count has not had, and it comes before more features.
-- [ ] **Check the "how much you know" bands with learners.** The figure is vocabulary coverage only (nouns, verbs, adjectives and
-      adverbs; a word at Stage 5 counts as known; ignored words are left out). Where "Mostly familiar" (88 to 98%) really is
-      followable, and how it differs by language and level, rests on two transcripts; ask learners, and for Japanese around N4
-      look at what grammar and speed do to it.
+- [ ] **Watch first sessions** (outside feedback, 11 Nov 2026). Three to five learners each import a short video (best with
+      subtitles), learn a few words and watch the video again. Someone watches, notes where they get stuck, and asks how it went.
+      This is observation, not measurement. We have no analytics, so we cannot track whether they return. It comes before more
+      features.
+- [ ] **Check the "how much you know" bands with learners.** The figure is vocabulary coverage only: nouns, verbs, adjectives and
+      adverbs, with Stage 5 counted as known and ignored words left out. The "Mostly familiar" band (88 to 98%) rests on two
+      transcripts. Ask learners if it matches what they can follow, by language and level. For Japanese near N4, look at what
+      grammar and speed do to it.
 - [ ] Rebuild the shareable zip from the final build.
-- [ ] The website (`site/`, Astro, GitHub Pages): scaffolded with the home, privacy and terms pages. To do: switch on
-      Pages (Settings > Pages > Source: GitHub Actions), a screenshot, and the Download link once there is a notarized
-      release. The privacy and terms pages give the GitHub issues page as the contact.
-- [x] **How people get updates** (6 Nov 2026, in 0.14.1): Kikimi > Check for Updates reads one small file from the website, only
-      when chosen (the privacy policy says so). No Sparkle and no automatic checking; a release raises `site/public/latest.json`
-      after it is published.
+- [ ] The website (`site/`) is live on GitHub Pages. When a notarized release exists, link Download to it. Today it links to the
+      Releases page.
+- [x] **Updates** (6 Nov 2026). Kikimi > Check for Updates reads one small file from the website, only when the user chooses it.
+      There is no Sparkle and no automatic check. A release raises `site/public/latest.json` after it is published.
 
 ### Quality
-- [x] **Readings and kanji for Japanese** (30 Oct 2026): a word with several readings (月: つき, がつ, げつ) lists them in the word bar
-      and on review cards, and a word's page lists each kanji with its meaning and its on'yomi and kun'yomi (KANJIDIC2,
-      EDRDG, CC BY-SA 4.0, 12,633 kanji, 0.7 MB). Not done: showing which reading a given sentence used on the review card,
-      and naming the on'yomi or kun'yomi of the kanji as it is read in the word.
-- [x] **First-launch welcome** (30 Oct 2026): languages you are learning, the language you read, a speech model download per
-      language (or later). Not seen on screen yet (the sandbox here could not capture it). Not done: asking macOS to download
-      the translation language during setup (needs the system's own sheet), and a link to run the welcome again.
-- [x] **Release the speech model when idle.** It is let go after 2 minutes unused (never mid-import); the next
-      import reloads it.
-- [ ] **Transcript performance.** It felt slow in Debug. A 20-second sample of the Debug build showed the main
-      thread about 74% idle and nothing in our code standing out. Confirm in the Release build; if it still lags,
-      likely suspects are every row re-evaluating on hover and rows never being released. Test on a 25-minute video.
-- [x] Accessibility pass on the newer features (code review and fixes, 26 Oct 2026): buttons name their video or
-      sentence, the resume offer and status messages are announced, auto-scroll honours Reduce Motion, previews are
-      hidden from VoiceOver. **Still to do by hand:** listen to it with VoiceOver on, and tab through with Full Keyboard
-      Access, in Light and Dark.
-- [x] A full backup (Settings > Data > Include my videos and transcripts) saves a folder with the compressed videos, their
-      transcripts and where you stopped. The small progress-only file still leaves out where you stopped; decide if it should.
-- [x] Help and feedback (6 Nov 2026): Help > Report a Problem… opens a new GitHub issue in the browser with the Kikimi and macOS
-      versions typed in, nothing else attached and nothing sent until the person submits it (a mailto link was dropped, since
-      we publish no email address). The privacy policy says so.
-- [x] App-wide text size (8 Nov 2026, **not yet seen in the running app**): Settings > General > Text size (Standard, Large,
-      Larger, Largest: 1, 1.15, 1.3 and 1.5 times), and View > Larger Text, Smaller Text and Standard Text Size (⌘+, ⌘-, ⌘0).
-      macOS ignores SwiftUI's own text-size setting (measured), so every font is made in `Theme` (`sized`, `styled`) and scaled by
-      `TextScale`. Not scaled: the transcript, which keeps its own size, and menus, system controls and tooltips. No step below
-      the usual size, since the smallest text is already 12 pt. To check by eye at Largest: the player's control row, the Learn
-      cards, the Settings window (it scrolls), and the Words table's fixed-width columns.
-
-### Already done for 1.0
-Import with progress and cancel; language check before transcribing; idempotent, non-destructive pipeline; word
-extraction; dictionary lookup (JMdict, Wiktionary); word table with filters and bulk actions; review with
-sentence audio; synced player with furigana, hints, clip export; coverage per video and level fit; known-words list;
-backup and restore; Storage view for models; Settings window; menu commands; About, Privacy and Acknowledgements;
-review overview (ready now, next 7 days, words per stage); transcript text size; resume where you stopped; video thumbnails; app icon; keyboard and VoiceOver for word hints.
+- [x] **Japanese readings and kanji** (30 Oct 2026). A word shows all its readings. Its page lists each kanji with meaning,
+      on'yomi and kun'yomi (KANJIDIC2, 12,633 kanji, 0.7 MB). Not done: show which reading a sentence used.
+- [x] **First-launch welcome** (30 Oct 2026): languages, reading language, speech model download. Not seen on screen. Not done: ask
+      macOS to download the translation language during setup (it needs the system sheet), and a link to run the welcome again.
+- [x] **Release the speech model when idle** (after 2 minutes, never during an import).
+- [ ] **Transcript performance.** It felt slow in Debug. A 20-second sample showed the main thread about 74% idle and nothing in
+      our code that stood out. Confirm in a Release build with a 25-minute video. If it lags, suspects are rows that evaluate on
+      hover and rows that are never released.
+- [x] **Accessibility pass** (code review and fixes, 26 Oct 2026). **Still to do by hand:** use it with VoiceOver, and tab through it
+      with Full Keyboard Access, in Light and Dark.
+- [x] **Full backup** (Settings > Data) saves a folder with the compressed videos, transcripts and where you stopped. The small
+      progress-only file does not save where you stopped. Decide if it should.
+- [x] **Help > Report a Problem…** (6 Nov 2026) opens a new GitHub issue in the browser with the Kikimi and macOS versions filled
+      in. Nothing is sent until the person submits it. We have no mailto link, because we publish no email address.
+- [x] **App-wide text size** (8 Nov 2026, **not seen in the running app**). Four steps (1, 1.15, 1.3, 1.5 times) in Settings >
+      General, and ⌘+, ⌘- and ⌘0. macOS ignores the SwiftUI text size (measured), so `Theme` makes every font and `TextScale`
+      scales it. The transcript, menus, system controls and tooltips are not scaled. Check by eye at Largest: the player controls,
+      the Learn cards, the Settings window and the Words table columns.
 
 ## After 1.0
 
-Ordered by how much each helps comprehensible input per unit of effort.
+The order follows how much each item helps comprehensible input for the effort.
 
 ### Understanding the material
-- [x] **Translations in your native language** (30 Oct 2026): macOS's on-device Translation framework, one line at a time, kept in a
-      `translations` table (derived data, not backed up). Settings > General: Off, When I ask (default: hidden until you press
-      a line's translate button or T, so you listen first) or Always, and the language to translate into (default: the
-      Mac's). Needs the language pair installed; if not, the status line says where to add it. Not done: an in-app
-      download prompt for a missing language (it needs the system's own sheet), and context-aware translation (a language
-      model such as TranslateGemma was researched: it needs a ~2.5 GB download, a new dependency and Gemma's licence terms,
-      so it waits until per-line translation has been used and found wanting). Findings behind the design (27 Oct 2026):
-      Apple's framework translates each line of a batch separately and returns no alignment; its default and high-fidelity
-      strategies gave identical results on 18 real lines, so the default is used.
-- [x] **Explain this sentence**: tested on 27 Oct 2026 and **dropped for now**. The on-device language model in macOS 26
-      is available on this Mac, but on real transcript lines it gave a wrong translation of a Spanish line, called
-      "qué tipo de" an "adjective phrase", and for a Japanese line explained a different line's ending as a "polite
-      negative suggestion". A wrong grammar note is worse than none for a learner. Revisit when the model improves, or
-      with a checked, fixed set of grammar notes instead of generated ones.
-- [x] **Grammar link-out for Japanese** (27 Oct 2026): the word bar names a verb's or adjective's form (from MeCab's inflection) and
-      links to its Tsumiki page. Next, if wanted: map the auxiliary morphemes (させ, られ, た) to Tsumiki's suffix pages
-      and show the whole derivation in the app from Tsumiki's data (CC BY-SA, so credited in the Acknowledgements).
-- [x] **Subtitle modes** (0.15.0): H hides the subtitles for listening (a plain bar per line, with a translation waiting too), and
-      S shows one line, which is the reveal-on-click mode. Target language only and target plus translation (T) were already there.
-- [x] **Pause after each line** (P) and **loop this line** (R), with a 1×, 0.75× or 0.5× speed for loops.
-- [x] **Import subtitles** (.srt / .vtt, 4 Nov 2026): drop a subtitle file with its video (or choose both together) and its cues
-      are used instead of transcribing, so the import needs no speech model and is quick. Files are paired by name (`film.mp4`
-      with `film.srt` or `film.es.srt`; the one tagged with the chosen language wins; a lone video with a lone subtitle file
-      pair whatever they are called). Reads UTF-8, UTF-16 and older Western or Japanese encodings, SubRip and WebVTT, with
-      markup, style codes, notes and sound descriptions removed. The language is checked from the text (a supported
-      other language offers the same switch as for audio; any other, such as English subtitles, is refused), and a file
-      whose cues all start after the video ends is refused before anything is copied. Not done: choosing a subtitle file for
-      a video already in the library, subtitles inside a video file (embedded tracks), and other formats (.ass, .ttml).
-- [ ] **Subtitles inside a video file, with a way to choose the track** (scoped 11 Nov 2026, **not started**): an MP4 or MOV can
-      carry several subtitle tracks (often one per language), and today Kikimi reads only a separate `.srt` / `.vtt`.
-      - Choosing is the point: a file may hold English, Spanish and a commentary track, and the wrong one is refused or, worse,
-        taken. Adding a video with more than one text track asks which to use, listing each by its language and name (the
-        file's own labels), with the track in the video's language ticked first. One text track in the right language is used
-        without asking. The chosen track is checked like a subtitle file (language from the text, refused if another).
-      - The same choice is offered for a video already in the library (the Info sheet's "Add subtitles", which is also the
-        "choose a subtitle file for a video already in the library" item above), as one menu: a file from disk, or a track
-        inside the video. Keyboard and VoiceOver reach every row.
-      - How: AVFoundation lists a file's subtitle and caption tracks and its reader gives each cue's text and time, so it is
-        MP4, MOV and M4V. Cue text is stored as a text sample and needs unwrapping (a `mov_text` sample is a length-prefixed
-        string with style boxes after it). **MKV is not readable by AVFoundation**, and MKV is where most embedded tracks are, so
-        most of those files still need the ffmpeg step in the guide; supporting them would mean a demuxer, which is a dependency
-        and not offered here without asking first. Picture-based tracks (DVD, Blu-ray) are not text and are not offered.
-      - Check with real files: an MP4 with one `mov_text` track, with two, with none, and a track whose language tag is missing or
-        wrong. Add the test that fails on a cue time offset (a track often starts after the video does).
-- [x] **Edit a transcript line** (right-click a line > Edit line…): fixes the text and its timing (with a preview), and
-      finds its words again.
-- [ ] **Word-level timestamps**, so a single word can be played and clips are tighter. **Partly done (12 Nov 2026):** transcription now asks
-      Whisper for word times (the same speed and text), and a line longer than 6.5 s (`maxSegmentSeconds` on the language profile) is cut at its
-      longest pause between words, each part again while still too long (`SegmentSplitter`). On a 5-minute Japanese video with human subtitles, lines
-      over 6.5 s went from 12 to 0 (the longest 11.6 s to 6.4 s), and the human cue breaks that a cut also falls on (within 0.6 s) went from
-      42% to 57%, with the same text and time; but lines under 1.2 s went from 0 to 6. One video is too few to tune the limit or compare
-      languages: a set of videos with same-language human subtitles per language is the next step. Tried and **not** taken: a punctuation prompt
-      (every line ends with a mark, but Whisper then writes 14 s lines and the cuts match worse), and the on-device language model rewriting
-      text (it changes words); grouping Whisper's own pieces with it (it writes no text) works but merges too much, and is macOS 26 only. Still to
-      do here: playing a single word, and tightening clips to words.
+- [x] **Translations** (30 Oct 2026). The macOS on-device Translation framework translates one line at a time. Settings > General:
+      Off, When I ask (default, so you listen first) or Always. Not done: an in-app prompt to download a missing language (it
+      needs the system sheet), and context-aware translation. A language model such as TranslateGemma needs a download of about
+      2.5 GB, a new dependency and the Gemma licence terms, so it waits until per-line translation proves too weak. The Apple
+      framework translates each line separately and gives no alignment. Its default and high-fidelity strategies gave the same
+      result on 18 real lines, so we use the default.
+- [x] **Explain this sentence** (tested 27 Oct 2026, **dropped**). The on-device model in macOS 26 translated a Spanish line
+      wrongly, called "qué tipo de" an "adjective phrase", and explained a Japanese line ending with the wrong line's grammar. A
+      wrong grammar note is worse than none. Revisit when the model improves, or use a fixed set of checked notes.
+- [x] **Japanese grammar link-out** (27 Oct 2026). The word bar names a verb's or adjective's form (from the MeCab inflection) and
+      links to its Tsumiki page. Next, if wanted: map the auxiliary morphemes (させ, られ, た) to Tsumiki suffix pages (CC BY-SA,
+      credited in Acknowledgements).
+- [x] **Subtitle modes** (0.15.0): H hides subtitles for listening, S shows one line. **Pause after each line** (P). **Loop this
+      line** (R) at 1×, 0.75× or 0.5× speed.
+- [x] **Import subtitles** (.srt and .vtt, 4 Nov 2026). Kikimi uses the cues and skips transcription and the speech model. Files
+      pair by name. Kikimi checks the language from the text and refuses other languages (English subtitles, for example). Not
+      done: choose a subtitle file for a video already in the library, and the formats .ass and .ttml.
+- [ ] **Subtitles inside a video file, with a way to choose the track** (scoped 11 Nov 2026, **not started**). An MP4 or MOV can
+      hold several subtitle tracks, often one per language. Kikimi reads only a separate `.srt` or `.vtt`.
+      - Choosing is the main point, because a wrong track is refused or, worse, used. With more than one text track, ask which to
+        use. List each by language and name, with the track in the video's language ticked. With one track in the right language,
+        use it without asking. Check it like a subtitle file.
+      - Offer the same choice for a video already in the library, in the Info sheet's "Add subtitles": one menu with a file from
+        disk or a track inside the video. This also covers the "choose a subtitle file for a video already in the library" item.
+        Every row works by keyboard and VoiceOver.
+      - AVFoundation reads subtitle tracks in MP4, MOV and M4V. A `mov_text` sample is a length-prefixed string with style boxes
+        after it, so the text needs unwrapping. **AVFoundation cannot read MKV**, and most embedded tracks are in MKV. Those files
+        still need the ffmpeg step in the guide. Support for them needs a demuxer, which is a dependency (ask first). Picture-based
+        tracks (DVD, Blu-ray) are not text. Do not offer them.
+      - Test with real files: one `mov_text` track, two, none, and a missing or wrong language tag. Add a test for a cue time
+        offset (a track often starts after the video).
+- [x] **Edit a transcript line** (right-click a line > Edit line…). It fixes the text and the timing, and finds the words again.
+- [ ] **Word-level timestamps**, so that one word can play and clips are tighter. **Partly done (12 Nov 2026).** Transcription asks
+      Whisper for word times (same speed, same text). A line longer than 6.5 s (`maxSegmentSeconds` in the language profile) is cut
+      at its longest pause between words, again while still too long (`SegmentSplitter`). Test: one 5-minute Japanese video with
+      human subtitles. Lines over 6.5 s went from 12 to 0. The share of human cue breaks that a cut also hits (within 0.6 s) went
+      from 42% to 57%. Text and time did not change. Lines under 1.2 s went from 0 to 6. One video is too few to tune the limit or
+      compare languages, so next we need a set of videos with same-language human subtitles for each language. **Tried and not
+      taken:** a punctuation prompt (every line ends with a mark, but Whisper then writes lines of 14 s and the cuts match worse),
+      and the on-device language model that rewrites text (it changes words). The model that only groups Whisper's own pieces
+      writes no text and works, but it merges too much and needs macOS 26. Still to do: play one word, and tighten clips to words.
 
 ### Finding the right material
-- [x] **Next up** (5 Nov 2026): a card at the top of Videos suggests the video that fits best, by fit alone. A video you have heard is as
-      good a choice as a new one, since listening again is how an almost-understood video becomes understood, so nothing is
-      marked finished and replays are not marked down. It is hidden with one video, or when every video is still hard.
-- [ ] **Frequency-list bootstrap**: mark the most common words as known for a beginner who has nothing yet. Needs
-      a data source and a licence decision first.
-- [x] **Calibrate on the first video** (6 Nov 2026, **not yet seen in the running app**): "Mark the words I know" on the first-video card
-      and in a video's Info sheet opens the pass described here: 20 words at a time, up to 120, tap the ones you don't know, it stops
-      when half a batch is unknown, a final screen says how many will be marked known, and Undo is offered afterwards. The rules
-      are in `Calibration` (tested). A new learner has nothing marked known, so every
-      video reads as mostly unknown and the first lessons teach words they already know. Offer a short pass from the
-      first-video card: show that video's most-seen new content words in batches of about 20, the learner taps the ones
-      they *don't* know, and it stops when most of a batch is unknown (or after about 120 words). Nothing changes until a
-      final screen says "You know about N of these words" and the learner confirms; then those words are marked known, and
-      the card's coverage figure updates. It needs no frequency list or new data (the order is the video's own counts, as in
-      `wordsToReach`) and works the same in all four languages, so unlike the frequency-list bootstrap above it has no
-      licence question. **Not a level label:** it does not guess "B1" or any grade, since the app has no validated mapping
-      from words known to a level; coverage per video is the measure. Risks: people over-claim (the known-words check
-      sends a missed word back to learning) and a single short video gives a noisy ranking. Today's manual way, hidden: Words >
-      Select > "250 most-seen new words" > Known. Needs the chips to work by keyboard and VoiceOver, and its strings to be
-      localisable.
-- [ ] **Audio files** (podcasts you have downloaded; scoped 11 Nov 2026, **not started**): import an MP3, M4A or similar as
-      you import a video, with or without a transcript. Everything after import (transcript, word lookup, coverage, lessons,
-      the Hear buttons) already works from the text and its times, so the work is at the two ends. About a few days, one pull
-      request.
-      - Import: today the pipeline re-encodes to HEVC and rejects a file with no video track (`AVFoundationTranscoder`). Audio
-        gets its own path: re-encode to AAC (or keep the file), skip the video checks, keep the same order, atomic move and
-        clean-up after failure. The file picker adds `.audio`. A supplied `.srt` / `.vtt` already needs no speech model.
-      - Player: `PlayerView` assumes a picture. An audio layout with the transcript large, and no empty video pane. Check
-        loop, pause after each line, hide subtitles and clip export (audio clips) work from audio.
-      - Small things: a thumbnail for an episode with no frame (the file's cover art if it has one, else a plain tile),
-        a video's length and coverage shown the same way, and the Info sheet, backup and restore carrying audio like video.
-      - Transcripts without times (plain text, HTML, Podcasting 2.0 JSON) are not supported by the subtitle importer; those
-        episodes are transcribed as any file with no subtitles is. Aligning a supplied text to the audio is a separate, later job.
-      - **Not included, on purpose: subscribing to feeds or downloading episodes.** AGENTS.md principle 7 makes the network
-        only for speech models and update checks, and a downloader would change the privacy policy, need a feed parser and
-        probably a dependency. Dropping in a file you downloaded yourself gives most of the benefit. If we ever want feeds, it
-        is a separate decision that starts with the privacy policy.
-      - Wording to settle: the app says "videos" throughout; audio files would need a word that covers both ("media"), kept out of
-        the UI until the feature lands.
+- [x] **Next up** (5 Nov 2026). A card on Videos suggests the video that fits best, by fit alone. A video you heard is as good a
+      choice as a new one, because listening again is how a nearly understood video becomes understood.
+- [ ] **Frequency-list bootstrap.** Mark the most common words as known for a beginner. It needs a data source and a licence
+      decision first.
+- [x] **Calibrate on the first video** (6 Nov 2026, **not seen in the running app**). "Mark the words I know" shows a video's
+      most-seen new content words, 20 at a time, up to 120. The learner taps the words they do *not* know. It stops when half a
+      batch is unknown. A last screen says how many words become known, and Undo is offered. Reason: a new learner has nothing
+      marked known, so every video reads as mostly unknown and the first lessons teach words that the learner knows. It needs no
+      frequency list and no new data, so it has no licence question. **It does not give a level label** ("B1"): the app has no
+      validated map from words known to a level. Risks: people over-claim, and one short video gives a noisy ranking.
+- [ ] **Audio files** (podcasts that you downloaded; scoped 11 Nov 2026, **not started**). Import an MP3, M4A or similar like a
+      video, with or without a transcript. After import, everything already works from the text and its times, so the work is at
+      the two ends. Estimate: a few days, one pull request.
+      - Import: today the pipeline re-encodes to HEVC and rejects a file with no video track. Audio needs its own path: AAC (or keep
+        the file), no video checks, and the same order, atomic move and clean-up after a failure.
+      - Player: `PlayerView` assumes a picture. Make an audio layout with a large transcript. Check loop, pause after each line,
+        hide subtitles and clip export.
+      - Small items: a thumbnail for an episode (cover art, else a plain tile), the Info sheet, and backup and restore.
+      - A transcript without times (plain text, HTML, Podcasting 2.0 JSON) is not supported. Such an episode is transcribed. Aligning
+        a supplied text to the audio is a later job.
+      - **Not included, on purpose: feeds and episode downloads.** AGENTS.md principle 7 limits the network to speech models and
+        update checks. A downloader changes the privacy policy and needs a feed parser and probably a dependency. A file that the
+        user downloads and drops in gives most of the benefit.
+      - To settle: the app says "videos" everywhere, and audio needs a word for both ("media"). Keep it out of the UI until the
+        feature exists.
 
 ### Practising
-- [x] **A Learn page with three paths** (suggested 4 Nov 2026, in the style of WaniKani's dashboard; built 5 Nov 2026 with Lessons, Reviews and Practice; seen on screen 6 Nov 2026): the Review page becomes
-      **Learn**, a page of cards, one for each thing you can do now:
-      - **Lessons**, with the count of the day's new words (see Daily lessons below). Start opens the lesson.
-      - **Reviews**, with the count due now. This is today's panel, with the card type and Start.
-      - **Practice**, extra study that does not move any stage: *Review ahead* (words not yet due), *Review known* (the quiz of
-        words you marked known, which exists today) and *Practice finished* (words that have been through every stage and
-        retired, WaniKani's "burned"), each a row with its count and a button, as WaniKani's Extra Study has.
-      "Known" and "finished" differ: known is what you marked yourself, finished is what you earned by passing every review.
-      The card type applies to all three paths. Settled 5 Nov 2026: a miss in *Practice finished* changes nothing (extra study; only *Review known*
-      is a real check), and the sidebar count stays reviews due. It absorbs the *Review ahead* and *Resurface finished words* items.
-- [x] **Daily lessons** (5 Nov 2026; built as below, 15 a day by default, Settings > Languages > New words a day, 0 turns them off; unused lessons lapse, and none are offered while more than 100 reviews are due; seen on screen 6 Nov 2026) (like WaniKani's): each day Kikimi queues up the most important words you haven't started, 15 for each
-      language by default, and you learn them from a short lesson instead of picking every word yourself. The number is a
-      setting (Settings > Languages > New words per day, one for each language you learn; 0 turns it off). Today nothing is
-      learned until you select words, so someone with videos but no habit meets an empty Review page; a steady supply of the
-      words that matter most keeps the loop going. Points to settle before building:
-      - **Which words.** From your own videos, never a generic list. New content words (nouns, verbs, adjectives, adverbs),
-        ranked by how much of your material they cover, either by the lines they appear in (as "Start with the 25 words you
-        hear most" does) or, better, by how much each raises the coverage of the videos you are working through (as the
-        per-video goal does). Skip known, learning and finished words, and any word with no example line from a video. With
-        no videos yet there is nothing to queue (see the frequency-list item).
-      - **No pile-up.** The day's lessons don't accumulate: unused ones lapse at midnight (our choice, to settle), and no new ones
-        are offered while the reviews due are over a limit, as WaniKani does for overload. The limit (say 100) needs measuring.
-      - **The lesson** (changed 5 Nov 2026, from the user's feedback: a lesson teaches a batch and quizzes it at once, as
-        WaniKani's does). Five words at a time, one by one: the word in a sentence from one of your videos with its audio and
-        its meaning. "Next" teaches it, "Already know it" marks it known. When the batch is done the words start at stage 1
-        with their first review one stage-1 interval (4 hours) away, and the page quizzes them straight away in the chosen
-        card type, asking a missed word again until it is right; the quiz moves no stage. Then the next five. Not a silent
-        bulk add. Reviews and Practice (including the known and finished rechecks) use the chosen card type; lessons do not.
-      - **Where it shows.** The Lessons card on the Learn page (above), with its count, for the language you are in.
-      - **Counting the day.** The activity log already records each word started (`learn`), by day, so no new table is needed.
-        It counts every start, including words you pick on Words or take from a video's goal; I'd let those use up the day's
-        allowance too, since it is the cap on new words per day however they begin.
-      - It sits beside picking words yourself and the per-video goal, not in place of them. Nothing leaves the Mac.
-- [ ] **Grammar from your own videos** (researched 5 Nov 2026, **not started**): noticing, not a course. Recommendation: **forms
-      of words you meet, shown on demand, with a link out**; no lesson path, no rules taught ahead of the material.
-      - **Fits the loop:** the word panel and word bar say what a form is ("hablaría: conditional, 1st/3rd singular"; "食べさせられた:
-        causative-passive, past") with a few other forms of the same word, and a line's pattern is found by looking, as
-        Japanese already is (see the link-out item). Works against it: a fourth path of explained rules, tables to memorise,
-        pattern drills ahead of use, anything generated (see *Explain this sentence*, dropped; and *Conversation practice*).
-        Grammar is a property of the word you are looking at, so it belongs in the player and the word panel, not on Learn.
-      - **What can be detected.** Japanese: well. MeCab/IPADIC already gives the 活用形 and the auxiliaries (させ, られ, た, ない, たい,
-        ている), and particles are their own part of speech; chaining them names a form with a fixed table in the profile.
-        Spanish, French, German: only lemma and part of speech, since `NLTagger` returns no tense, mood, case or person, and
-        French lemmas are noisy. A form can still be named by looking the *surface* up in the dictionary's inflected forms:
-        `build_kaikki.py` drops the `form_of` senses today, but kaikki carries each one with tags (`first-person singular
-        conditional`). Ambiguity is real (Spanish *hable* is subjunctive 1st or 3rd; German *die* is a case in four ways),
-        so show every reading or none, never one guess. Not detectable: syntax (relative clauses, word order), use
-        (why subjunctive here), German case of a noun phrase. Not measured: how often the form lookup is unambiguous on
-        real lines; measure on the library's transcripts before building.
-      - **Sources and licences** (none verified against the licence texts today; check each before use):
-        Wiktionary forms through kaikki.org (CC BY-SA 4.0, already credited, so no new entry; only a bigger derived file);
-        Tsumiki for Japanese (CC BY-SA per its repository, already credited); Tatoeba example sentences (mostly CC BY 2.0 FR,
-        some CC0; credit the project and not needed if our own video lines serve as examples, which they should);
-        Wikibooks grammars (CC BY-SA 4.0, uneven quality, so only as a link-out). Not usable: Tae Kim's guide (non-commercial
-        licence, we should not mix it in), Bunpro and similar (proprietary), JLPT grammar lists (no official one; unofficial
-        lists are others' work). Notes of our own would be short, written and checked by hand, not generated.
-      - **First slice** (small): Japanese form chains named in full in the word bar (extends the link-out item, no new data),
-        then Spanish/French/German forms from a `forms` table built by the dictionary script (surface to lemma, tags), shown
-        as one line in the word panel. A `LanguageProfile` property for the language's form names; the tag mapping and the
-        lookup in `LangCore` with tests; new strings localisable. The `forms` data is derived, so a new file, no GRDB
-        migration, out of backups. Cost: Spanish verbs alone have about 50 forms each, so roughly +20–40 MB on disk per
-        language read in place, no memory or launch cost unless opened; measure from the real build before committing.
-      - **Left out:** lessons and a grammar index (revisit once forms are named and used), pattern cloze cards (the sentence's
-        form is reachable from the existing cloze with the form as the blank, a later and cheap option), conjugation drills,
-        generated explanations, Italian, Portuguese and Dutch.
-      - **To settle:** whether the form line is on by default or in Settings (a learner sees it all day); whether a cloze
-        blank on a conjugated form should show the form as its hint; whether the size is acceptable per language.
-- [x] **Ignore** (5 Nov 2026): a fifth word status for entries that are not worth learning (names, tokenizer mistakes). An ignored
-      word is kept, hidden from the Words list (the Ignored status filter shows it, Reset brings it back), never offered as a
-      lesson, and left out of coverage. Ignore is on the lesson card (X) and on the Words page. The status is stored as
-      "ignored", so a backup made with it does not restore in an older Kikimi.
-- [x] **Cloze cards** (Review page > Fill in the word): the example sentence with the word blanked and a short
-      hint of its meaning ; you recall the word, then see it filled in with the
-      sentence audio. Production in context, which avoids the ambiguity of meaning-to-word cards. **Listening
-      cards** (done, Review page > Listen to the sentence): hear the sentence, answer before reading.
-- [ ] **Reverse (meaning to word) cards**, only as an optional extra: off by default, only for words that have reached
-      about stage 4 so early reviews don't double, and counted in the overview so the workload shows. Prefer cloze.
-      Evidence: reviews are recognition only today, and receptive practice doesn't reliably carry over to producing a
-      word, so generating it (cloze, meaning-to-word) is the main upgrade to the review loop.
-- [x] **Learning stats over time** (built; Review page > Your progress; carried in the full backup): a small history table, so the Review page can show words learned
-      per week, hours of listening (the measure that matters for comprehensible input), and how often you look
-      each word up, so the words you keep checking stand out as your weakest. A new table, so a deliberate step;
-      the log stays on the Mac and is left out of nothing the privacy policy promises.
-- [x] **Anki export** (File > Export Words to Anki…, since 6 Nov 2026; it came off the Words page's bar, where it sat beside the status buttons): a local text file Anki imports (word, meaning, example sentence), with
-      optional sentence audio in a media folder. Checked against Anki 25.09's own importer: notes land in a
-      "Kikimi Spanish" deck, and exporting again updates them instead of duplicating.
-
-- [ ] **Conversation practice** (researched 31 Oct 2026, **waiting**): a partner that talks with you in the language you
-      are learning, mostly in your own words. Apple's on-device model (macOS 27, M3) holds a short beginner dialogue in
-      Spanish, French, German and Japanese in about 0.7 s a reply. A check of each reply against your word list with the
-      profile's tokenizer, retrying up to twice, kept replies mostly inside it (14/15 Spanish, 12/15 French, 15/15 German
-      on a 130-word list; Japanese not measured). **It cannot be trusted to correct you**: given 12 sentences with one
-      error each, it fixed 6, passed 5 as "Correct" and wrongly changed 1, the same failure that ended "Explain this
-      sentence". Smallest useful version: typing only, about five exchanges, no correction, 100 to 200 sampled lemmas, new
-      words from your own videos, hidden without Apple Intelligence (`LangCore/Conversation/`, one view). Not measured:
-      voice in and out (the on-device recognisers aren't installed here), a real vocabulary of thousands, Japanese
-      word-keeping, battery, VoiceOver. A larger downloaded model (Gemma class, 2.5 GB or more, custom terms, a new
-      runtime) might correct better but is untested and changes the "only a speech model downloads" promise, so it needs the
-      policy first. Revisit when the built-in model improves or when correction can be checked.
-
-- [x] **Shadowing** (5 Nov 2026; built as the Shadow card type, with the privacy policy changed first; **the recording, the permission prompt and the
-      playback were not tried in the running app**): hear a line from your own video, record yourself saying it, and play both to compare. No AI, and the
-      recording stays on the Mac. Needs the microphone (a sandbox entitlement and a usage string), so the privacy policy
-      says so first. (From a look at JIVX's features, 3 Nov 2026.)
-- [x] **Type what you hear** (3 Nov 2026): a card type on the Review page. Hear a sentence and type it; the sentence then
-      shows with what you missed underlined and what you typed in error struck through, and says so for VoiceOver. A plain
-      comparison of spelling (case, width and punctuation ignored, accents count), no AI and no new permission; it is only as
-      right as the transcript, which Edit sentence can fix. Only short lines are offered: at most 6.5 seconds and 10 words
-      (25 characters for Japanese; in the library it was written for, 91% of Japanese lines and about 75% of Spanish ones
-      qualify). A word with no short line is asked as word and meaning, and a session prefers a short line when a word has
-      one. Not done: slowing the audio on this card, and judging kana against kanji (a correct reading in kana counts as
-      different from the kanji line).
-- [x] **Review ahead** (5 Nov 2026, as a row in Practice on the Learn page): practise words that are not due yet without changing their stages ("cram"). A row in the Learn page's
-      Practice area (see above).
-- [x] **Kanji level and school year** (4 Nov 2026): the word panel's Kanji section shows each kanji's JLPT level and the school
-      year that teaches it. KANJIDIC2's level is the exam's older four levels; they are shown as N5, N4, N3–N2 and N1 (the
-      counts match: 103, 181, 739 and 1,207 kanji), with a tooltip saying so. A kanji no exam asked for shows only its year.
-      A file built before this still opens, without them. Not wanted from the JIVX comparison: AI grading of what you write or say (the on-device model passed 5 of
-      12 mistakes; a cloud one breaks "local and private"), gardens and other gamification, pasting video links, a
-      sentence bank. Maybe later: a hands-free listening playlist of your learning words' sentences (see below).
-
-- [x] **Noun gender and articles** (3 Nov 2026, from a look at Clozemaster): a noun shows with its article (el/la, le/la,
-      der/die/das) in the word panel, the player's word bar and, once the answer is showing, on review cards. The Spanish,
-      French and German dictionaries now carry each noun's gender from Wiktionary (new `gender` column; a file built before
-      it still opens, with none). A word with two genders shows both ("le / la"). Where an article would be wrong the gender
-      is shown instead: French before a vowel or silent h (l'eau (f)) and Spanish feminine nouns starting with a or ha (agua
-      (f), because the data does not say which take el). Not done: a gender drill, German plural forms (the data has them),
-      and German nouns still keep a lower-case lemma in the word list (the tokenizer lower-cases every lemma), which is why the
-      phrase uses the dictionary's spelling.
-- [ ] **Hands-free listening** (Clozemaster has "Radio"): the sentences of your learning words play on their own with a pause,
-      and a translation only if you ask. Not wanted from that comparison: AI explanations, graded texts, rarity-chosen
-      blanks, custom review intervals.
+- [x] **Learn page with three paths** (built 5 Nov 2026, seen on screen 6 Nov 2026). **Lessons** (the day's new words), **Reviews**
+      (the count due) and **Practice** (extra study that moves no stage: *Review ahead*, *Review known*, *Practice finished*).
+      "Known" is what you marked. "Finished" is what you earned by passing every review. A miss in *Practice finished* changes
+      nothing. The sidebar count stays "reviews due".
+- [x] **Daily lessons** (5 Nov 2026, seen on screen 6 Nov 2026). Each day Kikimi queues the most important words that you have not
+      started: 15 for each language by default (Settings > Languages; 0 turns it off). Unused lessons lapse. No lessons are offered
+      while more than 100 reviews are due. Words come from your own videos, ranked by how many lines they appear in. A lesson
+      teaches five words one by one (sentence, audio, meaning), then quizzes them at once and asks a missed word again until it is
+      right. The words then start at stage 1, with the first review 4 hours later. "Already know it" marks a word known. Reason:
+      without lessons, a person with videos but no habit meets an empty Review page.
+- [ ] **Grammar from your own videos** (researched 5 Nov 2026, **not started**). Noticing, not a course. Recommendation: show the
+      **forms of the words you meet, on demand, with a link out**. No lesson path. No rules taught ahead of the material. Grammar
+      belongs to the word you look at, so it belongs in the player and the word panel, not on Learn.
+      - **Detection.** Japanese: good. MeCab and IPADIC give the inflection form and the auxiliaries, and a fixed table in the
+        profile names a chain. Spanish, French, German: `NLTagger` gives only lemma and part of speech. A form can be named by
+        looking up the *surface* in the dictionary's inflected forms (kaikki has each `form_of` sense with tags, and
+        `build_kaikki.py` drops them today). Ambiguity is real (Spanish *hable*, German *die*): show every reading or none, never
+        one guess. We cannot detect syntax, use, or the German case of a noun phrase. Not measured: how often the lookup is
+        unambiguous on real lines. Measure before building.
+      - **Sources.** Wiktionary forms through kaikki.org (CC BY-SA 4.0, already credited). Tsumiki (CC BY-SA, already credited).
+        Tatoeba (mostly CC BY 2.0 FR; not needed if our own video lines serve as examples). Wikibooks (CC BY-SA 4.0, uneven, so
+        only a link out). Not usable: Tae Kim's guide (non-commercial), Bunpro (proprietary), JLPT grammar lists (no official one).
+        Check each licence text before use. Our own notes would be short and checked by hand, never generated.
+      - **First slice.** Japanese form chains named in full in the word bar (no new data). Then Spanish, French and German forms
+        from a `forms` table that the dictionary script builds, shown as one line in the word panel. The mapping and lookup go in
+        `LangCore` with tests. The data is derived (a new file, no migration, out of backups). Cost: about +20 to +40 MB on disk for
+        each language, read in place. Measure from the real build.
+      - **Left out:** lessons, a grammar index, pattern cloze cards, conjugation drills, generated explanations.
+      - **To settle:** the form line on by default or in Settings; a conjugated cloze blank showing its form as the hint; the size
+        for each language.
+- [x] **Ignore** (5 Nov 2026). A fifth word status for names and tokenizer mistakes. An ignored word is kept, hidden from the Words
+      list (the Ignored filter shows it), never offered as a lesson, and left out of coverage. A backup that contains it does not
+      restore in an older Kikimi.
+- [x] **Cloze cards** and **listening cards** (Review page). Cloze: the sentence has the word blanked, with a short hint. This is
+      production in context and avoids the ambiguity of meaning-to-word cards.
+- [ ] **Reverse (meaning to word) cards**, only as an optional extra: off by default, only for words at about stage 4 or higher,
+      and counted in the overview. Prefer cloze. Reason: reviews are recognition only, and receptive practice does not reliably
+      carry over to producing a word.
+- [x] **Learning stats over time** (Review page > Your progress, in the full backup): words learned each week, hours of listening
+      and how often you look up each word. The log stays on the Mac.
+- [x] **Anki export** (File > Export Words to Anki…, since 6 Nov 2026). A local text file that Anki imports (word, meaning, example
+      sentence), with optional sentence audio. Checked with the Anki 25.09 importer: notes go to a "Kikimi Spanish" deck, and
+      exporting again updates them.
+- [ ] **Conversation practice** (researched 31 Oct 2026, **waiting**). A partner that talks with you in your learning language,
+      mostly in words you know. The Apple on-device model (macOS 27, M3) holds a short beginner dialogue in all four languages,
+      about 0.7 s a reply. Checked against your word list with the profile tokenizer (retry up to twice), replies mostly stayed
+      inside it: 14 of 15 Spanish, 12 of 15 French, 15 of 15 German with a 130-word list (Japanese not measured). **It cannot be
+      trusted to correct you.** Given 12 sentences with one error each, it fixed 6, passed 5 as "Correct" and changed 1 wrongly.
+      This is the failure that ended "Explain this sentence". Smallest useful version: typing only, about five exchanges, no
+      correction, hidden without Apple Intelligence. Not measured: voice, a vocabulary of thousands, Japanese word-keeping,
+      battery and VoiceOver. A larger downloaded model (Gemma class, 2.5 GB or more) might correct better, but it is untested and
+      it changes the "only a speech model downloads" promise, so it needs the policy first. Revisit when the built-in model
+      improves.
+- [x] **Shadowing** (5 Nov 2026, the Shadow card type; the privacy policy changed first). Hear a line, record yourself, play both.
+      There is no AI. The recording stays on the Mac. **The recording, the permission prompt and the playback were not tried in the
+      running app.**
+- [x] **Type what you hear** (3 Nov 2026). Hear a sentence and type it. The result marks what you missed and what you added. It is a
+      plain spelling comparison (case and punctuation ignored, accents count), with no AI. It offers only short lines (at most 6.5
+      seconds and 10 words; 25 characters for Japanese). Not done: slow audio, and judging kana against kanji.
+- [x] **Review ahead** (5 Nov 2026), a row in Practice.
+- [x] **Kanji level and school year** (4 Nov 2026). KANJIDIC2 has the older four-level exam. The app shows N5, N4, N3–N2 and N1 (the
+      counts match: 103, 181, 739 and 1,207 kanji), with a tooltip that says so. Not wanted (from the JIVX comparison): AI grading
+      of what you write or say (the on-device model passed 5 of 12 mistakes; a cloud model breaks "local and private"), gamification,
+      pasted video links, a sentence bank.
+- [x] **Noun gender and articles** (3 Nov 2026). A noun shows its article (el/la, le/la, der/die/das), from Wiktionary data. A word
+      with two genders shows both. Where an article would be wrong, the gender shows instead (French l'eau (f); Spanish agua (f)).
+      Not done: a gender drill, and German plural forms.
+- [ ] **Hands-free listening** (Clozemaster has "Radio"). The sentences of your learning words play on their own with a pause, and
+      a translation only if you ask. Not wanted from that comparison: AI explanations, graded texts, blanks chosen by rarity,
+      custom review intervals.
 
 ### Keeping the numbers honest
-- [x] **Check what you marked known** (Review page > Review known): a quiz of up to 10 random known words; any you
-      miss go back to learning, so coverage stops counting them. Self-marked words and imported lists can inflate it otherwise.
-- [x] **Encounters per word**: the Words table's Seen column, and the word panel's "Seen in N lines across M videos".
-- [x] **Measured the 95% claim** (26 Oct 2026, one Spanish and one Japanese transcript, 918 and 2,459 words): content words
-      were 58% (es) and 40% (ja) of all words, so knowing 90% of them is about 94% (es) and 96% (ja) of everything,
-      assuming the small words are known. The text now says that. A small sample; recount with more videos.
-- [ ] **Resurface finished words** now and then (a sparse, rare review, or a nudge when one appears in a video), since
-      stopping at the last interval can let words fade. Practice finished on the Learn page (see Practising) is the way to
-      choose to do this; a sparse automatic nudge would be on top of it.
+- [x] **Check what you marked known** (Review page > Review known). A quiz of up to 10 known words. A word you miss goes back to
+      learning. Without it, self-marked words and imported lists can inflate coverage.
+- [x] **Encounters per word:** the Words table's Seen column, and "Seen in N lines across M videos".
+- [x] **Measured the 95% claim** (26 Oct 2026; one Spanish and one Japanese transcript, 918 and 2,459 words). Content words were 58%
+      (Spanish) and 40% (Japanese) of all words. So 90% of content words is about 94% (Spanish) and 96% (Japanese) of everything,
+      if the small words are known. The text says so. This is a small sample. Count again with more videos.
+- [ ] **Resurface finished words** now and then (a rare review, or a nudge when one appears in a video), because stopping at the
+      last interval can let words fade. Practice finished lets a person choose to do this. An automatic nudge would be on top.
 - [ ] **Benchmark NVIDIA Nemotron 3.5 ASR (0.6B) against Whisper turbo** (looked at 5 Nov 2026, **not started**). The model
-      (`nvidia/nemotron-3.5-asr-streaming-0.6b`, OpenMDW-1.1 licence, which we haven't read in full) lists Japanese,
-      Spanish, French, German, Italian, Portuguese and Dutch as transcription-ready and Mandarin as broad-coverage, adds
-      punctuation, and is small. Against it: it is a NeMo model built for live streaming, and the app runs WhisperKit on Core ML,
-      so using it means another runtime and a dependency (ask first); community Core ML and MLX conversions exist but are
-      untested here; and we need accurate start and end times for each line, which we haven't confirmed. The yardstick is
-      the opt-in `ImportTimingTests` on a video with a human `.srt` (large-v3 took 312 s and turbo 62 s on a 334 s Japanese
-      video). The 30B Nemotron is too large to ship. Whisper large-v3 turbo is the default for Japanese as of 5 Nov 2026;
-      Spanish, French and German still use `medium` and haven't been compared with turbo (needs a video and `.srt` in each).
-- [ ] **Smarter review timing** (FSRS-style scheduling): low priority; the evidence is benchmark data, not trials.
+      (OpenMDW-1.1 licence, not read in full) lists our four languages, adds punctuation and is small. Against it: it is a NeMo
+      model for live streaming and the app runs WhisperKit on Core ML, so it needs another runtime and a dependency (ask first).
+      Community Core ML and MLX conversions are untested here. We need accurate start and end times for each line, and we have not
+      confirmed that it gives them. The measure is the opt-in `ImportTimingTests` on a video with a human `.srt` (large-v3 took
+      312 s and turbo 62 s on a 334 s Japanese video). Turbo is the default for Japanese since 5 Nov 2026. Spanish, French and
+      German still use `medium`, and nobody compared them with turbo (it needs a video and `.srt` for each).
+- [ ] **Smarter review timing** (FSRS-style). Low priority. The evidence is benchmark data, not trials.
 
 ### More languages
-- [x] **French and German** (30 Oct 2026): each is a profile plus a Wiktionary dictionary (about 9 MB each), with the
-      `medium` Whisper model and Apple's tokenizer. Checked on spoken-style sentences: German lemmas and word types
-      were good (one fix: the tagger answered `koennen`, `muessen`, `duerfen` for "kann", "musst", "darf"); French has more
-      mistakes (`restaurant` as a verb, `faut` as `faillir`, `commence` as a noun). Known gaps: a German separable verb
-      ("ruf ... an") is learned as `rufen` and the particle is lost, and compound nouns missing from Wiktionary have no
-      meaning. Not yet tried on a real French or German video, and `medium` is not benchmarked for either.
-- [x] **Verb forms for Spanish, French and German** (6 Nov 2026): Apple's tagger read every present-tense form of poder as podar
-      (puedo, puede, pueden...), sale as salar, venga as vengar, creo as crear. Each dictionary now carries a `forms` table (the
-      spellings of verbs with at least two Wiktionary meanings: 220,000 for Spanish, 88,000 for French, 37,000 for German, about
-      +6, +2.5 and +1 MB), and the tokenizer overrules a verb the spelling cannot be a form of, and reads a spelling that is no word
-      of its own as the verb it is. Checked by running every sampled spelling through the tokenizer (an audit test, in the suite):
-      99.97% of Spanish (15,741), 99.8% of French (17,671) and 99.2% of German lemmas (14,148) come out right, none as another
-      verb. Spanish siento and its forms are fixed by hand because sentar and sentir share them. It applies to videos imported from
-      now on: words already imported keep their old lemmas until there is a way to re-read a video (there is not yet). Other parts
-      of speech are not covered; neither is Japanese, which uses MeCab.
-- [ ] **More languages**: Italian, Portuguese and Dutch. **Correction, 5 Nov 2026:** this item used to say Italian is next because
-      Apple's tagger handles it. It does not: on macOS 27 `NLTagger` offers no lexical class and no lemma for Italian,
-      Portuguese or Dutch (only language, script and token type; checked with `availableTagSchemes`, and a probe of ten
-      Italian lines gave every word as "other"). So all three need a lemma source, and Italian is no cheaper than the
-      others. The likeliest source needs no dependency: the Wiktionary data we already use lists every inflected form of a
-      word with its tags, so a table of surface form to lemma and part of speech, built by the dictionary script, can lemmatize
-      them, with an `NLTokenizer` splitting the words. The same table is what *Grammar from your own videos* needs for Spanish,
-      French and German, so the two are one project. Open: how to choose among lemmas when a form is ambiguous (Italian
-      *sono* is both *essere* and *suono*), measured on real lines before any language ships. Mandarin has no inflection, so
-      it avoids the problem but needs a word splitter and a pinyin dictionary (CC-CEDICT, CC BY-SA); Korean is not planned.
+- [x] **French and German** (30 Oct 2026): a profile, a Wiktionary dictionary (about 9 MB each), the `medium` Whisper model and the
+      Apple tokenizer. French has more lemma mistakes. A German separable verb ("ruf … an") is learned as `rufen` and the
+      particle is lost. Compound nouns that Wiktionary lacks have no meaning. Not yet tried on a real French or German video, and
+      `medium` is not benchmarked for either.
+- [x] **Verb forms for Spanish, French and German** (6 Nov 2026). The Apple tagger read *puedo* as a form of *podar*, *sale* as
+      *salar*, *venga* as *vengar* and *creo* as *crear*. Each dictionary now has a `forms` table (220,000 forms for Spanish, 88,000
+      French, 37,000 German). The tokenizer overrules a verb that the spelling cannot be a form of, and reads a spelling that is no
+      word of its own as the verb it is. An audit test checks sampled spellings: 99.97% of Spanish, 99.8% of French and 99.2% of
+      German lemmas are right, and none is another verb. This applies to videos imported from now on. Words already imported keep
+      their old lemmas, because there is no way yet to read a video again.
+- [ ] **More languages:** Italian, Portuguese and Dutch. **Correction, 5 Nov 2026:** `NLTagger` on macOS 27 gives no lexical class
+      and no lemma for these three (checked with `availableTagSchemes`; ten Italian lines all returned "other"). All three need a
+      lemma source. The likeliest source needs no dependency: the Wiktionary data that we use lists every inflected form with
+      tags, so the dictionary script can build a table of surface form to lemma and part of speech, with `NLTokenizer` to split
+      words. The *Grammar from your own videos* item needs the same table, so the two are one project. Open: how to choose among
+      lemmas when a form is ambiguous (Italian *sono* is *essere* or *suono*). Mandarin has no inflection but needs a word splitter
+      and a pinyin dictionary (CC-CEDICT, CC BY-SA). Korean is not planned.
+
 ### Housekeeping
-- [ ] Cache video thumbnails on disk if scrolling a large library feels slow (they are now made once per launch).
-- [ ] **Translate the app's own interface** (no other language yet). The groundwork is done: strings are localisable and
-      kept in two string catalogs. To add a language: add it in each catalog in Xcode, translate (Product >
-      Export Localizations for a translator), add localised copies of `Privacy.md` and `Terms.md`, a localised
-      `InfoPlist.xcstrings` (document type name), and run the app with the double-length pseudolanguage to find text that
-      no longer fits. Several windows have fixed widths and will need checking.
+- [ ] Cache video thumbnails on disk if scrolling a large library feels slow.
+- [ ] **Translate the app's own interface.** The groundwork is done (strings are localisable, in two string catalogs). To add a
+      language: add it to each catalog in Xcode, translate (Product > Export Localizations), add localised copies of `Privacy.md`
+      and `Terms.md` and `InfoPlist.xcstrings`, and run the app with the double-length pseudolanguage to find text that no longer
+      fits. Several windows have fixed widths.
 
 ## Decisions
+
 Made:
-1. **Direct download** for 1.0, not the Mac App Store. Needs a Developer ID, notarization and a download page; no
-   review, screenshots or App Store listing. The App Store can come later.
-2. **Free.** The terms of use can say so plainly (no payment, provided as is). A donation link is optional.
-3. **More languages after Spanish and Japanese**: French and German are done; Italian, Portuguese and Dutch are next (see After 1.0).
+1. **Direct download** for 1.0, not the Mac App Store. It needs a Developer ID, notarization and a download page. The App Store
+   can come later.
+2. **Free.** The terms say so plainly (no payment, provided as is). A donation link is optional.
+3. **More languages after Spanish and Japanese.** French and German are done. Italian, Portuguese and Dutch are next.
 
 Open:
-1. Whether an always-visible translation should exist at all (see After 1.0).
+1. Whether an always-visible translation should exist at all.
 
 ## Not doing
 - Downloading from YouTube or any video site. Ever.
 - Accounts, sync servers, analytics, or anything that sends your data off the Mac.
-- Modifying or deleting your original files.
+- Changing or deleting your original files.

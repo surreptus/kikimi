@@ -21,145 +21,101 @@
 
 ---
 
-Drop in a video. Kikimi transcribes it on your Mac and finds the words you'll meet. Then it helps you learn them with
-spaced repetition, using real sentences from your own videos.
+Drop in a video. Kikimi transcribes it on your Mac and finds the words you will meet. Then it teaches you those words with
+spaced repetition, using real sentences from your own videos. Spanish, French, German and Japanese work today.
 
-The aim is to understand more of what you watch. Spanish, French, German and Japanese work today.
-
-- **Local files only.** Nothing is downloaded from video sites, ever.
+- **Local files only.** Kikimi never downloads video.
 - **On-device.** Transcription runs on your Mac with [WhisperKit](https://github.com/argmaxinc/WhisperKit).
-- **Almost no network use.** It downloads a speech model the first time you need one, and checks for a new version
-  when you ask.
-- **Your originals are never modified or deleted.**
+- **Almost no network use.** It downloads a speech model when you first need one, and checks for a new version when you ask.
+- **Your original files are never changed or deleted.**
 
 ## What it does
 
-### Videos
-
-Each video is transcribed with timestamps, or imported with its own `.srt` or `.vtt` subtitles, which needs no speech
-model. Each one shows how much of it you already know, and one button starts learning the words that would take it to
-about 90%. A **Next up** card suggests the one that fits you best, heard before or not. A new learner can tap the words they don't know in a video's commonest, and the rest are marked known, so the figure starts true.
-
-### Player
-
-- Clickable, synced subtitles with meanings and furigana.
-- Line looping and clips.
-- Translations when you ask for them, made on your Mac.
-
-### Words
-
-- A searchable table with dictionary entries and example lines. Select words to learn, mark known, ignore or reset them, and undo it. File > Export Words to Anki… makes a file Anki can import.
-- **Japanese:** every reading of a word, and each kanji with its on'yomi and kun'yomi, JLPT level and school year.
-- **Spanish, French and German:** a noun shows its article (el/la, le/la, der/die/das).
-
-### Learn
-
-- **Lessons.** Each day, the new words you hear most in your videos are offered as short lessons, 15 by default or none.
-  You are taught a few at a time and quizzed on them at once.
-- **Reviews.** Nine-stage spaced repetition. Choose the kind of card: word and meaning, fill in the word, listen to the
-  sentence, type a short sentence you hear, or say it aloud and play yourself beside the original (the Shadow
-  card, which uses the microphone).
-- **Practice.** Review words before they are due, practise finished ones, or test the words you marked known, without
-  moving the schedule.
-
-### Your progress
-
-It saves to a `.kikimi` file you can restore later. Restoring never overwrites what you already have.
+- **Videos.** Each video is transcribed, or imported with its own `.srt` or `.vtt` file (no speech model needed). Each one
+  shows how much of it you already know. One button starts the words that bring a video to about 90%.
+- **Player.** Clickable, synced subtitles with meanings and furigana. Loop a line, export clips, translate on request.
+- **Words.** A searchable table with dictionary entries and example lines. Mark words known, learn, ignore or reset them, with
+  undo. Japanese shows every reading and each kanji's readings, JLPT level and school year. Spanish, French and German
+  nouns show their article. File > Export Words to Anki… makes a file Anki can import.
+- **Learn.** Daily lessons, nine-stage spaced repetition and practice. Card types: meaning, fill in the word, listen, type what
+  you hear, and Shadow (say the sentence aloud, then hear yourself beside the original).
+- **Your progress** saves to a `.kikimi` file. A restore never overwrites what you already have.
 
 ## Install
 
-Download the latest `Kikimi-….zip` from the [Releases page](https://github.com/surreptus/kikimi/releases/latest), unzip
-it and drag **Kikimi** into Applications.
+1. Download the latest `Kikimi-….zip` from the [Releases page](https://github.com/surreptus/kikimi/releases/latest).
+2. Unzip it and drag **Kikimi** into Applications.
+3. The first time, macOS says it cannot verify the app, because Kikimi is not notarized yet. Click **Done**. Then open
+   **System Settings > Privacy & Security**, find the message about Kikimi, click **Open Anyway** and confirm.
 
-The first time you open it, macOS says it can't verify the app. That is expected: Kikimi is free and open source, and
-isn't notarized yet (Apple charges a yearly fee for that). To open it:
-
-1. Click **Done** on the warning.
-2. Open **System Settings > Privacy & Security**, scroll to the message about Kikimi, click **Open Anyway** and confirm.
-
-Each release lists a SHA-256 to check the download against. Building from source (below) avoids the warning.
+Each release lists a SHA-256 checksum for the download. Building from source avoids the warning.
 
 <details>
 <summary>Advanced: skip the warning from Terminal</summary>
 
 <br>
 
-Remove the download flag once, then open the app normally:
-
 ```bash
 xattr -dr com.apple.quarantine /Applications/Kikimi.app
 ```
 
-Do this only for a copy you trust, since it skips macOS's check.
+This removes the download flag. Run it only for a copy you trust, because it skips the macOS check.
 
 </details>
 
-## Finding videos to learn from
+## Finding videos
 
-Kikimi never finds or downloads videos. It works on files you give it. If you have none, some places publish video you
-may download and study, each under its own licence:
-
-- [Internet Archive, Moving Image Archive](https://archive.org/details/movies): many films and clips can be downloaded,
-  and some come with subtitle files. Drop the `.srt` with its video and Kikimi uses it instead of transcribing.
-- [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:Videos): free and public-domain clips, mostly short.
-  Each file's page states its licence.
-- [TED Talks](https://www.ted.com/about/our-organization/our-policies-terms/ted-talks-usage-policy): personal,
-  non-commercial use under a Creative Commons licence. Read TED's policy for what it allows.
-
-"Creative Commons" is not one licence. NonCommercial and NoDerivatives terms limit what you may do, and a subtitle file
-can have a different licence from its video, so check each one you use. This is not legal advice. Kikimi's
-[terms](Kikimi/Terms.md) say to use only videos you own or may copy and study.
+Kikimi works on files you give it. For where to find videos you may use, see
+[Finding material](https://surreptus.github.io/kikimi/guide/finding-material/). Use only videos you own or may copy and study
+(see the [terms](Kikimi/Terms.md)).
 
 ## Build from source
 
-You need macOS 15 or later (Apple silicon recommended; translations need macOS 26), Xcode 27, Python 3 and network
-access.
+Requirements: macOS 15 or later (Apple silicon recommended; translations need macOS 26), Xcode 27, Python 3, and network access.
 
-The dictionaries are large generated files, so they aren't in the repository. Build them once:
+The dictionaries are large generated files. They are not in the repository. Build them once:
 
 ```bash
 Scripts/build_ipadic.sh         # Japanese tokenizer dictionary (~50 MB)
 Scripts/build_dictionaries.sh   # JMdict, KANJIDIC2, Spanish, French and German (~2.5 GB download)
 ```
 
-Then open `Kikimi.xcodeproj`, pick the **Kikimi** scheme and **My Mac**, and press ⌘R.
-
-On the Videos page, download a speech model (about 1.5 GB for Spanish, French and German, 1.6 GB for Japanese), then
-drop in a video.
+Then open `Kikimi.xcodeproj`, choose the **Kikimi** scheme and **My Mac**, and press ⌘R. On the Videos page, download a speech
+model (about 1.5 GB; 1.6 GB for Japanese), then drop in a video.
 
 Run the tests with `cd LangCore && swift test`.
 
 ## Security
 
-The Python scripts, the website and the Swift in `LangCore` are scanned with CodeQL, and Dependabot watches the
-dependencies. That looks for common mistakes. It doesn't show the code is free of problems, and the code is public so
-anyone can read it. See [SECURITY.md](SECURITY.md), which also says how to report a vulnerability privately.
+CodeQL scans the Python scripts, the website and the Swift in `LangCore`. Dependabot watches the dependencies. These tools find
+common mistakes. They do not prove the code is safe. See [SECURITY.md](SECURITY.md) to report a vulnerability in private.
 
 ## Licences
 
-The app's code is under the [MIT licence](LICENSE).
+The app code uses the [MIT licence](LICENSE).
 
-- **Dictionaries:** JMdict and KANJIDIC2 (EDRDG) and English Wiktionary via kaikki.org, all CC BY-SA 4.0. The built
-  files stay under that licence, so they are built from scripts rather than committed.
+- **Dictionaries:** JMdict and KANJIDIC2 (EDRDG) and English Wiktionary via kaikki.org. All are CC BY-SA 4.0. The scripts
+  build the dictionary files, so the files are not committed.
 - **Speech models:** OpenAI Whisper, converted by Argmax.
-- **Japanese tokenizing:** [MeCab](https://taku910.github.io/mecab/) with IPADIC.
+- **Japanese word splitting:** [MeCab](https://taku910.github.io/mecab/) with IPADIC.
 
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) lists every component, and the licence texts are in the app under
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) lists every component. The licence texts are in the app, under
 Acknowledgements.
 
 ## Known limits
 
-- Accuracy depends on the model and the audio. `medium` scored about 23% word error rate on a long synthesized
-  Spanish passage. It has not been measured for Japanese, French or German, and real speech is probably harder than a
-  synthesized passage, so expect more mistakes there.
-- Whisper's timestamps are coarse in fast, overlapping speech, so sentence clips there can start or end slightly off.
-- French lemmas are noisier than German ones, and a German separable verb ("ruf ... an") is learned as `rufen`.
-- IPADIC dates from 2007, so modern Japanese slang is sometimes split or missed.
-- Audio-only files aren't supported. The UI has had limited hands-on testing.
+- Transcription accuracy depends on the model and the audio. The `medium` model made about 23% word errors on one long
+  synthesized Spanish passage. Japanese, French and German are not measured. Real speech is probably harder than synthesized
+  speech, so expect more errors.
+- Whisper timestamps are coarse in fast, overlapping speech. A sentence clip there can start or end slightly off.
+- French lemmas are less accurate than German ones. A German separable verb ("ruf … an") is learned as `rufen`.
+- IPADIC is from 2007. It can split or miss modern Japanese slang.
+- Audio-only files, and subtitle tracks inside a video file, are not supported. WebM and MKV files do not open.
+- The UI has had limited testing.
 
 ## More
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md): where things live, the import pipeline, tests, adding a language.
+- [`ARCHITECTURE.md`](ARCHITECTURE.md): where things live, the import pipeline, tests, how to add a language.
 - [`ROADMAP.md`](ROADMAP.md) and [`AGENTS.md`](AGENTS.md): what comes next, and how we work.
-- [`Release/CHECKLIST.md`](Release/CHECKLIST.md): shipping. The bundle identifier is `com.surreptus.Kikimi`.
-- [Privacy policy](Kikimi/Privacy.md) and [terms of use](Kikimi/Terms.md), shown in the app and on the website.
+- [`Release/CHECKLIST.md`](Release/CHECKLIST.md): how to ship. The bundle identifier is `com.surreptus.Kikimi`.
+- [Privacy policy](Kikimi/Privacy.md) and [terms of use](Kikimi/Terms.md): shown in the app and on the website.
