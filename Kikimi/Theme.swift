@@ -35,6 +35,8 @@ enum Theme {
     static let soft = Color(light: Color(hex: 0x153A0B).opacity(0.06), dark: .white.opacity(0.07))
     static let softStrong = Color(light: Color(hex: 0x153A0B).opacity(0.11), dark: .white.opacity(0.14))
     static let line = Color(light: .black.opacity(0.12), dark: .white.opacity(0.16))
+    /// The shadow under a raised button: the ink colour in Light, black in Dark (where the ink is the light colour).
+    static let raisedShadow = Color(light: Color(hex: 0x153A0B).opacity(0.22), dark: .black.opacity(0.45))
     /// The selected nav item, on the coloured window.
     static let navSelection = Color(light: .white.opacity(0.85), dark: .white.opacity(0.16))
 
@@ -110,6 +112,8 @@ struct PillButtonStyle: ButtonStyle {
     var compact = false
     var fullWidth = false
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.colorScheme) private var scheme
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -119,12 +123,31 @@ struct PillButtonStyle: ButtonStyle {
             .padding(.vertical, compact ? 7 : 12)
             .padding(.horizontal, compact ? 14 : 26)
             .frame(maxWidth: fullWidth ? .infinity : nil)
-            .background(Capsule().fill(face))
+            .background { background }
             .overlay { if kind == .quiet { Capsule().strokeBorder(Theme.line, lineWidth: 1) } }
             .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.4)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .contentShape(Capsule())
             .animation(Theme.easeOut(0.08), value: configuration.isPressed)
+    }
+
+    /// The one button that does the main thing is slightly raised: lighter at the top, a bright edge inside it and a soft
+    /// shadow. The others stay flat, so it is the only one that looks pressable at a glance. With Increase Contrast it is flat.
+    @ViewBuilder private var background: some View {
+        if kind == .primary, contrast == .standard {
+            Capsule().fill(face)
+                .overlay(Capsule().fill(LinearGradient(colors: shading, startPoint: .top, endPoint: .bottom)))
+                .overlay(Capsule().strokeBorder(LinearGradient(colors: [.white.opacity(0.4), .clear], startPoint: .top, endPoint: .center), lineWidth: 1))
+                .shadow(color: Theme.raisedShadow.opacity(0.9), radius: 1.5, y: 1)
+                .shadow(color: Theme.raisedShadow.opacity(0.6), radius: 4, y: 3)
+        } else {
+            Capsule().fill(face)
+        }
+    }
+
+    /// Light on top and dark below on the dark-green button; on the pale button in Dark, only a hint of shade below.
+    private var shading: [Color] {
+        scheme == .dark ? [.clear, .black.opacity(0.07)] : [.white.opacity(0.14), .clear, .black.opacity(0.12)]
     }
 
     private var face: Color {
