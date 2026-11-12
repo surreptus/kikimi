@@ -87,3 +87,17 @@ site-search button { border-radius: 999px; }
 
 /* The download and hero buttons. */
 .sl-link-button { font-weight: 600; }
+
+/* The primary button is slightly raised, as in the app: lighter at the top, a bright edge inside it and a soft shadow. The
+   others stay flat. With Increase Contrast it is flat, and it only moves when pressed if motion is allowed. */
+.sl-link-button.primary {
+  background-image: linear-gradient(rgb(255 255 255 / 0.14), transparent, rgb(0 0 0 / 0.12));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), 0 1px 2px rgb(21 58 11 / 0.2), 0 3px 5px rgb(21 58 11 / 0.12);
+  transition: transform 0.14s cubic-bezier(0.23, 1, 0.32, 1);
+}
+:root[data-theme='dark'] .sl-link-button.primary {
+  background-image: linear-gradient(transparent, rgb(0 0 0 / 0.07));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), 0 1px 2px rgb(0 0 0 / 0.3), 0 3px 5px rgb(0 0 0 / 0.25);
+}
+@media (prefers-reduced-motion: no-preference) { .sl-link-button.primary:active { transform: scale(0.98); } }
+@media (prefers-contrast: more) { .sl-link-button.primary { background-image: none; box-shadow: none; } }
