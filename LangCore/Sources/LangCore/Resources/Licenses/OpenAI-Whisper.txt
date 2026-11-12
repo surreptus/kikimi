@@ -2,7 +2,9 @@ Speech recognition
 
 Transcription uses OpenAI Whisper models, converted to Core ML and distributed by Argmax in the
 argmaxinc/whisperkit-coreml repository on Hugging Face (model card licence: MIT). The models are downloaded when you
-ask for them; they are not part of the app.
+ask for them; they are not part of the app. OpenAI's own repository releases Whisper's code and models under the MIT
+licence below; Hugging Face's cards for OpenAI's models say MIT (large-v3-turbo) or Apache 2.0 (medium), both permissive
+(checked 12 November 2026).
 
 MIT License
 

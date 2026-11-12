@@ -31,9 +31,15 @@ machine, release plumbing, and a few promises we have made but not kept (below).
       Store app in the US or Japan, no USPTO result, `.app`, `.io`, `.dev` free by DNS). The whole rename is the commit
       `71c93ff` (see its message); reverting this revert re-applies it in one step.
 - [ ] Ask the lawyer who reads the terms for a view on the KIKIMI registration, before any wider release.
-- [ ] Confirm licences listed in the [release checklist](Release/CHECKLIST.md) (Whisper model card, JMdict and
-      Wiktionary attribution, no use of the name "WaniKani"). Audited 25 Oct 2026: notices are complete, the
-      model card says MIT, the stage names are renamed, and the dictionaries are credited as adaptations.
+- [x] Confirm licences listed in the [release checklist](Release/CHECKLIST.md) (Whisper model card, JMdict and
+      Wiktionary attribution, no use of the name "WaniKani"). Audited 25 Oct 2026, and again **12 Nov 2026** against the upstream
+      licence texts: the bundled licence files are the upstream texts (with our headers), the credits meet the EDRDG
+      licence's acknowledgement terms, nothing linked is uncredited (`swift-argument-parser` and the server packages in WhisperKit's
+      manifest are not in the binary), and the speech-model cards say MIT (Argmax) with OpenAI's own saying MIT or Apache 2.0. **One real
+      gap found and closed:** the EDRDG licence requires regular updating of JMdict and KANJIDIC2 data and calls failing to
+      keep it up to date a violation. The checklist had no refresh step, and the data in 0.16.0 is from 3 Nov while EDRDG's files
+      changed on 12 Nov. Now a checklist step refreshes it before each release, and `check_release_sync.py` fails when it is over 31
+      days old. Not a lawyer's review; the terms and the name risk below still need one.
 - [ ] Privacy report (Xcode: Product > Archive > Generate Privacy Report) covered by `PrivacyInfo.xcprivacy`,
       including third-party packages.
 

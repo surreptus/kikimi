@@ -1,5 +1,7 @@
 """Tests for release_notes.py and check_release_sync.py. Run: python3 -I Scripts/test_release_tools.py"""
+import datetime
 import os
+import sqlite3
 import sys
 import tempfile
 import unittest
@@ -86,6 +88,32 @@ class SyncCheckTests(unittest.TestCase):
     def test_two_different_project_versions_are_caught(self):
         issues = check.problems("MARKETING_VERSION = 0.2.0;\nMARKETING_VERSION = 0.1.0;\n", CHANGELOG, {"version": "0.2.0"})
         self.assertTrue(any("different MARKETING_VERSION" in i for i in issues))
+
+
+class DataFreshness(unittest.TestCase):
+    TODAY = datetime.date(2026, 11, 12)
+
+    def test_recent_data_is_fine(self):
+        self.assertEqual(check.data_problems({"dictionary-ja.sqlite": "2026-11-03", "kanji-ja.sqlite": "2026-10-12"}, self.TODAY), [])
+
+    def test_data_more_than_a_month_old_is_caught(self):
+        issues = check.data_problems({"dictionary-ja.sqlite": "2026-11-03", "kanji-ja.sqlite": "2026-10-11"}, self.TODAY)
+        self.assertEqual(len(issues), 1)
+        self.assertIn("kanji-ja.sqlite", issues[0])
+        self.assertIn("32 days old", issues[0])
+
+    def test_missing_data_is_caught(self):
+        issues = check.data_problems({"dictionary-ja.sqlite": None, "kanji-ja.sqlite": "2026-11-03"}, self.TODAY)
+        self.assertEqual(len(issues), 1)
+        self.assertIn("dictionary-ja.sqlite is missing", issues[0])
+
+    def test_dates_are_read_from_the_built_files(self):
+        with tempfile.TemporaryDirectory() as folder:
+            with sqlite3.connect(os.path.join(folder, "dictionary-ja.sqlite")) as db:
+                db.execute("CREATE TABLE meta (key TEXT, value TEXT)")
+                db.execute("INSERT INTO meta VALUES ('source_created', '2026-11-03')")
+            dates = check.data_dates(folder)
+        self.assertEqual(dates, {"dictionary-ja.sqlite": "2026-11-03", "kanji-ja.sqlite": None})
 
 
 if __name__ == "__main__":
