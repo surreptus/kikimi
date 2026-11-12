@@ -11,9 +11,9 @@ Work from top to bottom. `Scripts/release.sh --help` shows how to run the build.
       `Kikimi/Assets.xcassets/AppIcon.appiconset`.
 - [ ] Open a video in the **Release** build, not only Debug. Release links differently: the AVKit link is set in the target's
       `OTHER_LDFLAGS`, because SwiftUI's `VideoPlayer` never names it.
-- [x] Version: `MARKETING_VERSION` is `0.16.0` (a public beta), build `13`. Raise `CURRENT_PROJECT_VERSION` (an integer) for every
+- [x] Version: `MARKETING_VERSION` is `0.16.1` (a public beta), build `14`. Raise `CURRENT_PROJECT_VERSION` (an integer) for every
       release you give to anyone. Use `0.16.x` for fixes, and `0.17.0` or `1.0.0` for features. 1.0.0 follows the 1.0 list in the
-      roadmap. Tag the release commit `v0.16.0`. Attach the notarized zip to a GitHub Release.
+      roadmap. Tag the release commit `v0.16.1`. Attach the notarized zip to a GitHub Release.
 - [ ] Direct download only: create a notarization profile once, with an app-specific password from appleid.apple.com:
       `xcrun notarytool store-credentials kikimi --apple-id <you> --team-id <TEAM_ID>`
 

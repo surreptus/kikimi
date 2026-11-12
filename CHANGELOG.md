@@ -2,6 +2,27 @@
 
 What changed in each version of Kikimi, newest first. Every release's page on GitHub has these notes with its download and checksum.
 
+## 0.16.1
+
+*12 November 2026.* A way to start over, English words in Japanese lines no longer offered to learn, shorter subtitle lines, clickable keys on review cards, and clearer messages for files Kikimi can't open.
+
+### New
+
+- **Start over.** **Settings > Data > Danger zone > Start over…** sets your library aside and quits Kikimi, and it opens empty the next time. Nothing is deleted: your words, progress and videos move to a Set Aside folder, **Show Set Aside Folder in Finder** shows where, and the speech models stay.
+- **The keys under a review card are buttons.** W (say the word), I (the word's page), E (edit the sentence) and T (translation) can be clicked. They now work on every kind of card. On a Shadow card they did nothing before, although the hints said otherwise.
+- **Shorter lines in new transcripts.** A line longer than 6.5 seconds is cut at its longest pause between words. On a test video, lines over 6.5 seconds went from 12 to none. It applies to videos you import from now on.
+- **A reason when a file can't be added.** WebM and MKV files, damaged files and audio-only files are refused when you add them, with the reason, instead of failing after Start. The guide shows how to convert a WebM or MKV to MP4.
+- **A slightly raised main button**, which is flat with Increase Contrast. Panels also get a thin edge with Increase Contrast.
+
+### Changed
+
+- **"Comfortable" is now "Mostly familiar"** in the figure on each video. The figure counts the words you know, not how much you understand. Its tooltip and the About page now say that words you ignore are left out of the count.
+
+### Fixed
+
+- **English words in a Japanese line** (such as "YouTube" or "OK") are plain text, not words to learn. Pronouns (彼, 私, 誰, どこ) can now be selected and learned. It applies to videos you import from now on.
+- **A word lookup could fail with "disk I/O error"** when Kikimi was replaced or rebuilt while it was open. It now opens the dictionary again and answers.
+
 ## 0.16.0
 
 *8 November 2026.* Text size you can change, a quicker way to tell Kikimi which words you know, Anki export back in the File menu, and a way to report a problem.
