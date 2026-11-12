@@ -11,7 +11,8 @@
   --sl-text-6xl: 3rem;   /* the homepage title */
 }
 
-/* A very faint paper grain, as in the app: the app's own 256-pixel tile (same seed) at half size, laid over the page in
+/* A very faint paper grain, as in the app: random grey pixels from the same generator and seed, a 128-pixel tile in 16 grey
+   levels (8 KB; the app's is 256 pixels in 256 levels, which weighs 66 KB as a file) shown at half size, laid over the page in
    soft light. Soft light changes a pale colour much less than a mid one, so the strength is set per theme to give about the
    same variation (a few of 255 levels): 0.6 on the cream page, 0.25 on the dark one. It only nudges the colour, and it goes
    away with Increase Contrast. */
@@ -22,7 +23,7 @@ body::before {
   z-index: 99;
   pointer-events: none;
   background-image: url('../assets/noise.png');
-  background-size: 128px 128px;
+  background-size: 64px 64px;
   mix-blend-mode: soft-light;
   opacity: 0.25;
 }
@@ -41,9 +42,9 @@ site-search button { border-radius: 999px; }
 .expressive-code { --ec-brdRad: 0.75rem; }
 
 :root[data-theme='light'] {
-  --sl-color-bg: #faf4e6;
-  --sl-color-bg-nav: #faf4e6;
-  --sl-color-bg-sidebar: #faf4e6;
+  --sl-color-bg: #fcf8ee;
+  --sl-color-bg-nav: #fcf8ee;
+  --sl-color-bg-sidebar: #fcf8ee;
   --sl-color-text: #153a0b;
   --sl-color-text-accent: #153a0b;
   --sl-color-white: #153a0b;
