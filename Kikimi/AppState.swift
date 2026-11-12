@@ -128,8 +128,9 @@ final class AppState {
     }
 
     init() {
+        StartOver.applyPending()    // first of all, before anything opens the library
         #if DEBUG
-        DebugReset.applyPending()   // first of all, before anything opens the library
+        DebugReset.applyPending()
         #endif
         languageCode = UserDefaults.standard.string(forKey: "language") ?? LanguageProfiles.all[0].code
     }

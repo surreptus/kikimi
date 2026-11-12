@@ -26,6 +26,7 @@ enum DebugReset {
     private static let key = "debugResetOnLaunch"
 
     static func request(_ kind: Kind) {
+        if kind == .library { StartOver.request(); return }   // the same as Settings > Data > Danger zone
         UserDefaults.standard.set(kind.rawValue, forKey: key)
         UserDefaults.standard.synchronize()
         NSApp.terminate(nil)

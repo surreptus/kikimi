@@ -229,6 +229,8 @@ private struct DataTab: View {
     @Environment(\.openWindow) private var openWindow
     @State private var known: KnownListState = .idle
     @State private var libraryBytes: Int64 = 0
+    @State private var confirmingStartOver = false
+    @State private var setAsideFolder = StartOver.setAsideFolder()
 
     var body: some View {
         @Bindable var backup = app.backup
@@ -283,8 +285,25 @@ private struct DataTab: View {
             } footer: {
                 Text("Speech models and your saved videos are kept on this Mac.")
             }
+
+            Section {
+                Button("Start over…", role: .destructive) { confirmingStartOver = true }
+                if let setAsideFolder {
+                    Button("Show Set Aside Folder in Finder") { NSWorkspace.shared.activateFileViewerSelecting([setAsideFolder]) }
+                }
+            } header: {
+                Text("Danger zone")
+            } footer: {
+                Text("Moves your words, progress and videos into a Set Aside folder and quits Kikimi, so it opens empty. Nothing is deleted: speech models stay, and you can move things back or delete the folder yourself. Save a backup first if you may want your progress back.")
+            }
         }
         .formStyle(.grouped)
+        .alert("Start over with an empty library?", isPresented: $confirmingStartOver) {
+            Button("Set Aside and Quit", role: .destructive) { StartOver.request() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Your words, progress and videos are moved to a Set Aside folder in Kikimi's Application Support folder, and Kikimi quits. Open it again to start with an empty library. Nothing is deleted, and the speech models stay.")
+        }
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = urls.first(where: { $0.pathExtension == ProgressBackup.fileExtension || LangEnvironment.isFullBackup($0) })
             else { return false }

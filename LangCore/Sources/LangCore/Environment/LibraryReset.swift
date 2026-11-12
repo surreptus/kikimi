@@ -1,9 +1,8 @@
-#if DEBUG
 import Foundation
 
-/// A developer aid, in Debug builds only: puts the library aside so the app starts empty. Nothing is deleted. The database,
-/// the videos and the staging folder move into "Set Aside/<date and time>" beside them, where they can be moved back; the
-/// speech models, which are large and slow to download, stay where they are.
+/// Starting over: puts the library aside so the app starts empty (Settings > Data > Danger zone). Nothing is deleted. The database,
+/// the videos and the staging folder move into "Set Aside/<date and time>" beside them, where they can be moved back, or deleted by
+/// the person, who is shown where they are; the speech models, which are large and slow to download, stay where they are.
 public enum LibraryReset {
     static let items = ["kikimi.sqlite", "kikimi.sqlite-wal", "kikimi.sqlite-shm", "kikimi.sqlite-journal", "Library", "Staging"]
 
@@ -23,4 +22,13 @@ public enum LibraryReset {
         return folder
     }
 }
-#endif
+
+extension LibraryReset {
+    /// The "Set Aside" folder, when something has been put in it, so a person can be shown where it is.
+    public static func setAsideFolder(root: URL) -> URL? {
+        let folder = root.appending(path: "Set Aside", directoryHint: .isDirectory)
+        let inside = try? FileManager.default.contentsOfDirectory(atPath: folder.path)
+        return (inside?.isEmpty ?? true) ? nil : folder
+    }
+}
+
