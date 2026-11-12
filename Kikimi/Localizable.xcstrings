@@ -135,6 +135,16 @@
         }
       }
     },
+    "%@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$@)"
+          }
+        }
+      }
+    },
     "%@ ↗" : {
 
     },
@@ -10608,6 +10618,9 @@
     "Shadow" : {
 
     },
+    "Shortcut: %@" : {
+
+    },
     "Show %lld more" : {
       "localizations" : {
         "de" : {
@@ -12520,9 +12533,6 @@
     "Translate or fix this sentence" : {
 
     },
-    "Translate sentence" : {
-
-    },
     "Translate, edit or save this line" : {
 
     },
@@ -13298,6 +13308,9 @@
           }
         }
       }
+    },
+    "Word page" : {
+
     },
     "Words" : {
       "localizations" : {
