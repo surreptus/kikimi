@@ -197,11 +197,14 @@ struct Panel: ViewModifier {
     var padding: CGFloat = 16
     var radius: CGFloat = Theme.cornerRadius
     var highlighted = false
+    @Environment(\.colorSchemeContrast) private var contrast
 
     func body(content: Content) -> some View {
         content
             .padding(padding)
             .background(RoundedRectangle(cornerRadius: radius).fill(highlighted ? Theme.softStrong : Theme.soft))
+            // The faint tint is the whole edge; with Increase Contrast it is too weak to see, so a hairline draws it.
+            .overlay { if contrast == .increased { RoundedRectangle(cornerRadius: radius).strokeBorder(Theme.line, lineWidth: 1) } }
     }
 }
 
