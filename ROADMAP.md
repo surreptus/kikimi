@@ -146,7 +146,15 @@ Ordered by how much each helps comprehensible input per unit of effort.
         wrong. Add the test that fails on a cue time offset (a track often starts after the video does).
 - [x] **Edit a transcript line** (right-click a line > Edit line…): fixes the text and its timing (with a preview), and
       finds its words again.
-- [ ] **Word-level timestamps**, so a single word can be played and clips are tighter.
+- [ ] **Word-level timestamps**, so a single word can be played and clips are tighter. **Partly done (12 Nov 2026):** transcription now asks
+      Whisper for word times (the same speed and text), and a line longer than 6.5 s (`maxSegmentSeconds` on the language profile) is cut at its
+      longest pause between words, each part again while still too long (`SegmentSplitter`). On a 5-minute Japanese video with human subtitles, lines
+      over 6.5 s went from 12 to 0 (the longest 11.6 s to 6.4 s), and the human cue breaks that a cut also falls on (within 0.6 s) went from
+      42% to 57%, with the same text and time; but lines under 1.2 s went from 0 to 6. One video is too few to tune the limit or compare
+      languages: a set of videos with same-language human subtitles per language is the next step. Tried and **not** taken: a punctuation prompt
+      (every line ends with a mark, but Whisper then writes 14 s lines and the cuts match worse), and the on-device language model rewriting
+      text (it changes words); grouping Whisper's own pieces with it (it writes no text) works but merges too much, and is macOS 26 only. Still to
+      do here: playing a single word, and tightening clips to words.
 
 ### Finding the right material
 - [x] **Next up** (5 Nov 2026): a card at the top of Videos suggests the video that fits best, by fit alone. A video you have heard is as
