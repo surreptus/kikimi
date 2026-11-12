@@ -36,7 +36,7 @@ public enum LevelFit: Int, Equatable, Sendable, CaseIterable {
         switch self {
         case .hard: String(localized: "Hard", bundle: .module)
         case .stretch: String(localized: "A stretch", bundle: .module)
-        case .comfortable: String(localized: "Comfortable", bundle: .module)
+        case .comfortable: String(localized: "Mostly familiar", bundle: .module)
         case .easy: String(localized: "Easy", bundle: .module)
         }
     }

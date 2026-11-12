@@ -149,7 +149,8 @@ Acknowledgements.
 ## Known limits
 
 - Accuracy depends on the model and the audio. `medium` scored about 23% word error rate on a long synthesized
-  Spanish passage and hasn't been benchmarked for French or German.
+  Spanish passage. It has not been measured for Japanese, French or German, and real speech is probably harder than a
+  synthesized passage, so expect more mistakes there.
 - Whisper's timestamps are coarse in fast, overlapping speech, so sentence clips there can start or end slightly off.
 - French lemmas are noisier than German ones, and a German separable verb ("ruf ... an") is learned as `rufen`.
 - IPADIC dates from 2007, so modern Japanese slang is sometimes split or missed.
