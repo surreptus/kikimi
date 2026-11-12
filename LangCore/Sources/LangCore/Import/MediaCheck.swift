@@ -30,8 +30,13 @@ public enum MediaProblem: Sendable, Equatable {
 }
 
 public enum MediaCheck {
-    /// nil when macOS opens the file and it has a video track.
+    /// nil when macOS opens the file and it has a video track, and also nil when this process cannot read the file at all: a
+    /// sandboxed app may read a chosen file only while it holds the file's security scope, and the import asks for that itself.
+    /// Without the scope a good file looks damaged, so a file that cannot be read here is left for the import to judge.
     public static func problem(with url: URL) async -> MediaProblem? {
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        guard FileManager.default.isReadableFile(atPath: url.path) else { return nil }
         let asset = AVURLAsset(url: url)
         do {
             guard try await asset.load(.isReadable) else { return .cannotOpen }
