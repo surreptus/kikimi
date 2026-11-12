@@ -47,6 +47,8 @@ public protocol LanguageProfile: Sendable {
     /// The pieces a typed copy of a line is compared in, and the most a line may have to be offered for typing.
     func dictationUnits(in text: String) -> [String]
     var dictationLimit: Int { get }
+    /// The longest a transcribed line should run, in seconds, before it is cut at its longest pause (see `SegmentSplitter`).
+    var maxSegmentSeconds: Double { get }
     /// What goes between the pieces when they are shown again: a space, or nothing in a language written without them.
     var dictationSeparator: String { get }
     /// A noun as a learner should meet it, with its article ("das Buch"), or nil if there is nothing to add.
@@ -65,6 +67,7 @@ extension LanguageProfile {
     }
     public var contentPOS: Set<PartOfSpeech> { [.noun, .verb, .adjective, .adverb] }
     public var kanjiResourceName: String? { nil }
+    public var maxSegmentSeconds: Double { 6.5 }
     public var nounArticles: [String: String] { [:] }
 
     public func nounPhrase(headword: String, gender: String?) -> String? {
@@ -89,5 +92,10 @@ public enum LanguageProfiles {
 
     public static func profile(for code: String) -> (any LanguageProfile)? {
         all.first { $0.code == code }
+    }
+
+    /// The profile whose speech-model language code is `code` (the same as its own code today).
+    public static func profile(forWhisperCode code: String) -> (any LanguageProfile)? {
+        all.first { $0.whisperCode == code }
     }
 }

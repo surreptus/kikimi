@@ -53,14 +53,18 @@ public actor WhisperKitTranscriber: Transcriber {
             let total = Double(samples.count) / AudioExtractor.sampleRate
             let options = DecodingOptions(
                 task: .transcribe, language: whisperCode, skipSpecialTokens: true,
+                wordTimestamps: true,   // the same speed and text, and the times a long line is cut by (SegmentSplitter)
                 chunkingStrategy: self.chunking == .voiceActivity ? .vad : nil)
             let results = try await kit.transcribe(
                 audioArray: samples, decodeOptions: options,
                 segmentCallback: { segments in
                     if let last = segments.last, total > 0 { progress(min(1, Double(last.end) / total)) }
                 })
-            let raw = results.flatMap(\.segments).map {
-                TranscriptSegment(start: Double($0.start), end: Double($0.end), text: $0.text)
+            let longest = LanguageProfiles.profile(forWhisperCode: whisperCode)?.maxSegmentSeconds ?? 6.5
+            let raw = results.flatMap(\.segments).flatMap { segment -> [TranscriptSegment] in
+                let whole = TranscriptSegment(start: Double(segment.start), end: Double(segment.end), text: segment.text)
+                let words = (segment.words ?? []).map { TimedWord(text: $0.word, start: Double($0.start), end: Double($0.end)) }
+                return SegmentSplitter.split(whole, words: words, maxSeconds: longest)
             }
             return TranscriptCleaner.clean(raw, audioDuration: total)
         }
