@@ -5,7 +5,7 @@ This file shows where things live. The [README](README.md) says what the app doe
 ## The one rule
 
 All logic is in `LangCore/`, a Swift package with no UI. `Kikimi/` holds SwiftUI views only. The views call `LangCore` through
-one object, `LangEnvironment`. New behavior belongs in `LangCore`, with a test.
+one object, `LangEnvironment`. New behaviour belongs in `LangCore`, with a test.
 
 Shared code never checks a language code such as `"ja"`. It asks the `LanguageProfile`.
 
