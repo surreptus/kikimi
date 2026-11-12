@@ -11,21 +11,24 @@
   --sl-text-6xl: 3rem;   /* the homepage title */
 }
 
-/* A very faint paper grain, as in the app, on the surfaces that paint the page colour (the page, the header bar and the sidebar), and
-   nowhere else: buttons, text and pictures sit above it, untouched. Random grey pixels from the app's generator and seed, a
-   128-pixel tile in 16 grey levels shown at half size, blended in soft light with the colour beneath. Soft light changes a pale
-   colour much less than a dark one, so each theme has its own tile with the strength built in (0.6 on the cream, 0.25 on the
-   dark): about the same variation, a few of 255 levels. Each tile is about 9 KB. Gone with Increase Contrast. */
+/* A very faint paper grain, as in the app, on the surfaces that paint the page colour (the page, the header bar and the sidebar),
+   and nowhere else: buttons, text and pictures sit above it, untouched. Random grey pixels from the app's generator and seed, a
+   128-pixel tile in 16 grey levels shown at half size, about 9 KB for each theme. Gone with Increase Contrast.
+   - Light: multiplied into the cream, so the page gets tiny darker specks (down to 93% of the colour; about 5 of 255 levels
+     either way). Soft light cannot do this on a pale colour: there is almost no room above it, so it showed hardly at all.
+     Multiply darkens the page a little on average, which the base colour (--sl-color-bg) allows for.
+   - Dark: soft light, with the strength built into the tile (0.25), about 5 levels. */
 body, header.header, .sidebar-pane {
   background-image: url('../assets/noise-light.png');
   background-size: 64px 64px;
-  background-blend-mode: soft-light;
+  background-blend-mode: multiply;
 }
 :root[data-theme='dark'] body, :root[data-theme='dark'] header.header, :root[data-theme='dark'] .sidebar-pane {
   background-image: url('../assets/noise-dark.png');
+  background-blend-mode: soft-light;
 }
 @media (prefers-contrast: more) {
-  body, .header, .sidebar-pane, :root[data-theme='dark'] body, :root[data-theme='dark'] header.header, :root[data-theme='dark'] .sidebar-pane { background-image: none; }
+  body, header.header, .sidebar-pane, :root[data-theme='dark'] body, :root[data-theme='dark'] header.header, :root[data-theme='dark'] .sidebar-pane { background-image: none; }
 }
 
 /* The rounded look of the app: pills for the sidebar's links and the search box, rounded corners on cards and notes. */
@@ -40,9 +43,9 @@ site-search button { border-radius: 999px; }
 .expressive-code { --ec-brdRad: 0.75rem; }
 
 :root[data-theme='light'] {
-  --sl-color-bg: #fcf8ee;
-  --sl-color-bg-nav: #fcf8ee;
-  --sl-color-bg-sidebar: #fcf8ee;
+  --sl-color-bg: #fffbf2;
+  --sl-color-bg-nav: #fffbf2;
+  --sl-color-bg-sidebar: #fffbf2;
   --sl-color-text: #153a0b;
   --sl-color-text-accent: #153a0b;
   --sl-color-white: #153a0b;
