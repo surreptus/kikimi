@@ -32,7 +32,7 @@ public struct DictionaryEntry: Sendable, Equatable, Identifiable {
 public final class DictionaryStore: Sendable {
     public static let empty = DictionaryStore()
 
-    private let files: [String: DatabaseQueue]
+    private let files: [String: ReopeningReader]
     /// Languages whose file has the gender column; a file built before it existed still opens, with no genders.
     private let withGender: Set<String>
 
@@ -40,12 +40,10 @@ public final class DictionaryStore: Sendable {
 
     /// `files` maps a language code to its built dictionary file.
     public init(files: [String: URL]) throws {
-        var configuration = Configuration()
-        configuration.readonly = true
-        let opened = try files.mapValues { try DatabaseQueue(path: $0.path, configuration: configuration) }
+        let opened = try files.mapValues { try ReopeningReader(url: $0) }
         self.files = opened
-        withGender = Set(try opened.compactMap { language, queue in
-            try queue.read { try $0.columns(in: "entries").contains { $0.name == "gender" } } ? language : nil
+        withGender = Set(try opened.compactMap { language, reader in
+            try reader.readNow { try $0.columns(in: "entries").contains { $0.name == "gender" } } ? language : nil
         })
     }
 
