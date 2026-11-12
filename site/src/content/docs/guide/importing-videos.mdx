@@ -9,6 +9,16 @@ Video files on your Mac, which you own or may copy and study (see the [terms](/k
 
 Add videos by dropping them on **Videos**, by pressing **Choose files**, or with <kbd>⌘O</kbd>. A video can be dropped together with its subtitle file.
 
+## Formats Kikimi can't open
+
+Kikimi opens what macOS itself can open: MP4, MOV, M4V and most files from a phone or a camera. It cannot open **WebM** or **MKV**, and it tells you so when you add one, instead of failing later. To use one, convert it to MP4 first. With [ffmpeg](https://ffmpeg.org), which is free:
+
+```sh
+ffmpeg -i film.webm -c:v libx264 -c:a aac film.mp4
+```
+
+Your original is not changed. A large video can take a few minutes to convert.
+
 ## With subtitles
 
 If you have an `.srt` or `.vtt` file for the video, add it and Kikimi uses its text and times instead of transcribing. A subtitle file with the same name as the video (such as `film.mp4` and `film.srt`) is paired with it automatically; otherwise press **Add subtitles** on the video's row. No speech model is needed, and it is the quickest way to start.

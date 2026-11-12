@@ -258,8 +258,25 @@ struct ImportSection: View {
     /// Videos, and any subtitle files dropped with them, join the list of videos waiting to start. A subtitle file dropped
     /// by itself goes to a waiting video it fits, so it can be added after the video as well as with it.
     private func start(_ urls: [URL]) {
-        let files = urls.filter {
-            SubtitlePairing.isSubtitle($0) || (UTType(filenameExtension: $0.pathExtension)?.conforms(to: .audiovisualContent) ?? false)
+        Task { await add(urls) }
+    }
+
+    /// Each file is looked at as it is added, so one macOS can't open (WebM, MKV), or that has no picture, is refused with
+    /// a reason now and not after Start.
+    private func add(_ urls: [URL]) async {
+        var files: [URL] = []
+        var refused: [(url: URL, why: String)] = []
+        for url in urls {
+            if SubtitlePairing.isSubtitle(url) { files.append(url); continue }
+            guard UTType(filenameExtension: url.pathExtension)?.conforms(to: .audiovisualContent) == true else {
+                refused.append((url, MediaProblem.notAVideo(url)))
+                continue
+            }
+            if let problem = await MediaCheck.problem(with: url) {
+                refused.append((url, problem.message(for: url)))
+            } else {
+                files.append(url)
+            }
         }
         let pairing = SubtitlePairing.pair(files, language: app.profile.whisperCode)
         for item in pairing.items where !app.pendingImports.contains(where: { $0.video == item.video }) {
@@ -276,7 +293,12 @@ struct ImportSection: View {
             }
             left = fitted.unmatched
         }
-        if !left.isEmpty {
+        // A refused video explains itself, and would leave its subtitle file with no video to go with, so that is not also said.
+        if refused.count == 1, let one = refused.first {
+            app.showToast(one.why, isError: true)
+        } else if refused.count > 1 {
+            app.showToast(String(localized: "\(inflected("^[\(refused.count) file](inflect: true)")) couldn't be added: \(listed(refused.map(\.url.lastPathComponent))). Kikimi adds video files that macOS can open, such as MP4 and MOV."), isError: true)
+        } else if !left.isEmpty {
             app.showToast(String(localized: "No video to go with \(listed(left.map(\.lastPathComponent)))."), isError: true)
         }
     }
