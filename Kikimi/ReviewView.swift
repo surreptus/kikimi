@@ -28,6 +28,8 @@ struct ReviewView: View {
     @State private var returned = 0
     /// The word's own page beside the card, opened from the revealed answer (never before: it would show the meaning).
     @State private var showsWord = false
+    /// Whether a voice is installed for the language, looked up once per language (it lists every installed voice).
+    @State private var voiceAvailable = true
     @State private var wordNow: Word?
     /// Typing what you hear: what was typed, and how it compared once checked.
     @State private var typed = ""
@@ -74,7 +76,10 @@ struct ReviewView: View {
         .onChange(of: mode) { _, new in env.reviewAudio.setMode(new, for: app.profile) }
         .task(id: app.languageCode) { await loadOverview() }
         .task(id: app.dataVersion) { if card == nil { await loadOverview(keepingSummary: true) } }
-        .task(id: app.languageCode) { style = env.reviewStyle.style(for: app.profile) }
+        .task(id: app.languageCode) {
+            style = env.reviewStyle.style(for: app.profile)
+            voiceAvailable = WordSpeaker.shared.isAvailable(languageCode: app.profile.whisperCode)
+        }
         .task(id: app.pendingLesson) { takePendingLesson() }
         .onDisappear { audio?.stop(); voice.discard() }
         // Having said it, the answer is what you want next.
@@ -156,7 +161,6 @@ struct ReviewView: View {
         if revealed {
             Button { showsWord.toggle() } label: { Text(lemmaLabel(card)).font(font) }
                 .buttonStyle(.plain)
-                .keyboardShortcut("i", modifiers: [])
                 .help(showsWord ? "Hide this word's page (I)" : "Show everything about this word (I)")
                 .accessibilityHint("Shows this word's page")
         } else {
@@ -240,7 +244,7 @@ struct ReviewView: View {
                     HStack(spacing: 10) {
                         SpeakButton(
                             text: (app.profile.display.showsReadings ? card.entries.first?.reading : nil) ?? card.word.lemma,
-                            languageCode: app.profile.whisperCode, showsTitle: true, shortcut: "w")
+                            languageCode: app.profile.whisperCode, showsTitle: true)
                         if card.example != nil {
                             Button { playSentence() } label: { KeyedLabel(title: "Play sentence", systemImage: "speaker.wave.2.fill", key: "R") }
                                 .buttonStyle(.pill(.secondary, compact: true))
@@ -257,14 +261,6 @@ struct ReviewView: View {
                             .menuStyle(.button).buttonStyle(.pill(.secondary, compact: true)).menuIndicator(.hidden).fixedSize()
                             .help("Translate or fix this sentence")
                             .accessibilityLabel("More actions for this sentence")
-                            .background {
-                                // The menu's items have no keys of their own; these give T and E.
-                                Group {
-                                    Button("Edit sentence", action: editSentence).keyboardShortcut("e", modifiers: [])
-                                    if canTranslate { Button("Translate sentence", action: toggleTranslation).keyboardShortcut("t", modifiers: []) }
-                                }
-                                .frame(width: 0, height: 0).opacity(0).accessibilityHidden(true)
-                            }
                         }
                     }
                     .padding(.top, 6)
@@ -301,7 +297,7 @@ struct ReviewView: View {
                 // Space is a letter while typing, so a typed card checks with Return instead.
                 .keyboardShortcut(dictation(for: card) ? nil : KeyboardShortcut(.space, modifiers: []))
             }
-            if !shortcutHints.isEmpty { ShortcutHints(items: shortcutHints) }
+            if !reviewShortcuts.isEmpty { ShortcutButtonRow(items: reviewShortcuts.map { shortcutItem($0, card) }) }
         }
         .padding(28)
     }
@@ -537,16 +533,30 @@ struct ReviewView: View {
         return text
     }
 
-    /// The keys that work right now: they change once the answer is showing.
-    private var shortcutHints: [(key: String, action: String)] {
-        guard revealed else {
-            if dictation(for: card) { return [("Return", "Check"), ("⌘R", "Play again")] }
-            return []   // Space and R are on the buttons
+    /// The keys that work right now: they change once the answer is showing. The row under the card is made from these, and its
+    /// buttons own the keys, so the same ones work on every kind of card (a Shadow card has no sentence buttons of its own).
+    private var reviewShortcuts: [ReviewShortcut] {
+        ReviewShortcut.available(
+            revealed: revealed, typing: dictation(for: card), hasSentence: card?.example != nil, canTranslate: canTranslate,
+            voiceAvailable: voiceAvailable)
+    }
+
+    private func shortcutItem(_ shortcut: ReviewShortcut, _ card: ReviewCard) -> ShortcutButtonRow.Item {
+        let title: String
+        let perform: () -> Void
+        switch shortcut {
+        case .check: title = String(localized: "Check"); perform = checkDictation
+        case .playAgain: title = String(localized: "Play again"); perform = playSentence
+        case .sayWord:
+            title = String(localized: "Say word")
+            let text = (app.profile.display.showsReadings ? card.entries.first?.reading : nil) ?? card.word.lemma
+            let code = app.profile.whisperCode
+            perform = { WordSpeaker.shared.speak(text, languageCode: code) }
+        case .wordPage: title = String(localized: "Word page"); perform = { showsWord.toggle() }
+        case .editSentence: title = String(localized: "Edit sentence"); perform = editSentence
+        case .translation: title = String(localized: "Translation"); perform = toggleTranslation
         }
-        var hints: [(key: String, action: String)] = [("W", "Say word"), ("I", "Word page")]
-        if card?.example != nil { hints.append(("E", "Edit sentence")) }
-        if canTranslate, card?.example != nil { hints.append(("T", "Translation")) }
-        return hints
+        return .init(id: shortcut.rawValue, key: shortcut.key, title: title, letter: shortcut.letter, perform: perform)
     }
 
     private var translationMode: TranslationDisplay { env.translation.display }
