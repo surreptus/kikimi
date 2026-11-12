@@ -4,85 +4,79 @@ Work from top to bottom. `Scripts/release.sh --help` shows how to run the build.
 
 ## One-time setup
 - [ ] Join the Apple Developer Program (paid). Note your **team ID** (developer.apple.com > Membership).
-- [x] The **bundle ID** is `com.surreptus.Kikimi` (Kikimi target). A change later moves the app's data container, so change it
-      before anyone has data.
-- [ ] Choose your team in the target (Signing & Capabilities). Keep "Automatically manage signing" on.
-- [x] **App icon**: an asanoha (hemp leaf) star in white line on dark green, made for Kikimi. `Scripts/icon/make_icon.swift`
-      regenerates it. The PNGs are in `Kikimi/Assets.xcassets/AppIcon.appiconset`.
+- [x] The **bundle ID** is `com.surreptus.Kikimi`. A change later moves the app's data container, so change it before anyone has
+      data.
+- [ ] Choose your team in the Kikimi target (Signing & Capabilities). Keep "Automatically manage signing" on.
+- [x] **App icon**: an asanoha star in white line on dark green. `Scripts/icon/make_icon.swift` regenerates the PNGs in
+      `Kikimi/Assets.xcassets/AppIcon.appiconset`.
 - [ ] Open a video in the **Release** build, not only Debug. Release links differently: the AVKit link is set in the target's
       `OTHER_LDFLAGS`, because SwiftUI's `VideoPlayer` never names it.
-- [x] Version: `MARKETING_VERSION` is `0.16.0` (a public beta; the first release was 0.9.0). Build is `13`. Version 1.0.0 follows
-      when the 1.0 list in the roadmap is done. Raise `CURRENT_PROJECT_VERSION` (an integer) for every release you give to
-      anyone. Then: `0.16.x` for fixes, `0.17.0` or `1.0.0` for features. Tag the release commit `v0.16.0`. Attach the notarized
-      zip to a GitHub Release.
-- [ ] Direct download only: create a notarization profile once. Use an app-specific password from appleid.apple.com:
+- [x] Version: `MARKETING_VERSION` is `0.16.0` (a public beta), build `13`. Raise `CURRENT_PROJECT_VERSION` (an integer) for every
+      release you give to anyone. Use `0.16.x` for fixes, and `0.17.0` or `1.0.0` for features. 1.0.0 follows the 1.0 list in the
+      roadmap. Tag the release commit `v0.16.0`. Attach the notarized zip to a GitHub Release.
+- [ ] Direct download only: create a notarization profile once, with an app-specific password from appleid.apple.com:
       `xcrun notarytool store-credentials kikimi --apple-id <you> --team-id <TEAM_ID>`
 
 ## Every release
 - [ ] **A release is a pull request, because `main` is protected.** The version bump, the changelog entry and the guide changes go
       in one release PR. After the merge, build from the merge commit (not the branch), tag that commit and publish. Raise
-      `site/public/latest.json` in a second small PR after the release is published. It must not change before.
+      `site/public/latest.json` in a second small PR after the release is published, not before.
 - [ ] Run `Scripts/build_ipadic.sh` and `Scripts/build_dictionaries.sh` (the build refuses to run without them).
 - [ ] **Refresh the dictionary data.** Run `Scripts/build_dictionaries.sh` again, so JMdict and KANJIDIC2 are the current EDRDG
-      files. The EDRDG licence requires "a procedure for regular updating", and calls old data a violation. This step is that
-      procedure. `check_release_sync.py` (below) fails if the data is more than 31 days old. The run also takes new Wiktionary
-      extracts, which can change meanings and verb forms. So run `python3 Scripts/dictionaries/test_builders.py`, `swift test`
-      and `LANGCORE_AUDIT=1 swift test --filter DictionaryAuditTests` before you build.
+      files. The EDRDG licence requires regular updates and calls old data a violation. `check_release_sync.py` fails if the data is
+      more than 31 days old. New Wiktionary extracts can change meanings and verb forms, so then run
+      `python3 Scripts/dictionaries/test_builders.py`, `swift test` and `LANGCORE_AUDIT=1 swift test --filter DictionaryAuditTests`.
 - [ ] `cd LangCore && swift test` passes. (The release script runs it unless you pass `--skip-tests`.)
-- [ ] **Run the model-based tests.** The normal run skips them because they need real models. Without them, coverage of
-      `WhisperKitTranscriber` is only 6%. With a network connection:
-      `cd LangCore && LANGCORE_INTEGRATION=1 swift test` (real transcription and language detection, tiny model, about 73 MB).
-      Then run once with a speech model that you ship:
+- [ ] **Run the model-based tests.** The normal run skips them, and without them `WhisperKitTranscriber` coverage is 6%. With a
+      network connection, run `cd LangCore && LANGCORE_INTEGRATION=1 swift test` (tiny model, about 73 MB). Then run once with a
+      model that you ship:
       `LANGCORE_BENCHMARK=1 LANGCORE_MODEL=<variant> LANGCORE_MODELS_DIR=<folder> swift test`.
-      Put the word error rate and the speed in the release notes. If the result is much worse than the README figure (about 23%
-      on a long Spanish passage with `medium`), stop and find the cause.
-- [ ] Open the project in Xcode. Run **Product > Archive > Generate Privacy Report**. `Kikimi/PrivacyInfo.xcprivacy` must cover
-      every API in the report. It declares UserDefaults only. We have not checked it against the third-party packages.
+      Put the word error rate and the speed in the release notes. If it is much worse than the README figure (about 23% on a long
+      Spanish passage with `medium`), stop and find the cause.
+- [ ] In Xcode, run **Product > Archive > Generate Privacy Report**. `Kikimi/PrivacyInfo.xcprivacy` must cover every API in it. It
+      declares UserDefaults only. We have not checked it against the third-party packages.
 - [ ] Build: `TEAM_ID=... Scripts/release.sh developer-id --notarize` (direct download) or `... app-store`.
 - [ ] **Write the version's section in `CHANGELOG.md`** (a summary line, then New and Fixed). Then run
       `python3 -I Scripts/check_release_sync.py`. It fails if the newest changelog section is not the Xcode project's version, if
-      `site/public/latest.json` is ahead of it, or if the built JMdict or KANJIDIC2 data is more than 31 days old. The changelog
-      is the one source: the website's changelog page imports it, and the release notes come from it.
+      `site/public/latest.json` is ahead of it, or if the built JMdict or KANJIDIC2 data is more than 31 days old. The changelog is
+      the one source: the website imports it, and the release notes come from it.
 - [ ] **Publish a checksum with every download.** Make the notes:
       `python3 -I Scripts/release_notes.py X.Y.Z --zip <the zip> --commit <the tagged commit> --out build/notes-X.Y.Z.md --tests "N automated tests pass."`
-      Give them to `gh release create --notes-file`. The script computes the SHA-256 of the exact file you attach. It adds the beta
-      notice, the download block and the standing limits from `Release/known-limits.md` (edit that file when the limits change).
-      The tag is annotated. The notes name the commit. A checksum only shows that the file is the published file. It does not show
-      that the file is safe. Do not claim more.
+      Give them to `gh release create --notes-file`. The script computes the SHA-256 of the exact file you attach, and adds the beta
+      notice, the download block and the limits from `Release/known-limits.md`. The tag is annotated. A checksum shows only that the
+      file is the published file. It does not show that the file is safe. Do not claim more.
 - [ ] **Update `site/public/latest.json`** to the new version
-      (`{"version": "x.y.z", "url": "https://github.com/surreptus/kikimi/releases/latest"}`) and push. Then Check for Updates in
-      older copies finds the release. Do this only after the release is published.
+      (`{"version": "x.y.z", "url": "https://github.com/surreptus/kikimi/releases/latest"}`) after the release is published. Then
+      Check for Updates in older copies finds it.
 
 ## Test the result
 Use a Mac or user account that has never run a dev build.
 - [ ] The app opens without a Gatekeeper warning (direct download).
-- [ ] The first launch is quick (the dictionaries are read in place). The Videos page can download a speech model.
+- [ ] The first launch is quick. The Videos page can download a speech model.
 - [ ] Import a short video. Play it. Review a word. Export a clip.
 - [ ] Quit and open again. The data is still there.
 - [ ] The Acknowledgements screen lists all licences.
 
 ## Mac App Store extras
 - [ ] Make an app record in App Store Connect with the same bundle ID.
-- [ ] Privacy policy URL: publish `Kikimi/Privacy.md` (the app shows the same file). Its contact is the GitHub issues page.
-- [ ] Terms of use: the contact in `Kikimi/Terms.md` is the GitHub issues page. The governing law is California. A lawyer must
-      read the terms before you publish or ship. The privacy "nutrition label" says: data not collected.
+- [ ] Privacy policy URL: publish `Kikimi/Privacy.md`. Its contact is the GitHub issues page.
+- [ ] Terms: the contact in `Kikimi/Terms.md` is the GitHub issues page, and the governing law is California. A lawyer must read the
+      terms before you publish or ship. The privacy "nutrition label" says: data not collected.
 - [ ] Export compliance: the app uses only standard HTTPS (model downloads).
 - [ ] Screenshots, description, age rating, category (Education).
-- [ ] Review note: the microphone is used only for the Shadow card type. The app deletes recordings when the card ends.
-- [ ] Review note: on first use the app downloads Whisper speech models (about 1.5 GB, data not code) from Hugging Face. It works
-      only on files that the user provides.
+- [ ] Review notes: the microphone is used only for the Shadow card, and recordings are deleted when the card ends. On first use
+      the app downloads Whisper models (about 1.5 GB, data not code) from Hugging Face, and it works only on files that the user
+      provides.
 
 ## Licences to confirm before publishing
-- [x] The Whisper model card on Hugging Face (`argmaxinc/whisperkit-coreml`) says MIT (checked 25 Oct and 12 Nov 2026; check again
-      when the model changes). OpenAI's own cards differ: `openai/whisper-large-v3-turbo` says MIT, and `openai/whisper-medium`
-      says Apache 2.0 (the Whisper repository says MIT). All are permissive. The user downloads the models. We do not bundle them.
+- [x] The Whisper model card (`argmaxinc/whisperkit-coreml`) says MIT (checked 25 Oct and 12 Nov 2026; check again when the model
+      changes). OpenAI's own cards say MIT (`openai/whisper-large-v3-turbo`) or Apache 2.0 (`openai/whisper-medium`; the Whisper
+      repository says MIT). All are permissive. The user downloads the models. We do not bundle them.
 - [x] JMdict and Wiktionary data stay under CC BY-SA 4.0 with attribution. Acknowledgements say that the data is adapted and shared
       under the same licence, and point to the build scripts. Do not commit the built dictionaries.
-- [x] The SRS stages are "Stage 1" to "Stage 8" and "Finished". The WaniKani names are gone from the app, the code and the docs.
-      Do not use the name "WaniKani" in marketing.
-- [x] Audit of 12 Nov 2026, against the upstream licence texts: the GRDB, WhisperKit, MeCab (BSD), IPADIC and swift-transformers
-      files are the upstream texts, with only our headers added. The credits meet the EDRDG acknowledgement terms: an Acknowledgements
-      screen reachable from About, a link to the licence, and the data credited as adapted under the same licence. The website
-      page and `THIRD_PARTY_NOTICES.md` match. This is not a lawyer's review.
+- [x] The SRS stages are "Stage 1" to "Stage 8" and "Finished". Do not use the name "WaniKani" in the app, the docs or marketing.
+- [x] Audit of 12 Nov 2026, against the upstream licence texts. The GRDB, WhisperKit, MeCab (BSD), IPADIC and swift-transformers
+      files are the upstream texts with only our headers added. The credits meet the EDRDG acknowledgement terms. The website page
+      and `THIRD_PARTY_NOTICES.md` match. This is not a lawyer's review.
 - [ ] When you add or update a package, check `Package.resolved` against Acknowledgements. Today: GRDB, WhisperKit and the
       swift-transformers code inside it. `swift-argument-parser` is resolved but not linked.
