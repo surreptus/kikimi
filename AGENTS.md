@@ -38,6 +38,11 @@ How we build Kikimi. Read this before changing anything; update it when we agree
 - **Say what you will change, then what you verified.** Before each step, one line on what is about to change.
   After it, what was verified and, just as plainly, what was not (for example "builds, tests pass; not seen in the
   running app"). Keep responses short.
+- **Write documents for their reader.** A document for people who do not work on the code (the README's install part, the guide,
+  the FAQ, the changelog, the privacy policy and the terms) is warm and plain. Every other document (this file, ARCHITECTURE, ROADMAP,
+  the release checklist, pull request text, code comments) is written in **simplified technical English**: short sentences (about 20
+  words at most), one idea each, active voice, simple common words, one name for one thing, no idioms or jokes. Keep documents short:
+  say it once, and cut what a reader does not need to act.
 - **Push back** when a step is overbuilt, or a request works against the principles above. Give a recommendation,
   not a survey of options.
 - **Ask before** adding a dependency, changing what leaves the Mac, anything hard to reverse, or pushing to GitHub.
