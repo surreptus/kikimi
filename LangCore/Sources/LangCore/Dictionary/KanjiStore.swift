@@ -54,7 +54,7 @@ public struct KanjiInfo: Sendable, Equatable, Identifiable {
 public final class KanjiStore: Sendable {
     public static let empty = KanjiStore()
 
-    private let files: [String: DatabaseQueue]
+    private let files: [String: ReopeningReader]
     /// Languages whose file has the level and grade columns; a file built before them still opens, without.
     private let withLevels: Set<String>
 
@@ -62,12 +62,10 @@ public final class KanjiStore: Sendable {
 
     /// `files` maps a language code to its built kanji file.
     public init(files: [String: URL]) throws {
-        var configuration = Configuration()
-        configuration.readonly = true
-        let opened = try files.mapValues { try DatabaseQueue(path: $0.path, configuration: configuration) }
+        let opened = try files.mapValues { try ReopeningReader(url: $0) }
         self.files = opened
-        withLevels = Set(try opened.compactMap { language, queue in
-            try queue.read { try $0.columns(in: "kanji").contains { $0.name == "jlpt" } } ? language : nil
+        withLevels = Set(try opened.compactMap { language, reader in
+            try reader.readNow { try $0.columns(in: "kanji").contains { $0.name == "jlpt" } } ? language : nil
         })
     }
 
