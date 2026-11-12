@@ -1,6 +1,18 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "“%@” can't be opened: macOS can't read WebM or MKV files. Convert it to MP4 first." : {
+
+    },
+    "“%@” can't be opened. It may be damaged, or in a format macOS can't read." : {
+
+    },
+    "“%@” has no video. Kikimi adds video files; audio-only files aren't supported yet." : {
+
+    },
+    "“%@” isn't a video. Kikimi adds video files, with .srt or .vtt subtitles." : {
+
+    },
     "A stretch" : {
       "localizations" : {
         "de" : {
@@ -176,6 +188,7 @@
       }
     },
     "Comfortable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -457,6 +470,9 @@
           }
         }
       }
+    },
+    "Mostly familiar" : {
+
     },
     "Off" : {
       "localizations" : {

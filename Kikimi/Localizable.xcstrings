@@ -138,6 +138,16 @@
     "%@ ↗" : {
 
     },
+    "%@ couldn't be added: %@. Kikimi adds video files that macOS can open, such as MP4 and MOV." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ couldn't be added: %2$@. Kikimi adds video files that macOS can open, such as MP4 and MOV."
+          }
+        }
+      }
+    },
     "%@ imports use it, so you'll need to download a model before importing again. %@" : {
       "localizations" : {
         "de" : {
@@ -1011,6 +1021,9 @@
           }
         }
       }
+    },
+    "^[%lld file](inflect: true)" : {
+
     },
     "^[%lld hour](inflect: true)" : {
       "localizations" : {
@@ -4243,6 +4256,7 @@
 
     },
     "Each video shows how much of it you know, such as 91% known · Comfortable. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4269,6 +4283,9 @@
           }
         }
       }
+    },
+    "Each video shows how much of it you know, such as 91% known · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
+
     },
     "Edit line" : {
       "localizations" : {
@@ -5408,6 +5425,7 @@
       }
     },
     "Hard is under 80%, A stretch is 80 to 88%, Comfortable is 88 to 98%, and Easy is 98% or more." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5434,6 +5452,9 @@
           }
         }
       }
+    },
+    "Hard is under 80%, A stretch is 80 to 88%, Mostly familiar is 88 to 98%, and Easy is 98% or more." : {
+
     },
     "Hear" : {
       "localizations" : {
@@ -13406,6 +13427,9 @@
     "Words you are learning that are not due yet. Nothing moves, whatever you answer." : {
 
     },
+    "Words you ignore, such as names and mistakes, are left out of the count, so ignoring words raises the figure." : {
+
+    },
     "Words you started learning, by week" : {
       "localizations" : {
         "de" : {
@@ -13546,12 +13570,12 @@
         }
       }
     },
-    "You know %lld of this video's %lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too." : {
+    "You know %lld of this video's %lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you ignore are left out of the count." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You know %1$lld of this video's %2$lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too."
+            "value" : "You know %1$lld of this video's %2$lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you ignore are left out of the count."
           }
         }
       }

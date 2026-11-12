@@ -526,6 +526,58 @@ struct KeyedLabel: View {
     }
 }
 
+/// A row of keys under a card, each a button: it shows its key, does its action when clicked, and (for a bare letter) owns that
+/// key, so what is shown is always what works.
+struct ShortcutButtonRow: View {
+    struct Item: Identifiable {
+        let id: String
+        let key: String
+        let title: String
+        var letter: Character?
+        let perform: () -> Void
+    }
+    let items: [Item]
+
+    var body: some View {
+        FlowLayout {
+            ForEach(items) { item in
+                let button = Button(action: item.perform) {
+                    HStack(spacing: 6) {
+                        KeyCap(item.key)
+                        Text(item.title).font(Theme.small).foregroundStyle(Theme.muted)
+                    }
+                }
+                .buttonStyle(HintButtonStyle())
+                .help("\(item.title) (\(item.key))")
+                .accessibilityLabel(item.title)
+                .accessibilityHint("Shortcut: \(item.key)")
+                if let letter = item.letter { button.keyboardShortcut(KeyEquivalent(letter), modifiers: []) } else { button }
+            }
+        }
+        .foregroundStyle(Theme.ink)
+        .accessibilityElement(children: .contain)
+    }
+}
+
+/// A key hint that reads as a quiet label until the pointer is on it.
+private struct HintButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View { HintFace(configuration: configuration) }
+
+    private struct HintFace: View {
+        let configuration: ButtonStyle.Configuration
+        @State private var hovering = false
+
+        var body: some View {
+            configuration.label
+                .padding(.horizontal, 6).padding(.vertical, 3)
+                .background(RoundedRectangle(cornerRadius: 8).fill(configuration.isPressed ? Theme.softStrong : hovering ? Theme.soft : .clear))
+                .contentShape(RoundedRectangle(cornerRadius: 8))
+                .onHover { hovering = $0 }
+                .animation(Theme.easeOut(0.12), value: hovering)
+        }
+    }
+}
+
 struct ShortcutHints: View {
     let items: [(key: String, action: String)]
 
