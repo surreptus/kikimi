@@ -65,13 +65,15 @@ public final class LangDatabase: Sendable {
         }
     }
 
-    /// Applies an SRS answer to a word that is being learned.
+    /// Applies an SRS answer to a word that is being learned. The next review is moved a little by `jitter`
+    /// (see `SRS.variation`); the default is random, and tests pass a fixed number.
     @discardableResult
-    public func recordReview(wordID: Int64, correct: Bool, now: Date = Date()) async throws -> Word {
+    public func recordReview(wordID: Int64, correct: Bool, now: Date = Date(),
+                             jitter: Double = SRS.randomJitter()) async throws -> Word {
         try await writer.write { db in
             guard var word = try Word.fetchOne(db, key: wordID) else { throw LangError.notFound }
             guard word.status == .learning, let stage = word.stage else { throw LangError.notLearning }
-            let result = SRS.answer(stage: stage, correct: correct, now: now)
+            let result = SRS.answer(stage: stage, correct: correct, now: now, jitter: jitter)
             word.stage = result.stage
             word.nextReview = result.nextReview
             word.status = result.stage == .finished ? .finished : .learning
@@ -82,13 +84,14 @@ public final class LangDatabase: Sendable {
         }
     }
 
-    public func dueWords(language: String, now: Date = Date()) async throws -> [Word] {
+    /// The words due now, the longest overdue first. `limit` keeps a session short: the rest stay due for the next one.
+    public func dueWords(language: String, now: Date = Date(), limit: Int? = nil) async throws -> [Word] {
         try await writer.read { db in
-            try Word
+            let request = Word
                 .filter(Column("language") == language && Column("status") == WordStatus.learning.rawValue
                         && Column("next_review") <= now)
-                .order(Column("next_review"))
-                .fetchAll(db)
+                .order(Column("next_review"), Column("id"))
+            return try (limit.map { request.limit($0) } ?? request).fetchAll(db)
         }
     }
 

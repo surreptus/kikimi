@@ -59,6 +59,13 @@ extension LangDatabase {
         }
     }
 
+    /// How many more new words today's allowance has room for, or nil when there is no limit (`perDay` is 0, lessons off).
+    /// Learn on the Words page uses it, so one click cannot start more words than the day's lessons would.
+    public func newWordRoom(language: String, perDay: Int, now: Date = Date(), calendar: Calendar = .current) async throws -> Int? {
+        guard perDay > 0 else { return nil }
+        return max(0, perDay - (try await startedToday(language: language, now: now, calendar: calendar)))
+    }
+
     /// The day's lessons. Only new content words that have a line in one of your videos, ranked by how many lines they
     /// are in. Unused lessons do not carry over: the list is worked out afresh each day from what is left of the allowance.
     public func dailyLessons(
