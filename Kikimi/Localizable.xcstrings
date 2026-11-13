@@ -192,41 +192,6 @@
         }
       }
     },
-    "%@ known · %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ bekannt · %@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ known · %2$@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ conocido · %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ connu · %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 既知 · %@"
-          }
-        }
-      }
-    },
     "%@ of words known · %@" : {
       "localizations" : {
         "en" : {
@@ -620,35 +585,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$lld of ^[%2$lld word](inflect: true) right"
-          }
-        }
-      }
-    },
-    "%lld words" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld Wörter"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld palabras"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld mots"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld 語"
           }
         }
       }
@@ -2257,35 +2193,6 @@
         }
       }
     },
-    "Added ^[%lld word](inflect: true) to your reviews." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu deinen Wiederholungen hinzugefügte Wörter: %lld."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Palabras añadidas a tus repasos: %lld."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mots ajoutés à vos révisions : %lld."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "復習に %lld 語を追加しました。"
-          }
-        }
-      }
-    },
     "Adjective" : {
       "localizations" : {
         "de" : {
@@ -2807,35 +2714,6 @@
     },
     "Back to the overview (Esc twice). Your answers so far are kept." : {
 
-    },
-    "Back to the overview (Esc). Your answers so far are kept." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zurück zur Übersicht (Esc). Deine bisherigen Antworten bleiben erhalten."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Volver al resumen (Esc). Tus respuestas hasta ahora se conservan."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retour à l’aperçu (Échap). Vos réponses jusqu’ici sont conservées."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "概要に戻ります（Esc）。ここまでの回答は保存されます。"
-          }
-        }
-      }
     },
     "Back up your progress" : {
       "localizations" : {
@@ -4272,35 +4150,6 @@
     "Each video shows how many of its words you already know. Around 90% is comfortable to follow." : {
 
     },
-    "Each video shows how much of it you know, such as 91% known · Comfortable. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jedes Video zeigt, wie viel davon du kennst, etwa 91 % bekannt · Angenehm. Gezählt werden nur Nomen, Verben, Adjektive und Adverbien. Kleine Wörter sind fast immer bekannt, du verstehst also mehr, als die Zahl sagt."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cada vídeo muestra cuánto de él conoces, por ejemplo 91 % conocido · Cómodo. Solo se cuentan sustantivos, verbos, adjetivos y adverbios. Las palabras pequeñas casi siempre se conocen, así que entiendes más de lo que dice la cifra."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chaque vidéo indique la part que vous en connaissez, par exemple 91 % connu · Confortable. Seuls les noms, verbes, adjectifs et adverbes sont comptés. Les petits mots sont presque toujours connus : vous comprenez donc plus que le chiffre ne l’indique."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "各動画には、どれだけ知っているかが「91% 既知 · 快適」のように表示されます。数えるのは名詞・動詞・形容詞・副詞だけです。小さな語はほとんど既知なので、実際には数字より多く理解できています。"
-          }
-        }
-      }
-    },
     "Each video shows how much of it you know, such as 91% known · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
 
     },
@@ -5446,35 +5295,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "文法: %@、%@。Webページを開きます。"
-          }
-        }
-      }
-    },
-    "Hard is under 80%, A stretch is 80 to 88%, Comfortable is 88 to 98%, and Easy is 98% or more." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schwer ist unter 80 %, Fordernd ist 80 bis 88 %, Angenehm ist 88 bis 98 % und Leicht ist 98 % oder mehr."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Difícil es menos del 80 %, Un reto es del 80 al 88 %, Cómodo es del 88 al 98 % y Fácil es el 98 % o más."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Difficile : moins de 80 %. Un défi : de 80 à 88 %. Confortable : de 88 à 98 %. Facile : 98 % ou plus."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "「難しい」は80%未満、「少し難しい」は80〜88%、「快適」は88〜98%、「易しい」は98%以上です。"
           }
         }
       }
@@ -7871,35 +7691,6 @@
         }
       }
     },
-    "Next review %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nächste Wiederholung %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Próximo repaso %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prochaine révision %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "次の復習 %@"
-          }
-        }
-      }
-    },
     "Next review comes after" : {
       "localizations" : {
         "de" : {
@@ -8464,35 +8255,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "音読み: %@"
-          }
-        }
-      }
-    },
-    "On Words, the words from your videos are listed by how often they appear. Press Learn on the ones you want, or Known on the ones you already know." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unter „Wörter“ sind die Wörter aus deinen Videos danach sortiert, wie oft sie vorkommen. Drücke „Lernen“ bei denen, die du willst, oder „Bekannt“ bei denen, die du schon kennst."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En Palabras, las palabras de tus vídeos aparecen ordenadas por la frecuencia con que salen. Pulsa «Aprender» en las que quieras, o «Conocida» en las que ya conoces."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dans Mots, les mots de vos vidéos sont classés selon leur fréquence. Appuyez sur « Apprendre » pour ceux que vous voulez, ou sur « Connu » pour ceux que vous connaissez déjà."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "「単語」には、動画の単語が登場回数の順に並びます。学びたい単語は「学習する」、すでに知っている単語は「既知」を押します。"
           }
         }
       }
@@ -9974,35 +9736,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "既知を復習"
-          }
-        }
-      }
-    },
-    "Review, %lld due" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wiederholung, %lld fällig"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Repaso, %lld pendientes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Révision, %lld à faire"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "復習、%lld 件が期限"
           }
         }
       }
@@ -11550,35 +11283,6 @@
     "Start import" : {
 
     },
-    "Start learning ^[%lld word](inflect: true)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "^[%lld Wort](inflect: true) lernen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empezar a aprender ^[%lld palabra](inflect: true)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Commencer à apprendre ^[%lld mot](inflect: true)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld 語の学習を始める"
-          }
-        }
-      }
-    },
     "Start learning this word" : {
       "localizations" : {
         "de" : {
@@ -11669,35 +11373,6 @@
     "Start over…" : {
 
     },
-    "Started learning ^[%lld word](inflect: true)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gestartete Wörter: %lld"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Palabras que empiezas a aprender: %lld"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mots dont l’apprentissage commence : %lld"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld 語の学習を始めました"
-          }
-        }
-      }
-    },
     "Started learning ^[%lld word](inflect: true). They are ready on the Learn page." : {
 
     },
@@ -11725,35 +11400,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始: %@"
-          }
-        }
-      }
-    },
-    "Starts learning the 25 new words that come up most often in your videos" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beginnt das Lernen der 25 neuen Wörter, die in deinen Videos am häufigsten vorkommen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empieza a aprender las 25 palabras nuevas que más aparecen en tus vídeos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Commence l’apprentissage des 25 mots nouveaux les plus fréquents dans vos vidéos"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "動画で最もよく出る新しい単語25語の学習を始めます"
           }
         }
       }
@@ -11792,41 +11438,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Step %1$lld: %2$@"
-          }
-        }
-      }
-    },
-    "Step %lld: %@. %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schritt %lld: %@. %@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Step %1$lld: %2$@. %3$@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paso %lld: %@. %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Étape %lld : %@. %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ステップ%lld: %@。%@"
           }
         }
       }
@@ -12460,35 +12071,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "文字起こし中"
-          }
-        }
-      }
-    },
-    "Transcript" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transkript"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transcripción"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transcription"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "文字起こし"
           }
         }
       }
