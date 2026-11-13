@@ -104,4 +104,45 @@ final class SpanishTokenizerTests: XCTestCase {
         XCTAssertFalse(content(text).contains { $0.surface == "Madrid" || $0.surface == "María" })
         XCTAssertTrue(content(text).contains { $0.lemma == "hermana" })
     }
+
+    func testEachChosenConjunctionIsOneInARealSentence() throws {
+        let lines: [(String, String)] = [
+            ("porque", "No voy porque estoy cansado."), ("Pero", "Pero no puedo ir."), ("aunque", "Voy aunque llueva."),
+            ("mientras", "Canto mientras cocino."), ("sino", "No es rojo sino azul."), ("Pues", "Pues, vamos."),
+            ("Cuando", "Cuando llegues, llámame."),
+        ]
+        for (surface, text) in lines {
+            let word = try token(surface, in: text)
+            XCTAssertEqual(word.pos, .conjunction, text)
+            XCTAssertEqual(word.lemma, surface.lowercased(), text)
+            XCTAssertTrue(content(text).contains { $0.surface == surface }, "it is a content word of Spanish: \(text)")
+        }
+    }
+
+    func testTheTaggerCallingAChosenConjunctionANounDoesNotChangeIt() throws {
+        // The tagger reads "Pues." and "Sino" on their own as nouns.
+        XCTAssertEqual(try token("Pues", in: "Pues.").pos, .conjunction)
+        XCTAssertEqual(try token("Sino", in: "Sino").pos, .conjunction)
+    }
+
+    func testComoStaysTheVerbAndOtherConjunctionsStayOther() throws {
+        XCTAssertEqual(try token("Como", in: "Como pan.").pos, .adverb, "the tagger's own answer, not a conjunction")
+        XCTAssertEqual(try token("pan", in: "Como pan.").pos, .verb)
+        let text = "Dime que y yo vamos, y si quieres, o no."
+        for surface in ["que", "y", "si", "o"] { XCTAssertNotEqual(try token(surface, in: text).pos, .conjunction, surface) }
+        XCTAssertEqual(try token("que", in: text).pos, .other)
+        XCTAssertEqual(try token("y", in: text).pos, .other)
+        XCTAssertFalse(content(text).contains { $0.surface == "que" || $0.surface == "y" })
+    }
+
+    func testTheQuestionsAreNotConjunctions() throws {
+        XCTAssertNotEqual(try token("cuándo", in: "No sé cuándo llegó.").pos, .conjunction)
+        XCTAssertNotEqual(try token("qué", in: "Dime por qué.").pos, .conjunction)
+        XCTAssertNotEqual(try token("porqué", in: "El porqué de todo.").pos, .conjunction)
+    }
+
+    func testOtherLanguagesLeaveConjunctionsOut() {
+        for profile in LanguageProfiles.all where profile.code != "es" { XCTAssertFalse(profile.contentPOS.contains(.conjunction), profile.code) }
+        XCTAssertTrue(profile.contentPOS.contains(.conjunction))
+    }
 }

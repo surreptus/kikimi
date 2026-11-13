@@ -2,7 +2,8 @@ import Foundation
 import NaturalLanguage
 
 public enum PartOfSpeech: String, Codable, Sendable {
-    case noun, verb, adjective, adverb, other
+    /// `conjunction` is a small set of chosen words (`TokenRules.learnableConjunctions`). All other function words are `other`.
+    case noun, verb, adjective, adverb, conjunction, other
 }
 
 public struct Token: Equatable, Sendable {
@@ -78,7 +79,10 @@ public struct NLTaggerTokenizer: WordTokenizer {
             let spelling = surface.lowercased().precomposedStringWithCanonicalMapping
             var pos = Self.map(tag)
             var chosen = spellingFixes[spelling] ?? lemmaFixes[lemma] ?? lemma
-            if let word = rules.functionWords[spelling] {
+            if pos != .verb, rules.learnableConjunctions.contains(spelling) {
+                pos = .conjunction
+                chosen = spelling
+            } else if let word = rules.functionWords[spelling] {
                 pos = .other
                 chosen = word
             } else if rules.interjections.contains(spelling)

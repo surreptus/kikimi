@@ -169,4 +169,22 @@ final class CoverageTests: XCTestCase {
         _ = try await db.wordsToReach(target: 0.9, inVideo: video)
         XCTAssertLessThan(Date().timeIntervalSince(started), 2.0, "an hour of video: coverage and the word list")
     }
+
+    func testAConjunctionTakenFromALineCountsInCoverageLikeAnyWord() async throws {
+        let db = try LangDatabase()
+        let profile = SpanishProfile()
+        let text = "Voy porque quiero."
+        let tokens = profile.contentWords(in: text)
+        XCTAssertTrue(tokens.contains { $0.pos == .conjunction && $0.lemma == "porque" })
+        let video = try await db.saveImport(
+            video: Video(language: "es", title: "v", contentHash: "h", videoPath: "v", duration: 5),
+            subtitles: [(TranscriptSegment(start: 0, end: 1, text: text), tokens)])
+        let before = try await db.coverage(forVideo: video.id!)
+        XCTAssertEqual(before?.totalWords, tokens.count)
+        XCTAssertEqual(before?.knownWords, 0)
+        let porque = try await db.writer.read { try Word.filter(Column("lemma") == "porque").fetchOne($0) }
+        try await db.markKnown(wordID: porque!.id!)
+        let after = try await db.coverage(forVideo: video.id!)
+        XCTAssertEqual(after?.knownWords, 1)
+    }
 }

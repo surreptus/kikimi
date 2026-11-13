@@ -18,6 +18,7 @@ public struct SpanishProfile: LanguageProfile {
         if gender == "f", folded.hasPrefix("a") || folded.hasPrefix("ha") { return "\(headword) (f)" }
         return "\(article) \(headword)"
     }
+    public var contentPOS: Set<PartOfSpeech> { [.noun, .verb, .adjective, .adverb, .conjunction] }
     public let defaultModel = "openai_whisper-medium"
     public let tokenizer: any WordTokenizer = NLTaggerTokenizer(
         language: .spanish, spellingFixes: SpanishProfile.spellingFixes, verbForms: VerbForms(resource: "dictionary-es"),
@@ -35,6 +36,9 @@ public struct SpanishProfile: LanguageProfile {
         participleEndings: ["ado", "ido", "to", "cho"],
         verbMarkers: ["yo", "me", "te", "se", "nos"],
         conjunctions: ["y", "e", "o", "pero"],
+        // Left out: "como" (also comer), "si" and "que" (too frequent to teach), "y" and "o" (a child knows them), and the
+        // questions "cuándo" and "porqué", which are other words.
+        learnableConjunctions: ["porque", "pero", "aunque", "mientras", "sino", "pues", "cuando"],
         // "para" is the verb parar only after a subject or "se" ("el coche se para"); a noun or "el tren" before it is
         // ambiguous, and the tagger decides there. Cut off ("pues para-"), the tagger reads it as a number named parar.
         prepositionsSpelledAsVerbs: ["para"],

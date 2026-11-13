@@ -40,6 +40,20 @@ final class DailyLessonsTests: XCTestCase {
         XCTAssertEqual(all.wordIDs, [ids["casa"]!, ids["perro"]!, ids["gato"]!])
     }
 
+    func testAConjunctionIsALessonOnlyWhenTheProfileCountsIt() async throws {
+        let (db, ids) = try await library()
+        try await db.writer.write { d in
+            var w = Word(language: "es", lemma: "porque", pos: .conjunction); try w.insert(d)
+            var line = Subtitle(videoId: 1, idx: 9, startTime: 9, endTime: 10, text: "t"); try line.insert(d)
+            var o = Occurrence(wordId: w.id!, subtitleId: line.id!, surface: "porque"); try o.insert(d)
+        }
+        let without = try await db.dailyLessons(language: "es", contentPOS: content, perDay: 15)
+        XCTAssertEqual(without.wordIDs.count, 3)
+        let with = try await db.dailyLessons(language: "es", contentPOS: SpanishProfile().contentPOS, perDay: 15)
+        XCTAssertEqual(with.wordIDs.count, 4)
+        XCTAssertFalse(with.wordIDs.contains(ids["y"]!), "a word left as other is still not one")
+    }
+
     func testAnyWordStartedTodayUsesUpTheAllowance() async throws {
         let (db, ids) = try await library()
         try await db.startLearning(wordIDs: [ids["casa"]!])
