@@ -142,6 +142,21 @@ final class AppSupportTests: XCTestCase {
         XCTAssertEqual(after.count, all.count - 2)
     }
 
+    func testANewVideoIsUnwatchedUntilItIsPlayedOrTheWindowPasses() async throws {
+        let (db, video) = try await seededDatabase()
+        let id = try XCTUnwrap(video.id)
+        let waiting = try await db.unwatchedVideoIDs(language: "es")
+        XCTAssertEqual(waiting, [id])
+        let other = try await db.unwatchedVideoIDs(language: "ja")
+        XCTAssertTrue(other.isEmpty, "only this language's videos")
+        let later = Date().addingTimeInterval(LangDatabase.unwatchedWindow + 3600)
+        let old = try await db.unwatchedVideoIDs(language: "es", now: later)
+        XCTAssertTrue(old.isEmpty, "an old video is not pushed")
+        try await db.record(.listen, subject: id, amount: 3)
+        let played = try await db.unwatchedVideoIDs(language: "es")
+        XCTAssertTrue(played.isEmpty, "playing it ends the offer")
+    }
+
     func testExamplesComeFromYourVideos() async throws {
         let (db, _) = try await seededDatabase()
         let id = try await wordID(db, "casa")
@@ -660,19 +675,21 @@ final class CalibrationTests: XCTestCase {
         XCTAssertTrue(Calibration.batches(of: []).isEmpty)
     }
 
-    func testThePassEndsWhenHalfOfABatchIsUnknown() {
+    func testThePassEndsWhenFewerThanHalfOfABatchIsKnown() {
         let batch = (1...20).map { word(Int64($0)) }
-        XCTAssertFalse(Calibration.endsAfter(batch, unknown: Set(1...9)), "9 of 20 is less than half")
-        XCTAssertTrue(Calibration.endsAfter(batch, unknown: Set(1...10)), "10 of 20 is half")
-        XCTAssertFalse(Calibration.endsAfter(batch, unknown: []), "all known: go on")
-        XCTAssertTrue(Calibration.endsAfter([], unknown: []), "nothing left to ask")
+        XCTAssertTrue(Calibration.endsAfter(batch, known: Set(1...9)), "9 of 20 is less than half")
+        XCTAssertFalse(Calibration.endsAfter(batch, known: Set(1...10)), "10 of 20 is half: go on")
+        XCTAssertFalse(Calibration.endsAfter(batch, known: Set(1...20)), "all known: go on")
+        XCTAssertTrue(Calibration.endsAfter(batch, known: []), "none known: that is enough")
+        XCTAssertTrue(Calibration.endsAfter([], known: []), "nothing left to ask")
     }
 
-    func testEverythingShownAndNotPointedAtIsKnown() {
+    func testOnlyTheWordsYouTickedAreKnown() {
         let first = (1...3).map { word(Int64($0)) }, second = (4...6).map { word(Int64($0)) }
-        XCTAssertEqual(Calibration.known(shown: [first, second], unknown: [2, 5]), [1, 3, 4, 6])
-        XCTAssertEqual(Calibration.known(shown: [first], unknown: [1, 2, 3]), [])
-        XCTAssertEqual(Calibration.known(shown: [], unknown: [1]), [])
+        XCTAssertEqual(Calibration.known(shown: [first, second], ticked: [2, 5]), [2, 5])
+        XCTAssertEqual(Calibration.known(shown: [first], ticked: []), [])
+        XCTAssertEqual(Calibration.known(shown: [first], ticked: [4]), [], "a word not shown is never marked")
+        XCTAssertEqual(Calibration.known(shown: [], ticked: [1]), [])
     }
 }
 

@@ -30,6 +30,8 @@ struct ReviewView: View {
     @State private var showsWord = false
     /// Furigana kept on over the sentence (the F key), for a card whose reading you want to read slowly.
     @State private var furiganaPinned = false
+    /// Ending a session asks first, since a lesson's remaining words are dropped and it is easy to press Esc by mistake.
+    @State private var confirmingEnd = false
     /// Whether a voice is installed for the language, looked up once per language (it lists every installed voice).
     @State private var voiceAvailable = true
     @State private var wordNow: Word?
@@ -177,12 +179,29 @@ struct ReviewView: View {
     }
 
     private func cardView(_ card: ReviewCard) -> some View {
+        cardBody(card)
+            .alert("End this session?", isPresented: $confirmingEnd) {
+                Button("Keep Going", role: .cancel) {}.keyboardShortcut(.defaultAction)
+                Button("End Session", role: .destructive) { endSession() }
+            } message: {
+                Text(lessonQueue.isEmpty
+                     ? "Your answers so far are kept."
+                     : "Your answers so far are kept. The words you have not been taught yet stay waiting in your lessons.")
+            }
+    }
+
+    private func cardBody(_ card: ReviewCard) -> some View {
         VStack(spacing: 20) {
             HStack(spacing: 14) {
-                Button("End session", systemImage: "xmark") { endSession() }
+                Button("End session", systemImage: "xmark") { confirmingEnd = true }
                     .labelStyle(.pillIcon).buttonStyle(.pill(.secondary, compact: true))
-                    .keyboardShortcut(.escape, modifiers: [])
-                    .help("Back to the overview (Esc). Your answers so far are kept.")
+                    .help("Back to the overview (Esc twice). Your answers so far are kept.")
+                    .background {
+                        // Esc steps out one layer at a time: the word's page first, then the session, after asking.
+                        Button("") { if showsWord { showsWord = false } else { confirmingEnd = true } }
+                            .keyboardShortcut(.escape, modifiers: [])
+                            .frame(width: 0, height: 0).opacity(0).accessibilityHidden(true)
+                    }
                 ProgressView(value: Double(max(0, total - remaining)), total: Double(max(1, total)))
                     .progressViewStyle(.thin)
                 Text("\(remaining) left").font(Theme.sized(size: 12, weight: .medium, design: .rounded)).foregroundStyle(Theme.muted)
