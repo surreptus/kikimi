@@ -2,8 +2,8 @@ import XCTest
 @testable import LangCore
 
 final class ReviewShortcutTests: XCTestCase {
-    private func keys(revealed: Bool = true, typing: Bool = false, sentence: Bool = true, translate: Bool = true, voice: Bool = true) -> [String] {
-        ReviewShortcut.available(revealed: revealed, typing: typing, hasSentence: sentence, canTranslate: translate, voiceAvailable: voice).map(\.key)
+    private func keys(revealed: Bool = true, typing: Bool = false, sentence: Bool = true, translate: Bool = true, voice: Bool = true, furigana: Bool = false) -> [String] {
+        ReviewShortcut.available(revealed: revealed, typing: typing, hasSentence: sentence, canTranslate: translate, voiceAvailable: voice, hasFurigana: furigana).map(\.key)
     }
 
     func testNothingIsOfferedBeforeTheAnswerExceptOnATypedCard() {
@@ -15,6 +15,11 @@ final class ReviewShortcutTests: XCTestCase {
         XCTAssertEqual(keys(), ["W", "I", "E", "T"])
     }
 
+    func testFuriganaIsOfferedOnlyForAJapaneseCardWithASentence() {
+        XCTAssertEqual(keys(furigana: true), ["W", "I", "F", "E", "T"])
+        XCTAssertEqual(keys(sentence: false, furigana: true), ["W", "I"])
+    }
+
     func testEachKeyIsLeftOutWhenItCannotWork() {
         XCTAssertEqual(keys(voice: false), ["I", "E", "T"], "no installed voice, no Say word")
         XCTAssertEqual(keys(translate: false), ["W", "I", "E"], "a Mac that cannot translate offers no T")
@@ -22,7 +27,7 @@ final class ReviewShortcutTests: XCTestCase {
     }
 
     func testOnlyTheKeysWithNoButtonOfTheirOwnAreBoundAsBareLetters() {
-        XCTAssertEqual(ReviewShortcut.allCases.compactMap(\.letter), ["w", "i", "e", "t"])
+        XCTAssertEqual(ReviewShortcut.allCases.compactMap(\.letter), ["w", "i", "f", "e", "t"])
         XCTAssertNil(ReviewShortcut.check.letter)
         XCTAssertNil(ReviewShortcut.playAgain.letter)
     }
