@@ -235,10 +235,17 @@ extension LangDatabase {
         return restored
     }
 
-    /// Whether two copies of a word (or two absences) have the same status, stage and next review.
+    /// Whether two copies of a word (or two absences) have the same status, stage and next review. The database keeps dates to
+    /// the millisecond, so a copy from memory (with a varied interval) and one read back differ by less than that.
     static func sameProgress(_ a: Word?, _ b: Word?) -> Bool {
         guard let a, let b else { return a == nil && b == nil }
-        return a.status == b.status && a.stage == b.stage && a.nextReview == b.nextReview
+        let sameReview: Bool
+        switch (a.nextReview, b.nextReview) {
+        case (nil, nil): sameReview = true
+        case let (x?, y?): sameReview = abs(x.timeIntervalSince(y)) < 0.01
+        default: sameReview = false
+        }
+        return a.status == b.status && a.stage == b.stage && sameReview
     }
 
     /// Marks words as known and takes them out of the review queue.

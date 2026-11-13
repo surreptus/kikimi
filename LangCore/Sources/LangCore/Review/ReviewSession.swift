@@ -35,6 +35,10 @@ public enum ExamplePicker {
 /// One sitting of reviews. A word's SRS stage changes once per session, on its first answer;
 /// a missed word comes back later in the session but does not change stage again.
 public actor ReviewSession {
+    /// Most due cards one session asks. The rest stay due, so a big pile is cleared over several sittings and review time
+    /// does not take over from watching.
+    public static let sizeLimit = 50
+
     private let database: LangDatabase
     private let language: String
     private var queue: [Int64] = []
@@ -71,7 +75,8 @@ public actor ReviewSession {
     private var latest: Undoable?
     public var canUndo: Bool { latest != nil }
 
-    public init(database: LangDatabase, language: String, preferring: (@Sendable (ExampleLine) -> Bool)? = nil, now: Date = Date()) async throws {
+    public init(database: LangDatabase, language: String, preferring: (@Sendable (ExampleLine) -> Bool)? = nil,
+                now: Date = Date(), limit: Int = ReviewSession.sizeLimit) async throws {
         self.database = database
         self.language = language
         self.preferring = preferring
@@ -79,7 +84,7 @@ public actor ReviewSession {
         isPractice = false
         repeatsMisses = false
         startsOnCompletion = []
-        queue = try await database.dueWords(language: language, now: now).compactMap(\.id)
+        queue = try await database.dueWords(language: language, now: now, limit: limit).compactMap(\.id)
     }
 
     /// A quick check of a few words you marked known. A missed word goes back to being learned (so a video's coverage

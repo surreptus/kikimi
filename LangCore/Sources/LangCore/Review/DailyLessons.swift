@@ -59,6 +59,30 @@ extension LangDatabase {
         }
     }
 
+    /// Most lines first, then alphabetical: the order the day's lessons teach in. Needs `occurrences` joined to `words`.
+    private static let mostSeenOrder = "COUNT(DISTINCT occurrences.subtitle_id) DESC, words.lemma"
+
+    /// The first `count` of `ids` by that order. A word with no line comes last. Learn on the Words page uses it when
+    /// the day's room is smaller than the selection.
+    public func mostSeen(_ ids: [Int64], count: Int) async throws -> [Int64] {
+        guard count > 0, !ids.isEmpty else { return [] }
+        let marks = ids.map { _ in "?" }.joined(separator: ",")
+        return try await writer.read { db in
+            try Int64.fetchAll(db, sql: """
+                SELECT words.id FROM words LEFT JOIN occurrences ON occurrences.word_id = words.id
+                WHERE words.id IN (\(marks))
+                GROUP BY words.id ORDER BY \(Self.mostSeenOrder) LIMIT ?
+                """, arguments: StatementArguments(ids) + [count])
+        }
+    }
+
+    /// How many more new words today's allowance has room for, or nil when there is no limit (`perDay` is 0, lessons off).
+    /// Learn on the Words page uses it, so one click cannot start more words than the day's lessons would.
+    public func newWordRoom(language: String, perDay: Int, now: Date = Date(), calendar: Calendar = .current) async throws -> Int? {
+        guard perDay > 0 else { return nil }
+        return max(0, perDay - (try await startedToday(language: language, now: now, calendar: calendar)))
+    }
+
     /// The day's lessons. Only new content words that have a line in one of your videos, ranked by how many lines they
     /// are in. Unused lessons do not carry over: the list is worked out afresh each day from what is left of the allowance.
     public func dailyLessons(
@@ -79,7 +103,7 @@ extension LangDatabase {
             try Int64.fetchAll(db, sql: """
                 SELECT words.id FROM words JOIN occurrences ON occurrences.word_id = words.id
                 WHERE words.language = ? AND words.status = 'new' AND words.pos IN (\(marks))
-                GROUP BY words.id ORDER BY COUNT(DISTINCT occurrences.subtitle_id) DESC, words.lemma LIMIT ?
+                GROUP BY words.id ORDER BY \(Self.mostSeenOrder) LIMIT ?
                 """, arguments: StatementArguments([language] + parts) + [room])
         }
         return lessons

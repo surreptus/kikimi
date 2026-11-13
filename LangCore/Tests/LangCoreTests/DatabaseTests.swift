@@ -78,7 +78,7 @@ final class DatabaseTests: XCTestCase {
         var due = try await db.dueWords(language: "es", now: now)
         XCTAssertEqual(due.map(\.id), [id])
 
-        let w = try await db.recordReview(wordID: id, correct: true, now: now)
+        let w = try await db.recordReview(wordID: id, correct: true, now: now, jitter: 0)
         XCTAssertEqual(w.stage, .stage2)
         XCTAssertEqual(w.nextReview, now.addingTimeInterval(8 * 3600))
         due = try await db.dueWords(language: "es", now: now)
@@ -94,7 +94,7 @@ final class DatabaseTests: XCTestCase {
             var w = Word(language: "es", lemma: "casa", pos: .noun); try w.insert(d); return w.id!
         }
         try await db.startLearning(wordID: id, now: now)
-        let advanced = try await db.recordReview(wordID: id, correct: true, now: now)
+        let advanced = try await db.recordReview(wordID: id, correct: true, now: now, jitter: 0)
         XCTAssertEqual(advanced.stage, .stage2)
 
         try await db.startLearning(wordID: id, now: now.addingTimeInterval(60))
