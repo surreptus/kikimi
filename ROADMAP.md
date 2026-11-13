@@ -19,14 +19,6 @@ sessions), release work (signing, notarization) and a legal review. New features
       because a lawyer did not write them and what they can limit depends on where users live.
 - [x] **Contact line** (4 Nov 2026). The privacy policy and the terms point to the GitHub issues page and say that issues there
       are public. We publish no email address.
-- [x] **Name: keep Kikimi, with the trademark risk known** (decision of 30 Oct 2026). KIKIMI is a live US registered mark (reg.
-      7139558, 15 Aug 2023, owner KKLT Enterprises, LLC, which has a law firm). Its goods are downloadable software to share photos,
-      exchange information securely, store data and reach social networks. The goods differ from a language app, but an identical
-      mark in the same class can draw a demand letter. The worst case is a forced rename after we have users. The app is free, so
-      the risk is a request to stop, not damages. To keep the risk small: present the app as education, stay out of the App Store
-      for now, and register no mark of our own. **Fallback:** the earlier alternative name was checked fully. Commit `71c93ff` is the
-      whole rename. Reverting the revert applies it again.
-- [ ] Ask the lawyer for a view on the KIKIMI registration, before any wider release.
 - [x] **Licences confirmed** (25 Oct and 12 Nov 2026, against the upstream licence texts; details in the
       [release checklist](Release/CHECKLIST.md)). One gap found and closed: the EDRDG licence requires regular updates of the
       JMdict and KANJIDIC2 data. Each release now refreshes it, and `check_release_sync.py` fails if the data is more than 31 days
