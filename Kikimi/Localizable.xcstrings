@@ -88,6 +88,24 @@
         }
       }
     },
+    "Brought “%@” back" : {
+
+    },
+    "Couldn't undo: the word has changed since." : {
+
+    },
+    "Marked “%@” as known" : {
+
+    },
+    "Marked “%@” as known and took it out of your reviews" : {
+
+    },
+    "Set “%@” aside" : {
+
+    },
+    "Started learning “%@”" : {
+
+    },
     "“%@” is no longer in that sentence, so this card was skipped." : {
 
     },
@@ -621,6 +639,12 @@
 
     },
     "%lld×" : {
+
+    },
+    "“%@”: got it" : {
+
+    },
+    "“%@”: missed it" : {
 
     },
     "•" : {
