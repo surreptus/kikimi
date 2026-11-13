@@ -91,8 +91,9 @@ Engineering:
 - [ ] `VideosView.reload` measures the library folder and calls `wordsToReach` for each video. Check the cost with a large library.
 
 Security and privacy (no high-severity finding):
-- [ ] **Speech model download (confirmed):** no fixed revision and no checksum. The app checks only that four files exist. Fix the
-      revision, check SHA-256 values, and name the host in the privacy policy.
+- [x] **Speech model download** (13 Nov 2026): the app downloads one fixed commit of `argmaxinc/whisperkit-coreml`. It checks the
+      size and SHA-256 value of every LFS file against `ModelManifest.json` before it records the model. The privacy policy names
+      Hugging Face. Not done on purpose: files that are not in LFS have no SHA-256 value, and earlier installs are not checked.
 - [ ] **Shadow recording (confirmed):** the policy says the recording is deleted on quit, and the code has no quit step. Add the
       step, or change the sentence.
 - [ ] Restore: refuse a symbolic link in a backup folder (suspected, not confirmed).
