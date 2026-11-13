@@ -384,7 +384,8 @@ private struct VideoInfoSheet: View {
         } message: {
             Text("""
                 Removes the app's copy (\(formatBytes(details?.totalBytes ?? 0))) and its ^[\(details?.subtitleCount ?? 0) subtitle line](inflect: true). \
-                Words you've started learning or marked known are kept; untouched words found only in this video are removed. \
+                Words you've started learning or marked known are kept, but their example lines from this video go until you import it again; \
+                untouched words found only in this video are removed. \
                 Your original file isn't affected. This can't be undone, but you can import the file again.
                 """)
         }

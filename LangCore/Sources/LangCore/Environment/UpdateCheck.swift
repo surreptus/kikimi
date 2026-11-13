@@ -37,13 +37,23 @@ public enum UpdateCheck {
 
     private struct Latest: Decodable { let version: String; let url: URL }
 
-    /// Only a page on GitHub is offered, so a damaged or tampered file can't send anyone elsewhere.
-    private static let trustedHosts: Set<String> = ["github.com", "surreptus.github.io"]
+    /// Only a page of this project is offered, so a damaged or tampered file can't send anyone elsewhere: this repository on
+    /// GitHub, or this project's website.
+    static func isTrusted(_ url: URL) -> Bool {
+        guard url.scheme == "https", let host = url.host else { return false }
+        let path = url.path.lowercased()
+        func within(_ root: String) -> Bool { path == root || path.hasPrefix(root + "/") }
+        switch host {
+        case "github.com": return within("/surreptus/kikimi")
+        case "surreptus.github.io": return within("/kikimi")
+        default: return false
+        }
+    }
 
     public static func outcome(current: String, latest data: Data) -> Outcome {
         guard let latest = try? JSONDecoder().decode(Latest.self, from: data),
               let newest = AppVersion(latest.version), let now = AppVersion(current),
-              latest.url.scheme == "https", let host = latest.url.host, trustedHosts.contains(host) else { return .failed }
+              isTrusted(latest.url) else { return .failed }
         return newest > now ? .available(version: latest.version, page: latest.url) : .upToDate
     }
 }

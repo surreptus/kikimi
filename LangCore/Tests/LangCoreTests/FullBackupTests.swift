@@ -118,6 +118,28 @@ final class FullBackupTests: XCTestCase {
         XCTAssertEqual(count, 0)
     }
 
+    func testAVideoFolderWithASymbolicLinkIsLeftOut() async throws {
+        let dir = scratch()
+        let a = try await source(in: dir)
+        let out = dir.appending(path: "out", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
+        let backup = try await a.writeFullBackup(in: out, name: "Backup").folder
+        let hash = try await a.database.video(id: 1)!.contentHash
+        // A link to a file elsewhere on the Mac, beside the real files.
+        let outside = dir.appending(path: "secret.txt")
+        try "private".write(to: outside, atomically: true, encoding: .utf8)
+        try FileManager.default.createSymbolicLink(
+            at: backup.appending(path: "Library/\(hash)/extra.txt"), withDestinationURL: outside)
+
+        let b = try env(in: dir, name: "b")
+        let preview = try await b.previewFullBackup(at: backup)
+        XCTAssertEqual(preview.videosToAdd, 0)
+        let result = try await b.restoreFullBackup(from: backup, includingSettings: false)
+        XCTAssertEqual(result.videosAdded, 0)
+        let count = try await b.database.writer.read { try Video.fetchCount($0) }
+        XCTAssertEqual(count, 0)
+    }
+
     func testAProgressOnlyFolderStillRestoresProgress() async throws {
         let dir = scratch()
         let a = try await source(in: dir)

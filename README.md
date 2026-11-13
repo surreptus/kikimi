@@ -37,7 +37,7 @@ spaced repetition, using real sentences from your own videos. Spanish, French, G
 - **Words.** A searchable table with dictionary entries and example lines. Mark words known, learn, ignore or reset them, with
   undo. Japanese shows every reading and each kanji's readings, JLPT level and school year. Spanish, French and German
   nouns show their article. File > Export Words to Anki… makes a file Anki can import.
-- **Learn.** Daily lessons, nine-stage spaced repetition and practice. Card types: meaning, fill in the word, listen, type what
+- **Learn.** Daily lessons, eight-stage spaced repetition and practice. Card types: meaning, fill in the word, listen, type what
   you hear, and Shadow (say the sentence aloud, then hear yourself beside the original).
 - **Your progress** saves to a `.kikimi` file. A restore never overwrites what you already have.
 

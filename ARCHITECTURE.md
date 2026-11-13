@@ -28,7 +28,7 @@ Paths are under `LangCore/Sources/LangCore/`.
 | `Database/` | GRDB records, migrations (`LangMigrations`) and queries. A schema change is always a new migration. |
 | `Import/` | The pipeline, queue, transcription and video compaction. `SubtitleParser` reads `.srt` and `.vtt`. `MediaCheck` refuses a file that macOS cannot open or that has no video. `SegmentSplitter` cuts a line longer than `maxSegmentSeconds` at its longest pause, using Whisper word times. |
 | `Models/` | Speech-model download, listing and removal (`ModelManager`, `ModelCatalog`). |
-| `SRS/`, `Review/` | The nine stages and their intervals. Review sessions. The cloze, typing and calibration logic. `ReviewShortcut` lists the keys a card offers. |
+| `SRS/`, `Review/` | The eight stages, Finished, and their intervals. Review sessions. The cloze, typing and calibration logic. `ReviewShortcut` lists the keys a card offers. |
 | `Playback/` | The player controller, subtitle timeline and word hints. |
 | `Export/` | Audio and video clips. `AnkiExport` writes the Anki import file. |
 | `Translation/` | On-device translation (macOS Translation framework, behind a protocol so tests use a stand-in). Results are in the `translations` table. |
