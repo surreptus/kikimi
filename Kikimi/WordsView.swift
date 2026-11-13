@@ -59,12 +59,6 @@ struct WordsView: View {
     private var selectionBinding: Binding<Set<Int64>> { Binding(get: { app.wordsSelection }, set: { app.wordsSelection = $0 }) }
 
     private var sortedRows: [WordRow] { rows.sorted(using: sort.comparators) }
-    /// Offered until you have started anything: the most frequent words are the ones that make the next video easier.
-    private var showsStartHere: Bool {
-        trimmedSearch.isEmpty && filter == nil && typeFilter == nil && selection.isEmpty
-            && rows.contains { $0.word.status == .new }
-            && !rows.contains { $0.word.status == .learning || $0.word.status == .finished }
-    }
     /// No words in this language at all (not just none that match a search or filter).
     private var noWordsYet: Bool { rows.isEmpty && trimmedSearch.isEmpty && filter == nil && typeFilter == nil }
     private var selectedRows: [WordRow] { rows.filter { selection.contains($0.id) } }
@@ -117,11 +111,6 @@ struct WordsView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
             ScreenTitle(text: "Words", subtitle: "Pick words to learn, or mark the ones you already know.")
-            if showsStartHere {
-                Button("Start with the 25 new words you hear most") { selectMostSeenNew(25); apply(.learn) }
-                    .buttonStyle(.pill(compact: true))
-                    .help("Starts learning the 25 new words that come up most often in your videos")
-            }
             HStack(spacing: 10) {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass").foregroundStyle(Theme.ink).font(Theme.sized(size: 14, weight: .bold))

@@ -53,7 +53,7 @@ struct RootView: View {
             set: { app.select($0, reduceMotion: reduceMotion) })
         return HStack(spacing: 0) {
             SideNav(
-                selection: selection, dueCount: app.dueCount,
+                selection: selection, dueCount: app.dueCount, lessonsWaiting: app.lessonsWaiting,
                 languages: app.learning.map { ($0.code, $0.displayName) },
                 language: $app.languageCode, showAbout: { app.showAbout = true },
                 showSettings: { app.openSettings(app.settingsTab) })

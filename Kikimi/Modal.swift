@@ -33,6 +33,7 @@ private struct ModalModifier<Panel: View>: ViewModifier {
                             .onTapGesture(perform: close)
                             .accessibilityHidden(true)
                         panel()
+                            .font(Theme.copy)   // paragraphs in a panel read at 16 pt unless they set their own size
                             .environment(\.dismissModal, close)
                             .background(Theme.card)
                             .clipShape(RoundedRectangle(cornerRadius: 24))

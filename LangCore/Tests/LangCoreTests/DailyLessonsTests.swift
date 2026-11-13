@@ -88,4 +88,11 @@ final class DailyLessonsTests: XCTestCase {
         preference.setPerDay(15, for: es)
         XCTAssertEqual(preference.perDay(for: es), 15)
     }
+
+    func testALessonIsWaitingOnlyWhenOnNotHeldBackAndNotEmpty() {
+        XCTAssertTrue(DailyLessons(wordIDs: [1], perDay: 15).isWaiting)
+        XCTAssertFalse(DailyLessons(wordIDs: [1], perDay: 0).isWaiting)
+        XCTAssertFalse(DailyLessons(wordIDs: [], perDay: 15).isWaiting)
+        XCTAssertFalse(DailyLessons(wordIDs: [], perDay: 15, heldBack: true).isWaiting)
+    }
 }

@@ -57,6 +57,8 @@ final class AppState {
     var pendingImports: [PendingImport] = []
     /// Words due for review in the selected language.
     private(set) var dueCount = 0
+    /// A lesson is waiting to be done, which the sidebar shows as a dot on Learn.
+    private(set) var lessonsWaiting = false
     /// Bumped when the database changes under the views (imports, status changes) so they reload.
     private(set) var dataVersion = 0
 
@@ -214,6 +216,14 @@ final class AppState {
     func refreshDue() async {
         guard case .ready(let env) = phase else { return }
         dueCount = (try? await env.database.dueCount(language: languageCode)) ?? 0
+        let perDay = env.dailyLessons.perDay(for: profile)
+        // Reviews over the limit, or lessons off, need no look at the words.
+        if perDay > 0, dueCount <= LangDatabase.lessonReviewLimit {
+            let lessons = try? await env.database.dailyLessons(language: languageCode, contentPOS: profile.contentPOS, perDay: perDay)
+            lessonsWaiting = lessons?.isWaiting ?? false
+        } else {
+            lessonsWaiting = false
+        }
     }
 
     /// Shows the Learn page and teaches these words there, five at a time, like the day's lessons: each can be ignored or

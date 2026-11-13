@@ -213,7 +213,7 @@ struct ReviewView: View {
 
                 // The word as it was said in your video: the context is part of the question, the translation is not.
                 if let example = card.example {
-                    Text(example.highlighted).font(Theme.styled(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                    Text(example.highlighted).font(Theme.sized(size: 20, design: .rounded)).foregroundStyle(Theme.muted)
                         .multilineTextAlignment(.center)
                         .padding(.top, 4)
                 }
