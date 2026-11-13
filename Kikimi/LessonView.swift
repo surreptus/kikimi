@@ -28,11 +28,13 @@ struct LessonView: View {
     @State private var known = 0
     @State private var audio: SentenceAudioPlayer?
     @State private var error: String?
+    /// Leaving asks first: Esc is easy to press by mistake, and the words taught so far are not started.
+    @State private var confirmingEnd = false
 
     var body: some View {
         VStack(spacing: 20) {
             HStack(spacing: 14) {
-                Button("End lesson", systemImage: "xmark") { Task { await end() } }
+                Button("End lesson", systemImage: "xmark") { confirmingEnd = true }
                     .labelStyle(.pillIcon).buttonStyle(.pill(.secondary, compact: true))
                     .keyboardShortcut(.escape, modifiers: [])
                     .help("Back to the Learn page (Esc). Words you were taught but not yet quizzed on are not started.")
@@ -56,6 +58,12 @@ struct LessonView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .task(id: index) { await load() }
         .onDisappear { audio?.stop() }
+        .alert("Leave this lesson?", isPresented: $confirmingEnd) {
+            Button("Keep Learning", role: .cancel) {}.keyboardShortcut(.defaultAction)
+            Button("Leave Lesson", role: .destructive) { Task { await end() } }
+        } message: {
+            Text("Words you were taught but not yet quizzed on are not started. Words you marked known stay known.")
+        }
     }
 
     private func face(_ card: ReviewCard) -> some View {
