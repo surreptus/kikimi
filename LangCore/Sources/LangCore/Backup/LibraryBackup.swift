@@ -137,7 +137,17 @@ extension LangEnvironment {
         guard LibraryBackup.isSafeHash(entry.contentHash), LibraryBackup.isSafe(entry.videoPath, hash: entry.contentHash),
               entry.audioPath.map({ LibraryBackup.isSafe($0, hash: entry.contentHash) }) ?? true,
               LanguageProfiles.profile(for: entry.language) != nil else { return false }
-        return FileManager.default.fileExists(atPath: folder.appending(path: "Library/\(entry.videoPath)").path)
+        let video = folder.appending(path: "Library/\(entry.videoPath)")
+        let dir = folder.appending(path: "Library/\(entry.contentHash)", directoryHint: .isDirectory)
+        return FileManager.default.fileExists(atPath: video.path) && !Self.containsSymbolicLink(dir)
+    }
+
+    /// A backup made by Kikimi has only plain files. A link in it could point at a file elsewhere on the Mac, which a restore
+    /// would then copy into the library as a link, so such a video is left out.
+    static func containsSymbolicLink(_ folder: URL) -> Bool {
+        let keys: [URLResourceKey] = [.isSymbolicLinkKey]
+        guard let items = FileManager.default.enumerator(at: folder, includingPropertiesForKeys: keys, options: []) else { return false }
+        return items.contains { ($0 as? URL).flatMap { try? $0.resourceValues(forKeys: Set(keys)).isSymbolicLink } == true }
     }
 
     public func previewFullBackup(at folder: URL, appSettingKeys: Set<String> = []) async throws -> FullBackupPreview {
