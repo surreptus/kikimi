@@ -4,6 +4,8 @@ import SwiftUI
 struct FlowLayout: Layout {
     var spacing: CGFloat = 0
     var lineSpacing: CGFloat = 2
+    /// Centres each line in the width, for a sentence set in the middle of a card.
+    var centered = false
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         arrange(width: proposal.width ?? .infinity, subviews: subviews).size
@@ -26,10 +28,18 @@ struct FlowLayout: Layout {
 
     private func arrange(width: CGFloat, subviews: Subviews) -> (size: CGSize, origins: [CGPoint]) {
         var origins: [CGPoint] = []
+        var rowStart = 0
         var x: CGFloat = 0, y: CGFloat = 0, rowHeight: CGFloat = 0, widest: CGFloat = 0
+        func centreRow(upTo end: Int) {
+            guard centered, width.isFinite else { return }
+            let shift = (width - (x - spacing)) / 2
+            for i in rowStart..<end { origins[i].x += shift }
+        }
         for subview in subviews {
             let size = subview.sizeThatFits(.unspecified)
             if x > 0, x + size.width > width {
+                centreRow(upTo: origins.count)
+                rowStart = origins.count
                 x = 0
                 y += rowHeight + lineSpacing
                 rowHeight = 0
@@ -39,6 +49,7 @@ struct FlowLayout: Layout {
             widest = max(widest, x - spacing)
             rowHeight = max(rowHeight, size.height)
         }
+        centreRow(upTo: origins.count)
         return (CGSize(width: widest, height: y + rowHeight), origins)
     }
 }

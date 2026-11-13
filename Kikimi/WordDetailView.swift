@@ -22,7 +22,7 @@ struct WordDetail: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 header
-                if !kanji.isEmpty { kanjiSection }
+                if !kanji.isEmpty { KanjiList(kanji: kanji, showsTitle: true) }
 
                 Text("Dictionary").font(Theme.title(17))
                 if entries.isEmpty {
@@ -66,72 +66,6 @@ struct WordDetail: View {
             (entries, kanji, examples, seen, loadedFor) = (newEntries, newKanji, newExamples, newSeen, id)
         }
         .onDisappear { audio?.stop() }
-    }
-
-    /// Each kanji in the word with its meaning and readings. On'yomi (from Chinese) are in katakana and kun'yomi
-    /// (native) in hiragana, and each is labelled too, so the difference never depends on telling scripts apart.
-    private var kanjiSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Kanji").font(Theme.title(17))
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(kanji) { info in
-                    HStack(alignment: .top, spacing: 14) {
-                        Text(info.literal).font(Theme.sized(size: 34, design: .rounded))
-                        VStack(alignment: .leading, spacing: 4) {
-                            if !info.meanings.isEmpty {
-                                Text(info.meanings.joined(separator: "; ")).font(Theme.styled(.callout))
-                            }
-                            if let level = levelLine(info) {
-                                Text(level).font(Theme.small).foregroundStyle(Theme.muted)
-                                    .help("The JLPT level is KANJIDIC2's, from the exam's older four levels, shown as the matching N levels (N3 and N2 share one). The school year is when Japanese schools teach it.")
-                            }
-                            Grid(alignment: .topLeading, horizontalSpacing: 8, verticalSpacing: 2) {
-                                if !info.onReadings.isEmpty {
-                                    GridRow {
-                                        Text("On'yomi").font(Theme.sized(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
-                                        Text(info.onReadings.joined(separator: "、"))
-                                    }
-                                }
-                                if !info.kunReadings.isEmpty {
-                                    GridRow {
-                                        Text("Kun'yomi").font(Theme.sized(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
-                                        Text(info.kunReadings.joined(separator: "、"))
-                                    }
-                                }
-                            }
-                            .font(Theme.styled(.callout))
-                        }
-                        Spacer(minLength: 0)
-                    }
-                    .textSelection(.enabled)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(kanjiLabel(info))
-                }
-            }
-        }
-        .help("On'yomi: reading from Chinese. Kun'yomi: native reading; the dot marks where the ending begins.")
-    }
-
-    /// "JLPT N5 · School year 1", or whichever of the two the kanji has.
-    private func levelLine(_ info: KanjiInfo) -> String? {
-        var parts: [String] = []
-        if let levels = info.jlptLevels { parts.append(String(localized: "JLPT \(levels)")) }
-        switch info.schoolGrade {
-        case .year(let year): parts.append(String(localized: "School year \(year)"))
-        case .secondary: parts.append(String(localized: "Secondary school"))
-        case .names: parts.append(String(localized: "Used in names"))
-        case nil: break
-        }
-        return parts.isEmpty ? nil : parts.joined(separator: " · ")
-    }
-
-    private func kanjiLabel(_ info: KanjiInfo) -> String {
-        var parts = [info.literal]
-        if !info.meanings.isEmpty { parts.append(String(localized: "Meaning: \(listed(info.meanings))")) }
-        if let level = levelLine(info) { parts.append(level) }
-        if !info.onReadings.isEmpty { parts.append(String(localized: "On reading: \(listed(info.onReadings))")) }
-        if !info.kunReadings.isEmpty { parts.append(String(localized: "Kun reading: \(listed(info.kunReadings))")) }
-        return parts.joined(separator: ". ")
     }
 
     /// The word, with its audio and clip menu beside it; its status and actions share the line below.

@@ -28,6 +28,8 @@ struct ReviewView: View {
     @State private var returned = 0
     /// The word's own page beside the card, opened from the revealed answer (never before: it would show the meaning).
     @State private var showsWord = false
+    /// Furigana kept on over the sentence (the F key), for a card whose reading you want to read slowly.
+    @State private var furiganaPinned = false
     /// Ending a session asks first, since a lesson's remaining words are dropped and it is easy to press Esc by mistake.
     @State private var confirmingEnd = false
     /// Whether a voice is installed for the language, looked up once per language (it lists every installed voice).
@@ -232,9 +234,14 @@ struct ReviewView: View {
 
                 // The word as it was said in your video: the context is part of the question, the translation is not.
                 if let example = card.example {
-                    Text(example.highlighted).font(Theme.sized(size: 20, design: .rounded)).foregroundStyle(Theme.muted)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 4)
+                    // After the answer, furigana over the sentence on hover. Before it, the reading would give the word away.
+                    if revealed, app.profile.display.showsReadings {
+                        RubySentence(example: example, profile: app.profile, pinned: furiganaPinned).padding(.top, 4)
+                    } else {
+                        Text(example.highlighted).font(Theme.sized(size: 20, design: .rounded)).foregroundStyle(Theme.muted)
+                            .multilineTextAlignment(.center)
+                            .padding(.top, 4)
+                    }
                 }
 
                 if revealed {
@@ -246,6 +253,7 @@ struct ReviewView: View {
                             .font(Theme.styled(.title3, design: .rounded)).lineSpacing(4)
                             .multilineTextAlignment(.center)
                             .textSelection(.enabled)
+                        WordKanji(env: env, lemma: card.word.lemma, language: card.word.language)
                         if let example = card.example {
                             Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint)
                         }
@@ -381,6 +389,7 @@ struct ReviewView: View {
             }
             Text(card.entries.first?.gloss ?? "No dictionary entry")
                 .font(Theme.styled(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
+            WordKanji(env: env, lemma: card.word.lemma, language: card.word.language)
             if let example = card.example { Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint) }
         }
         .padding(.top, 6)
@@ -557,7 +566,8 @@ struct ReviewView: View {
     private var reviewShortcuts: [ReviewShortcut] {
         ReviewShortcut.available(
             revealed: revealed, typing: dictation(for: card), hasSentence: card?.example != nil, canTranslate: canTranslate,
-            voiceAvailable: voiceAvailable)
+            voiceAvailable: voiceAvailable, hasFurigana: app.profile.display.showsReadings && card.map { cloze(for: $0) == nil } == true && !listening(for: card)
+                && !dictation(for: card) && !shadowing(for: card))
     }
 
     private func shortcutItem(_ shortcut: ReviewShortcut, _ card: ReviewCard) -> ShortcutButtonRow.Item {
@@ -572,6 +582,7 @@ struct ReviewView: View {
             let code = app.profile.whisperCode
             perform = { WordSpeaker.shared.speak(text, languageCode: code) }
         case .wordPage: title = String(localized: "Word page"); perform = { showsWord.toggle() }
+        case .furigana: title = String(localized: "Furigana"); perform = { furiganaPinned.toggle() }
         case .editSentence: title = String(localized: "Edit sentence"); perform = editSentence
         case .translation: title = String(localized: "Translation"); perform = toggleTranslation
         }
@@ -697,7 +708,7 @@ struct ReviewView: View {
         lessonQueue = []
         style = env.reviewStyle.style(for: app.profile)
         audio?.stop()
-        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil; extra = nil
+        session = nil; card = nil; summary = nil; revealed = false; showsWord = false; furiganaPinned = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil; extra = nil
         Task { await loadOverview() }
     }
 
@@ -749,7 +760,7 @@ struct ReviewView: View {
     }
 
     private func advance(_ session: ReviewSession) async {
-        revealed = false; showsWord = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil
+        revealed = false; showsWord = false; furiganaPinned = false; wordNow = nil; translationChoice = nil; typed = ""; dictationResult = nil
         voice.discard()   // the recording was for the card that has just been answered
         do {
             let next = try await session.currentCard()
