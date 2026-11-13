@@ -3605,6 +3605,34 @@
         }
       }
     },
+    "Conjunction" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konjunktion"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conjunción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conjonction"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続詞"
+          }
+        }
+      }
+    },
     "Continue" : {
       "localizations" : {
         "de" : {
@@ -4201,7 +4229,7 @@
     "Each video shows how many of its words you already know. Around 90% is comfortable to follow." : {
 
     },
-    "Each video shows how much of it you know, such as 91% known, 6% learning · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
+    "Each video shows how much of it you know, such as 91% known, 6% learning · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted, and in Spanish a few conjunctions such as porque and pero. Other small words are nearly always known, so you understand more than the figure says." : {
 
     },
     "Edit line" : {

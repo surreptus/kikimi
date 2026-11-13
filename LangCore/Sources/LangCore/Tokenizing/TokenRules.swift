@@ -22,6 +22,9 @@ public struct TokenRules: Sendable {
     public var subjects: Set<String>
     /// Words that join two verbs ("y", "o").
     public var conjunctions: Set<String>
+    /// A few conjunctions worth learning, as spelt in lower case. Each is `.conjunction`, with the spelling as its lemma, whatever
+    /// the tagger says (it calls "pues" and "sino" a noun at times). Only a spelling with no other common use belongs here.
+    public var learnableConjunctions: Set<String>
     /// Whether a word cut off by a hyphen or dash ("hab-") is a fragment, not a word to learn.
     public var marksCutOffWords: Bool
     /// Whether a capitalised word inside a sentence that the tagger names a person, place or organisation is a name, not a noun.
@@ -29,7 +32,7 @@ public struct TokenRules: Sendable {
 
     public init(functionWords: [String: String] = [:], interjections: Set<String> = [], standaloneInterjections: Set<String> = [],
                 auxiliaries: Set<String> = [], participleEndings: [String] = [], verbMarkers: Set<String> = [],
-                conjunctions: Set<String> = [], prepositionsSpelledAsVerbs: Set<String> = [], subjects: Set<String> = [],
+                conjunctions: Set<String> = [], learnableConjunctions: Set<String> = [], prepositionsSpelledAsVerbs: Set<String> = [], subjects: Set<String> = [],
                 marksCutOffWords: Bool = false, marksNames: Bool = false) {
         self.functionWords = functionWords
         self.interjections = interjections
@@ -38,6 +41,7 @@ public struct TokenRules: Sendable {
         self.participleEndings = participleEndings
         self.verbMarkers = verbMarkers
         self.conjunctions = conjunctions
+        self.learnableConjunctions = learnableConjunctions
         self.prepositionsSpelledAsVerbs = prepositionsSpelledAsVerbs
         self.subjects = subjects
         self.marksCutOffWords = marksCutOffWords

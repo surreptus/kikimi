@@ -36,7 +36,7 @@ sessions), release work (signing, notarization) and a legal review. New features
       This is observation, not measurement. We have no analytics, so we cannot track whether they return. It comes before more
       features.
 - [ ] **Check the "how much you know" bands with learners.** The figure is vocabulary coverage only: nouns, verbs, adjectives and
-      adverbs, with Stage 5 counted as known and ignored words left out. The "Mostly familiar" band (88 to 98%) rests on two
+      adverbs (and a few Spanish conjunctions), with Stage 5 counted as known and ignored words left out. The "Mostly familiar" band (88 to 98%) rests on two
       transcripts. Ask learners if it matches what they can follow, by language and level. For Japanese near N4, look at what
       grammar and speed do to it.
 - [ ] Rebuild the shareable zip from the final build.

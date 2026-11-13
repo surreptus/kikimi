@@ -73,6 +73,25 @@ final class ProgressBackupTests: XCTestCase {
         XCTAssertNil(mesa, "a word that was new isn't invented")
     }
 
+    func testAConjunctionSurvivesABackupAndAnUnknownTypeIsSkipped() async throws {
+        let source = try LangDatabase()
+        try await word(source, "porque", .conjunction, status: .learning, stage: .stage2, due: now)
+        let data = try await source.exportProgress(now: now).encoded()
+        XCTAssertTrue(String(decoding: data, as: UTF8.self).contains("\"pos\" : \"conjunction\""))
+        let target = try LangDatabase()
+        let report = try await target.importProgress(ProgressBackup.decode(data), now: now)
+        XCTAssertEqual(report.added, 1)
+        let restored = try await fetch(target, "porque")
+        XCTAssertEqual(restored?.pos, .conjunction)
+        XCTAssertEqual(restored?.stage, .stage2)
+
+        // An older Kikimi does not know the type. It skips the entry, as it does any type it cannot read.
+        let unknown = ProgressBackup.Entry(language: "es", lemma: "porque", pos: "particle", status: "known")
+        let older = try await LangDatabase().importProgress(
+            ProgressBackup(createdAt: now, words: [unknown]), now: now)
+        XCTAssertEqual(older.skipped, 1)
+    }
+
     func testRestoredWordsAttachToTheirSentencesWhenTheVideoIsAddedLater() async throws {
         let data = try await sampleSource().exportProgress(now: now).encoded()
         let target = try LangDatabase()
