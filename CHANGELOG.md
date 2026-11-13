@@ -10,7 +10,7 @@ What changed in each version of Kikimi, newest first. Every release's page on Gi
 
 - **Every reading, and each kanji, on Japanese cards.** 月 now shows つき・げつ・がつ. Under the meaning, each kanji appears with its own meaning and its on'yomi and kun'yomi readings, on the learn card and on the back of a review card.
 - **Furigana on a review card's sentence.** After you reveal a card, point at the sentence to see furigana over its words, or press **F** to keep it on.
-- **"I know these words."** The list that tunes a video to your level now asks which words you *know*. Tick them, or use **Select all**. Only ticked words are marked known, and it stops when fewer than half of a group are ticked.
+- **"I know these words."** The list that tunes a video to your level now asks which words you *know*. Tick them, or use **Select all**. You are shown more words only while you know at least half of a group, and **Mark N as known** marks just the ticked ones, with Undo.
 - **Next steps in a new video's row.** Until you play a video you added in the last two weeks, its row offers **Mark the words I know** and **Learn N words in lessons**. This replaces the card that the first video used to get.
 - **A yellow dot on Learn** when lessons are waiting.
 - **A small animation** when a new video joins the list (a plain fade if Reduce Motion is on).
