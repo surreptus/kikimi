@@ -9,7 +9,7 @@ final class LineTranslations {
     /// Asked for and not back yet, for the "Translating…" placeholder.
     private(set) var waiting: Set<Int64> = []
     /// Why translating can't work (a language isn't installed, say), in words for the status line.
-    private(set) var problem: String?
+    private(set) var problem: Problem?
 
     @ObservationIgnored private let service: TranslationService
     @ObservationIgnored private let videoID: Int64
@@ -62,7 +62,7 @@ final class LineTranslations {
             texts.merge(made) { _, new in new }
             none.formUnion(ids.filter { made[$0] == nil })
         } catch {
-            problem = String(localized: "Couldn't translate: \(error.localizedDescription)")
+            problem = Problem(error, fallback: String(localized: "Kikimi couldn't translate these lines. Try again in a moment."))
         }
     }
 
@@ -72,9 +72,9 @@ final class LineTranslations {
         case .ready:
             return true
         case .needsDownload:
-            problem = String(localized: "Translating from \(source) to \(target) needs a language download. Add it in System Settings > General > Language & Region > Translation Languages.")
+            problem = Problem(message: String(localized: "Translating from \(source) to \(target) needs a language download. Add it in System Settings > General > Language & Region > Translation Languages."), detail: "")
         case .unavailable:
-            problem = String(localized: "macOS can't translate from \(source) to \(target).")
+            problem = Problem(message: String(localized: "macOS can't translate from \(source) to \(target)."), detail: "")
         }
         return false
     }

@@ -252,7 +252,7 @@ struct WordsView: View {
                 app.dataChanged()
                 app.showToast(text, undo: (String(localized: "Undo"), { undo(before) }))
             } catch {
-                app.showToast(String(localized: "Failed: \(error.localizedDescription)"), isError: true)
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't change those words. Try again.")))
             }
         }
     }
@@ -264,7 +264,7 @@ struct WordsView: View {
                 app.dataChanged()
                 app.showToast(String(localized: "Undone"))
             } catch {
-                app.showToast(String(localized: "Couldn't undo: \(error.localizedDescription)"), isError: true)
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't undo that. Try again.")))
             }
         }
     }

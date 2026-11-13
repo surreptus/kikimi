@@ -18,7 +18,7 @@ struct ReviewView: View {
     @State private var remaining = 0
     @State private var total = 0
     @State private var summary: (answered: Int, correct: Int)?
-    @State private var error: String?
+    @State private var error: Problem?
     @State private var audio: SentenceAudioPlayer?
     @State private var mode: SentenceAudioMode = .onReveal
     @State private var style: ReviewStyle = .meaning
@@ -52,7 +52,7 @@ struct ReviewView: View {
     var body: some View {
         Group {
             if let error {
-                FailureView(title: "Something went wrong", detail: error)
+                FailureView(title: "Something went wrong", problem: error)
             } else if let teaching {
                 // A batch of its own: when every word in one is marked known there is no quiz, so the next batch follows at
                 // once, and without this identity it would inherit the last one's position and wait on a card that never loads.
@@ -608,7 +608,7 @@ struct ReviewView: View {
                 .multilineTextAlignment(.center).textSelection(.enabled)
                 .accessibilityLabel("Translation: \(text)")
         } else if let problem = translations?.problem {
-            Text(problem).font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+            Text(problem.message).font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
         } else {
             Text("Translating…").font(Theme.small).foregroundStyle(Theme.faint)
         }
@@ -662,7 +662,7 @@ struct ReviewView: View {
             lessons = try await env.database.dailyLessons(
                 language: app.languageCode, contentPOS: app.profile.contentPOS, perDay: env.dailyLessons.perDay(for: app.profile))
             stats = try await env.database.learningStats(language: app.languageCode)
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't load your reviews.")) }
     }
 
     private func startLessons() {
@@ -687,7 +687,7 @@ struct ReviewView: View {
                 }
                 lessonQueue = stride(from: 0, to: ids.count, by: DailyLessons.batchSize).map { Array(ids[$0..<min($0 + DailyLessons.batchSize, ids.count)]) }
                 teachNext()
-            } catch { self.error = error.localizedDescription }
+            } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't load those words.")) }
         }
     }
 
@@ -746,7 +746,7 @@ struct ReviewView: View {
             total = await new.remaining
             remaining = total   // set together with the total, or the bar shows full for a moment
             await advance(new)
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't start this session.")) }
     }
 
     private func answer(_ correct: Bool) async {
@@ -756,7 +756,7 @@ struct ReviewView: View {
             try await session.answer(correct: correct)
             await app.refreshDue()
             await advance(session)
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't save your answer.")) }
     }
 
     private func advance(_ session: ReviewSession) async {
@@ -778,6 +778,6 @@ struct ReviewView: View {
                 if await session.isKnownCheck || extra == .lesson { app.dataChanged() }   // the lists and coverage have changed
                 await loadOverview(keepingSummary: true)
             }
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't load the next card.")) }
     }
 }

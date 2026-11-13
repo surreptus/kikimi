@@ -12,7 +12,7 @@ struct PlayerView: View {
     @State private var controller: PlaybackController?
     /// Where you stopped last time, while the choice to continue from there or start over is on offer.
     @State private var resumeOffer: Double?
-    @State private var failure: String?
+    @State private var failure: Problem?
     @State private var hoveredToken: Token?
     /// A word whose meaning is kept in the hint bar until you unpin it, so its buttons can be reached.
     @State private var pinnedToken: Token?
@@ -60,8 +60,13 @@ struct PlayerView: View {
                     topBar.padding(.horizontal, 20).padding(.top, 20)
                     Group {
                         if let failure {
-                            ContentUnavailableView("Can't play this video", systemImage: "exclamationmark.triangle",
-                                                   description: Text(failure))
+                            ContentUnavailableView {
+                                Label("Can't play this video", systemImage: "exclamationmark.triangle")
+                            } description: {
+                                Text(failure.message)
+                            } actions: {
+                                if !failure.detail.isEmpty { ProblemDetails(detail: failure.detail).frame(maxWidth: 420) }
+                            }
                         } else {
                             ProgressView()
                         }
@@ -76,7 +81,7 @@ struct PlayerView: View {
         .task(id: controller != nil) { await keepPlace() }
         .onChange(of: pauseAfterLine) { _, on in controller?.pausesAfterLines = on }
         .onChange(of: translationDisplayRaw) { _, _ in Task { await setUpTranslations() } }
-        .onChange(of: translations?.problem) { _, text in if let text { app.showToast(text, isError: true) } }
+        .onChange(of: translations?.problem) { _, problem in if let problem { app.showToast(problem) } }
         .onChange(of: loopSpeed) { _, speed in controller?.loopSpeed = Float(speed) }
         .sheet(isPresented: Binding(get: { editing != nil }, set: { if !$0 { editing = nil } })) {
             if let editing, let controller {
@@ -182,7 +187,7 @@ struct PlayerView: View {
                 AccessibilityNotification.Announcement(String(localized: "You stopped at \(clock(spot)). Continue or start over.")).post()
             }
         } catch {
-            failure = error.localizedDescription
+            failure = Problem(error, fallback: String(localized: "Kikimi couldn't open this video. Go back and try again, or add it again."))
         }
     }
 
@@ -514,7 +519,7 @@ struct PlayerView: View {
                 try await env.clips.export(video: video, start: line.startTime, end: line.endTime, kind: kind, to: url)
                 app.showToast(String(localized: "Saved \(url.lastPathComponent)"))
             } catch {
-                app.showToast(String(localized: "Export failed: \(error.localizedDescription)"), isError: true)
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't save that clip. Check that there is space in that folder, then try again.")))
             }
         }
     }

@@ -342,9 +342,9 @@ private struct DataTab: View {
                     .foregroundStyle(.secondary)
                 Button("Done") { backup.reset() }
             }
-        case .failed(let message):
+        case .failed(let problem):
             VStack(alignment: .leading, spacing: 8) {
-                Text(message).foregroundStyle(.red)
+                ProblemView(problem: problem)
                 Button("Try again") { backup.reset() }
             }
         case .idle, .exported:
@@ -403,7 +403,7 @@ private struct DataTab: View {
         case idle
         case previewing(words: [String], report: KnownListReport)
         case done(KnownListReport)
-        case failed(String)
+        case failed(Problem)
     }
 
     @ViewBuilder
@@ -440,9 +440,9 @@ private struct DataTab: View {
                 Text("Marked ^[\(report.marked) word](inflect: true) as known.").font(Theme.styled(.headline))
                 Button("Done") { known = .idle }
             }
-        case .failed(let message):
+        case .failed(let problem):
             VStack(alignment: .leading, spacing: 8) {
-                Text(message).foregroundStyle(.red)
+                ProblemView(problem: problem)
                 Button("Try again") { known = .idle }
             }
         }
@@ -455,11 +455,11 @@ private struct DataTab: View {
         do {
             let text = try String(contentsOf: url, encoding: .utf8)
             let words = KnownWordList.parse(text)
-            guard !words.isEmpty else { known = .failed(String(localized: "That file has no words in it.")); return }
+            guard !words.isEmpty else { known = .failed(Problem(message: String(localized: "That file has no words in it. Choose a text file with words in it."), detail: "")); return }
             let report = try await env.database.markKnown(lemmas: words, language: app.languageCode, dryRun: true)
             known = .previewing(words: words, report: report)
         } catch {
-            known = .failed(String(localized: "Couldn't read that file as text: \(error.localizedDescription)"))
+            known = .failed(Problem(error, fallback: String(localized: "Kikimi couldn't read that file. Choose a plain text file of words.")))
         }
     }
 
@@ -469,7 +469,7 @@ private struct DataTab: View {
             app.dataChanged()
             known = .done(report)
         } catch {
-            known = .failed(String(localized: "Couldn't mark those words: \(error.localizedDescription)"))
+            known = .failed(Problem(error, fallback: String(localized: "Kikimi couldn't mark those words as known. Try again.")))
         }
     }
 
