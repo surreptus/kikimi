@@ -134,16 +134,38 @@ struct LessonView: View {
     private func answer(teach: Bool?) async {
         guard let id = card?.word.id else { return }
         audio?.stop()
+        app.dismissToast()   // Undo is for the latest card only
         do {
             switch teach {
             case true?: taught.append(id)
-            case false?: try await env.database.markKnown(wordID: id); known += 1
-            case nil: try await env.database.markIgnored(wordIDs: [id]); known += 1   // saved now, so the Words page is refreshed
+            case false?: try await setAside(id, status: .known)
+            case nil: try await setAside(id, status: .ignored)
             }
             card = nil
             index += 1
             if index >= wordIDs.count { await end(quiz: true) }
         } catch { self.error = error.localizedDescription }
+    }
+
+    /// Saved now, so the Words page is refreshed. The toast offers Undo, which also brings the card back if it is still next.
+    private func setAside(_ id: Int64, status: WordStatus) async throws {
+        let change = try await env.database.setStatus(status, ofWord: id)
+        known += 1
+        let at = index
+        let lemma = card?.word.lemma ?? ""
+        let text = status == .known ? String(localized: "Marked “\(lemma)” as known") : String(localized: "Set “\(lemma)” aside")
+        app.showToast(text, undo: (String(localized: "Undo"), {
+            Task {
+                guard (try? await env.database.undo(change)) ?? 0 > 0 else {
+                    app.showToast(String(localized: "Couldn't undo: the word has changed since."), isError: true)
+                    return
+                }
+                known -= 1
+                if index == at + 1 { index = at }   // the same card again; `load` runs for the new index
+                app.dataChanged()
+                app.showToast(String(localized: "Undone"))
+            }
+        }))
     }
 
     /// Hands the taught words on to be quizzed, or, when leaving early, hands on nothing. Words marked known are already
