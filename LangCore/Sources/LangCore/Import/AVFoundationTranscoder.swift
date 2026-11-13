@@ -23,7 +23,7 @@
 import AVFoundation
 import Foundation
 
-public enum TranscodeError: Error, LocalizedError {
+public enum TranscodeError: Error, DetailedError {
     case presetUnavailable(String)
     case noVideoTrack
     case readerFailed(Error?)
@@ -31,10 +31,19 @@ public enum TranscodeError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .presetUnavailable(let preset): String(localized: "This Mac can't export with \(preset).", bundle: .module)
-        case .noVideoTrack: String(localized: "This file has no video track.", bundle: .module)
-        case .readerFailed(let e): String(localized: "Couldn't read the video: \(e?.localizedDescription ?? String(localized: "unknown error", bundle: .module))", bundle: .module)
-        case .writerFailed(let e): String(localized: "Couldn't write the video: \(e?.localizedDescription ?? String(localized: "unknown error", bundle: .module))", bundle: .module)
+        case .presetUnavailable: String(localized: "This Mac can't prepare this video. Try a different video.", bundle: .module)
+        case .noVideoTrack: String(localized: "This file has no video. Kikimi adds video files; audio-only files aren't supported yet.", bundle: .module)
+        case .readerFailed: String(localized: "Kikimi couldn't read this video. The file may be damaged. Try a different copy.", bundle: .module)
+        case .writerFailed: String(localized: "Kikimi couldn't write the library copy of this video. Check that your Mac has free space, then try again.", bundle: .module)
+        }
+    }
+
+    public var detail: String {
+        switch self {
+        case .presetUnavailable(let preset): "presetUnavailable: \(preset)"
+        case .noVideoTrack: "noVideoTrack"
+        case .readerFailed(let e): "readerFailed: \(e.map(Problem.rawDetail(of:)) ?? "unknown error")"
+        case .writerFailed(let e): "writerFailed: \(e.map(Problem.rawDetail(of:)) ?? "unknown error")"
         }
     }
 }

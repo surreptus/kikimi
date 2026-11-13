@@ -191,7 +191,7 @@ struct WordDetail: View {
                 app.showToast(inflected("Saved ^[\(files.count) clip](inflect: true) to \(folder.lastPathComponent)"))
                 NSWorkspace.shared.activateFileViewerSelecting(files)
             } catch {
-                app.showToast(String(localized: "Export failed: \(error.localizedDescription)"), isError: true)
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't save those clips. Check that there is space in that folder, then try again.")))
             }
         }
     }

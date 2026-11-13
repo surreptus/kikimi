@@ -8,7 +8,7 @@ final class AppState {
     enum Phase {
         case loading
         case ready(LangEnvironment)
-        case failed(String)
+        case failed(Problem)
     }
 
     struct PlaybackRequest: Equatable {
@@ -67,12 +67,18 @@ final class AppState {
     @ObservationIgnored private var toastTimer: Task<Void, Never>?
 
     /// `undo` puts a button on the toast, and keeps it up longer so there is time to use it.
-    func showToast(_ text: String, isError: Bool = false, undo: (title: String, run: () -> Void)? = nil) {
+    func showToast(_ text: String, isError: Bool = false, detail: String? = nil, undo: (title: String, run: () -> Void)? = nil) {
         var shown = Toast(text: text, isError: isError)
+        shown.detail = detail
         shown.action = undo
         toast = shown
         AccessibilityNotification.Announcement(undo == nil ? text : "\(text). \(undo!.title) is available.").post()   // VoiceOver can't see it appear
         dismissToast(after: isError || undo != nil ? 8 : 4)
+    }
+
+    /// An error toast: the plain message, with the raw detail one click away.
+    func showToast(_ problem: Problem) {
+        showToast(problem.message, isError: true, detail: problem.detail.isEmpty ? nil : problem.detail)
     }
 
     func dismissToast() {
@@ -158,7 +164,7 @@ final class AppState {
                 handleOpen(url)
             }
         } catch {
-            phase = .failed(error.localizedDescription)
+            phase = .failed(Problem(error, fallback: String(localized: "Kikimi couldn't open your library.")))
         }
     }
 

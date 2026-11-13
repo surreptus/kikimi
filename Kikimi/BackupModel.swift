@@ -22,7 +22,7 @@ final class BackupModel {
         case exported(URL, words: Int, videos: Int)
         case previewing(Pending)
         case restored(ProgressImportReport, settingsRestored: Bool, videos: Int)
-        case failed(String)
+        case failed(Problem)
     }
 
     var state: State = .idle
@@ -49,7 +49,7 @@ final class BackupModel {
             try data.write(to: url, options: .atomic)
             state = .exported(url, words: try ProgressBackup.decode(data).words.count, videos: 0)
         } catch {
-            state = .failed(String(localized: "Couldn't save the backup: \(error.localizedDescription)"))
+            state = .failed(Problem(error, fallback: String(localized: "Kikimi couldn't save the backup. Check that there is space in that location, then try again.")))
         }
     }
 
@@ -62,7 +62,7 @@ final class BackupModel {
             let summary = try await env.writeFullBackup(in: parent, name: name, extraSettings: Self.currentAppSettings())
             state = .exported(summary.folder, words: summary.words, videos: summary.videos)
         } catch {
-            state = .failed(String(localized: "Couldn't save the backup: \(error.localizedDescription)"))
+            state = .failed(Problem(error, fallback: String(localized: "Kikimi couldn't save the backup. Check that there is space in that location, then try again.")))
         }
     }
 
@@ -89,7 +89,7 @@ final class BackupModel {
                 state = .previewing(Pending(url: url, data: data, preview: preview))
             }
         } catch {
-            state = .failed(error.localizedDescription)
+            state = .failed(Problem(error, fallback: String(localized: "Kikimi couldn't read that backup. Choose a file or folder you saved from Kikimi.")))
         }
     }
 
@@ -113,7 +113,7 @@ final class BackupModel {
             }
             stopAccess()
         } catch {
-            state = .failed(String(localized: "Couldn't restore the backup: \(error.localizedDescription)"))
+            state = .failed(Problem(error, fallback: String(localized: "Kikimi couldn't restore the backup. Try again.")))
         }
     }
 

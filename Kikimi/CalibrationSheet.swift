@@ -16,7 +16,7 @@ struct CalibrationSheet: View {
     @State private var index = 0
     @State private var ticked: Set<Int64> = []
     @State private var glosses: [Int64: String] = [:]
-    @State private var error: String?
+    @State private var error: Problem?
 
     private var batch: [CalibrationWord] { batches.indices.contains(index) ? batches[index] : [] }
     /// Whether another batch can be offered: there is one, and at least half of this one is known.
@@ -30,7 +30,7 @@ struct CalibrationSheet: View {
             case .nothing: nothing
             case .asking: asking
             }
-            if let error { Text(error).font(Theme.small).foregroundStyle(Theme.red) }
+            if let error { ProblemView(problem: error) }
         }
         .padding(24)
         .frame(width: 560)
@@ -43,7 +43,7 @@ struct CalibrationSheet: View {
             do {
                 batches = Calibration.batches(of: try await env.database.calibrationWords(videoID: id))
                 if batches.isEmpty { step = .nothing } else { step = .asking; await loadGlosses() }
-            } catch { self.error = error.localizedDescription; step = .nothing }
+            } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't load these words.")); step = .nothing }
         }
     }
 
@@ -146,7 +146,7 @@ struct CalibrationSheet: View {
                     app.showToast(String(localized: "Undone"))
                 }
             }))
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't mark those words as known. Try again.")) }
     }
 
     // MARK: Nothing to ask

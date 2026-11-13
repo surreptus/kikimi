@@ -1,7 +1,7 @@
 import Foundation
 import WhisperKit
 
-public enum ModelError: Error, LocalizedError {
+public enum ModelError: Error, DetailedError {
     case notInstalled(String)
     /// The download finished but files are missing (usually a dropped connection). Trying again resumes it.
     case incomplete(String, missing: [String])
@@ -10,10 +10,17 @@ public enum ModelError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .notInstalled(let model): String(localized: "The speech model \(model) isn't downloaded yet.", bundle: .module)
+        case .notInstalled: String(localized: "The speech model isn't downloaded yet. Download it from Import, then try again.", bundle: .module)
         case .busy(let model): String(localized: "The \(ModelCatalog.name(for: model)) model is downloading right now. Wait for it to finish.", bundle: .module)
-        case .incomplete(let model, let missing):
-            String(localized: "The \(model) download didn't finish (missing \(missing.joined(separator: ", "))). Check your connection and download again.", bundle: .module)
+        case .incomplete: String(localized: "The speech model didn't finish downloading. Check your connection, then download it again.", bundle: .module)
+        }
+    }
+
+    public var detail: String {
+        switch self {
+        case .notInstalled(let model): "notInstalled: \(model)"
+        case .busy(let model): "busy: \(model)"
+        case .incomplete(let model, let missing): "incomplete: \(model), missing \(missing.joined(separator: ", "))"
         }
     }
 }
