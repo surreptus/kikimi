@@ -80,7 +80,7 @@ Learning loop:
       the daily allowance for bulk Learn. Reason: review time must not replace watching time.
 - [ ] **Undo.** Add undo for a review answer, for L, K and X in the player, and for "Already know it" in a lesson. K on a
       learning word discards its stage without a message.
-- [ ] Build *Known and learning on each video's bar* (below) before 1.0, because Next up uses that figure.
+- [x] Build *Known and learning on each video's bar* (below) before 1.0, because Next up uses that figure.
 
 Engineering:
 - [ ] **CI (confirmed: no workflow runs the tests or builds the app).** Add a pull request workflow with `swift test` and a
@@ -172,15 +172,16 @@ The order follows how much each item helps comprehensible input for the effort.
       writes no text and works, but it merges too much and needs macOS 26. Still to do: play one word, and tighten clips to words.
 
 ### Finding the right material
-- [ ] **Known and learning on each video's bar** (suggested 12 Nov 2026, agreed 13 Nov 2026, for the next minor version). Today the bar counts only
+- [x] **Known and learning on each video's bar** (suggested 12 Nov 2026, agreed 13 Nov 2026, built 13 Nov 2026, **not seen in the running app**). Today the bar counts only
       known words: known, finished, or learning at Stage 5 and up (`knownCondition` in `Coverage.swift`). A word you are
       learning at Stages 1 to 4 counts as unknown, so a video made of words you are working on reads as hard. Proposal: a
       second, lighter segment for learning words. The text keeps the known figure and the fit word, and adds the learning
       share ("82% known, 6% learning"). The segments differ in length and fill, never in colour alone, and VoiceOver reads
       both figures. The fit word stays on known words: a Stage 1 to 4 word is recognised only with effort, so counting it
-      would call a video easy before it is. Open: the "long tail" idea, that a learning word seen once in a video could count
-      as known sooner than a common one. We have no data for this, so the fit rule stays until it is measured on real videos.
-      The change is a query in `videoCoverage` with a test, and a small view change. No new table, no migration.
+      would call a video easy before it is. Built as proposed: `VideoCoverage.learningWords`, a lighter bar segment, and the learning share in the text and
+      the VoiceOver label. No new table, no migration.
+- [ ] **Long tail on the bar.** A learning word seen once in a video could count as known sooner than a common one. We have no data
+      for this, so the fit rule stays on known words until it is measured on real videos.
 - [x] **Next up** (5 Nov 2026). A card on Videos suggests the video that fits best, by fit alone. A video you heard is as good a
       choice as a new one, because listening again is how a nearly understood video becomes understood.
 - [ ] **Frequency-list bootstrap.** Mark the most common words as known for a beginner. It needs a data source and a licence

@@ -91,6 +91,9 @@
     "%@ of words known, %@ learning · %@" : {
 
     },
+    "A word you are learning at Stages 1 to 4 is the lighter part of the bar, and the text says how many are learning. It does not count as known, and the level word ignores it." : {
+
+    },
     "Known-word coverage %@, learning %@: %@" : {
 
     },
@@ -4159,7 +4162,7 @@
     "Each video shows how many of its words you already know. Around 90% is comfortable to follow." : {
 
     },
-    "Each video shows how much of it you know, such as 91% known · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
+    "Each video shows how much of it you know, such as 91% known, 6% learning · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
 
     },
     "Edit line" : {
