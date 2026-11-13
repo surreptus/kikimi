@@ -88,6 +88,49 @@ final class DatabaseTests: XCTestCase {
         XCTAssertEqual(w2.stage, .stage1)
     }
 
+    func testStartLearningKeepsStageOfLearningWord() async throws {
+        let db = try LangDatabase()
+        let id = try await db.writer.write { d -> Int64 in
+            var w = Word(language: "es", lemma: "casa", pos: .noun); try w.insert(d); return w.id!
+        }
+        try await db.startLearning(wordID: id, now: now)
+        let advanced = try await db.recordReview(wordID: id, correct: true, now: now)
+        XCTAssertEqual(advanced.stage, .stage2)
+
+        try await db.startLearning(wordID: id, now: now.addingTimeInterval(60))
+        let after = try await db.writer.read { try Word.fetchOne($0, key: id)! }
+        XCTAssertEqual(after.status, .learning)
+        XCTAssertEqual(after.stage, .stage2)
+        XCTAssertEqual(after.nextReview, advanced.nextReview)
+    }
+
+    func testStartLearningLeavesFinishedWordFinished() async throws {
+        let db = try LangDatabase()
+        let id = try await db.writer.write { d -> Int64 in
+            var w = Word(language: "es", lemma: "casa", pos: .noun); try w.insert(d); return w.id!
+        }
+        try await db.startLearning(wordID: id, now: now)
+        for _ in 0..<8 { try await db.recordReview(wordID: id, correct: true, now: now) }
+
+        try await db.startLearning(wordID: id, now: now)
+        let after = try await db.writer.read { try Word.fetchOne($0, key: id)! }
+        XCTAssertEqual(after.status, .finished)
+        XCTAssertEqual(after.stage, .finished)
+        XCTAssertNil(after.nextReview)
+    }
+
+    func testStartLearningStartsNewWordAtStageOne() async throws {
+        let db = try LangDatabase()
+        let id = try await db.writer.write { d -> Int64 in
+            var w = Word(language: "es", lemma: "casa", pos: .noun); try w.insert(d); return w.id!
+        }
+        try await db.startLearning(wordID: id, now: now)
+        let after = try await db.writer.read { try Word.fetchOne($0, key: id)! }
+        XCTAssertEqual(after.status, .learning)
+        XCTAssertEqual(after.stage, .stage1)
+        XCTAssertEqual(after.nextReview, now)
+    }
+
     func testBurnAndKnown() async throws {
         let db = try LangDatabase()
         let id = try await db.writer.write { d -> Int64 in

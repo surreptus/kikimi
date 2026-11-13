@@ -40,15 +40,16 @@ public final class LangDatabase: Sendable {
     // MARK: Words
 
     /// Puts a word into the review queue at stage 1, due immediately.
+    /// A word that is already learning or finished stays as it is, like the bulk version.
     public func startLearning(wordID: Int64, now: Date = Date()) async throws {
         try await writer.write { db in
             guard var word = try Word.fetchOne(db, key: wordID) else { throw LangError.notFound }
-            let started = word.status != .learning && word.status != .finished
+            guard word.status != .learning && word.status != .finished else { return }
             word.status = .learning
             word.stage = .stage1
             word.nextReview = now
             try word.update(db)
-            if started { try Self.bump(.learn, subject: wordID, at: now, in: db) }
+            try Self.bump(.learn, subject: wordID, at: now, in: db)
         }
     }
 
