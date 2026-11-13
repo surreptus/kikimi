@@ -71,6 +71,7 @@ struct PlayerView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .focusedSceneValue(\.playbackActions, playbackActions)
         .task { await load() }
         .task(id: shownToken?.lemma) { await refreshHint(announce: pinnedToken != nil) }
         .task(id: controller != nil) { await keepPlace() }
@@ -269,24 +270,46 @@ struct PlayerView: View {
         Task { try? await database.saveResumePosition(videoID: id, seconds: seconds) }
     }
 
+    /// What the Playback menu may do now. The keys are bound there, so each one is found in the menu bar.
+    private var playbackActions: PlaybackActions {
+        PlaybackActions(
+            available: PlaybackCommand.available(
+                videoReady: controller != nil, editingLine: editing != nil, hasWord: hint?.wordID != nil, status: hint?.status),
+            isPlaying: controller?.isPlaying == true, isLooping: controller?.loopingIndex != nil,
+            pausesAfterLine: pauseAfterLine, subtitlesHidden: hideSubtitles,
+            perform: { command in
+                guard let controller else { return }
+                switch command {
+                case .playPause: controller.togglePlayback()
+                case .previousLine: Task { await controller.previousLine() }
+                case .nextLine: Task { await controller.nextLine() }
+                case .pauseAfterLine: pauseAfterLine.toggle()
+                case .hideSubtitles: hideSubtitles.toggle(); shownLines = []
+                case .loopLine: Task { await controller.toggleLoop() }
+                case .focusTranscript: focusedLine = controller.activeIndex ?? 0
+                case .learnWord: setStatus(.learning)
+                case .restoreWord: setStatus(.new)
+                case .knownWord: setStatus(.known)
+                case .ignoreWord: setStatus(.ignored)
+                }
+            })
+    }
+
     private func controls(_ controller: PlaybackController) -> some View {
         HStack(spacing: 12) {
             Button("Previous line", systemImage: "backward.fill") { Task { await controller.previousLine() } }
                 .buttonStyle(.pill(.secondary, compact: true))
-                .keyboardShortcut(.leftArrow, modifiers: .command)
                 .help("Previous line (⌘←)")
             Button(controller.isPlaying ? String(localized: "Pause") : String(localized: "Play"), systemImage: controller.isPlaying ? "pause.fill" : "play.fill") {
                 controller.togglePlayback()
             }
             .buttonStyle(.pill(compact: true))
-            .keyboardShortcut(.space, modifiers: [])
+            .help(controller.isPlaying ? "Pause (Space)" : "Play (Space)")
             Button("Next line", systemImage: "forward.fill") { Task { await controller.nextLine() } }
                 .buttonStyle(.pill(.secondary, compact: true))
-                .keyboardShortcut(.rightArrow, modifiers: .command)
                 .help("Next line (⌘→)")
             Button("Pause after each line", systemImage: "pause.rectangle") { pauseAfterLine.toggle() }
                 .buttonStyle(.pill(pauseAfterLine ? .primary : .secondary, compact: true))
-                .keyboardShortcut("p", modifiers: [])
                 .help(pauseAfterLine ? "Pausing after each line (P). Press again to play straight through."
                                      : "Pause after each line (P), to think or look a word up")
                 .accessibilityValue(pauseAfterLine ? "On" : "Off")
@@ -294,13 +317,11 @@ struct PlayerView: View {
                 hideSubtitles.toggle(); shownLines = []
             }
             .buttonStyle(.pill(hideSubtitles ? .primary : .secondary, compact: true))
-            .keyboardShortcut("h", modifiers: [])
             .help(hideSubtitles ? "Subtitles are hidden (H). Press again to show them, or S to show one line."
                                 : "Hide the subtitles (H), to listen without reading")
             .accessibilityValue(hideSubtitles ? "On" : "Off")
             Button("Loop this line", systemImage: "repeat") { Task { await controller.toggleLoop() } }
                 .buttonStyle(.pill(controller.loopingIndex != nil ? .primary : .secondary, compact: true))
-                .keyboardShortcut("r", modifiers: [])
                 .help(controller.loopingIndex != nil ? "Looping this line (R). Press again to stop."
                                                      : "Repeat this line (R), until you stop it")
                 .accessibilityValue(controller.loopingIndex != nil ? "On" : "Off")
@@ -322,12 +343,6 @@ struct PlayerView: View {
         }
         .labelStyle(.pillIcon)
         .animation(reduceMotion ? nil : Theme.easeOut(0.15), value: controller.loopingIndex != nil)
-        .background {
-            // Moves the keyboard into the transcript without Full Keyboard Access; a menu-less shortcut, so it has no face.
-            Button("Focus transcript") { focusedLine = controller.activeIndex ?? 0 }
-                .keyboardShortcut(.downArrow, modifiers: .command)
-                .frame(width: 0, height: 0).opacity(0)
-        }
     }
 
     /// The keys that work in the player, so none of them has to be found by hovering.
@@ -482,22 +497,18 @@ struct PlayerView: View {
         if hint?.wordID != nil {
             if hint?.status == .ignored {
                 Button { setStatus(.new) } label: { KeyedLabel(title: "Restore", key: "L") }.buttonStyle(.pill(.secondary, compact: true))
-                    .keyboardShortcut("l", modifiers: [])
                     .help("Bring this word back as a new word (L)")
             }
             if hint?.status != .learning && hint?.status != .finished && hint?.status != .ignored {
                 Button { setStatus(.learning) } label: { KeyedLabel(title: "Learn", key: "L") }.buttonStyle(.pill(compact: true))
-                    .keyboardShortcut("l", modifiers: [])
                     .help("Start learning this word (L)")
             }
             if hint?.status != .known && hint?.status != .ignored {
                 Button { setStatus(.known) } label: { KeyedLabel(title: "Known", key: "K") }.buttonStyle(.pill(.secondary, compact: true))
-                    .keyboardShortcut("k", modifiers: [])
                     .help("Mark this word as known (K)")
             }
             if hint?.status == .new {
                 Button { setStatus(.ignored) } label: { KeyedLabel(title: "Ignore", key: "X") }.buttonStyle(.pill(.quiet, compact: true))
-                    .keyboardShortcut("x", modifiers: [])
                     .help("Set this word aside: not worth learning, such as a name or a mistake (X)")
             }
         }

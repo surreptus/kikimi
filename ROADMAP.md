@@ -119,7 +119,7 @@ Website:
 
 Accessibility (no high-severity finding):
 - [ ] Pill buttons, status pills and key hints do not follow the text size setting (`Theme.swift` uses fixed sizes).
-- [ ] Add Playback and Review menus. Today the single-key shortcuts are on hidden buttons, so nobody can find them in the menu bar.
+- [x] Add Playback and Review menus. Today the single-key shortcuts are on hidden buttons, so nobody can find them in the menu bar.
 - [ ] Announce a review result, the next card, and a line reached with ⌘← or ⌘→ to VoiceOver.
 - [ ] Contrast (reported): the stage ring is below 3:1 in Light, and muted text on the window colour is 4.39:1.
 - [ ] With Increase Contrast or Differentiate Without Colour on, make the word underlines thicker.
