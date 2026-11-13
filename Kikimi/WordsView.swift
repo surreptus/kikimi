@@ -239,7 +239,7 @@ struct WordsView: View {
                     // Learn follows the day's new-word allowance, like the lessons, so one click cannot start a pile of reviews.
                     perDay = env.dailyLessons.perDay(for: app.profile)
                     if let room = try await env.database.newWordRoom(language: app.languageCode, perDay: perDay) {
-                        ids = Array(ids.prefix(room))
+                        ids = try await env.database.mostSeen(ids, count: room)   // as the lessons choose
                     }
                     guard !ids.isEmpty else {
                         app.showToast(inflected("No words started. Today's limit is ^[\(perDay) new word](inflect: true), and it is used up. You can change the limit in Settings."))

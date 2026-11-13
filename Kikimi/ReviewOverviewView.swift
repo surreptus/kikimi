@@ -138,6 +138,10 @@ struct ReviewOverviewView: View {
                     .disabled(overview.dueNow == 0)
             }
             if overview.dueNow == 0 { Text(nextText).font(Theme.small).foregroundStyle(Theme.muted) }
+            if overview.isCapped {
+                Text("This session asks \(overview.sessionSize) of \(overview.dueNow) due. The rest wait for the next one.")
+                    .font(Theme.small).foregroundStyle(Theme.muted)
+            }
 
             IconSegmentedPicker(
                 options: ReviewPrompt.allCases.map { .init(value: $0, title: $0.shortTitle, fullTitle: $0.title, symbol: $0.symbol) },
