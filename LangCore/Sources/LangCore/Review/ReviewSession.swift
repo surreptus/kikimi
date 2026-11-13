@@ -150,8 +150,8 @@ public actor ReviewSession {
         guard let id = queue.first else { return }
         queue.removeFirst()
         cached = nil
-        answered += 1
         if isPractice {
+            answered += 1
             if correct {
                 if !missed.contains(id) { correctFirstTry += 1 }
             } else if repeatsMisses {
@@ -164,6 +164,7 @@ public actor ReviewSession {
             return
         }
         if isKnownCheck {
+            answered += 1
             if correct { correctFirstTry += 1 }
             else {
                 try await database.startLearning(wordID: id, now: now)
@@ -172,9 +173,16 @@ public actor ReviewSession {
             return
         }
         if !missed.contains(id) {
-            try await database.recordReview(wordID: id, correct: correct, now: now)
+            do {
+                try await database.recordReview(wordID: id, correct: correct, now: now)
+            } catch LangError.notLearning {
+                // The word left learning during the session (marked known or ignored). Drop the card: it is not
+                // asked again and counts as neither right nor missed.
+                return
+            }
             if correct { correctFirstTry += 1 }
         }
+        answered += 1
         if !correct {
             missed.insert(id)
             queue.append(id)
