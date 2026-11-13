@@ -138,13 +138,30 @@ final class ReanalysisTests: XCTestCase {
         }
     }
 
-    func testAChangedLemmaLeavesBothWords() async throws {
+    func testAChangedLemmaLeavesBothWordsWhenTheOldOneHasProgress() async throws {
         let db = try await library()
+        try await db.writer.write { try $0.execute(sql: "UPDATE words SET status = 'known' WHERE lemma = 'cargo'") }
         _ = try await run(db, fixed)
         let oldWord = try await word(db, "cargo"), newWord = try await word(db, "cargar")
         XCTAssertNotNil(oldWord)
         XCTAssertNotNil(newWord)
         XCTAssertNotEqual(oldWord?.id, newWord?.id)
+    }
+
+    func testAnUntouchedWordThatNoVideoHasAnymoreIsRemovedAndOneWithAHistoryIsKept() async throws {
+        let db = try await library()
+        let looked = try await word(db, "cargo")   // looked up once, still `new`
+        try await db.record(.lookup, subject: looked!.id!)
+        let report = try await run(db, fixed)
+        // "unas" (new, no activity) and "y" are gone; "cargo" (new, but looked up) stays.
+        let unas = try await word(db, "unas"), y = try await word(db, "y"), cargo = try await word(db, "cargo")
+        XCTAssertNil(unas)
+        XCTAssertNil(y)
+        XCTAssertNotNil(cargo)
+        XCTAssertEqual(report.wordsRemoved, 2)
+        XCTAssertEqual(report.wordsInNoVideo, 1)
+        let second = try await run(db, fixed)
+        XCTAssertEqual(second.wordsRemoved, 0, "a second run removes nothing more")
     }
 
     func testEditedLinesAreUsed() async throws {

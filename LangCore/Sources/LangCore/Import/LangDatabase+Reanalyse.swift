@@ -9,12 +9,14 @@ public struct ReanalysisReport: Equatable, Sendable {
     public var videosSkipped = 0
     /// Words that did not exist before.
     public var wordsAdded = 0
-    /// Words that appeared in some video before, and now appear in none. They are kept, with their progress.
+    /// Words with progress or a history (not just `new`) that appeared in some video before, and now appear in none. They are kept.
     public var wordsInNoVideo = 0
+    /// Words nobody has touched (`new`, no activity) that no longer appear in any video. Nothing of yours is in them, so they are removed.
+    public var wordsRemoved = 0
 
-    public init(videosLooked: Int = 0, videosSkipped: Int = 0, wordsAdded: Int = 0, wordsInNoVideo: Int = 0) {
+    public init(videosLooked: Int = 0, videosSkipped: Int = 0, wordsAdded: Int = 0, wordsInNoVideo: Int = 0, wordsRemoved: Int = 0) {
         self.videosLooked = videosLooked; self.videosSkipped = videosSkipped
-        self.wordsAdded = wordsAdded; self.wordsInNoVideo = wordsInNoVideo
+        self.wordsAdded = wordsAdded; self.wordsInNoVideo = wordsInNoVideo; self.wordsRemoved = wordsRemoved
     }
 }
 
@@ -22,9 +24,11 @@ extension LangDatabase {
     /// Reads the stored lines of every video again with the current tokenizer, so fixes made since the import reach
     /// videos imported before them. It uses the lines as saved (edits included) and needs no file, model or network.
     ///
-    /// It changes only `occurrences` and adds `words`. A word is never removed or changed, so status, stage, next
-    /// review and activity stay, even for a word the tokenizer no longer finds. A word found for the first time is
-    /// `new`. A changed lemma gives a second word; the old one is not merged.
+    /// It changes `occurrences` and adds `words`. A word with a status other than `new`, or with any recorded activity, is
+    /// never changed or removed, so status, stage, next review and activity stay, even for a word the tokenizer no longer
+    /// finds. A word found for the first time is `new`. A changed lemma gives a second word; the old one is not merged.
+    /// A `new` word with no activity that now appears in no video holds nothing of yours, so it is removed, as editing a
+    /// line does.
     ///
     /// Each video is one transaction, so a failure leaves that video as it was. Videos done before it are complete,
     /// and a second run carries on from there. A run with nothing to change writes nothing.
@@ -35,8 +39,9 @@ extension LangDatabase {
         let videos = try await writer.read { db in
             try Row.fetchAll(db, sql: "SELECT id, language FROM videos ORDER BY id").map { ($0["id"] as Int64, $0["language"] as String) }
         }
-        let unseenBefore = try await wordsInNoVideoCount()
+        let unseenBefore = try await keptWordsInNoVideoCount()
         var report = ReanalysisReport()
+        var languagesLooked: Set<String> = []
         progress(0, videos.count)
         for (index, (videoID, language)) in videos.enumerated() {
             try Task.checkCancellation()
@@ -45,19 +50,43 @@ extension LangDatabase {
                     try Self.reanalyse(videoID: videoID, language: language, profile: profile, in: db)
                 }
                 report.videosLooked += 1
+                languagesLooked.insert(language)
             } else {
                 report.videosSkipped += 1
             }
             progress(index + 1, videos.count)
         }
+        report.wordsRemoved = try await removeUntouchedUnusedWords(in: languagesLooked)
         // Words are only added with an occurrence, so any rise in this count is a word that lost its last one.
-        report.wordsInNoVideo = max(0, try await wordsInNoVideoCount() - unseenBefore)
+        report.wordsInNoVideo = max(0, try await keptWordsInNoVideoCount() - unseenBefore)
         return report
     }
 
-    private func wordsInNoVideoCount() async throws -> Int {
+    /// The condition for a word that is only a guess of the tokenizer: still `new`, never looked up or learned or answered.
+    private static let untouched = """
+        words.status = 'new' AND NOT EXISTS (
+            SELECT 1 FROM activity WHERE activity.subject = words.id
+            AND activity.kind IN ('lookup', 'learn', 'known', 'review', 'review_correct'))
+        """
+
+    private func keptWordsInNoVideoCount() async throws -> Int {
         try await writer.read { db in
-            try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM words WHERE NOT EXISTS (SELECT 1 FROM occurrences WHERE word_id = words.id)") ?? 0
+            try Int.fetchOne(db, sql: """
+                SELECT COUNT(*) FROM words
+                WHERE NOT EXISTS (SELECT 1 FROM occurrences WHERE word_id = words.id) AND NOT (\(Self.untouched))
+                """) ?? 0
+        }
+    }
+
+    private func removeUntouchedUnusedWords(in languages: Set<String>) async throws -> Int {
+        guard !languages.isEmpty else { return 0 }
+        return try await writer.write { db in
+            let marks = languages.map { _ in "?" }.joined(separator: ",")
+            try db.execute(sql: """
+                DELETE FROM words
+                WHERE language IN (\(marks)) AND NOT EXISTS (SELECT 1 FROM occurrences WHERE word_id = words.id) AND \(Self.untouched)
+                """, arguments: StatementArguments(languages.sorted()))
+            return db.changesCount
         }
     }
 
