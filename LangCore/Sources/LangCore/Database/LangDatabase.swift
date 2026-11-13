@@ -1,13 +1,25 @@
 import Foundation
 import GRDB
 
-public enum LangError: Error, Equatable {
+public enum LangError: Error, DetailedError, Equatable {
     case notFound
     case notLearning
     case emptyTitle
     case emptyLine
     /// A line must start at or after 0, end after it starts, and stay within the video.
     case badTiming
+
+    public var errorDescription: String? {
+        switch self {
+        case .notFound: String(localized: "Kikimi can't find that any more. Close this window and open it again.", bundle: .module)
+        case .notLearning: String(localized: "This isn't one of the languages you are learning, so Kikimi can't do that.", bundle: .module)
+        case .emptyTitle: String(localized: "A title can't be empty.", bundle: .module)
+        case .emptyLine: String(localized: "A line can't be empty. Type some text, or cancel.", bundle: .module)
+        case .badTiming: String(localized: "The start must come before the end, and both must be inside the video. Change the times and try again.", bundle: .module)
+        }
+    }
+
+    public var detail: String { "LangError.\(self)" }
 }
 
 public final class LangDatabase: Sendable {

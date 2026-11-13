@@ -13,7 +13,7 @@ struct StorageView: View {
     @State private var videoCount = 0
     @State private var videoBytes: Int64 = 0
     @State private var removing: InstalledModel?
-    @State private var error: String?
+    @State private var error: Problem?
 
     private var importRunning: Bool { app.importQueue?.isBusy == true }
 
@@ -41,7 +41,7 @@ struct StorageView: View {
                     .foregroundStyle(Theme.muted)
             }
 
-            if let error { Text(error).font(Theme.small).foregroundStyle(Theme.red) }
+            if let error { ProblemView(problem: error) }
         }
         .padding(24)
         .frame(width: 540)
@@ -111,7 +111,7 @@ struct StorageView: View {
                 await reload()
                 app.dataChanged()   // so Import notices the model is gone
             } catch {
-                self.error = error.localizedDescription
+                self.error = Problem(error, fallback: String(localized: "Kikimi couldn't remove that speech model. Try again."))
             }
         }
     }

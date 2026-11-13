@@ -14,7 +14,7 @@ struct EditLineSheet: View {
     @State private var text: String
     @State private var start: Double
     @State private var end: Double
-    @State private var failure: String?
+    @State private var failure: Problem?
     @State private var saving = false
 
     init(line: Subtitle, duration: Double, profile: (any LanguageProfile)?, env: LangEnvironment,
@@ -51,7 +51,7 @@ struct EditLineSheet: View {
                 Stepper(value: $end, in: (start + 0.2)...max(start + 0.2, duration), step: 0.1) { Text("Ends \(clock(end))").monospacedDigit() }
             }
             .font(Theme.small)
-            if let failure { Text(failure).font(Theme.small).foregroundStyle(Theme.red) }
+            if let failure { ProblemView(problem: failure) }
             HStack {
                 Button("Play this part", systemImage: "play.fill") { preview(start, end) }
                     .buttonStyle(.pill(.secondary, compact: true))
@@ -80,7 +80,7 @@ struct EditLineSheet: View {
                 saved(try await env.database.editSubtitle(
                     id: id, text: text, start: timingChanged ? start : nil, end: timingChanged ? end : nil, profile: profile))
             }
-            catch { failure = error.localizedDescription; saving = false }
+            catch { failure = Problem(error, fallback: String(localized: "Kikimi couldn't save this line. Try again.")); saving = false }
         }
     }
 }

@@ -20,7 +20,7 @@ struct ImportSection: View {
     @State private var model = ""
     @State private var modelInstalled: Bool?
     @State private var downloadProgress: Double?
-    @State private var downloadError: String?
+    @State private var downloadError: Problem?
     @State private var isTargeted = false
     @State private var showImporter = false
     /// Which waiting video the subtitle chooser is open for.
@@ -109,7 +109,7 @@ struct ImportSection: View {
                     Button("Download (\(modelSize))") { Task { await download() } }.buttonStyle(.pill(compact: true))
                 }
             }
-            if let downloadError { Text(downloadError).font(Theme.small).foregroundStyle(Theme.red) }
+            if let downloadError { ProblemView(problem: downloadError) }
         }
         .panel()
     }
@@ -153,9 +153,7 @@ struct ImportSection: View {
             if let note = ModelCatalog.info(for: model)?.note {
                 Text(note).font(Theme.small).foregroundStyle(Theme.muted)
             }
-            if let downloadError {
-                Text(downloadError).font(Theme.small).foregroundStyle(Theme.red)
-            }
+            if let downloadError { ProblemView(problem: downloadError) }
         }
         .panel()
     }
@@ -205,7 +203,7 @@ struct ImportSection: View {
         do {
             try await env.models.download(variant: variant) { p in Task { @MainActor in downloadProgress = p } }
         } catch {
-            downloadError = error.localizedDescription
+            downloadError = Problem(error, fallback: String(localized: "The speech model didn't download. Check your connection, then try again."))
         }
         downloadProgress = nil
         await refreshInstalled()
@@ -403,8 +401,8 @@ struct ImportSection: View {
                             Text(detail).font(Theme.small).foregroundStyle(Theme.muted)
                         }
                     }
-                    if case .failed(let message) = job.status {
-                        Text(message).font(Theme.small).foregroundStyle(Theme.red)
+                    if case .failed(let problem) = job.status {
+                        ProblemView(problem: problem)
                     }
                     if case .languageMismatch(let detected) = job.status, let other = LanguageProfiles.profile(for: detected) {
                         languagePrompt(job: job, detected: other)

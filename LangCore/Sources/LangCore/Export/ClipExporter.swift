@@ -8,10 +8,26 @@ public enum ClipKind: Sendable {
     public var fileExtension: String { self == .audio ? "m4a" : "mp4" }
 }
 
-public enum ClipError: Error {
+public enum ClipError: Error, DetailedError {
     case missingSource(URL)
     case emptyRange
     case presetUnavailable
+
+    public var errorDescription: String? {
+        switch self {
+        case .missingSource: String(localized: "This video's file is missing from your library. Add the video again, then try again.", bundle: .module)
+        case .emptyRange: String(localized: "That line is too short to save as a clip.", bundle: .module)
+        case .presetUnavailable: String(localized: "This Mac can't make that kind of clip.", bundle: .module)
+        }
+    }
+
+    public var detail: String {
+        switch self {
+        case .missingSource(let url): "missingSource: \(url.path)"
+        case .emptyRange: "emptyRange"
+        case .presetUnavailable: "presetUnavailable"
+        }
+    }
 }
 
 /// Cuts sentence clips out of imported videos. Reads the library; writes only to the destination it is given.

@@ -15,8 +15,8 @@ struct RootView: View {
                     ProgressView().controlSize(.large)
                     Text("Opening your library…").font(Theme.title(18)).foregroundStyle(Theme.ink)
                 }
-            case .failed(let message):
-                FailureView(title: "Couldn't start", detail: message)
+            case .failed(let problem):
+                FailureView(title: "Couldn't start", problem: problem)
             case .ready(let env):
                 if app.needsOnboarding { OnboardingView(env: env) } else { layout(env).modifier(AnkiExportFlow(env: env)) }
             }

@@ -18,7 +18,7 @@ struct ReviewView: View {
     @State private var remaining = 0
     @State private var total = 0
     @State private var summary: (answered: Int, correct: Int)?
-    @State private var error: String?
+    @State private var error: Problem?
     @State private var audio: SentenceAudioPlayer?
     @State private var mode: SentenceAudioMode = .onReveal
     @State private var style: ReviewStyle = .meaning
@@ -52,7 +52,7 @@ struct ReviewView: View {
     var body: some View {
         Group {
             if let error {
-                FailureView(title: "Something went wrong", detail: error)
+                FailureView(title: "Something went wrong", problem: error)
             } else if let teaching {
                 // A batch of its own: when every word in one is marked known there is no quiz, so the next batch follows at
                 // once, and without this identity it would inherit the last one's position and wait on a card that never loads.
@@ -190,6 +190,13 @@ struct ReviewView: View {
             }
     }
 
+    private func showAnswer(_ card: ReviewCard) {
+        if dictation(for: card) { checkDictation(); return }
+        revealed = true
+        // In a fill-in card the sentence is the question, so hearing it before the answer would give it away.
+        if !listening(for: card), mode == .onReveal || (mode == .onCardShown && cloze(for: card) != nil) { playSentence() }
+    }
+
     private func cardBody(_ card: ReviewCard) -> some View {
         VStack(spacing: 20) {
             HStack(spacing: 14) {
@@ -275,7 +282,7 @@ struct ReviewView: View {
                         if card.example != nil {
                             Button { playSentence() } label: { KeyedLabel(title: "Play sentence", systemImage: "speaker.wave.2.fill", key: "R") }
                                 .buttonStyle(.pill(.secondary, compact: true))
-                                .keyboardShortcut("r", modifiers: [])
+                                .focusedSceneValue(\.reviewPlaySentence, playSentence)
                                 .help("Play this sentence from your video (R)")
                             Menu {
                                 if canTranslate {
@@ -306,27 +313,24 @@ struct ReviewView: View {
                 HStack(spacing: 16) {
                     Button { Task { await answer(false) } } label: { KeyedLabel(title: "Missed it", systemImage: "xmark", key: "←") }
                         .buttonStyle(.pill(.secondary))
-                        .keyboardShortcut(.leftArrow, modifiers: [])
+                        .focusedSceneValue(\.reviewMissed, { Task { await answer(false) } } as () -> Void)
                     Button { Task { await answer(true) } } label: { KeyedLabel(title: "Got it", systemImage: "checkmark", key: "→") }
                         .buttonStyle(.pill)
-                        .keyboardShortcut(.rightArrow, modifiers: [])
+                        .focusedSceneValue(\.reviewGot, { Task { await answer(true) } } as () -> Void)
                 }
             } else {
-                Button {
-                    if dictation(for: card) { checkDictation(); return }
-                    revealed = true
-                    // In a fill-in card the sentence is the question, so hearing it before the answer would give it away.
-                    if !listening(for: card), mode == .onReveal || (mode == .onCardShown && cloze(for: card) != nil) { playSentence() }
-                } label: {
+                Button { showAnswer(card) } label: {
                     KeyedLabel(title: "Show answer", key: dictation(for: card) ? nil : "Space")
                 }
                 .buttonStyle(.pill(dictation(for: card) ? .secondary : .primary))
                 // Space is a letter while typing, so a typed card checks with Return instead.
-                .keyboardShortcut(dictation(for: card) ? nil : KeyboardShortcut(.space, modifiers: []))
+                .focusedSceneValue(\.reviewShowAnswer, dictation(for: card) ? nil : { showAnswer(card) } as (() -> Void))
             }
             if !reviewShortcuts.isEmpty { ShortcutButtonRow(items: reviewShortcuts.map { shortcutItem($0, card) }) }
         }
         .padding(28)
+        .focusedSceneValue(\.reviewShortcutActions, shortcutActions(card))
+        .focusedSceneValue(\.reviewTyping, typingFocused || editingExample != nil)
     }
 
     /// The fill-in version of a card, when that is the chosen style and the word has a sentence to blank.
@@ -360,7 +364,7 @@ struct ReviewView: View {
                 .font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
             Button { playSentence() } label: { KeyedLabel(title: "Play again", systemImage: "speaker.wave.2.fill", key: "R") }
                 .buttonStyle(.pill(.secondary, compact: true))
-                .keyboardShortcut("r", modifiers: [])
+                .focusedSceneValue(\.reviewPlaySentence, playSentence)
                 .help("Play the sentence again (R)")
         }
     }
@@ -422,23 +426,20 @@ struct ReviewView: View {
             HStack(spacing: 10) {
                 Button { playSentence() } label: { KeyedLabel(title: "Hear it", systemImage: "speaker.wave.2.fill", key: "R") }
                     .buttonStyle(.pill(.secondary, compact: true))
-                    .keyboardShortcut("r", modifiers: [])
+                    .focusedSceneValue(\.reviewPlaySentence, playSentence)
                     .help("Play the sentence from your video (R)")
-                Button {
-                    if voice.state == .recording { voice.stop() }
-                    else { audio?.stop(); Task { await voice.start(maxSeconds: min(20, (example.endTime - example.startTime) * 2 + 3)) } }
-                } label: {
+                Button { toggleRecording(example) } label: {
                     KeyedLabel(title: voice.state == .recording ? "Stop" : "Record", systemImage: voice.state == .recording ? "stop.fill" : "mic.fill", key: "M")
                 }
                 .buttonStyle(.pill(voice.state == .recording ? .primary : .secondary, compact: true))
-                .keyboardShortcut("m", modifiers: [])
+                .focusedSceneValue(\.reviewRecord, { toggleRecording(example) } as () -> Void)
                 .help("Record yourself saying the sentence (M). The recording is deleted when the card ends.")
                 if voice.state == .recorded {
-                    Button { audio?.stop(); voice.togglePlayback() } label: {
+                    Button { hearYourself() } label: {
                         KeyedLabel(title: voice.isPlaying ? "Stop" : "Hear yourself", systemImage: voice.isPlaying ? "stop.fill" : "waveform", key: "Y")
                     }
                     .buttonStyle(.pill(.secondary, compact: true))
-                    .keyboardShortcut("y", modifiers: [])
+                    .focusedSceneValue(\.reviewHearYourself, { hearYourself() } as () -> Void)
                 }
             }
             switch voice.state {
@@ -502,7 +503,6 @@ struct ReviewView: View {
             HStack(spacing: 10) {
                 Button("Play again", systemImage: "speaker.wave.2.fill") { playSentence() }
                     .buttonStyle(.pill(.secondary, compact: true))
-                    .keyboardShortcut("r", modifiers: .command)
                     .help("Play the sentence again (⌘R)")
                 Button("Check", action: checkDictation).buttonStyle(.pill(compact: true))
             }
@@ -571,22 +571,25 @@ struct ReviewView: View {
     }
 
     private func shortcutItem(_ shortcut: ReviewShortcut, _ card: ReviewCard) -> ShortcutButtonRow.Item {
-        let title: String
         let perform: () -> Void
         switch shortcut {
-        case .check: title = String(localized: "Check"); perform = checkDictation
-        case .playAgain: title = String(localized: "Play again"); perform = playSentence
+        case .check: perform = checkDictation
+        case .playAgain: perform = playSentence
         case .sayWord:
-            title = String(localized: "Say word")
             let text = (app.profile.display.showsReadings ? card.entries.first?.reading : nil) ?? card.word.lemma
             let code = app.profile.whisperCode
             perform = { WordSpeaker.shared.speak(text, languageCode: code) }
-        case .wordPage: title = String(localized: "Word page"); perform = { showsWord.toggle() }
-        case .furigana: title = String(localized: "Furigana"); perform = { furiganaPinned.toggle() }
-        case .editSentence: title = String(localized: "Edit sentence"); perform = editSentence
-        case .translation: title = String(localized: "Translation"); perform = toggleTranslation
+        case .wordPage: perform = { showsWord.toggle() }
+        case .furigana: perform = { furiganaPinned.toggle() }
+        case .editSentence: perform = editSentence
+        case .translation: perform = toggleTranslation
         }
-        return .init(id: shortcut.rawValue, key: shortcut.key, title: title, letter: shortcut.letter, perform: perform)
+        return .init(id: shortcut.rawValue, key: shortcut.key, title: shortcut.title, perform: perform)
+    }
+
+    /// What the Review menu may do now: the same keys as the row under the card, each with its action.
+    private func shortcutActions(_ card: ReviewCard) -> [ReviewShortcut: () -> Void] {
+        Dictionary(uniqueKeysWithValues: reviewShortcuts.map { ($0, shortcutItem($0, card).perform) })
     }
 
     private var translationMode: TranslationDisplay { env.translation.display }
@@ -608,7 +611,7 @@ struct ReviewView: View {
                 .multilineTextAlignment(.center).textSelection(.enabled)
                 .accessibilityLabel("Translation: \(text)")
         } else if let problem = translations?.problem {
-            Text(problem).font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+            Text(problem.message).font(Theme.small).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
         } else {
             Text("Translating…").font(Theme.small).foregroundStyle(Theme.faint)
         }
@@ -626,6 +629,16 @@ struct ReviewView: View {
         }
         translations?.need(Subtitle(id: example.id, videoId: example.videoID, idx: 0, startTime: example.startTime,
                                     endTime: example.endTime, text: example.text))
+    }
+
+    private func toggleRecording(_ example: ExampleLine) {
+        if voice.state == .recording { voice.stop() }
+        else { audio?.stop(); Task { await voice.start(maxSeconds: min(20, (example.endTime - example.startTime) * 2 + 3)) } }
+    }
+
+    private func hearYourself() {
+        audio?.stop()
+        voice.togglePlayback()
     }
 
     private func editSentence() {
@@ -662,7 +675,7 @@ struct ReviewView: View {
             lessons = try await env.database.dailyLessons(
                 language: app.languageCode, contentPOS: app.profile.contentPOS, perDay: env.dailyLessons.perDay(for: app.profile))
             stats = try await env.database.learningStats(language: app.languageCode)
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't load your reviews.")) }
     }
 
     private func startLessons() {
@@ -687,7 +700,7 @@ struct ReviewView: View {
                 }
                 lessonQueue = stride(from: 0, to: ids.count, by: DailyLessons.batchSize).map { Array(ids[$0..<min($0 + DailyLessons.batchSize, ids.count)]) }
                 teachNext()
-            } catch { self.error = error.localizedDescription }
+            } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't load those words.")) }
         }
     }
 
@@ -746,7 +759,7 @@ struct ReviewView: View {
             total = await new.remaining
             remaining = total   // set together with the total, or the bar shows full for a moment
             await advance(new)
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't start this session.")) }
     }
 
     private func answer(_ correct: Bool) async {
@@ -757,7 +770,7 @@ struct ReviewView: View {
             await app.refreshDue()
             if await session.canUndo { offerUndo(session: session) } else { app.clearReviewUndo() }
             await advance(session)
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't save your answer.")) }
     }
 
     /// Edit > Undo takes back the latest answer only, so it is the quick undo until the next answer.
@@ -771,7 +784,7 @@ struct ReviewView: View {
                     }
                     await app.refreshDue()
                     if self.session === session { await advance(session) }
-                } catch { self.error = error.localizedDescription }
+                } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't undo that answer. Try again.")) }
             }
         }
     }
@@ -796,6 +809,6 @@ struct ReviewView: View {
                 if await session.isKnownCheck || extra == .lesson { app.dataChanged() }   // the lists and coverage have changed
                 await loadOverview(keepingSummary: true)
             }
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't load the next card.")) }
     }
 }

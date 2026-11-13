@@ -27,7 +27,7 @@ struct LessonView: View {
     @State private var taught: [Int64] = []
     @State private var known = 0
     @State private var audio: SentenceAudioPlayer?
-    @State private var error: String?
+    @State private var error: Problem?
     /// Leaving asks first: Esc is easy to press by mistake, and the words taught so far are not started.
     @State private var confirmingEnd = false
 
@@ -47,7 +47,7 @@ struct LessonView: View {
 
             Spacer(minLength: 0)
             if let error {
-                FailureView(title: "Something went wrong", detail: error)
+                FailureView(title: "Something went wrong", problem: error)
             } else if let card {
                 face(card)
             } else {
@@ -122,7 +122,7 @@ struct LessonView: View {
             if card == nil { index += 1; return }
             if audio == nil { audio = SentenceAudioPlayer(libraryRoot: env.libraryURL) }
             if env.reviewAudio.mode(for: app.profile) != .off { play() }
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't load this lesson.")) }
     }
 
     private func play() {
@@ -144,7 +144,7 @@ struct LessonView: View {
             card = nil
             index += 1
             if index >= wordIDs.count { await end(quiz: true) }
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't save your answer.")) }
     }
 
     /// Saved now, so the Words page is refreshed. The toast offers Undo, which also brings the card back if it is still next.

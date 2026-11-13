@@ -26,8 +26,9 @@ final class ImportQueueTests: XCTestCase {
         queue.enqueue([h.original], profile: SpanishProfile(), model: "m")
         await queue.waitUntilIdle()
 
-        guard case .failed(let message) = queue.jobs[0].status else { return XCTFail("expected failure") }
-        XCTAssertEqual(message, "The speech model isn't downloaded yet.")
+        guard case .failed(let problem) = queue.jobs[0].status else { return XCTFail("expected failure") }
+        XCTAssertEqual(problem.message, "The speech model isn't downloaded yet. Download it from Import, then try again.")
+        XCTAssertTrue(problem.detail.contains("notInstalled: m"))
         try h.assertOriginalUntouched()
         try await h.assertNothingLeft()
 

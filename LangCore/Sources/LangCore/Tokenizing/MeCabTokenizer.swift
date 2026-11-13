@@ -1,8 +1,18 @@
 import CMeCab
 import Foundation
 
-public enum MeCabError: Error {
+public enum MeCabError: Error, DetailedError {
     case modelFailed(String)
+
+    public var errorDescription: String? {
+        String(localized: "Kikimi couldn't start reading Japanese words. Quit and open Kikimi again.", bundle: .module)
+    }
+
+    public var detail: String {
+        switch self {
+        case .modelFailed(let why): "modelFailed: \(why)"
+        }
+    }
 }
 
 /// MeCab morphological analyser. Knows nothing about any dictionary's tag set: the profile that supplies
