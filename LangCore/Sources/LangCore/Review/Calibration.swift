@@ -10,14 +10,14 @@ public struct CalibrationWord: Equatable, Sendable, Identifiable {
 }
 
 /// Telling Kikimi which words of a video you already know, so a new learner's first coverage figure and first lessons start
-/// from what they really know. The video's most-seen new words are shown in batches; you point at the ones you don't know,
-/// and the pass stops once most of a batch is unknown, since further down the list it only gets harder. Everything shown
-/// that you did not point at is then known. The rules live here; the screen only draws them.
+/// from what they really know. The video's most-seen new words are shown in batches; you tick the ones you know, and the
+/// pass stops once fewer than half of a batch are known, since further down the list it only gets harder. Only the words
+/// you ticked are then known. The rules live here; the screen only draws them.
 public enum Calibration {
     public static let batchSize = 20
     /// About 120 words, a few minutes at most.
     public static let maxBatches = 6
-    /// A batch with at least this share of unknown words is the last.
+    /// A batch with a smaller share of known words than this is the last.
     public static let stopShare = 0.5
 
     /// The words in the groups they are shown in, most-seen first.
@@ -27,15 +27,15 @@ public enum Calibration {
         }
     }
 
-    /// Whether the pass ends after this batch, because most of it is unknown to you.
-    public static func endsAfter(_ batch: [CalibrationWord], unknown: Set<Int64>) -> Bool {
+    /// Whether the pass ends after this batch, because fewer than half of it is known to you.
+    public static func endsAfter(_ batch: [CalibrationWord], known: Set<Int64>) -> Bool {
         guard !batch.isEmpty else { return true }
-        return Double(batch.filter { unknown.contains($0.id) }.count) / Double(batch.count) >= stopShare
+        return Double(batch.filter { known.contains($0.id) }.count) / Double(batch.count) < stopShare
     }
 
-    /// The words to mark known: every word shown that was not pointed at as unknown.
-    public static func known(shown: [[CalibrationWord]], unknown: Set<Int64>) -> [Int64] {
-        shown.flatMap { $0 }.map(\.id).filter { !unknown.contains($0) }
+    /// The words to mark known: every word shown that you ticked.
+    public static func known(shown: [[CalibrationWord]], ticked: Set<Int64>) -> [Int64] {
+        shown.flatMap { $0 }.map(\.id).filter { ticked.contains($0) }
     }
 }
 
