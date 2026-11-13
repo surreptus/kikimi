@@ -99,6 +99,7 @@ default. There are no UI tests. Check views by building and by rendering.
 | `LANGCORE_FILE=<media>` | With the benchmark: one file (read-only) |
 | `LANGCORE_COMPACT_FILE=<video>` | What video compaction does to one file (read-only) |
 | `LANGCORE_AUDIT=1` | The full dictionary audits (`DictionaryAuditTests`) |
+| `KIKIMI_TOKEN_AUDIT=<folder>` | The tokenizer audit (`TokenAuditRunTests`) on the .srt and .vtt files in the folder. It reads the files only. The language is the file name prefix (`es-`), or `KIKIMI_AUDIT_LANG`. `KIKIMI_AUDIT_SAVE=<file>` writes a baseline. `KIKIMI_AUDIT_BASELINE=<file>` shows new and gone suspects. `KIKIMI_AUDIT_TOP=<n>` sets the list length. |
 
 If `xcode-select` points at the Command Line Tools, set `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`. Other tests:
 `python3 Scripts/dictionaries/test_builders.py`, `python3 -I Scripts/test_release_tools.py`, and `Scripts/check_leaks.sh` (the
