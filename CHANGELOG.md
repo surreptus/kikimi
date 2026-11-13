@@ -2,6 +2,29 @@
 
 What changed in each version of Kikimi, newest first. Every release's page on GitHub has these notes with its download and checksum.
 
+## 0.17.0
+
+*12 November 2026.* Japanese cards show every reading and each kanji, a sentence's furigana appears when you point at it, the "words I know" list is ticked the friendly way round, and new videos offer their next steps right in the list.
+
+### New
+
+- **Every reading, and each kanji, on Japanese cards.** 月 now shows つき・げつ・がつ. Under the meaning, each kanji appears with its own meaning and its on'yomi and kun'yomi readings, on the learn card and on the back of a review card.
+- **Furigana on a review card's sentence.** After you reveal a card, point at the sentence to see furigana over its words, or press **F** to keep it on.
+- **"I know these words."** The list that tunes a video to your level now asks which words you *know*. Tick them, or use **Select all**. You are shown more words only while you know at least half of a group, and **Mark N as known** marks just the ticked ones, with Undo.
+- **Next steps in a new video's row.** Until you play a video you added in the last two weeks, its row offers **Mark the words I know** and **Learn N words in lessons**. This replaces the card that the first video used to get.
+- **A yellow dot on Learn** when lessons are waiting.
+- **A small animation** when a new video joins the list (a plain fade if Reduce Motion is on).
+
+### Changed
+
+- **Esc is gentler.** In lessons and reviews, the first Esc closes the word's page. A second Esc asks before it ends the session, and your answers so far are kept.
+- **Larger text** for the explanations in dialogs and under each page's title, and for the sentence on the back of a review card. They follow your text size setting.
+- The Words page no longer has the "Start with the 25 new words" button. Lessons already do that job.
+
+### Fixed
+
+- **A good video was sometimes refused** with "can't be opened", because Kikimi did not have permission to read it at the moment it checked. It now asks for that permission first.
+
 ## 0.16.1
 
 *12 November 2026.* A way to start over, English words in Japanese lines no longer offered to learn, shorter subtitle lines, clickable keys on review cards, and clearer messages for files Kikimi can't open.
