@@ -414,6 +414,34 @@
         }
       }
     },
+    "Kikimi can't download the speech model %@." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kikimi kann das Sprachmodell „%@“ nicht laden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kikimi no puede descargar el modelo de voz %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kikimi ne peut pas télécharger le modèle vocal %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kikimi は音声モデル %@ をダウンロードできません。"
+          }
+        }
+      }
+    },
     "less than a minute left" : {
       "localizations" : {
         "de" : {
@@ -531,6 +559,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ のダウンロードが完了しませんでした（%@ が不足）。接続を確認して、もう一度ダウンロードしてください。"
+          }
+        }
+      }
+    },
+    "The %@ download is damaged: a file does not match what it should be. Kikimi deleted it and will not use it. Check your connection and download again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Download von %@ ist beschädigt: Eine Datei stimmt nicht mit dem erwarteten Inhalt überein. Kikimi hat sie gelöscht und verwendet sie nicht. Prüfe deine Verbindung und lade erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La descarga de %@ está dañada: un archivo no coincide con lo esperado. Kikimi lo ha eliminado y no lo usará. Comprueba tu conexión y vuelve a descargar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le téléchargement de %@ est endommagé : un fichier ne correspond pas à ce qui est attendu. Kikimi l’a supprimé et ne l’utilisera pas. Vérifiez votre connexion et téléchargez à nouveau."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ のダウンロードが壊れています。期待される内容と一致しないファイルがありました。Kikimi はそのファイルを削除し、使用しません。接続を確認して、もう一度ダウンロードしてください。"
           }
         }
       }

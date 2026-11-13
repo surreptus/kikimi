@@ -27,6 +27,9 @@ Work from top to bottom. `Scripts/release.sh --help` shows how to run the build.
       more than 31 days old. New Wiktionary extracts can change meanings and verb forms, so then run
       `python3 Scripts/dictionaries/test_builders.py`, `swift test` and `LANGCORE_AUDIT=1 swift test --filter DictionaryAuditTests`.
 - [ ] `cd LangCore && swift test` passes. (The release script runs it unless you pass `--skip-tests`.)
+- [ ] **When the speech models change, run the manifest script.** Run `python3 -I Scripts/update_model_manifest.py --commit <full
+      commit name>`, then `python3 -I Scripts/test_model_manifest.py` and `swift test`. Commit `ModelManifest.json`. Without
+      `--commit`, the script keeps the current commit. A new variant in `ModelCatalog.swift` needs this too.
 - [ ] **Run the model-based tests.** The normal run skips them, and without them `WhisperKitTranscriber` coverage is 6%. With a
       network connection, run `cd LangCore && LANGCORE_INTEGRATION=1 swift test` (tiny model, about 73 MB). Then run once with a
       model that you ship:

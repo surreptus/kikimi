@@ -27,7 +27,7 @@ let package = Package(
                 .product(name: "GRDB", package: "GRDB.swift"),
                 .product(name: "WhisperKit", package: "WhisperKit"),
             ],
-            resources: [.copy("Resources/ipadic"), .copy("Resources/dictionaries"), .copy("Resources/Licenses"), .process("Resources/Localizable.xcstrings")]
+            resources: [.copy("Resources/ipadic"), .copy("Resources/dictionaries"), .copy("Resources/Licenses"), .copy("Resources/ModelManifest.json"), .process("Resources/Localizable.xcstrings")]
         ),
         .testTarget(name: "LangCoreTests", dependencies: ["LangCore"]),
     ],

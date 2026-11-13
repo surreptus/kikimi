@@ -116,7 +116,7 @@ final class ModelStorageTests: XCTestCase {
     func testCantRemoveAModelThatIsDownloadingRightNow() async throws {
         let dir = directory()
         let gate = Gate()
-        let manager = ModelManager(directory: dir) { [self] variant, base, _ in
+        let manager = ModelManager(directory: dir, manifest: .unchecked("openai_whisper-medium")) { [self] variant, base, _ in
             await gate.wait()
             return try writeModel(variant, in: base)
         }
