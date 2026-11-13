@@ -753,10 +753,29 @@ struct ReviewView: View {
         guard let session else { return }
         audio?.stop()
         do {
+            let word = card?.word.lemma ?? ""
             try await session.answer(correct: correct)
             await app.refreshDue()
+            if await session.canUndo { offerUndo(correct, word: word, session: session) }
             await advance(session)
         } catch { self.error = error.localizedDescription }
+    }
+
+    /// Undo takes back the latest answer only; the next answer replaces this toast.
+    private func offerUndo(_ correct: Bool, word: String, session: ReviewSession) {
+        let text = correct ? String(localized: "“\(word)”: got it") : String(localized: "“\(word)”: missed it")
+        app.showToast(text, undo: (String(localized: "Undo"), {
+            Task {
+                do {
+                    guard try await session.undoLast() else {
+                        app.showToast(String(localized: "Couldn't undo: the word has changed since."), isError: true)
+                        return
+                    }
+                    await app.refreshDue()
+                    if self.session === session { await advance(session) }
+                } catch { self.error = error.localizedDescription }
+            }
+        }))
     }
 
     private func advance(_ session: ReviewSession) async {
