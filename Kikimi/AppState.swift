@@ -143,6 +143,7 @@ final class AppState {
             let env = try LangEnvironment.standard()
             try await env.prepare()
             VoiceRecorder.removeLeftovers()   // a Shadow recording that a crash left behind
+            VoiceRecorder.removeWhenQuitting()
             importQueue = ImportQueue(pipeline: env.pipeline)
             // A library from before this choice existed is already in use, so it skips the welcome.
             if env.learning.codes == nil, try await !env.database.libraryVideos().isEmpty {

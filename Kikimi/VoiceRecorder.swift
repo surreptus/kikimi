@@ -1,9 +1,11 @@
+import AppKit
 import AVFoundation
 import Observation
 
 /// Records the learner saying a sentence, for the Shadow card, so it can be played beside the original. The recording is
-/// a temporary file that exists only while the card does: `discard()` deletes it, and anything left by a crash is
-/// deleted when the app next opens (`removeLeftovers`). Nothing is uploaded, transcribed or analysed.
+/// a temporary file that exists only while the card does: `discard()` deletes it, quitting deletes what is left
+/// (`removeWhenQuitting`), and anything left by a crash is deleted when the app next opens (`removeLeftovers`). Nothing is
+/// uploaded, transcribed or analysed.
 @MainActor @Observable
 final class VoiceRecorder: NSObject, AVAudioPlayerDelegate {
     enum State: Equatable { case idle, recording, recorded, denied, failed }
@@ -19,6 +21,13 @@ final class VoiceRecorder: NSObject, AVAudioPlayerDelegate {
 
     /// Deletes recordings a crash left behind. Call once at launch.
     nonisolated static func removeLeftovers() { try? FileManager.default.removeItem(at: folder) }
+
+    /// Deletes any recording when the app quits, since a closing window does not always end the card first. Call once at launch.
+    nonisolated static func removeWhenQuitting() {
+        NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: nil) { _ in
+            removeLeftovers()
+        }
+    }
 
     /// Starts recording, asking for the microphone the first time. Stops by itself after `seconds`, so a forgotten
     /// recording can't run on.
