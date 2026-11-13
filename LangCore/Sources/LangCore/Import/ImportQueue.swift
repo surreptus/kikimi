@@ -1,36 +1,56 @@
 import Foundation
 import Observation
 
-extension ImportError: LocalizedError {
+extension ImportError: DetailedError {
     public var errorDescription: String? {
         switch self {
         case .duplicate: String(localized: "Already imported.", bundle: .module)
         case .languageMismatch(let detected, let chosen, _):
             String(localized: "This sounds like \(LanguageProfiles.profile(for: detected)?.displayName ?? detected), not \(LanguageProfiles.profile(for: chosen)?.displayName ?? chosen).", bundle: .module)
-        case .copyFailed(let e): String(localized: "Couldn't copy the file: \(e.localizedDescription)", bundle: .module)
+        case .copyFailed:
+            String(localized: "Kikimi couldn't copy this video. Check that the file is still there and that your Mac has free space, then try again.", bundle: .module)
         case .transcriptionFailed(let e): Self.describe(transcription: e)
-        case .transcodeFailed(let e): String(localized: "Couldn't re-encode the video: \(e.localizedDescription)", bundle: .module)
-        case .verificationFailed(let why): String(localized: "The re-encoded video failed verification (\(why)). Your original is untouched.", bundle: .module)
-        case .libraryMoveFailed(let e): String(localized: "Couldn't save to the library: \(e.localizedDescription)", bundle: .module)
-        case .databaseFailed(let e): String(localized: "Couldn't save to the database: \(e.localizedDescription)", bundle: .module)
+        case .transcodeFailed:
+            String(localized: "Kikimi couldn't prepare this video for your library. Your original is untouched. Check that your Mac has free space, then try again.", bundle: .module)
+        case .verificationFailed:
+            String(localized: "The library copy of this video didn't turn out right, so Kikimi didn't keep it. Your original is untouched. Try adding it again.", bundle: .module)
+        case .libraryMoveFailed:
+            String(localized: "Kikimi couldn't put this video in your library. Check that your Mac has free space, then try again.", bundle: .module)
+        case .databaseFailed:
+            String(localized: "Kikimi couldn't save this video's words. Quit and open Kikimi again, then try again.", bundle: .module)
         case .subtitlesUnusable(let problem): Self.describe(subtitles: problem)
+        }
+    }
+
+    /// The technical text, for "Show details" and bug reports.
+    public var detail: String {
+        switch self {
+        case .duplicate(let id): "duplicate (existing video \(id.map(String.init) ?? "none"))"
+        case .languageMismatch(let detected, let chosen, let confidence): "languageMismatch detected=\(detected) chosen=\(chosen) confidence=\(confidence)"
+        case .copyFailed(let e): "copyFailed: \(Problem.rawDetail(of: e))"
+        case .transcriptionFailed(let e): "transcriptionFailed: \(Problem(e, fallback: "").detail)"
+        case .transcodeFailed(let e): "transcodeFailed: \(Problem(e, fallback: "").detail)"
+        case .verificationFailed(let why): "verificationFailed: \(why)"
+        case .libraryMoveFailed(let e): "libraryMoveFailed: \(Problem.rawDetail(of: e))"
+        case .databaseFailed(let e): "databaseFailed: \(Problem.rawDetail(of: e))"
+        case .subtitlesUnusable(let problem): "subtitlesUnusable: \(problem)"
         }
     }
 
     private static func describe(subtitles problem: SubtitleProblem) -> String {
         switch problem {
-        case .unreadable: String(localized: "Couldn't read the subtitles file.", bundle: .module)
+        case .unreadable: String(localized: "Kikimi couldn't read that subtitles file. Check that it is an .srt or .vtt file, then try again.", bundle: .module)
         case .noSubtitles: String(localized: "There are no subtitles in that file. Kikimi reads .srt and .vtt files.", bundle: .module)
-        case .outsideVideo: String(localized: "These subtitles don't match this video: they all start after it ends.", bundle: .module)
-        case .otherLanguage(let name): String(localized: "These subtitles are in \(name), not the language you chose.", bundle: .module)
+        case .outsideVideo: String(localized: "These subtitles don't match this video: they all start after it ends. Choose the subtitles for this video.", bundle: .module)
+        case .otherLanguage(let name): String(localized: "These subtitles are in \(name), not the language you chose. Choose subtitles in that language, or change the language.", bundle: .module)
         }
     }
 
     private static func describe(transcription error: Error) -> String {
         switch error {
-        case ModelError.notInstalled: String(localized: "The speech model isn't downloaded yet.", bundle: .module)
-        case AudioExtractionError.noAudioTrack: String(localized: "This file has no audio track.", bundle: .module)
-        default: String(localized: "Transcription failed: \(error.localizedDescription)", bundle: .module)
+        case ModelError.notInstalled: String(localized: "The speech model isn't downloaded yet. Download it from Import, then try again.", bundle: .module)
+        case AudioExtractionError.noAudioTrack: String(localized: "This file has no audio track. Try a video with sound, or add a subtitles file.", bundle: .module)
+        default: String(localized: "Kikimi couldn't turn the speech into text. Try again. If it keeps happening, choose Help > Report a Problem.", bundle: .module)
         }
     }
 }
@@ -48,7 +68,7 @@ public final class ImportQueue {
         /// Cancel was pressed on a running import; it stops at the next safe point.
         case cancelling
         case cancelled
-        case failed(String)
+        case failed(Problem)
     }
 
     public struct Job: Identifiable, Sendable {
@@ -166,7 +186,9 @@ public final class ImportQueue {
                 case is CancellationError: set(job.id, .cancelled)
                 case ImportError.duplicate: set(job.id, .duplicate)
                 case ImportError.languageMismatch(let detected, _, _): set(job.id, .languageMismatch(detected: detected))
-                default: set(job.id, .failed(error.localizedDescription))
+                default:
+                    set(job.id, .failed(Problem(error, fallback: String(
+                        localized: "Kikimi couldn't add this video. Try again. If it keeps happening, choose Help > Report a Problem.", bundle: .module))))
                 }
             }
         }

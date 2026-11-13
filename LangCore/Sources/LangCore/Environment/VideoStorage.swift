@@ -21,14 +21,21 @@ public struct VideoDeletion: Sendable {
     public let removedWords: Int
 }
 
-public enum VideoStorageError: Error, LocalizedError {
+public enum VideoStorageError: Error, DetailedError {
     case unsafePath(String)
     case filesRemain(URL)
 
     public var errorDescription: String? {
         switch self {
-        case .unsafePath(let path): String(localized: "Refusing to delete \(path): it isn't inside the library.", bundle: .module)
-        case .filesRemain(let url): String(localized: "The video was removed from the app but its files couldn't be deleted: \(url.path)", bundle: .module)
+        case .unsafePath: String(localized: "Kikimi didn't remove that file, because it isn't in your library. Nothing was deleted.", bundle: .module)
+        case .filesRemain: String(localized: "The video is gone from Kikimi, but some of its files are still on your Mac. You can delete them in Finder.", bundle: .module)
+        }
+    }
+
+    public var detail: String {
+        switch self {
+        case .unsafePath(let path): "unsafePath: \(path)"
+        case .filesRemain(let url): "filesRemain: \(url.path)"
         }
     }
 }

@@ -62,16 +62,24 @@ public struct ProgressBackup: Codable, Equatable, Sendable {
     private struct Header: Decodable { let format: String; let version: Int }
 }
 
-public enum BackupError: Error, LocalizedError, Equatable {
+public enum BackupError: Error, DetailedError, Equatable {
     case notABackup
     case newerVersion(Int)
     case damaged
 
     public var errorDescription: String? {
         switch self {
-        case .notABackup: String(localized: "This file isn't a Kikimi backup.", bundle: .module)
+        case .notABackup: String(localized: "This file isn't a Kikimi backup. Choose a file you saved from Kikimi.", bundle: .module)
         case .newerVersion: String(localized: "This backup was made by a newer version of Kikimi. Update the app, then try again.", bundle: .module)
         case .damaged: String(localized: "This backup file is damaged, so nothing was changed.", bundle: .module)
+        }
+    }
+
+    public var detail: String {
+        switch self {
+        case .notABackup: "notABackup"
+        case .newerVersion(let version): "newerVersion: \(version)"
+        case .damaged: "damaged"
         }
     }
 }

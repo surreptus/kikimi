@@ -296,7 +296,7 @@ final class AppSupportTests: XCTestCase {
         let installed = await manager.isInstalled("openai_whisper-medium")
         XCTAssertFalse(installed)
         let message = ModelError.incomplete("m", missing: ["a"]).errorDescription ?? ""
-        XCTAssertTrue(message.contains("download again"))
+        XCTAssertTrue(message.contains("download it again"))
     }
 
     func testModelPreferencesOverrideAndReset() {
