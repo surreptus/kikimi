@@ -1,6 +1,6 @@
 # Roadmap
 
-This file lists what 1.0 needs and what comes after. The principles are in [AGENTS.md](AGENTS.md). Last updated 2026-11-12.
+This file lists what 1.0 needs and what comes after. The principles are in [AGENTS.md](AGENTS.md). Last updated 2026-11-13.
 
 ## Where we are
 
@@ -65,6 +65,65 @@ sessions), release work (signing, notarization) and a legal review. New features
       scales it. The transcript, menus, system controls and tooltips are not scaled. Check by eye at Largest: the player controls,
       the Learn cards, the Settings window and the Words table columns.
 
+### From the review of 13 Nov 2026
+
+A review read the source for platform practice, security, text, the website, accessibility and the learning loop. "Confirmed"
+means a second read of the code agreed. All other items are reported and need a check. Nothing was run in the app.
+
+Learning loop:
+- [ ] **Bug (confirmed): `startLearning(wordID:)` resets a finished or learning word to stage 1** (`LangDatabase.swift`). Only the
+      UI guards it. Skip those words, as the bulk version does. Add a test. Fix open in pull request #45.
+- [ ] **Bug (confirmed): a review session ends if a word changes status during it.** `recordReview` throws `notLearning`, and
+      the failure screen replaces the session. Skip the card. Add a test. Fix open in pull request #46.
+- [ ] **Limit the review load (confirmed: `dueWords` has no limit, and the intervals have no variation).** A bulk Learn of many
+      words comes back as one pile at each stage. Add a limit for each session, a small random variation on each interval, and
+      the daily allowance for bulk Learn. Reason: review time must not replace watching time.
+- [ ] **Undo.** Add undo for a review answer, for L, K and X in the player, and for "Already know it" in a lesson. K on a
+      learning word discards its stage without a message.
+- [ ] Build *Known and learning on each video's bar* (below) before 1.0, because Next up uses that figure.
+
+Engineering:
+- [ ] **CI (confirmed: no workflow runs the tests or builds the app).** Add a pull request workflow with `swift test` and a
+      Debug build.
+- [ ] **`Info.plist` has `NSHumanReadableCopyright` twice (confirmed).** The second is empty. Delete it.
+- [ ] Show an error when a write fails. The app target has about 50 `try?` calls, and a failed status change looks successful.
+- [ ] Open With and the Dock icon accept only `.kikimi` backups. Accept videos and subtitle files too.
+- [ ] `VideosView.reload` measures the library folder and calls `wordsToReach` for each video. Check the cost with a large library.
+
+Security and privacy (no high-severity finding):
+- [ ] **Speech model download (confirmed):** no fixed revision and no checksum. The app checks only that four files exist. Fix the
+      revision, check SHA-256 values, and name the host in the privacy policy.
+- [ ] **Shadow recording (confirmed):** the policy says the recording is deleted on quit, and the code has no quit step. Add the
+      step, or change the sentence.
+- [ ] Restore: refuse a symbolic link in a backup folder (suspected, not confirmed).
+- [ ] Workflows: give `pages` and `id-token` permissions to the deploy job only. Pin actions by commit.
+- [ ] Update check: accept only this repository's path on `github.com`.
+
+Text in the app:
+- [ ] **Error messages.** Import and storage errors show raw system text and the words "re-encode", "verification" and
+      "database". Each message must say what happened and what to do next. Put the raw detail behind "Show details".
+- [ ] **One name for one thing.** Learn, Review, Lessons, Practice and Session overlap. "Set aside" means an ignored word and a
+      reset library. "Danger zone" is above text that says nothing is deleted.
+- [ ] "Practise" in `AboutView.swift` (confirmed) must be "Practice". The app says "Stage N of 9", the guide says eight stages,
+      and the README says nine. Use one count.
+- [ ] Remove the stale catalog entries (about 14). Use title case for all menu items and buttons.
+
+Website:
+- [ ] **Landing page.** Say "free Mac app" in the first line. Explain comprehensible input in one sentence. Show the beta status.
+      Add a screenshot in a language other than Japanese, and one of a card.
+- [ ] **Download page.** Notarization removes most of it. Until then, explain the warning in plain words, and move the Terminal
+      command out of the main steps.
+- [ ] **Guide.** Move the `ffmpeg` commands to a separate page. Rewrite the Lessons and Words pages in the warm style. Say that
+      the first reviews come four hours after the first lesson.
+- [ ] **Terms and contact.** Offer a private way to make a privacy request. Consider the plain summary as the full terms.
+
+Accessibility (no high-severity finding):
+- [ ] Pill buttons, status pills and key hints do not follow the text size setting (`Theme.swift` uses fixed sizes).
+- [ ] Add Playback and Review menus. Today the single-key shortcuts are on hidden buttons, so nobody can find them in the menu bar.
+- [ ] Announce a review result, the next card, and a line reached with ⌘← or ⌘→ to VoiceOver.
+- [ ] Contrast (reported): the stage ring is below 3:1 in Light, and muted text on the window colour is 4.39:1.
+- [ ] With Increase Contrast or Differentiate Without Colour on, make the word underlines thicker.
+
 ## After 1.0
 
 The order follows how much each item helps comprehensible input for the effort.
@@ -113,12 +172,21 @@ The order follows how much each item helps comprehensible input for the effort.
       writes no text and works, but it merges too much and needs macOS 26. Still to do: play one word, and tighten clips to words.
 
 ### Finding the right material
+- [ ] **Known and learning on each video's bar** (suggested 12 Nov 2026, agreed 13 Nov 2026, for the next minor version). Today the bar counts only
+      known words: known, finished, or learning at Stage 5 and up (`knownCondition` in `Coverage.swift`). A word you are
+      learning at Stages 1 to 4 counts as unknown, so a video made of words you are working on reads as hard. Proposal: a
+      second, lighter segment for learning words. The text keeps the known figure and the fit word, and adds the learning
+      share ("82% known, 6% learning"). The segments differ in length and fill, never in colour alone, and VoiceOver reads
+      both figures. The fit word stays on known words: a Stage 1 to 4 word is recognised only with effort, so counting it
+      would call a video easy before it is. Open: the "long tail" idea, that a learning word seen once in a video could count
+      as known sooner than a common one. We have no data for this, so the fit rule stays until it is measured on real videos.
+      The change is a query in `videoCoverage` with a test, and a small view change. No new table, no migration.
 - [x] **Next up** (5 Nov 2026). A card on Videos suggests the video that fits best, by fit alone. A video you heard is as good a
       choice as a new one, because listening again is how a nearly understood video becomes understood.
 - [ ] **Frequency-list bootstrap.** Mark the most common words as known for a beginner. It needs a data source and a licence
       decision first.
 - [x] **Calibrate on the first video** (6 Nov 2026, **not seen in the running app**). "Mark the words I know" shows a video's
-      most-seen new content words, 20 at a time, up to 120. The learner taps the words they do *not* know. It stops when half a
+      most-seen new content words, 20 at a time, up to 120. The learner ticks the words they know. It stops when half a
       batch is unknown. A last screen says how many words become known, and Undo is offered. Reason: a new learner has nothing
       marked known, so every video reads as mostly unknown and the first lessons teach words that the learner knows. It needs no
       frequency list and no new data, so it has no licence question. **It does not give a level label** ("B1"): the app has no
@@ -150,8 +218,8 @@ The order follows how much each item helps comprehensible input for the effort.
       teaches five words one by one (sentence, audio, meaning), then quizzes them at once and asks a missed word again until it is
       right. The words then start at stage 1, with the first review 4 hours later. "Already know it" marks a word known. Reason:
       without lessons, a person with videos but no habit meets an empty Review page.
-- [ ] **Grammar from your own videos** (researched 5 Nov 2026, **not started**). Noticing, not a course. Recommendation: show the
-      **forms of the words you meet, on demand, with a link out**. No lesson path. No rules taught ahead of the material. Grammar
+- [ ] **Grammar from your own videos** (researched 5 Nov 2026, direction **agreed 12 Nov 2026**, not started). Noticing, not a
+      course. Decision: show the **forms of the words you meet, on demand, with a link out**. No lesson path. No rules taught ahead of the material. Grammar
       belongs to the word you look at, so it belongs in the player and the word panel, not on Learn.
       - **Detection.** Japanese: good. MeCab and IPADIC give the inflection form and the auxiliaries, and a fixed table in the
         profile names a chain. Spanish, French, German: `NLTagger` gives only lemma and part of speech. A form can be named by
@@ -170,6 +238,11 @@ The order follows how much each item helps comprehensible input for the effort.
       - **Left out:** lessons, a grammar index, pattern cloze cards, conjugation drills, generated explanations.
       - **To settle:** the form line on by default or in Settings; a conjugated cloze blank showing its form as the hint; the size
         for each language.
+- [ ] **Deleting a video that taught you words** (checked in code 12 Nov 2026, not run). Progress is kept: words you started,
+      review or marked known keep their stage and dates. Their example sentences go, so their cards become word and meaning
+      only, and the word panel shows no line from your videos. Importing the file again brings the sentences back. Decision:
+      keep this behaviour. Small step: say in the delete dialog that reviews of those words lose their example sentences. Not
+      checked: a lesson already queued for a word that the deletion removes.
 - [x] **Ignore** (5 Nov 2026). A fifth word status for names and tokenizer mistakes. An ignored word is kept, hidden from the Words
       list (the Ignored filter shows it), never offered as a lesson, and left out of coverage. A backup that contains it does not
       restore in an older Kikimi.
@@ -227,7 +300,14 @@ The order follows how much each item helps comprehensible input for the effort.
       confirmed that it gives them. The measure is the opt-in `ImportTimingTests` on a video with a human `.srt` (large-v3 took
       312 s and turbo 62 s on a 334 s Japanese video). Turbo is the default for Japanese since 5 Nov 2026. Spanish, French and
       German still use `medium`, and nobody compared them with turbo (it needs a video and `.srt` for each).
-- [ ] **Smarter review timing** (FSRS-style). Low priority. The evidence is benchmark data, not trials.
+- [ ] **Smarter review timing** (FSRS-style). Low priority. The evidence is benchmark data, not trials. The review limit and
+      interval variation (review of 13 Nov 2026) come first and cost less.
+- [ ] **The meaning used in the line, and phrases** (review of 13 Nov 2026). A card shows the first dictionary meaning, not the
+      one the line uses. Phrases ("por favor") are not kept. German nouns are stored in lower case (`Tokenizer.swift`); check
+      how they show.
+- [ ] **Playback speed and a subtitle time offset** (review of 13 Nov 2026). Speed exists only for a looped line.
+- [ ] **Swift 6 language mode** (review of 13 Nov 2026). Both targets use Swift 5 mode, with 12 `@unchecked Sendable` types.
+      Turn on the strict concurrency warnings first.
 
 ### More languages
 - [x] **French and German** (30 Oct 2026): a profile, a Wiktionary dictionary (about 9 MB each), the `medium` Whisper model and the
