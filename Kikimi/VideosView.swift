@@ -96,12 +96,18 @@ struct VideosView: View {
         return (item, best)
     }
 
+    private func nextUpDetail(_ coverage: VideoCoverage) -> String {
+        let known = Int((coverage.fraction * 100).rounded()), learning = Int((coverage.learningFraction * 100).rounded())
+        guard learning > 0 else { return String(localized: "You know \(known)% of its words.") }
+        return String(localized: "You know \(known)% of its words and are learning \(learning)%.")
+    }
+
     private func nextUpCard(_ item: LibraryEntry, _ coverage: VideoCoverage) -> some View {
         HStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Next up").font(Theme.title(17))
                 Text(item.video.title).font(Theme.styled(.headline, design: .rounded)).lineLimit(2)
-                Text("You know \(Int((coverage.fraction * 100).rounded()))% of its words.")
+                Text(nextUpDetail(coverage))
                     .font(Theme.small).foregroundStyle(Theme.muted)
             }
             Spacer()
