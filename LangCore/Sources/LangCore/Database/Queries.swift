@@ -75,6 +75,21 @@ extension LangDatabase {
         }
     }
 
+    /// How long after it is added a video that has not been played still offers its next steps in the list.
+    public static let unwatchedWindow: TimeInterval = 14 * 24 * 3600
+
+    /// The videos of `language` added within the window that have never been played, so the list can offer to mark the words
+    /// you know or to learn the ones the video needs. Playing a video (even briefly) ends it.
+    public func unwatchedVideoIDs(language: String, now: Date = Date()) async throws -> Set<Int64> {
+        let since = now.addingTimeInterval(-Self.unwatchedWindow)
+        return try await writer.read { db in
+            Set(try Int64.fetchAll(db, sql: """
+                SELECT id FROM videos WHERE language = ? AND imported_at > ?
+                AND id NOT IN (SELECT subject FROM activity WHERE kind = 'listen')
+                """, arguments: [language, since]))
+        }
+    }
+
     /// One word as it is now, for a view that holds an older copy of it.
     public func word(id: Int64) async throws -> Word? {
         try await writer.read { try Word.fetchOne($0, key: id) }

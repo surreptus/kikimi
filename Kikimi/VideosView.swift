@@ -21,14 +21,9 @@ struct VideosView: View {
     @State private var renaming: Video?
     @State private var newTitle = ""
     @State private var renameError: String?
-    /// The first video of each language gets one card of next steps, until it is used or there is a second video.
-    /// The languages that have had it, as codes joined by commas.
-    @AppStorage("firstVideoCardLanguages") private var firstVideoCardLanguages = ""
-    private var firstVideoCardDone: Bool {
-        get { firstVideoCardLanguages.split(separator: ",").contains { $0 == app.languageCode } }
-        nonmutating set { if newValue, !firstVideoCardDone { firstVideoCardLanguages += (firstVideoCardLanguages.isEmpty ? "" : ",") + app.languageCode } }
-    }
-    @State private var firstGoal: CoverageGoal?
+    /// New videos not yet played, with the words each needs to reach about 90%: their rows offer the next steps.
+    @State private var unwatched: Set<Int64> = []
+    @State private var goals: [Int64: CoverageGoal] = [:]
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -75,7 +70,6 @@ struct VideosView: View {
                         : inflected("^[\(items.count) video](inflect: true) · \(formatBytes(totalBytes)) on this Mac"))
                 ImportSection(env: env, compact: !items.isEmpty)
                 if items.isEmpty { firstSteps }
-                if let first = firstVideo, let goal = firstGoal { firstVideoCard(first, goal) }
                 if let next = nextUp { nextUpCard(next.item, next.coverage) }
                 if !items.isEmpty { sortMenu }
                 ForEach(orderedItems) { item in
@@ -163,6 +157,24 @@ struct VideosView: View {
     }
 
     private func row(_ item: LibraryEntry) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            rowHeader(item)
+            if unwatched.contains(item.id) { nextSteps(item) }
+        }
+        .panel()
+        .contentShape(Rectangle())
+        .onTapGesture(count: 2) { open(item.video, at: nil) }
+        .contextMenu {
+            Button("Play") { open(item.video, at: nil) }
+            Button("Rename…") { startRename(item.video) }
+            Button("Get Info…") { info = item.video }
+            Button("Show in Finder") {
+                NSWorkspace.shared.activateFileViewerSelecting([env.fileURL(for: item.video)])
+            }
+        }
+    }
+
+    private func rowHeader(_ item: LibraryEntry) -> some View {
         HStack(spacing: 14) {
             VideoThumbnailView(url: env.fileURL(for: item.video), duration: item.video.duration)
             VStack(alignment: .leading, spacing: 4) {
@@ -182,17 +194,6 @@ struct VideosView: View {
                 .labelStyle(.iconOnly).buttonStyle(.plain)
                 .font(Theme.sized(size: 28)).foregroundStyle(Theme.ink)
                 .help("Play")
-        }
-        .panel()
-        .contentShape(Rectangle())
-        .onTapGesture(count: 2) { open(item.video, at: nil) }
-        .contextMenu {
-            Button("Play") { open(item.video, at: nil) }
-            Button("Rename…") { startRename(item.video) }
-            Button("Get Info…") { info = item.video }
-            Button("Show in Finder") {
-                NSWorkspace.shared.activateFileViewerSelecting([env.fileURL(for: item.video)])
-            }
         }
     }
 
@@ -223,42 +224,26 @@ struct VideosView: View {
         items = (try? await env.database.libraryVideos(language: app.languageCode)) ?? []
         totalBytes = env.libraryBytes()
         coverages = (try? await env.database.videoCoverage(language: app.languageCode)) ?? [:]
-        firstGoal = nil
-        if let id = firstVideo?.id { firstGoal = try? await env.database.wordsToReach(target: 0.90, inVideo: id) }
+        unwatched = (try? await env.database.unwatchedVideoIDs(language: app.languageCode)) ?? []
+        var reach: [Int64: CoverageGoal] = [:]
+        for id in unwatched { reach[id] = try? await env.database.wordsToReach(target: 0.90, inVideo: id) }
+        goals = reach
     }
 
-    /// The only video, while it has not been used for its card.
-    private var firstVideo: LibraryEntry? { items.count == 1 && !firstVideoCardDone ? items.first : nil }
-
-    /// What to do with the first video: watch it, or first learn the few words that would let you follow it.
-    private func firstVideoCard(_ item: LibraryEntry, _ goal: CoverageGoal) -> some View {
-        let percent = Int((goal.current.fraction * 100).rounded()), fresh = goal.notStarted
-        return VStack(alignment: .leading, spacing: 10) {
-            Text("Your first video is ready").font(Theme.title(17))
-            Text("You know \(percent)% of its words.").foregroundStyle(Theme.muted)
-            if !goal.isReached, !fresh.isEmpty {
-                Text(inflected("Learning ^[\(fresh.count) word](inflect: true) would take it to about 90% of its words known."))
-                    .foregroundStyle(Theme.muted)
-            }
-            HStack(spacing: 10) {
-                Button("Watch") { firstVideoCardDone = true; open(item.video, at: nil) }
+    /// What a new video offers before you have played it: tell Kikimi which words you know, or learn the few it needs to
+    /// reach about 90%. Playing the video ends the offer.
+    private func nextSteps(_ item: LibraryEntry) -> some View {
+        let fresh = goals[item.id].map { $0.isReached ? [] : $0.notStarted } ?? []
+        return HStack(spacing: 10) {
+            Button("Mark the words I know") { calibrating = item.video }
+                .buttonStyle(.pill(.secondary, compact: true))
+                .help("Go through this video's commonest new words and tick the ones you know. Only those are marked known.")
+            if !fresh.isEmpty {
+                Button(inflected("Learn ^[\(fresh.count) word](inflect: true) in lessons")) { app.learnInLessons(fresh.map(\.wordID)) }
                     .buttonStyle(.pill(compact: true))
-                    .accessibilityLabel("Watch \(item.video.title)")
-                if !goal.isReached, !fresh.isEmpty {
-                    Button(inflected("Learn ^[\(fresh.count) word](inflect: true) in lessons")) {
-                        firstVideoCardDone = true
-                        app.learnInLessons(fresh.map(\.wordID))
-                    }
-                    .buttonStyle(.pill(.secondary, compact: true))
-                }
-                Button("Mark the words I know") { calibrating = item.video }
-                    .buttonStyle(.pill(.quiet, compact: true))
-                    .help("Go through this video's commonest new words and tap the ones you don't know. The rest are marked known.")
+                    .help("Learning these would take the video to about 90% of its words known.")
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .panel()
-        .accessibilityElement(children: .contain)
     }
 
     /// The list in the chosen order. "Best fit" uses coverage; videos with nothing to judge by go last.
