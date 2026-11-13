@@ -20,7 +20,23 @@ public struct SpanishProfile: LanguageProfile {
     }
     public let defaultModel = "openai_whisper-medium"
     public let tokenizer: any WordTokenizer = NLTaggerTokenizer(
-        language: .spanish, spellingFixes: SpanishProfile.spellingFixes, verbForms: VerbForms(resource: "dictionary-es"))
+        language: .spanish, spellingFixes: SpanishProfile.spellingFixes, verbForms: VerbForms(resource: "dictionary-es"),
+        rules: SpanishProfile.rules)
+
+    static let rules = TokenRules(
+        // The table of verb forms knows "unas" only as a form of unir, so it overruled the tagger's "article".
+        functionWords: ["unas": "un", "unos": "un"],
+        interjections: ["ey"],
+        // "vale" is a verb too ("esto vale poco"), so only when it stands alone ("¿vale?").
+        standaloneInterjections: ["vale"],
+        auxiliaries: ["he", "has", "ha", "hemos", "habéis", "han", "había", "habías", "habíamos", "habíais", "habían",
+                      "haya", "hayas", "hayamos", "hayáis", "hayan", "habré", "habrás", "habrá", "habremos", "habrán",
+                      "habría", "habrías", "habríamos", "habrían", "hube", "hubo", "hubiera", "hubiese"],
+        participleEndings: ["ado", "ido", "to", "cho"],
+        verbMarkers: ["yo", "me", "te", "se", "nos"],
+        conjunctions: ["y", "e", "o", "pero"],
+        marksCutOffWords: true,
+        marksNames: true)
 
     /// Spellings that two common verbs share, where the dictionary's table of verb forms (`VerbForms`) cannot choose and
     /// the tagger picks the wrong one: siento is sentir ("lo siento"), not sentar. The table overrules the rest of the
@@ -28,6 +44,8 @@ public struct SpanishProfile: LanguageProfile {
     /// forms of 40 common verbs through it.
     static let spellingFixes: [String: String] = [
         "siento": "sentir", "sientes": "sentir", "siente": "sentir", "sienten": "sentir",
+        // Subtitles often leave the accent off; no other word is spelt like these.
+        "tia": "tía", "tias": "tía", "tio": "tío", "tios": "tío",
     ]
     public let dictionarySource = DictionarySource(
         resourceName: "dictionary-es",
