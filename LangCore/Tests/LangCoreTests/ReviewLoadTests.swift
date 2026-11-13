@@ -144,3 +144,46 @@ final class NewWordRoomTests: XCTestCase {
         XCTAssertEqual(room, 5)
     }
 }
+
+final class SessionSizeAndOrderTests: XCTestCase {
+    func testOverviewSaysHowManyCardsASessionAsks() {
+        var overview = ReviewOverview()
+        overview.dueNow = ReviewSession.sizeLimit
+        XCTAssertEqual(overview.sessionSize, ReviewSession.sizeLimit)
+        XCTAssertFalse(overview.isCapped, "everything due fits in one session")
+        overview.dueNow = 120
+        XCTAssertEqual(overview.sessionSize, ReviewSession.sizeLimit)
+        XCTAssertTrue(overview.isCapped)
+        overview.dueNow = 0
+        XCTAssertEqual(overview.sessionSize, 0)
+        XCTAssertFalse(overview.isCapped)
+    }
+
+    func testMostSeenKeepsTheWordsInTheMostLinesAndPutsLineLessLast() async throws {
+        let db = try LangDatabase()
+        let ids: [String: Int64] = try await db.writer.write { d in
+            var video = Video(language: "es", title: "v", contentHash: "h", videoPath: "h/v.mov", duration: 100)
+            try video.insert(d)
+            var lines: [Int64] = []
+            for i in 0..<3 {
+                var line = Subtitle(videoId: video.id!, idx: i, startTime: Double(i), endTime: Double(i) + 1, text: "t\(i)")
+                try line.insert(d); lines.append(line.id!)
+            }
+            var ids: [String: Int64] = [:]
+            for (lemma, count) in [("gato", 1), ("casa", 3), ("luz", 0), ("perro", 2)] {
+                var w = Word(language: "es", lemma: lemma, pos: .noun); try w.insert(d); ids[lemma] = w.id!
+                for line in lines.prefix(count) {
+                    var o = Occurrence(wordId: w.id!, subtitleId: line, surface: lemma); try o.insert(d)
+                }
+            }
+            return ids
+        }
+        let all = [ids["gato"]!, ids["casa"]!, ids["luz"]!, ids["perro"]!]
+        let two = try await db.mostSeen(all, count: 2)
+        XCTAssertEqual(two, [ids["casa"]!, ids["perro"]!])
+        let every = try await db.mostSeen(all, count: 10)
+        XCTAssertEqual(every, [ids["casa"]!, ids["perro"]!, ids["gato"]!, ids["luz"]!])
+        let none = try await db.mostSeen(all, count: 0)
+        XCTAssertEqual(none, [])
+    }
+}
