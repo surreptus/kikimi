@@ -215,18 +215,30 @@ extension LangDatabase {
     /// old id. Returns how many were restored.
     @discardableResult
     public func restore(_ words: [Word], now: Date = Date()) async throws -> Int {
-        try await writer.write { db in
-            var restored = 0
-            for var word in words {
-                guard let id = word.id else { continue }
-                let current = try Word.fetchOne(db, key: id)
-                if current?.status == .learning, word.status != .learning { try Self.unbump(.learn, subject: id, at: now, in: db) }
-                if current?.status == .known, word.status != .known { try Self.unbump(.known, subject: id, at: now, in: db) }
-                try word.save(db)
-                restored += 1
-            }
-            return restored
+        try await writer.write { db in try Self.restore(words, in: db, now: now) }
+    }
+
+    /// The restore, inside the caller's transaction. With `onlyIfStill`, a word is put back only if it is still as that
+    /// snapshot had it (see `WordChange`).
+    static func restore(_ words: [Word], onlyIfStill after: [Word]? = nil, in db: Database, now: Date) throws -> Int {
+        let afterByID = after.map { Dictionary(uniqueKeysWithValues: $0.compactMap { word in word.id.map { ($0, word) } }) }
+        var restored = 0
+        for var word in words {
+            guard let id = word.id else { continue }
+            let current = try Word.fetchOne(db, key: id)
+            if let afterByID, !Self.sameProgress(current, afterByID[id]) { continue }
+            if current?.status == .learning, word.status != .learning { try Self.unbump(.learn, subject: id, at: now, in: db) }
+            if current?.status == .known, word.status != .known { try Self.unbump(.known, subject: id, at: now, in: db) }
+            try word.save(db)
+            restored += 1
         }
+        return restored
+    }
+
+    /// Whether two copies of a word (or two absences) have the same status, stage and next review.
+    static func sameProgress(_ a: Word?, _ b: Word?) -> Bool {
+        guard let a, let b else { return a == nil && b == nil }
+        return a.status == b.status && a.stage == b.stage && a.nextReview == b.nextReview
     }
 
     /// Marks words as known and takes them out of the review queue.
