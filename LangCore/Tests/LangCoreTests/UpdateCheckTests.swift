@@ -32,4 +32,15 @@ final class UpdateCheckTests: XCTestCase {
         XCTAssertEqual(UpdateCheck.outcome(current: "0.14.0", latest: json("0.15.0", "http://github.com/surreptus/kikimi")), .failed, "https only")
         XCTAssertEqual(UpdateCheck.outcome(current: "dev", latest: json("0.15.0")), .failed)
     }
+
+    func testOnlyThisProjectsPagesAreTrusted() {
+        func trusted(_ url: String) -> Bool { UpdateCheck.isTrusted(URL(string: url)!) }
+        XCTAssertTrue(trusted("https://github.com/surreptus/kikimi/releases/latest"))
+        XCTAssertTrue(trusted("https://surreptus.github.io/kikimi/download/"))
+        XCTAssertFalse(trusted("https://github.com/someone-else/kikimi/releases/latest"), "another account on GitHub")
+        XCTAssertFalse(trusted("https://github.com/surreptus/kikimi-fake/releases"), "a longer repository name")
+        XCTAssertFalse(trusted("https://github.com/surreptus"), "the account, not this repository")
+        XCTAssertFalse(trusted("https://surreptus.github.io/other/"), "another site of the same account")
+        XCTAssertFalse(trusted("https://github.com.example.com/surreptus/kikimi"))
+    }
 }
