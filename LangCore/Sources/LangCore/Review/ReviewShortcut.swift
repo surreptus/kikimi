@@ -44,4 +44,10 @@ public enum ReviewShortcut: String, CaseIterable, Sendable, Equatable {
         if hasSentence, canTranslate { result.append(.translation) }
         return result
     }
+
+    /// The keys the Review menu may enable. A bare letter would be typed into a text field that has focus, so while one has focus
+    /// only the keys that need no bare letter (Check, and Play again with ⌘R) stay.
+    public static func menuKeys(offered: [ReviewShortcut], textFieldFocused: Bool) -> [ReviewShortcut] {
+        textFieldFocused ? offered.filter { $0.letter == nil } : offered
+    }
 }
