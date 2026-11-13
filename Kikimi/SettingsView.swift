@@ -281,7 +281,7 @@ private struct DataTab: View {
             } header: {
                 Text("Words in your videos")
             } footer: {
-                Text("Reads the lines of your videos again with the latest word finder, so fixes made since you added a video reach it. Use it after an update, if your videos show mistakes in their words. It needs no video file or internet. Your progress is never changed, and words that no longer appear in any video are kept.")
+                Text("Reads the lines of your videos again with the latest word finder, so fixes made since you added a video reach it. Use it after an update, if your videos show mistakes in their words. It needs no video file or internet. Your progress is never changed. Words you have worked with are kept, even if they no longer appear in a video.")
             }
 
             Section {
@@ -312,7 +312,7 @@ private struct DataTab: View {
             Button("Find Words Again") { Task { await findWordsAgain() } }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Kikimi reads every saved line again, including lines you edited. New words are added. Your progress, and every word you already have, stays.")
+            Text("Kikimi reads every saved line again, including lines you edited. New words are added. Your progress, and every word you have worked with, stays. Words you never touched that no longer appear in any video are removed.")
         }
         .alert("Start over with an empty library?", isPresented: $confirmingStartOver) {
             Button("Set Aside and Quit", role: .destructive) { StartOver.request() }
@@ -517,6 +517,9 @@ private struct DataTab: View {
                     Text(report.wordsAdded > 0
                          ? inflected("• ^[\(report.wordsAdded) word](inflect: true) added.")
                          : String(localized: "• No new words."))
+                    if report.wordsRemoved > 0 {
+                        Text("• ^[\(report.wordsRemoved) unused word](inflect: true) removed. You had not touched them.")
+                    }
                     if report.wordsInNoVideo > 0 {
                         Text("• ^[\(report.wordsInNoVideo) word](inflect: true) no longer appear in any video. They are kept.")
                     }
