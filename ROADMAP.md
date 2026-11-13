@@ -71,10 +71,10 @@ A review read the source for platform practice, security, text, the website, acc
 means a second read of the code agreed. All other items are reported and need a check. Nothing was run in the app.
 
 Learning loop:
-- [ ] **Bug (confirmed): `startLearning(wordID:)` resets a finished or learning word to stage 1** (`LangDatabase.swift`). Only the
-      UI guards it. Skip those words, as the bulk version does. Add a test. Fix open in pull request #45.
-- [ ] **Bug (confirmed): a review session ends if a word changes status during it.** `recordReview` throws `notLearning`, and
-      the failure screen replaces the session. Skip the card. Add a test. Fix open in pull request #46.
+- [x] **Bug: `startLearning(wordID:)` reset a finished or learning word to stage 1** (13 Nov 2026, pull request #45). It now
+      skips those words, as the bulk version does. A test covers it.
+- [x] **Bug: a review session ended if a word changed status during it** (13 Nov 2026, pull request #46). The session now skips
+      the card. A test covers it.
 - [ ] **Limit the review load (confirmed: `dueWords` has no limit, and the intervals have no variation).** A bulk Learn of many
       words comes back as one pile at each stage. Add a limit for each session, a small random variation on each interval, and
       the daily allowance for bulk Learn. Reason: review time must not replace watching time.
@@ -85,7 +85,7 @@ Learning loop:
 Engineering:
 - [ ] **CI (confirmed: no workflow runs the tests or builds the app).** Add a pull request workflow with `swift test` and a
       Debug build.
-- [ ] **`Info.plist` has `NSHumanReadableCopyright` twice (confirmed).** The second is empty. Delete it.
+- [x] **`Info.plist` had `NSHumanReadableCopyright` twice** (13 Nov 2026). The empty second one is deleted.
 - [ ] Show an error when a write fails. The app target has about 50 `try?` calls, and a failed status change looks successful.
 - [ ] Open With and the Dock icon accept only `.kikimi` backups. Accept videos and subtitle files too.
 - [ ] `VideosView.reload` measures the library folder and calls `wordsToReach` for each video. Check the cost with a large library.
@@ -94,20 +94,21 @@ Security and privacy (no high-severity finding):
 - [x] **Speech model download** (13 Nov 2026): the app downloads one fixed commit of `argmaxinc/whisperkit-coreml`. It checks the
       size and SHA-256 value of every LFS file against `ModelManifest.json` before it records the model. The privacy policy names
       Hugging Face. Not done on purpose: files that are not in LFS have no SHA-256 value, and earlier installs are not checked.
-- [ ] **Shadow recording (confirmed):** the policy says the recording is deleted on quit, and the code has no quit step. Add the
-      step, or change the sentence.
-- [ ] Restore: refuse a symbolic link in a backup folder (suspected, not confirmed).
-- [ ] Workflows: give `pages` and `id-token` permissions to the deploy job only. Pin actions by commit.
-- [ ] Update check: accept only this repository's path on `github.com`.
+- [x] **Shadow recording** (13 Nov 2026). The policy says the recording is deleted on quit. The app now deletes it at quit. The
+      cleanup at launch still covers a crash. Checked with a probe file and a normal quit; a force-quit is not tested.
+- [x] Restore leaves out a video whose backup folder holds a symbolic link (13 Nov 2026). A test covers it.
+- [x] Workflows (13 Nov 2026): the `pages` and `id-token` permissions are on the deploy job only. Actions are pinned by commit,
+      and Dependabot keeps the pins current.
+- [x] Update check (13 Nov 2026): it accepts only this repository's path on `github.com`, or this project's website.
 
 Text in the app:
 - [ ] **Error messages.** Import and storage errors show raw system text and the words "re-encode", "verification" and
       "database". Each message must say what happened and what to do next. Put the raw detail behind "Show details".
 - [ ] **One name for one thing.** Learn, Review, Lessons, Practice and Session overlap. "Set aside" means an ignored word and a
       reset library. "Danger zone" is above text that says nothing is deleted.
-- [ ] "Practise" in `AboutView.swift` (confirmed) must be "Practice". The app says "Stage N of 9", the guide says eight stages,
-      and the README says nine. Use one count.
-- [ ] Remove the stale catalog entries (about 14). Use title case for all menu items and buttons.
+- [x] "Practice" in `AboutView.swift`, and one count of stages everywhere: eight, then Finished (13 Nov 2026). The stale catalog
+      entries are removed.
+- [ ] Use title case for all menu items and buttons.
 
 Website:
 - [ ] **Landing page.** Say "free Mac app" in the first line. Explain comprehensible input in one sentence. Show the beta status.
@@ -122,7 +123,8 @@ Accessibility (no high-severity finding):
 - [ ] Pill buttons, status pills and key hints do not follow the text size setting (`Theme.swift` uses fixed sizes).
 - [ ] Add Playback and Review menus. Today the single-key shortcuts are on hidden buttons, so nobody can find them in the menu bar.
 - [ ] Announce a review result, the next card, and a line reached with ⌘← or ⌘→ to VoiceOver.
-- [ ] Contrast (reported): the stage ring is below 3:1 in Light, and muted text on the window colour is 4.39:1.
+- [ ] Contrast (reported): the stage ring is below 3:1 in Light. Muted text on the sidebar and header was 4.39:1; it is 4.83:1
+      since 13 Nov 2026.
 - [ ] With Increase Contrast or Differentiate Without Colour on, make the word underlines thicker.
 
 ## After 1.0
@@ -242,7 +244,7 @@ The order follows how much each item helps comprehensible input for the effort.
 - [ ] **Deleting a video that taught you words** (checked in code 12 Nov 2026, not run). Progress is kept: words you started,
       review or marked known keep their stage and dates. Their example sentences go, so their cards become word and meaning
       only, and the word panel shows no line from your videos. Importing the file again brings the sentences back. Decision:
-      keep this behaviour. Small step: say in the delete dialog that reviews of those words lose their example sentences. Not
+      keep this behaviour. The delete dialog says that those words lose their example lines (13 Nov 2026). Not
       checked: a lesson already queued for a word that the deletion removes.
 - [x] **Ignore** (5 Nov 2026). A fifth word status for names and tokenizer mistakes. An ignored word is kept, hidden from the Words
       list (the Ignored filter shows it), never offered as a lesson, and left out of coverage. A backup that contains it does not
