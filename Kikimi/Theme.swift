@@ -537,7 +537,6 @@ struct ShortcutButtonRow: View {
         let id: String
         let key: String
         let title: String
-        var letter: Character?
         let perform: () -> Void
     }
     let items: [Item]
@@ -545,7 +544,7 @@ struct ShortcutButtonRow: View {
     var body: some View {
         FlowLayout {
             ForEach(items) { item in
-                let button = Button(action: item.perform) {
+                Button(action: item.perform) {
                     HStack(spacing: 6) {
                         KeyCap(item.key)
                         Text(item.title).font(Theme.small).foregroundStyle(Theme.muted)
@@ -555,7 +554,6 @@ struct ShortcutButtonRow: View {
                 .help("\(item.title) (\(item.key))")
                 .accessibilityLabel(item.title)
                 .accessibilityHint("Shortcut: \(item.key)")
-                if let letter = item.letter { button.keyboardShortcut(KeyEquivalent(letter), modifiers: []) } else { button }
             }
         }
         .foregroundStyle(Theme.ink)
