@@ -65,7 +65,7 @@ struct CalibrationSheet: View {
             .frame(maxHeight: 300)
             Text(index < batches.count - 1 && !canContinue
                  ? String(localized: "Know at least half of these to be shown more words.")
-                 : String(localized: "Words \(index * Calibration.batchSize + 1) to \(index * Calibration.batchSize + batch.count), the most common in this video."))
+                 : String(localized: "Words \(index * Calibration.batchSize + 1) to \(index * Calibration.batchSize + batch.count) of \(batches.reduce(0) { $0 + $1.count }), the most common in this video."))
                 .font(Theme.copy).foregroundStyle(Theme.muted)
             HStack(spacing: 12) {
                 Button("Cancel") { dismiss() }.buttonStyle(.pill(.quiet, compact: true))
