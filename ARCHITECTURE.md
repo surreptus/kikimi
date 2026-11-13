@@ -23,7 +23,7 @@ Paths are under `LangCore/Sources/LangCore/`.
 | Folder | What it holds |
 |---|---|
 | `Profiles/` | `LanguageProfile`, the four profiles, and the registry `LanguageProfiles.all`. |
-| `Tokenizing/` | Lines to content words (lemma, part of speech). Apple `NaturalLanguage` for Spanish, French and German. The vendored MeCab (`Sources/CMeCab`) for Japanese. A profile gives `TokenRules` (articles, interjections, cut-off words, names, verbs after "he" or "yo") to correct the tagger. |
+| `Tokenizing/` | Lines to content words (lemma, part of speech). Apple `NaturalLanguage` for Spanish, French and German. The vendored MeCab (`Sources/CMeCab`) for Japanese. A profile gives `TokenRules` (articles, interjections, cut-off words, names, verbs after "he" or "yo", a short list of conjunctions to learn) to correct the tagger. |
 | `Dictionary/` | `DictionaryStore` and `KanjiStore` read the bundled files in place, read-only. `ReopeningReader` opens a file again, once, after a SQLite disk I/O error (the file changed while the app ran). `VerbForms` reads the `forms` table (verb spellings built from Wiktionary). The tokenizer uses it to correct verb lemmas (Spanish `puede` read as `podar`). |
 | `Database/` | GRDB records, migrations (`LangMigrations`) and queries. A schema change is always a new migration. |
 | `Import/` | The pipeline, queue, transcription and video compaction. `SubtitleParser` reads `.srt` and `.vtt`. `MediaCheck` refuses a file that macOS cannot open or that has no video. `SegmentSplitter` cuts a line longer than `maxSegmentSeconds` at its longest pause, using Whisper word times. |
