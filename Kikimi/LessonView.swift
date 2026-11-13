@@ -63,11 +63,12 @@ struct LessonView: View {
             VStack(spacing: 12) {
                 Text(lemma(card)).font(Theme.sized(size: 58, weight: .regular, design: .rounded)).multilineTextAlignment(.center)
                 StatusPill(text: card.word.pos.title)
-                if app.profile.display.showsReadings, let reading = card.entries.readings(of: card.word.lemma, first: card.entries.first?.reading).first {
-                    Text(reading).font(Theme.title(22))
+                if app.profile.display.showsReadings, case let all = card.entries.readings(of: card.word.lemma, first: card.entries.first?.reading), !all.isEmpty {
+                    Text(all.joined(separator: "・")).font(Theme.title(22))
                 }
                 Text(card.entries.first?.gloss ?? String(localized: "No dictionary entry"))
                     .font(Theme.styled(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
+                WordKanji(env: env, lemma: card.word.lemma, language: card.word.language)
                 if let example = card.example {
                     Text(example.highlighted).font(Theme.styled(.body, design: .rounded)).foregroundStyle(Theme.muted)
                         .multilineTextAlignment(.center).padding(.top, 6)
