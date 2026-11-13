@@ -36,10 +36,10 @@ struct WordsView: View {
     private var filterBinding: Binding<WordStatus?> { Binding(get: { app.wordsFilter }, set: { app.wordsFilter = $0 }) }
     private var typeFilter: PartOfSpeech? { app.wordsTypeFilter }
     private var typeBinding: Binding<PartOfSpeech?> { Binding(get: { app.wordsTypeFilter }, set: { app.wordsTypeFilter = $0 }) }
-    /// The types of word this language keeps (nouns, verbs...), in a fixed order. Particles and other small words
+    /// The types of word this language keeps (nouns, verbs...), in a fixed order. Particles and most other small words
     /// aren't kept, so they aren't offered.
     private var typeChoices: [PartOfSpeech] {
-        [.noun, .verb, .adjective, .adverb, .other].filter { app.profile.contentPOS.contains($0) }
+        [.noun, .verb, .adjective, .adverb, .conjunction, .other].filter { app.profile.contentPOS.contains($0) }
     }
     /// What the filter button says: "All", or what is narrowing the list.
     private var filterSummary: String {

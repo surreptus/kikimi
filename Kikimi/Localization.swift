@@ -109,6 +109,7 @@ extension PartOfSpeech {
         case .verb: String(localized: "Verb")
         case .adjective: String(localized: "Adjective")
         case .adverb: String(localized: "Adverb")
+        case .conjunction: String(localized: "Conjunction")
         case .other: String(localized: "Other")
         }
     }

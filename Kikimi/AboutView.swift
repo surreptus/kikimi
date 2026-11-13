@@ -149,7 +149,7 @@ struct AboutView: View {
 
     private var level: some View {
         section("Finding videos at your level") {
-            paragraph("Each video shows how much of it you know, such as 91% known, 6% learning · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says.")
+            paragraph("Each video shows how much of it you know, such as 91% known, 6% learning · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted, and in Spanish a few conjunctions such as porque and pero. Other small words are nearly always known, so you understand more than the figure says.")
             VStack(alignment: .leading, spacing: 6) {
                 bullet("Hard is under 80%, A stretch is 80 to 88%, Mostly familiar is 88 to 98%, and Easy is 98% or more.")
                 bullet("Around 90% of the counted words is where following along gets comfortable.")
