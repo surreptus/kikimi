@@ -20,15 +20,36 @@ public enum SRS {
         stage == .finished ? nil : intervals[stage.rawValue - 1]
     }
 
+    /// How far an interval may move, as a share of it. Words learned together then come back over a spread of time, not as one pile.
+    public static let variation = 0.1
+
+    /// A random number from -1 to 1 for `answer(jitter:)`. Tests pass a seeded generator.
+    public static func randomJitter<G: RandomNumberGenerator>(using generator: inout G) -> Double {
+        Double.random(in: -1...1, using: &generator)
+    }
+
+    public static func randomJitter() -> Double {
+        var generator = SystemRandomNumberGenerator()
+        return randomJitter(using: &generator)
+    }
+
+    /// The interval moved by `jitter` (-1...1) times `variation`. It is never shorter than the stage-1 interval,
+    /// so no card is asked before its first wait is over.
+    public static func interval(for stage: SRSStage, jitter: Double) -> TimeInterval? {
+        guard let base = interval(for: stage) else { return nil }
+        let moved = base * (1 + variation * min(1, max(-1, jitter)))
+        return max(intervals[0], moved)
+    }
+
     /// Correct advances one stage, wrong drops one (never below stage 1).
-    /// Finished is terminal. `nextReview` is nil once finished.
+    /// Finished is terminal. `nextReview` is nil once finished. The default `jitter` of 0 gives the exact interval.
     public static func answer(
-        stage: SRSStage, correct: Bool, now: Date
+        stage: SRSStage, correct: Bool, now: Date, jitter: Double = 0
     ) -> (stage: SRSStage, nextReview: Date?) {
         guard stage != .finished else { return (.finished, nil) }
         let next = correct
             ? SRSStage(rawValue: stage.rawValue + 1)!
             : SRSStage(rawValue: max(1, stage.rawValue - 1))!
-        return (next, interval(for: next).map { now.addingTimeInterval($0) })
+        return (next, interval(for: next, jitter: jitter).map { now.addingTimeInterval($0) })
     }
 }
