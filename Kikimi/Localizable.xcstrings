@@ -2808,7 +2808,11 @@
     "Back to the Learn page (Esc). Words you were taught but not yet quizzed on are not started." : {
 
     },
+    "Back to the overview (Esc twice). Your answers so far are kept." : {
+
+    },
     "Back to the overview (Esc). Your answers so far are kept." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3531,6 +3535,9 @@
           }
         }
       }
+    },
+    "Clear all" : {
+
     },
     "Clear finished" : {
       "localizations" : {
@@ -4421,6 +4428,12 @@
         }
       }
     },
+    "End Session" : {
+
+    },
+    "End this session?" : {
+
+    },
     "Ends %@" : {
       "localizations" : {
         "de" : {
@@ -4903,6 +4916,9 @@
         }
       }
     },
+    "Fewer than half of these are known to you, so that is enough." : {
+
+    },
     "Files are missing" : {
       "localizations" : {
         "de" : {
@@ -5245,6 +5261,9 @@
         }
       }
     },
+    "Furigana" : {
+
+    },
     "General" : {
       "localizations" : {
         "de" : {
@@ -5335,7 +5354,7 @@
         }
       }
     },
-    "Go through this video's commonest new words and tap the ones you don't know. The rest are marked known." : {
+    "Go through this video's commonest new words and tick the ones you know. Only those are marked known." : {
 
     },
     "Go to Videos" : {
@@ -5780,6 +5799,9 @@
 
     },
     "How you answer a sentence card" : {
+
+    },
+    "I know these words" : {
 
     },
     "I'm learning" : {
@@ -6247,6 +6269,12 @@
           }
         }
       }
+    },
+    "Keep Going" : {
+
+    },
+    "Keep Learning" : {
+
     },
     "Keep the meaning" : {
       "localizations" : {
@@ -6757,6 +6785,12 @@
     "Learn, %lld due" : {
 
     },
+    "Learn, %lld due, lessons waiting" : {
+
+    },
+    "Learn, lessons waiting" : {
+
+    },
     "Learning" : {
       "localizations" : {
         "de" : {
@@ -6785,7 +6819,7 @@
         }
       }
     },
-    "Learning ^[%lld word](inflect: true) would take it to about 90%% of its words known." : {
+    "Learning these would take the video to about 90% of its words known." : {
 
     },
     "Learning words shown" : {
@@ -6816,6 +6850,12 @@
         }
       }
     },
+    "Leave Lesson" : {
+
+    },
+    "Leave this lesson?" : {
+
+    },
     "Lesson done" : {
 
     },
@@ -6823,6 +6863,9 @@
 
     },
     "Lessons" : {
+
+    },
+    "Lessons are waiting" : {
 
     },
     "Let go" : {
@@ -7626,9 +7669,6 @@
     "More actions for this sentence" : {
 
     },
-    "Most of these are new to you, so that is enough." : {
-
-    },
     "Move" : {
       "localizations" : {
         "de" : {
@@ -7687,9 +7727,6 @@
           }
         }
       }
-    },
-    "New to you" : {
-
     },
     "New words a day" : {
 
@@ -8175,6 +8212,9 @@
           }
         }
       }
+    },
+    "Not ticked" : {
+
     },
     "Nothing in this list would change." : {
       "localizations" : {
@@ -11638,9 +11678,6 @@
     "Start over…" : {
 
     },
-    "Start with the 25 new words you hear most" : {
-
-    },
     "Started learning ^[%lld word](inflect: true)" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -11702,6 +11739,7 @@
       }
     },
     "Starts learning the 25 new words that come up most often in your videos" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -12010,9 +12048,6 @@
     "Take this video off the list. Your file is not touched." : {
 
     },
-    "Tap the ones that are new to you. The rest are marked as known, which makes this video's figure and your lessons truer." : {
-
-    },
     "Terms of use" : {
       "localizations" : {
         "de" : {
@@ -12255,7 +12290,7 @@
     "The words you were just taught, asked at once." : {
 
     },
-    "These are the words shown that you didn't tap. They are marked as known, so they are left out of lessons and count toward how much of each video you know. You can undo it right after." : {
+    "These are the words you ticked. They are marked as known, so they are left out of lessons and count toward how much of each video you know. You can undo it right after." : {
 
     },
     "This is the app's own copy. Your original file, wherever you imported it from, is not touched by the app." : {
@@ -12321,6 +12356,9 @@
       }
     },
     "Those words are already known, set aside or in your reviews." : {
+
+    },
+    "Tick the words you know. Only those are marked as known, which makes this video's figure and your lessons truer." : {
 
     },
     "Title" : {
@@ -13240,9 +13278,6 @@
         }
       }
     },
-    "Which of these words don't you know?" : {
-
-    },
     "Word" : {
       "localizations" : {
         "de" : {
@@ -13489,6 +13524,9 @@
         }
       }
     },
+    "Words you were taught but not yet quizzed on are not started. Words you marked known stay known." : {
+
+    },
     "Writing out what's said" : {
 
     },
@@ -13614,9 +13652,6 @@
     "You know %lld%% of its words." : {
 
     },
-    "You said every word shown is new to you, so none are marked known." : {
-
-    },
     "You started ^[%lld new word](inflect: true) today. More tomorrow." : {
 
     },
@@ -13704,13 +13739,19 @@
         }
       }
     },
+    "You ticked no words, so none are marked known." : {
+
+    },
     "You will be asked these words as soon as you have seen them all." : {
 
     },
     "You're up to date. Next review %@" : {
 
     },
-    "Your first video is ready" : {
+    "Your answers so far are kept." : {
+
+    },
+    "Your answers so far are kept. The words you have not been taught yet stay waiting in your lessons." : {
 
     },
     "Your original file is only read, never changed or deleted. Its row shows the step it is on, such as 4 of 7 · Transcribing." : {
