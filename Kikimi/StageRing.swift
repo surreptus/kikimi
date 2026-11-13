@@ -1,7 +1,7 @@
 import LangCore
 import SwiftUI
 
-/// Where a word is in its nine review stages: a ring of nine segments that fills as the word moves up. The colour
+/// Where a word is in its eight review stages and finished: a ring of nine segments that fills as the word moves up. The colour
 /// goes from red through yellow to green, and a word that has finished (stage 9) is a white disc. Stage 0 is an
 /// empty ring: not started. The number of segments filled says the stage, so colour is never the only signal.
 struct StageRing: View {
@@ -31,7 +31,7 @@ struct StageRing: View {
             }
         }
         .frame(width: size, height: size)
-        .accessibilityLabel(stage >= 9 ? String(localized: "Stage 9 of 9, finished") : stage == 0 ? String(localized: "Not started") : String(localized: "Stage \(stage) of 9"))
+        .accessibilityLabel(stage >= 9 ? String(localized: "Finished") : stage == 0 ? String(localized: "Not started") : String(localized: "Stage \(stage) of 8"))
     }
 
     /// One ninth of the ring, with a small gap either side, starting at the top and going clockwise.
