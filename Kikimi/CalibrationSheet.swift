@@ -1,16 +1,16 @@
 import LangCore
 import SwiftUI
 
-/// "I know these words" for one video: its most-seen new words in batches of twenty, where you tick the ones you know. It
-/// stops once fewer than half of a batch are known, then says how many words it will mark known, and only marks them when
-/// you say so. The rules (the batches, when to stop, which words end up known) are in `Calibration`.
+/// "I know these words" for one video: its most-seen new words in batches of twenty, where you tick the ones you know. More
+/// words are offered only while at least half of a batch are known. Marking is one button that says how many words it marks,
+/// and Undo follows it. The rules (the batches, when to stop, which words end up known) are in `Calibration`.
 struct CalibrationSheet: View {
     let env: LangEnvironment
     let video: Video
     @Environment(AppState.self) private var app
     @Environment(\.dismissModal) private var dismiss
 
-    private enum Step { case loading, asking, confirming, nothing }
+    private enum Step { case loading, asking, nothing }
     @State private var step = Step.loading
     @State private var batches: [[CalibrationWord]] = []
     @State private var index = 0
@@ -19,7 +19,8 @@ struct CalibrationSheet: View {
     @State private var error: String?
 
     private var batch: [CalibrationWord] { batches.indices.contains(index) ? batches[index] : [] }
-    private var isLast: Bool { index >= batches.count - 1 || Calibration.endsAfter(batch, known: ticked) }
+    /// Whether another batch can be offered: there is one, and at least half of this one is known.
+    private var canContinue: Bool { index < batches.count - 1 && !Calibration.endsAfter(batch, known: ticked) }
     private var toMark: [Int64] { Calibration.known(shown: Array(batches.prefix(index + 1)), ticked: ticked) }
 
     var body: some View {
@@ -28,7 +29,6 @@ struct CalibrationSheet: View {
             case .loading: ProgressView().frame(maxWidth: .infinity, minHeight: 160)
             case .nothing: nothing
             case .asking: asking
-            case .confirming: confirming
             }
             if let error { Text(error).font(Theme.small).foregroundStyle(Theme.red) }
         }
@@ -63,8 +63,8 @@ struct CalibrationSheet: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(maxHeight: 300)
-            Text(Calibration.endsAfter(batch, known: ticked) && !ticked.isEmpty
-                 ? String(localized: "Fewer than half of these are known to you, so that is enough.")
+            Text(index < batches.count - 1 && !canContinue
+                 ? String(localized: "Know at least half of these to be shown more words.")
                  : String(localized: "Words \(index * Calibration.batchSize + 1) to \(index * Calibration.batchSize + batch.count), the most common in this video."))
                 .font(Theme.copy).foregroundStyle(Theme.muted)
             HStack(spacing: 12) {
@@ -74,13 +74,24 @@ struct CalibrationSheet: View {
                 }
                 .buttonStyle(.pill(.secondary, compact: true))
                 Spacer()
-                if isLast {
-                    Button("Review") { step = .confirming }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
-                } else {
+                if index < batches.count - 1 {
                     Button("Next \(min(Calibration.batchSize, batches[index + 1].count)) words") { advance() }
-                        .buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
+                        .buttonStyle(.pill(.secondary, compact: true)).disabled(!canContinue)
+                        .keyboardShortcut(canContinue ? .defaultAction : nil)
                 }
+                finishButton.keyboardShortcut(canContinue ? nil : .defaultAction)
             }
+        }
+    }
+
+    /// Marks what is ticked, in one step. With nothing ticked it only closes.
+    @ViewBuilder private var finishButton: some View {
+        if toMark.isEmpty {
+            Button("Done") { dismiss() }.buttonStyle(.pill(compact: true))
+        } else {
+            Button(inflected("Mark ^[\(toMark.count) word](inflect: true) as known")) { Task { await mark() } }
+                .buttonStyle(.pill(canContinue ? .secondary : .primary, compact: true))
+                .help("They are left out of lessons and count toward how much of each video you know. You can undo it right after.")
         }
     }
 
@@ -118,28 +129,6 @@ struct CalibrationSheet: View {
         for word in batch where glosses[word.id] == nil {
             let entry = try? await env.database.lookup(language: video.language, term: word.lemma, limit: 1).first
             glosses[word.id] = entry?.shortGloss
-        }
-    }
-
-    // MARK: Confirming
-
-    private var confirming: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text(toMark.isEmpty ? "Nothing to mark" : "Mark \(inflected("^[\(toMark.count) word](inflect: true)")) as known?").font(Theme.title(20))
-            Text(toMark.isEmpty
-                 ? "You ticked no words, so none are marked known."
-                 : "These are the words you ticked. They are marked as known, so they are left out of lessons and count toward how much of each video you know. You can undo it right after.")
-                .font(Theme.copy).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
-            HStack(spacing: 12) {
-                Button("Back") { step = .asking }.buttonStyle(.pill(.quiet, compact: true))
-                Spacer()
-                if toMark.isEmpty {
-                    Button("Done") { dismiss() }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
-                } else {
-                    Button("Cancel") { dismiss() }.buttonStyle(.pill(.secondary, compact: true))
-                    Button("Mark known") { Task { await mark() } }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction)
-                }
-            }
         }
     }
 
