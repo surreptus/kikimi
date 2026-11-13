@@ -165,7 +165,7 @@ struct LessonView: View {
                 app.dataChanged()
                 app.showToast(String(localized: "Undone"))
             }
-        }))
+        }), undoTitle: status == .known ? String(localized: "Mark as Known") : String(localized: "Set Aside"))
     }
 
     /// Hands the taught words on to be quizzed, or, when leaving early, hands on nothing. Words marked known are already

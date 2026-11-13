@@ -156,7 +156,13 @@ struct PlayerView: View {
                 default: wasInReviews ? String(localized: "Marked “\(lemma)” as known and took it out of your reviews")
                                       : String(localized: "Marked “\(lemma)” as known")
                 }
-                app.showToast(text, undo: (String(localized: "Undo"), { undo(change) }))
+                let title = switch status {
+                case .learning: String(localized: "Start Learning")
+                case .ignored: String(localized: "Set Aside")
+                case .new: String(localized: "Restore Word")
+                default: String(localized: "Mark as Known")
+                }
+                app.showToast(text, undo: (String(localized: "Undo"), { undo(change) }), undoTitle: title)
             } catch {
                 app.showToast(String(localized: "Failed: \(error.localizedDescription)"), isError: true)
             }
