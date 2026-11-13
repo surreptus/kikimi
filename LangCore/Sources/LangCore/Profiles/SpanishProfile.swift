@@ -35,6 +35,10 @@ public struct SpanishProfile: LanguageProfile {
         participleEndings: ["ado", "ido", "to", "cho"],
         verbMarkers: ["yo", "me", "te", "se", "nos"],
         conjunctions: ["y", "e", "o", "pero"],
+        // "para" is the verb parar only after a subject or "se" ("el coche se para"); a noun or "el tren" before it is
+        // ambiguous, and the tagger decides there. Cut off ("pues para-"), the tagger reads it as a number named parar.
+        prepositionsSpelledAsVerbs: ["para"],
+        subjects: ["yo", "tú", "él", "ella", "usted", "nosotros", "nosotras", "vosotros", "vosotras", "ellos", "ellas", "ustedes"],
         marksCutOffWords: true,
         marksNames: true)
 

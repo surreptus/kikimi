@@ -15,6 +15,11 @@ public struct TokenRules: Sendable {
     public var participleEndings: [String]
     /// Words that can stand only before a verb ("yo", "me"). A noun the tagger names right after one is that verb.
     public var verbMarkers: Set<String>
+    /// Spellings of a preposition that is also a verb form ("para"). Where the tagger gives a lemma that is a verb ("para-" is
+    /// read as parar) but no verb, the preposition is meant, unless a subject or a word from `verbMarkers` comes before it.
+    public var prepositionsSpelledAsVerbs: Set<String>
+    /// Subject pronouns ("él"). A word from `prepositionsSpelledAsVerbs` right after one is the verb.
+    public var subjects: Set<String>
     /// Words that join two verbs ("y", "o").
     public var conjunctions: Set<String>
     /// Whether a word cut off by a hyphen or dash ("hab-") is a fragment, not a word to learn.
@@ -24,7 +29,8 @@ public struct TokenRules: Sendable {
 
     public init(functionWords: [String: String] = [:], interjections: Set<String> = [], standaloneInterjections: Set<String> = [],
                 auxiliaries: Set<String> = [], participleEndings: [String] = [], verbMarkers: Set<String> = [],
-                conjunctions: Set<String> = [], marksCutOffWords: Bool = false, marksNames: Bool = false) {
+                conjunctions: Set<String> = [], prepositionsSpelledAsVerbs: Set<String> = [], subjects: Set<String> = [],
+                marksCutOffWords: Bool = false, marksNames: Bool = false) {
         self.functionWords = functionWords
         self.interjections = interjections
         self.standaloneInterjections = standaloneInterjections
@@ -32,6 +38,8 @@ public struct TokenRules: Sendable {
         self.participleEndings = participleEndings
         self.verbMarkers = verbMarkers
         self.conjunctions = conjunctions
+        self.prepositionsSpelledAsVerbs = prepositionsSpelledAsVerbs
+        self.subjects = subjects
         self.marksCutOffWords = marksCutOffWords
         self.marksNames = marksNames
     }

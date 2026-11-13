@@ -27,6 +27,40 @@ final class SpanishTokenizerTests: XCTestCase {
         XCTAssertTrue(content("Es un país hispano-americano.").contains { $0.surface == "hispano" })
     }
 
+    func testACutOffParaIsThePrepositionNotParar() throws {
+        let text = "la noche anterior mirar el depósito y ver si me quedaba o no pues para-"
+        let para = try token("para", in: text)
+        XCTAssertEqual(para.lemma, "para")
+        XCTAssertEqual(para.pos, .other)
+        XCTAssertTrue(para.isCutOff)
+        // The preposition stays one, before an infinitive, a noun phrase and "que".
+        XCTAssertEqual(try token("para", in: "había pensado en comprar dos barras de pan para el desayuno,").lemma, "para")
+        XCTAssertEqual(try token("para", in: "Es para comer.").lemma, "para")
+        XCTAssertEqual(try token("para", in: "Lo hago para que vengas.").lemma, "para")
+    }
+
+    func testParaTheTaggerReadsAsAVerbStaysTheVerb() throws {
+        // The rule only moves a word the tagger did not call a verb. Here the tagger says verb, and it stays.
+        let no = try token("para", in: "No para de hablar.")
+        XCTAssertEqual(no.lemma, "parar")
+        // The tagger reads "el tren para en la estación" as the preposition. The rule does not change that.
+        XCTAssertEqual(try token("para", in: "El tren para en la estación.").pos, .other)
+    }
+
+    func testSeWithAnAccentIsTheVerbSaberEveryTime() throws {
+        for text in ["unos tomates, unas cebollas y lo que no sé es si quedan patatas.", "Es que soy gilipollas. No sé cómo no se me ocurrió",
+                     "porque sé que tú siempre estás más liadilla,"] {
+            let sé = try token("sé", in: text)
+            XCTAssertEqual(sé.lemma, "saber")
+            XCTAssertEqual(sé.pos, .verb)
+            XCTAssertTrue(content(text).contains { $0.lemma == "saber" })
+        }
+        // The pronoun without an accent is not a verb.
+        let se = try token("se", in: "Es que no se me ocurrió.")
+        XCTAssertEqual(se.pos, .other)
+        XCTAssertNotEqual(se.lemma, "saber")
+    }
+
     func testAVerbAfterAnotherVerbIsNotANoun() throws {
         let verb = try token("cargo", in: "y dije: bueno vale, pues me pongo y cargo ahí el coche.")
         XCTAssertEqual(verb.lemma, "cargar")
