@@ -35,6 +35,10 @@ public enum ExamplePicker {
 /// One sitting of reviews. A word's SRS stage changes once per session, on its first answer;
 /// a missed word comes back later in the session but does not change stage again.
 public actor ReviewSession {
+    /// Most due cards one session asks. The rest stay due, so a big pile is cleared over several sittings and review time
+    /// does not take over from watching.
+    public static let sizeLimit = 50
+
     private let database: LangDatabase
     private let language: String
     private var queue: [Int64] = []
@@ -57,7 +61,22 @@ public actor ReviewSession {
     /// In a known-words check: how many were missed, and so went back to being learned.
     public private(set) var returnedToLearning = 0
 
-    public init(database: LangDatabase, language: String, preferring: (@Sendable (ExampleLine) -> Bool)? = nil, now: Date = Date()) async throws {
+    /// What the latest answer changed, so that it can be taken back. Only a real review keeps one (the other kinds change
+    /// no stage), and only the latest answer can be undone.
+    private struct Undoable {
+        var wordID: Int64
+        var correct: Bool
+        var at: Date
+        var change: WordChange?          // nil when the answer wrote nothing (a missed word asked again)
+        var wasFirstAnswer: Bool         // counted towards `correctFirstTry`
+        var addedToMissed: Bool
+        var requeued: Bool
+    }
+    private var latest: Undoable?
+    public var canUndo: Bool { latest != nil }
+
+    public init(database: LangDatabase, language: String, preferring: (@Sendable (ExampleLine) -> Bool)? = nil,
+                now: Date = Date(), limit: Int = ReviewSession.sizeLimit) async throws {
         self.database = database
         self.language = language
         self.preferring = preferring
@@ -65,7 +84,7 @@ public actor ReviewSession {
         isPractice = false
         repeatsMisses = false
         startsOnCompletion = []
-        queue = try await database.dueWords(language: language, now: now).compactMap(\.id)
+        queue = try await database.dueWords(language: language, now: now, limit: limit).compactMap(\.id)
     }
 
     /// A quick check of a few words you marked known. A missed word goes back to being learned (so a video's coverage
@@ -150,6 +169,7 @@ public actor ReviewSession {
         guard let id = queue.first else { return }
         queue.removeFirst()
         cached = nil
+        latest = nil
         if isPractice {
             answered += 1
             if correct {
@@ -172,9 +192,13 @@ public actor ReviewSession {
             }
             return
         }
-        if !missed.contains(id) {
+        let firstAnswer = !missed.contains(id)
+        var change: WordChange?
+        if firstAnswer {
+            let before = try await database.snapshot(of: [id])
             do {
-                try await database.recordReview(wordID: id, correct: correct, now: now)
+                let after = try await database.recordReview(wordID: id, correct: correct, now: now)
+                change = WordChange(before: before, after: [after])
             } catch LangError.notLearning {
                 // The word left learning during the session (marked known or ignored). Drop the card: it is not
                 // asked again and counts as neither right nor missed.
@@ -183,9 +207,30 @@ public actor ReviewSession {
             if correct { correctFirstTry += 1 }
         }
         answered += 1
+        let addsToMissed = !correct && !missed.contains(id)
         if !correct {
             missed.insert(id)
             queue.append(id)
         }
+        latest = Undoable(wordID: id, correct: correct, at: now, change: change, wasFirstAnswer: firstAnswer,
+                          addedToMissed: addsToMissed, requeued: !correct)
+    }
+
+    /// Takes back the latest answer: the word's stage, next review and tally go back, and the card is the next one asked
+    /// again. Returns false, and changes nothing, if there is no answer to take back or the word has moved on since.
+    @discardableResult
+    public func undoLast() async throws -> Bool {
+        guard let last = latest else { return false }
+        latest = nil
+        if let change = last.change {
+            guard try await database.undoReview(change, correct: last.correct, answeredAt: last.at) else { return false }
+        }
+        if last.requeued, queue.last == last.wordID { queue.removeLast() }
+        if last.addedToMissed { missed.remove(last.wordID) }
+        if last.correct, last.wasFirstAnswer { correctFirstTry -= 1 }
+        answered -= 1
+        queue.insert(last.wordID, at: 0)
+        cached = nil
+        return true
     }
 }

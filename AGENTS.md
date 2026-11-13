@@ -74,6 +74,7 @@ xcodebuild -project Kikimi.xcodeproj -scheme Kikimi -destination 'platform=macOS
 (cd LangCore && swift test)                                  # about 430 tests, 12 opt-in ones skipped
 python3 Scripts/dictionaries/test_builders.py                # dictionary builder tests
 python3 -I Scripts/test_release_tools.py                     # release tool tests
+python3 -I Scripts/test_model_manifest.py                    # model manifest script tests
 Scripts/check_leaks.sh                                       # LangCore tests under `leaks`
 ```
 

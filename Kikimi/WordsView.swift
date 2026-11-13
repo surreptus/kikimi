@@ -229,16 +229,31 @@ struct WordsView: View {
     }
 
     private func apply(_ action: Bulk) {
-        let ids = ids(for: action)
+        var ids = ids(for: action)
         guard !ids.isEmpty else { return }
         Task {
             do {
+                let wanted = ids.count
+                var perDay = 0
+                if action == .learn {
+                    // Learn follows the day's new-word allowance, like the lessons, so one click cannot start a pile of reviews.
+                    perDay = env.dailyLessons.perDay(for: app.profile)
+                    if let room = try await env.database.newWordRoom(language: app.languageCode, perDay: perDay) {
+                        ids = try await env.database.mostSeen(ids, count: room)   // as the lessons choose
+                    }
+                    guard !ids.isEmpty else {
+                        app.showToast(inflected("No words started. Today's limit is ^[\(perDay) new word](inflect: true), and it is used up. You can change the limit in Settings."))
+                        return
+                    }
+                }
                 let before = try await env.database.snapshot(of: ids)   // so Undo can put each word back as it was
                 let text: String
                 switch action {
                 case .learn:
                     let n = try await env.database.startLearning(wordIDs: ids)
-                    text = inflected("Started learning ^[\(n) word](inflect: true). They are ready on the Learn page.")
+                    text = ids.count < wanted
+                        ? inflected("Started learning \(n) of \(wanted) words. Today's limit is ^[\(perDay) new word](inflect: true). They are ready on the Learn page.")
+                        : inflected("Started learning ^[\(n) word](inflect: true). They are ready on the Learn page.")
                 case .known:
                     let n = try await env.database.markKnown(wordIDs: ids)
                     text = inflected("Marked ^[\(n) word](inflect: true) as known")
@@ -252,7 +267,7 @@ struct WordsView: View {
                 app.dataChanged()
                 app.showToast(text, undo: (String(localized: "Undo"), { undo(before) }))
             } catch {
-                app.showToast(String(localized: "Failed: \(error.localizedDescription)"), isError: true)
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't change those words. Try again.")))
             }
         }
     }
@@ -264,7 +279,7 @@ struct WordsView: View {
                 app.dataChanged()
                 app.showToast(String(localized: "Undone"))
             } catch {
-                app.showToast(String(localized: "Couldn't undo: \(error.localizedDescription)"), isError: true)
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't undo that. Try again.")))
             }
         }
     }

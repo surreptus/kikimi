@@ -264,7 +264,7 @@ final class AppSupportTests: XCTestCase {
         let dir = FileManager.default.temporaryDirectory.appending(path: "models-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: dir) }
         let calls = LockedBox(0)
-        let manager = ModelManager(directory: dir) { [self] variant, base, _ in
+        let manager = ModelManager(directory: dir, manifest: .unchecked("openai_whisper-medium")) { [self] variant, base, _ in
             let folder = base.appending(path: "models/x/\(variant)")
             let attempt = calls.mutateReturning { $0 += 1; return $0 }
             // First attempt drops the encoder weights, as a dropped connection did.
@@ -281,7 +281,7 @@ final class AppSupportTests: XCTestCase {
     func testDownloadGivesUpWithAClearErrorAndNoStaleEntry() async throws {
         let dir = FileManager.default.temporaryDirectory.appending(path: "models-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: dir) }
-        let manager = ModelManager(directory: dir) { [self] variant, base, _ in
+        let manager = ModelManager(directory: dir, manifest: .unchecked("openai_whisper-medium")) { [self] variant, base, _ in
             let folder = base.appending(path: "models/x/\(variant)")
             try writeModel(at: folder, leaving: ["AudioEncoder.mlmodelc/weights/weight.bin"])
             return folder
@@ -296,7 +296,7 @@ final class AppSupportTests: XCTestCase {
         let installed = await manager.isInstalled("openai_whisper-medium")
         XCTAssertFalse(installed)
         let message = ModelError.incomplete("m", missing: ["a"]).errorDescription ?? ""
-        XCTAssertTrue(message.contains("download again"))
+        XCTAssertTrue(message.contains("download it again"))
     }
 
     func testModelPreferencesOverrideAndReset() {

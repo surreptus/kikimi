@@ -18,6 +18,11 @@ public struct ReviewOverview: Equatable, Sendable {
     public var perStage = [Int](repeating: 0, count: 8)
     public var learning = 0, known = 0, finished = 0, new = 0
 
+    /// How many cards the next session asks: all that are due, up to `ReviewSession.sizeLimit`.
+    public var sessionSize: Int { min(dueNow, ReviewSession.sizeLimit) }
+    /// More are due than one session asks, so the start screen says how many it will ask.
+    public var isCapped: Bool { dueNow > sessionSize }
+
     public var isEmpty: Bool { learning + known + finished == 0 }
     public var scheduled: Int { byDay.reduce(0, +) + afterThat }
 }

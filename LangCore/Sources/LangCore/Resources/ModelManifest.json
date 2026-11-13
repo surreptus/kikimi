@@ -1,0 +1,353 @@
+{
+  "repo": "argmaxinc/whisperkit-coreml",
+  "commit": "0f63a7800b00dd0226abd051b906c246e1907482",
+  "variants": {
+    "openai_whisper-base": [
+      {
+        "path": "AudioEncoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "c4e096b2abd561f00b9b698401df3fbe1a0d0c8d2476ff19cb4e1995680e827e"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/coremldata.bin",
+        "size": 347,
+        "sha256": "e316980638e2099e83cb1a93b903717dc12b3c2168d0ab69113764c3767696ba"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/model.mlmodel",
+        "size": 79853,
+        "sha256": "1d42038f84b508da5ce9b953302387ffedc097c346d36a56b765109002b6080e"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/weights/weight.bin",
+        "size": 41189632,
+        "sha256": "061ff4d74e5de3937b31288465d6c6f2697f92d121c80b23f51dd26bbdfe642b"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "7f77e6457285248f99cd7aa3fd4cc2efbb17733e63e7023ac53abe1f95785d07"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/coremldata.bin",
+        "size": 328,
+        "sha256": "dabdc5aa69f6ef4d97dc9499f5c30514e00e96b53b750b33a5a6471363c71662"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/weights/weight.bin",
+        "size": 354080,
+        "sha256": "35d74417ef9c765e70f4ef85fe7405015a7086e9af05e3b63a5c2c7c748b2efc"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "6ac1227740ecc2fd7a03df50ac6e2a7f7946acfa77069cf2c486ae0255356b95"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/coremldata.bin",
+        "size": 633,
+        "sha256": "9f1f6fe409486e2797d3f0c65d9a6d5af596771760548cd86f41939c54cdbe7c"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/model.mlmodel",
+        "size": 164481,
+        "sha256": "ae260ff7b95d0c957c3c1f4df4dbeaa0ae6c76bacc55eb86caca8f6820d346f0"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/weights/weight.bin",
+        "size": 104122162,
+        "sha256": "72325d42a4a4ccc8a6fa974ede6cdf2e0770685a5c4f9da94f41495b94d8d174"
+      }
+    ],
+    "openai_whisper-large-v3": [
+      {
+        "path": "AudioEncoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "195e35e9fbaa218cd59eca69988a2165245e5bfccc4a5d9776847e8955d1625a"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/coremldata.bin",
+        "size": 348,
+        "sha256": "273d6cd004f95763e9d03e5d36622f11038819a81b9eafed64b1d95444e04f62"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/model.mlmodel",
+        "size": 408667,
+        "sha256": "bf0987c0d8c3fe180877b12ba5b4ac1d890e011f2103926e53186089feced575"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/weights/weight.bin",
+        "size": 1273974400,
+        "sha256": "eb07bab32dcd62ce653b5b288bd6c27bdc5a538be309f242e33ed05e1cb53457"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "091a361134891f94e613562771beea0d93a9aefbc6984ba86c60f856e07a508f"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/coremldata.bin",
+        "size": 329,
+        "sha256": "f3c5778c86d6fbc6a9817a56dbcac05a946a4d95c77f6db8355572f3be9e9a68"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/weights/weight.bin",
+        "size": 373376,
+        "sha256": "97a66b915cd3fc97dcba6806d92381e1a56024b8f68c1a1cd370d4c92505fe87"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "7c151c6259c279aa7922d60e82c7851bbad1df10018b1cebc566aa6c2aee5e0f"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/coremldata.bin",
+        "size": 637,
+        "sha256": "f41a7939b47f7cf127aa69dfd8c552a141dc773b936bf8621aeffcd201fb9e30"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/model.mlmodel",
+        "size": 745579,
+        "sha256": "680d8dfb7c7d8f1f852071ac7bdc96e55c696d0b822e70861045efb426b0a27b"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/weights/weight.bin",
+        "size": 1813201716,
+        "sha256": "680f398925225a313c62da0221aa0a58c9f1bffac5c36f20c449a70a7c9b1e55"
+      }
+    ],
+    "openai_whisper-large-v3-v20240930_turbo": [
+      {
+        "path": "AudioEncoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "b58d36a7f4a729570b46b424ed8d847baefa07580e6cb9d47773ae738f8b845a"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/coremldata.bin",
+        "size": 348,
+        "sha256": "ffa9eb76e8e9d9be75a4d527e5249e61d67fd43081c5aa110fd24efa6c8c5ea3"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/model.mlmodel",
+        "size": 441653,
+        "sha256": "c5eb570c19871d7b0c59e0a84718cc9c8cde77a94273886de87e866961262e2c"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/weights/weight.bin",
+        "size": 1273974400,
+        "sha256": "98daf651a919978e28fe185daf55ce2f70085a8e59fa07fe8a4d08c87d368ae4"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "c5be419f8622083ac7046306400643539f0e7577c843448c36defc090d41e7ce"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/coremldata.bin",
+        "size": 329,
+        "sha256": "98efa1e351b759e078c4044668926d32bee886caf7596ae897e08e21da45565a"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/weights/weight.bin",
+        "size": 373376,
+        "sha256": "009d9fb8f6b589accfa08cebf1c712ef07c3405229ce3cfb3a57ee033c9d8a49"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "47703aed03fbfa5128e118cfe6519024006f953a53e921d66003f1412c27996c"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/coremldata.bin",
+        "size": 633,
+        "sha256": "605dad4099a82cf2c7afe93e6d8e322f1c16d4160ab27bd017ec2517b81c1bdd"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/model.mlmodel",
+        "size": 113164,
+        "sha256": "03b79e4355e814c56239ea809e5d8f6432d70d74256bc9d70c27184fe9fcec48"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/weights/weight.bin",
+        "size": 343933748,
+        "sha256": "47b2703aa37448e09cf2f06e45984fabd5ded4c34ba3400cec38a5294af39dc1"
+      },
+      {
+        "path": "TextDecoderContextPrefill.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "97639d36c7b137ea51c3c39b175911788f4d4a601ab03cd67a4b14164c3145e1"
+      },
+      {
+        "path": "TextDecoderContextPrefill.mlmodelc/coremldata.bin",
+        "size": 380,
+        "sha256": "2c159f5c862ec187092ea58e755d8c0b298952e22f3d75da023d7693c1c7389e"
+      },
+      {
+        "path": "TextDecoderContextPrefill.mlmodelc/weights/weight.bin",
+        "size": 12288192,
+        "sha256": "1310070082639173e9d81508c5f220692d489e85655aa6883cc1c7506da7fcfd"
+      }
+    ],
+    "openai_whisper-medium": [
+      {
+        "path": "AudioEncoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "1ac17e8f029504f6ecb645f539e039e650428b135cbed2d4234a4e65fde271d5"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/coremldata.bin",
+        "size": 347,
+        "sha256": "d875fd7e0a389117711940fc2052b29dc4ed0fd07813265a13cb041ae068f805"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/weights/weight.bin",
+        "size": 614460544,
+        "sha256": "577c78ed7e0ae71f9ed6fdb063dc74a0f4c0c44d04118111650458973f7ddae6"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "847173d00b238eb63f0d3dab36dc52b7a3fd1d4b31e95d4093975fada8fde2cd"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/coremldata.bin",
+        "size": 328,
+        "sha256": "ebbb4bf9699f7d65018645e168ecedf47541eee154800f9e9766f1ac90746416"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/weights/weight.bin",
+        "size": 354080,
+        "sha256": "801024dbc7a89c677be1f8b285de3409e35f7d1786c9c8d9d0d6842ac57a1c83"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "c314ca0a7738acc7ac9f4c04da834cf46972c697bd1a6c5413c18e9d278a3c81"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/coremldata.bin",
+        "size": 637,
+        "sha256": "aed3dffd67cc0be59aa28a552d8963cb27ec29d60996ede9fc74162fa09af0a4"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/weights/weight.bin",
+        "size": 913428274,
+        "sha256": "283878d285cb0e557eeb1c6a1524eb5fd33cae2c289a114bc9e72ca76c0bfc75"
+      }
+    ],
+    "openai_whisper-small": [
+      {
+        "path": "AudioEncoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "211457b92a0ced67bb8625efe39799a0030c4fc71eb87d7284ea81043caccde7"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/coremldata.bin",
+        "size": 347,
+        "sha256": "d68f152b6573ac55203a3dc8383730e6ecde685c7d2a88815b89820c88e35371"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/model.mlmodel",
+        "size": 155271,
+        "sha256": "68ca04660b8b050c68ca54c27d97c47e4133bc591422cb7009de8922d56fb8c9"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/weights/weight.bin",
+        "size": 176323456,
+        "sha256": "fe35cef2c9406993a635639b16f373f6debb0215ac115b7bf93fa03c8e10310b"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "7f77e6457285248f99cd7aa3fd4cc2efbb17733e63e7023ac53abe1f95785d07"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/coremldata.bin",
+        "size": 328,
+        "sha256": "dabdc5aa69f6ef4d97dc9499f5c30514e00e96b53b750b33a5a6471363c71662"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/weights/weight.bin",
+        "size": 354080,
+        "sha256": "267017e533b5f542d195fd9a775f2ba649075128283ce8e86c63a2ec20de5b07"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "39c0d6d55353bc61ef8071081bb958dd1ab7b0b7f2a3338a797f1a64211e084c"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/coremldata.bin",
+        "size": 633,
+        "sha256": "b2ccd0b8920701386ab9554f7db47b43e55ee07863280ee5d829d5272839adc2"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/model.mlmodel",
+        "size": 313629,
+        "sha256": "7ea861c6dfdd866ed0f2e7fe0c3df7459daa44481cb25236e03698dd6d259391"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/weights/weight.bin",
+        "size": 307287346,
+        "sha256": "bfea8044a8f38e8d33f56585b1e75ce023d3845e2a945e20480bd7e16558016e"
+      }
+    ],
+    "openai_whisper-tiny": [
+      {
+        "path": "AudioEncoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "0b25820e5b2ab0b0686b4bea147fb217d1d1bface45170ff4ffde01fa6864ae2"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/coremldata.bin",
+        "size": 347,
+        "sha256": "142c33ade402fe41952059f175eb855093dfe09b5d2b84624a31e3a9952ed47d"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/model.mlmodel",
+        "size": 54965,
+        "sha256": "030d64a3ddd296d6f709691a66a870aab7ee9f19e5fe07e8086245fb85302802"
+      },
+      {
+        "path": "AudioEncoder.mlmodelc/weights/weight.bin",
+        "size": 16422784,
+        "sha256": "bcd0879f6d1c61832765c7ec05d883d0dcbf1504057b13095fd315484196fc5e"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "7f77e6457285248f99cd7aa3fd4cc2efbb17733e63e7023ac53abe1f95785d07"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/coremldata.bin",
+        "size": 328,
+        "sha256": "dabdc5aa69f6ef4d97dc9499f5c30514e00e96b53b750b33a5a6471363c71662"
+      },
+      {
+        "path": "MelSpectrogram.mlmodelc/weights/weight.bin",
+        "size": 354080,
+        "sha256": "5b65b76f4e1dab57239e3946f6ab1314a7d1fdfa114485683dd04476ca62adb6"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/analytics/coremldata.bin",
+        "size": 243,
+        "sha256": "bfbe102ae5fb9368974a077f780441dd222fdfb0c7778c1df227ef6a73cbaada"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/coremldata.bin",
+        "size": 633,
+        "sha256": "292f96416a33f9a80aaa62ead3dd5206aee6c5e6b3ac6cc02c059d38cbf04c6a"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/model.mlmodel",
+        "size": 113134,
+        "sha256": "1afdfc3a8f3e8d6afc46e1ecc5fb216eadccbf82d9c568e7dbd3955143a1cd0e"
+      },
+      {
+        "path": "TextDecoder.mlmodelc/weights/weight.bin",
+        "size": 59216434,
+        "sha256": "d0313e1a4ffa88538c141cc3c73e6eb0e3dc54db9d574b21c7c034de688e4951"
+      }
+    ]
+  }
+}

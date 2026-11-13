@@ -27,7 +27,7 @@ struct LessonView: View {
     @State private var taught: [Int64] = []
     @State private var known = 0
     @State private var audio: SentenceAudioPlayer?
-    @State private var error: String?
+    @State private var error: Problem?
     /// Leaving asks first: Esc is easy to press by mistake, and the words taught so far are not started.
     @State private var confirmingEnd = false
 
@@ -47,7 +47,7 @@ struct LessonView: View {
 
             Spacer(minLength: 0)
             if let error {
-                FailureView(title: "Something went wrong", detail: error)
+                FailureView(title: "Something went wrong", problem: error)
             } else if let card {
                 face(card)
             } else {
@@ -122,7 +122,7 @@ struct LessonView: View {
             if card == nil { index += 1; return }
             if audio == nil { audio = SentenceAudioPlayer(libraryRoot: env.libraryURL) }
             if env.reviewAudio.mode(for: app.profile) != .off { play() }
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't load this lesson.")) }
     }
 
     private func play() {
@@ -134,16 +134,38 @@ struct LessonView: View {
     private func answer(teach: Bool?) async {
         guard let id = card?.word.id else { return }
         audio?.stop()
+        app.dismissToast()   // Undo is for the latest card only
         do {
             switch teach {
             case true?: taught.append(id)
-            case false?: try await env.database.markKnown(wordID: id); known += 1
-            case nil: try await env.database.markIgnored(wordIDs: [id]); known += 1   // saved now, so the Words page is refreshed
+            case false?: try await setAside(id, status: .known)
+            case nil: try await setAside(id, status: .ignored)
             }
             card = nil
             index += 1
             if index >= wordIDs.count { await end(quiz: true) }
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't save your answer.")) }
+    }
+
+    /// Saved now, so the Words page is refreshed. The toast offers Undo, which also brings the card back if it is still next.
+    private func setAside(_ id: Int64, status: WordStatus) async throws {
+        let change = try await env.database.setStatus(status, ofWord: id)
+        known += 1
+        let at = index
+        let lemma = card?.word.lemma ?? ""
+        let text = status == .known ? String(localized: "Marked “\(lemma)” as known") : String(localized: "Set “\(lemma)” aside")
+        app.showToast(text, undo: (String(localized: "Undo"), {
+            Task {
+                guard (try? await env.database.undo(change)) ?? 0 > 0 else {
+                    app.showToast(String(localized: "Couldn't undo: the word has changed since."), isError: true)
+                    return
+                }
+                known -= 1
+                if index == at + 1 { index = at }   // the same card again; `load` runs for the new index
+                app.dataChanged()
+                app.showToast(String(localized: "Undone"))
+            }
+        }), undoTitle: status == .known ? String(localized: "Mark as Known") : String(localized: "Set Aside"))
     }
 
     /// Hands the taught words on to be quizzed, or, when leaving early, hands on nothing. Words marked known are already

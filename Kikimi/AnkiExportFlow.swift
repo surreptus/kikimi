@@ -43,7 +43,7 @@ struct AnkiExportFlow: ViewModifier {
                 result = try await env.exportAnki(wordIDs: ids, language: app.languageCode, includeAudio: includeAudio, into: folder)
                 app.dismissToast()   // the saved-file alert takes over
             } catch {
-                app.showToast(String(localized: "Export failed: \(error.localizedDescription)"), isError: true)
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't save the Anki file. Check that there is space in that folder, then try again.")))
             }
         }
     }

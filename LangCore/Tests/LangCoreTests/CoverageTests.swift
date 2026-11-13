@@ -46,6 +46,17 @@ final class CoverageTests: XCTestCase {
         XCTAssertEqual(c?.unknownWords, 3)
     }
 
+    func testCoverageCountsLearningWordsBelowStage5SeparatelyFromKnown() async throws {
+        let f = try await fixture()
+        let c = try await f.db.coverage(forVideo: f.video)
+        XCTAssertEqual(c?.learningWords, 2, "perro (stage 2) only: mesa at stage 5 is known, gato is new")
+        XCTAssertEqual(c?.learningFraction ?? 0, 0.2, accuracy: 0.0001)
+        XCTAssertEqual(c?.knownWords, 7, "learning words never raise the known count")
+        XCTAssertEqual(c?.fit, LevelFit(fraction: 0.7), "the fit word ignores learning words")
+        let other = try await f.db.coverage(forVideo: f.other)
+        XCTAssertEqual(other?.learningWords, 0)
+    }
+
     func testTheStageWhereALearningWordCountsAsKnown() {
         XCTAssertFalse(SRSStage.stage4.isEstablished)
         XCTAssertTrue(SRSStage.stage5.isEstablished)

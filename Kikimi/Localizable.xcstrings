@@ -88,6 +88,57 @@
         }
       }
     },
+    "Brought “%@” back" : {
+
+    },
+    "Couldn't undo: the word has changed since." : {
+
+    },
+    "Mark as Known" : {
+
+    },
+    "Marked “%@” as known" : {
+
+    },
+    "Marked “%@” as known and took it out of your reviews" : {
+
+    },
+    "Redo" : {
+
+    },
+    "Restore Word" : {
+
+    },
+    "Review Answer" : {
+
+    },
+    "Set Aside" : {
+
+    },
+    "Set “%@” aside" : {
+
+    },
+    "Start Learning" : {
+
+    },
+    "Started learning “%@”" : {
+
+    },
+    "Undo %@" : {
+
+    },
+    "%@ of words known, %@ learning · %@" : {
+
+    },
+    "A word you are learning at Stages 1 to 4 is the lighter part of the bar, and the text says how many are learning. It does not count as known, and the level word ignores it." : {
+
+    },
+    "Known-word coverage %@, learning %@: %@" : {
+
+    },
+    "You know %lld%% of its words and are learning %lld%%." : {
+
+    },
     "“%@” is no longer in that sentence, so this card was skipped." : {
 
     },
@@ -4150,7 +4201,7 @@
     "Each video shows how many of its words you already know. Around 90% is comfortable to follow." : {
 
     },
-    "Each video shows how much of it you know, such as 91% known · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
+    "Each video shows how much of it you know, such as 91% known, 6% learning · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says." : {
 
     },
     "Edit line" : {
@@ -13212,12 +13263,12 @@
         }
       }
     },
-    "You know %lld of this video's %lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you ignore are left out of the count." : {
+    "You know %lld of this video's %lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you are learning at Stages 1 to 4 are shown beside it and do not count as known. Words you ignore are left out of the count." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You know %1$lld of this video's %2$lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you ignore are left out of the count."
+            "value" : "You know %1$lld of this video's %2$lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you are learning at Stages 1 to 4 are shown beside it and do not count as known. Words you ignore are left out of the count."
           }
         }
       }

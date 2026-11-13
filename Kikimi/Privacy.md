@@ -2,7 +2,7 @@
 
 Kikimi is built so that your videos, and what you learn from them, stay on your Mac.
 
-_Last updated: 6 November 2026._
+_Last updated: 13 November 2026._
 
 ## The short version
 
@@ -51,7 +51,9 @@ A few links open a web page in your browser, such as a Japanese grammar guide. T
 
 **Report a Problem.** Choose Report a Problem in the Help menu and your browser opens a new issue on GitHub with the Kikimi and macOS version numbers already typed in, where you can read and change them. Nothing is sent from Kikimi, and nothing is sent at all until you submit the issue there. Issues on GitHub are public, and GitHub handles them under its own privacy policy, so leave out anything personal.
 
-The first time you need a speech model, Kikimi downloads it from Hugging Face (huggingface.co), a service that hosts it. When it does, Hugging Face can see your internet address and which model files you asked for, as any website would, and handles that under its own privacy policy. Kikimi sends nothing else: not your videos, transcripts, words or how you use the app.
+The first time you need a speech model, Kikimi downloads it from the public repository argmaxinc/whisperkit-coreml on Hugging Face (huggingface.co and its content-delivery hosts). When it does, Hugging Face can see your internet address and which model files you asked for, as any website would, and handles that under its own privacy policy. Kikimi sends nothing else: not your videos, transcripts, words or how you use the app.
+
+Kikimi downloads one fixed, named version of that repository, not whatever is newest. It checks every large file against a SHA-256 value built into the app. A file that does not match is deleted and not used.
 
 **Checking for updates.** Choose Check for Updates in the Kikimi menu and Kikimi reads one small file from its website, which GitHub Pages hosts. It does this only when you choose it, never at launch and never in the background. The file holds the newest version number and a link to the download page. When it is read, GitHub can see your internet address and that a file was asked for, as any website would, and handles that under its own privacy policy. As with any request an app makes through macOS, the request names the app and its version. Kikimi sends nothing else: not your videos, transcripts, words or how you use the app.
 

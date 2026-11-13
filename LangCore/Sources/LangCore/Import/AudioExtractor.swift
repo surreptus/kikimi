@@ -1,9 +1,23 @@
 import AVFoundation
 import Foundation
 
-public enum AudioExtractionError: Error {
+public enum AudioExtractionError: Error, DetailedError {
     case noAudioTrack
     case readerFailed(Error?)
+
+    public var errorDescription: String? {
+        switch self {
+        case .noAudioTrack: String(localized: "This file has no audio track. Try a video with sound, or add a subtitles file.", bundle: .module)
+        case .readerFailed: String(localized: "Kikimi couldn't read this video's sound. The file may be damaged. Try a different copy.", bundle: .module)
+        }
+    }
+
+    public var detail: String {
+        switch self {
+        case .noAudioTrack: "noAudioTrack"
+        case .readerFailed(let e): "readerFailed: \(e.map(Problem.rawDetail(of:)) ?? "unknown error")"
+        }
+    }
 }
 
 public enum AudioExtractor {

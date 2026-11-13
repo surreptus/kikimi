@@ -27,7 +27,7 @@ Paths are under `LangCore/Sources/LangCore/`.
 | `Dictionary/` | `DictionaryStore` and `KanjiStore` read the bundled files in place, read-only. `ReopeningReader` opens a file again, once, after a SQLite disk I/O error (the file changed while the app ran). `VerbForms` reads the `forms` table (verb spellings built from Wiktionary). The tokenizer uses it to correct verb lemmas (Spanish `puede` read as `podar`). |
 | `Database/` | GRDB records, migrations (`LangMigrations`) and queries. A schema change is always a new migration. |
 | `Import/` | The pipeline, queue, transcription and video compaction. `SubtitleParser` reads `.srt` and `.vtt`. `MediaCheck` refuses a file that macOS cannot open or that has no video. `SegmentSplitter` cuts a line longer than `maxSegmentSeconds` at its longest pause, using Whisper word times. |
-| `Models/` | Speech-model download, listing and removal (`ModelManager`, `ModelCatalog`). |
+| `Models/` | Speech-model download, check, listing and removal (`ModelManager`, `ModelCatalog`, `ModelManifest`). `ModelManifest.json` fixes the model version and holds a SHA-256 value for each LFS file. |
 | `SRS/`, `Review/` | The eight stages, Finished, and their intervals. Review sessions. The cloze, typing and calibration logic. `ReviewShortcut` lists the keys a card offers. |
 | `Playback/` | The player controller, subtitle timeline and word hints. |
 | `Export/` | Audio and video clips. `AnkiExport` writes the Anki import file. |

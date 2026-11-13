@@ -12,7 +12,7 @@ struct PlayerView: View {
     @State private var controller: PlaybackController?
     /// Where you stopped last time, while the choice to continue from there or start over is on offer.
     @State private var resumeOffer: Double?
-    @State private var failure: String?
+    @State private var failure: Problem?
     @State private var hoveredToken: Token?
     /// A word whose meaning is kept in the hint bar until you unpin it, so its buttons can be reached.
     @State private var pinnedToken: Token?
@@ -60,8 +60,13 @@ struct PlayerView: View {
                     topBar.padding(.horizontal, 20).padding(.top, 20)
                     Group {
                         if let failure {
-                            ContentUnavailableView("Can't play this video", systemImage: "exclamationmark.triangle",
-                                                   description: Text(failure))
+                            ContentUnavailableView {
+                                Label("Can't play this video", systemImage: "exclamationmark.triangle")
+                            } description: {
+                                Text(failure.message)
+                            } actions: {
+                                if !failure.detail.isEmpty { ProblemDetails(detail: failure.detail).frame(maxWidth: 420) }
+                            }
                         } else {
                             ProgressView()
                         }
@@ -71,12 +76,13 @@ struct PlayerView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .focusedSceneValue(\.playbackActions, playbackActions)
         .task { await load() }
         .task(id: shownToken?.lemma) { await refreshHint(announce: pinnedToken != nil) }
         .task(id: controller != nil) { await keepPlace() }
         .onChange(of: pauseAfterLine) { _, on in controller?.pausesAfterLines = on }
         .onChange(of: translationDisplayRaw) { _, _ in Task { await setUpTranslations() } }
-        .onChange(of: translations?.problem) { _, text in if let text { app.showToast(text, isError: true) } }
+        .onChange(of: translations?.problem) { _, problem in if let problem { app.showToast(problem) } }
         .onChange(of: loopSpeed) { _, speed in controller?.loopSpeed = Float(speed) }
         .sheet(isPresented: Binding(get: { editing != nil }, set: { if !$0 { editing = nil } })) {
             if let editing, let controller {
@@ -138,18 +144,47 @@ struct PlayerView: View {
         if announce, let wordID = hint?.wordID { try? await env.database.record(.lookup, subject: wordID) }
     }
 
-    /// Start learning or mark known without leaving the video.
+    /// Start learning or mark known without leaving the video. The toast says what happened and offers Undo.
     private func setStatus(_ status: WordStatus) {
         guard let id = hint?.wordID else { return }
+        let lemma = hint?.lemma ?? ""
         Task {
-            switch status {
-            case .learning: try? await env.database.startLearning(wordID: id)
-            case .ignored: try? await env.database.markIgnored(wordIDs: [id])
-            case .new: try? await env.database.markNew(wordIDs: [id])
-            default: try? await env.database.markKnown(wordID: id)
+            do {
+                let change = try await env.database.setStatus(status, ofWord: id)
+                app.dataChanged()
+                await refreshHint()
+                guard !change.isEmpty else { return }
+                let wasInReviews = change.before.first.map { $0.status == .learning || $0.status == .finished } ?? false
+                let text = switch status {
+                case .learning: String(localized: "Started learning “\(lemma)”")
+                case .ignored: String(localized: "Set “\(lemma)” aside")
+                case .new: String(localized: "Brought “\(lemma)” back")
+                default: wasInReviews ? String(localized: "Marked “\(lemma)” as known and took it out of your reviews")
+                                      : String(localized: "Marked “\(lemma)” as known")
+                }
+                let title = switch status {
+                case .learning: String(localized: "Start Learning")
+                case .ignored: String(localized: "Set Aside")
+                case .new: String(localized: "Restore Word")
+                default: String(localized: "Mark as Known")
+                }
+                app.showToast(text, undo: (String(localized: "Undo"), { undo(change) }), undoTitle: title)
+            } catch {
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't change that word. Try again.")))
             }
-            app.dataChanged()
-            await refreshHint()
+        }
+    }
+
+    private func undo(_ change: WordChange) {
+        Task {
+            do {
+                try await env.database.undo(change)
+                app.dataChanged()
+                await refreshHint()
+                app.showToast(String(localized: "Undone"))
+            } catch {
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't undo that. Try again.")))
+            }
         }
     }
 
@@ -182,7 +217,7 @@ struct PlayerView: View {
                 AccessibilityNotification.Announcement(String(localized: "You stopped at \(clock(spot)). Continue or start over.")).post()
             }
         } catch {
-            failure = error.localizedDescription
+            failure = Problem(error, fallback: String(localized: "Kikimi couldn't open this video. Go back and try again, or add it again."))
         }
     }
 
@@ -269,24 +304,46 @@ struct PlayerView: View {
         Task { try? await database.saveResumePosition(videoID: id, seconds: seconds) }
     }
 
+    /// What the Playback menu may do now. The keys are bound there, so each one is found in the menu bar.
+    private var playbackActions: PlaybackActions {
+        PlaybackActions(
+            available: PlaybackCommand.available(
+                videoReady: controller != nil, editingLine: editing != nil, hasWord: hint?.wordID != nil, status: hint?.status),
+            isPlaying: controller?.isPlaying == true, isLooping: controller?.loopingIndex != nil,
+            pausesAfterLine: pauseAfterLine, subtitlesHidden: hideSubtitles,
+            perform: { command in
+                guard let controller else { return }
+                switch command {
+                case .playPause: controller.togglePlayback()
+                case .previousLine: Task { await controller.previousLine() }
+                case .nextLine: Task { await controller.nextLine() }
+                case .pauseAfterLine: pauseAfterLine.toggle()
+                case .hideSubtitles: hideSubtitles.toggle(); shownLines = []
+                case .loopLine: Task { await controller.toggleLoop() }
+                case .focusTranscript: focusedLine = controller.activeIndex ?? 0
+                case .learnWord: setStatus(.learning)
+                case .restoreWord: setStatus(.new)
+                case .knownWord: setStatus(.known)
+                case .ignoreWord: setStatus(.ignored)
+                }
+            })
+    }
+
     private func controls(_ controller: PlaybackController) -> some View {
         HStack(spacing: 12) {
             Button("Previous line", systemImage: "backward.fill") { Task { await controller.previousLine() } }
                 .buttonStyle(.pill(.secondary, compact: true))
-                .keyboardShortcut(.leftArrow, modifiers: .command)
                 .help("Previous line (⌘←)")
             Button(controller.isPlaying ? String(localized: "Pause") : String(localized: "Play"), systemImage: controller.isPlaying ? "pause.fill" : "play.fill") {
                 controller.togglePlayback()
             }
             .buttonStyle(.pill(compact: true))
-            .keyboardShortcut(.space, modifiers: [])
+            .help(controller.isPlaying ? "Pause (Space)" : "Play (Space)")
             Button("Next line", systemImage: "forward.fill") { Task { await controller.nextLine() } }
                 .buttonStyle(.pill(.secondary, compact: true))
-                .keyboardShortcut(.rightArrow, modifiers: .command)
                 .help("Next line (⌘→)")
             Button("Pause after each line", systemImage: "pause.rectangle") { pauseAfterLine.toggle() }
                 .buttonStyle(.pill(pauseAfterLine ? .primary : .secondary, compact: true))
-                .keyboardShortcut("p", modifiers: [])
                 .help(pauseAfterLine ? "Pausing after each line (P). Press again to play straight through."
                                      : "Pause after each line (P), to think or look a word up")
                 .accessibilityValue(pauseAfterLine ? "On" : "Off")
@@ -294,13 +351,11 @@ struct PlayerView: View {
                 hideSubtitles.toggle(); shownLines = []
             }
             .buttonStyle(.pill(hideSubtitles ? .primary : .secondary, compact: true))
-            .keyboardShortcut("h", modifiers: [])
             .help(hideSubtitles ? "Subtitles are hidden (H). Press again to show them, or S to show one line."
                                 : "Hide the subtitles (H), to listen without reading")
             .accessibilityValue(hideSubtitles ? "On" : "Off")
             Button("Loop this line", systemImage: "repeat") { Task { await controller.toggleLoop() } }
                 .buttonStyle(.pill(controller.loopingIndex != nil ? .primary : .secondary, compact: true))
-                .keyboardShortcut("r", modifiers: [])
                 .help(controller.loopingIndex != nil ? "Looping this line (R). Press again to stop."
                                                      : "Repeat this line (R), until you stop it")
                 .accessibilityValue(controller.loopingIndex != nil ? "On" : "Off")
@@ -322,12 +377,6 @@ struct PlayerView: View {
         }
         .labelStyle(.pillIcon)
         .animation(reduceMotion ? nil : Theme.easeOut(0.15), value: controller.loopingIndex != nil)
-        .background {
-            // Moves the keyboard into the transcript without Full Keyboard Access; a menu-less shortcut, so it has no face.
-            Button("Focus transcript") { focusedLine = controller.activeIndex ?? 0 }
-                .keyboardShortcut(.downArrow, modifiers: .command)
-                .frame(width: 0, height: 0).opacity(0)
-        }
     }
 
     /// The keys that work in the player, so none of them has to be found by hovering.
@@ -482,22 +531,18 @@ struct PlayerView: View {
         if hint?.wordID != nil {
             if hint?.status == .ignored {
                 Button { setStatus(.new) } label: { KeyedLabel(title: "Restore", key: "L") }.buttonStyle(.pill(.secondary, compact: true))
-                    .keyboardShortcut("l", modifiers: [])
                     .help("Bring this word back as a new word (L)")
             }
             if hint?.status != .learning && hint?.status != .finished && hint?.status != .ignored {
                 Button { setStatus(.learning) } label: { KeyedLabel(title: "Learn", key: "L") }.buttonStyle(.pill(compact: true))
-                    .keyboardShortcut("l", modifiers: [])
                     .help("Start learning this word (L)")
             }
             if hint?.status != .known && hint?.status != .ignored {
                 Button { setStatus(.known) } label: { KeyedLabel(title: "Known", key: "K") }.buttonStyle(.pill(.secondary, compact: true))
-                    .keyboardShortcut("k", modifiers: [])
                     .help("Mark this word as known (K)")
             }
             if hint?.status == .new {
                 Button { setStatus(.ignored) } label: { KeyedLabel(title: "Ignore", key: "X") }.buttonStyle(.pill(.quiet, compact: true))
-                    .keyboardShortcut("x", modifiers: [])
                     .help("Set this word aside: not worth learning, such as a name or a mistake (X)")
             }
         }
@@ -514,7 +559,7 @@ struct PlayerView: View {
                 try await env.clips.export(video: video, start: line.startTime, end: line.endTime, kind: kind, to: url)
                 app.showToast(String(localized: "Saved \(url.lastPathComponent)"))
             } catch {
-                app.showToast(String(localized: "Export failed: \(error.localizedDescription)"), isError: true)
+                app.showToast(Problem(error, fallback: String(localized: "Kikimi couldn't save that clip. Check that there is space in that folder, then try again.")))
             }
         }
     }

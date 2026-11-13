@@ -20,7 +20,7 @@ struct VideosView: View {
     @State private var calibrating: Video?
     @State private var renaming: Video?
     @State private var newTitle = ""
-    @State private var renameError: String?
+    @State private var renameError: Problem?
     /// New videos not yet played, with the words each needs to reach about 90%: their rows offer the next steps.
     @State private var unwatched: Set<Int64> = []
     @State private var goals: [Int64: CoverageGoal] = [:]
@@ -56,8 +56,14 @@ struct VideosView: View {
             TextField("Title", text: $newTitle)
             Button("Save") { saveRename() }
             Button("Cancel", role: .cancel) { renaming = nil }
+            if let detail = renameError?.detail, !detail.isEmpty {
+                Button("Copy Details") {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(detail, forType: .string)
+                }
+            }
         } message: {
-            Text(renameError ?? "The files on disk keep their names; this changes the title shown here.")
+            Text(renameError?.message ?? String(localized: "The files on disk keep their names; this changes the title shown here."))
         }
     }
 
@@ -90,12 +96,18 @@ struct VideosView: View {
         return (item, best)
     }
 
+    private func nextUpDetail(_ coverage: VideoCoverage) -> String {
+        let known = Int((coverage.fraction * 100).rounded()), learning = Int((coverage.learningFraction * 100).rounded())
+        guard learning > 0 else { return String(localized: "You know \(known)% of its words.") }
+        return String(localized: "You know \(known)% of its words and are learning \(learning)%.")
+    }
+
     private func nextUpCard(_ item: LibraryEntry, _ coverage: VideoCoverage) -> some View {
         HStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Next up").font(Theme.title(17))
                 Text(item.video.title).font(Theme.styled(.headline, design: .rounded)).lineLimit(2)
-                Text("You know \(Int((coverage.fraction * 100).rounded()))% of its words.")
+                Text(nextUpDetail(coverage))
                     .font(Theme.small).foregroundStyle(Theme.muted)
             }
             Spacer()
@@ -212,10 +224,10 @@ struct VideosView: View {
                 renaming = nil
                 app.dataChanged()
             } catch LangError.emptyTitle {
-                renameError = "A title can't be empty."
+                renameError = Problem(LangError.emptyTitle, fallback: "")
                 renaming = video   // keep the alert open
             } catch {
-                renameError = error.localizedDescription
+                renameError = Problem(error, fallback: String(localized: "Kikimi couldn't rename this video. Try again."))
                 renaming = video
             }
         }
@@ -307,7 +319,7 @@ private struct VideoInfoSheet: View {
     @State private var details: VideoDetails?
     @State private var goal: CoverageGoal?
     @State private var confirmDelete = false
-    @State private var error: String?
+    @State private var error: Problem?
 
     /// Everything above the buttons; it scrolls only if the window is too short to show it all.
     private var info: some View {
@@ -344,7 +356,7 @@ private struct VideoInfoSheet: View {
                 ProgressView()
             }
 
-            if let error { Text(error).font(Theme.small).foregroundStyle(Theme.red) }
+            if let error { ProblemView(problem: error) }
 
         }
     }
@@ -417,7 +429,7 @@ private struct VideoInfoSheet: View {
                 app.dataChanged()
                 dismiss()
             } catch {
-                self.error = error.localizedDescription
+                self.error = Problem(error, fallback: String(localized: "Kikimi couldn't remove this video. Try again."))
             }
         }
     }

@@ -1,19 +1,35 @@
 import Foundation
 import WhisperKit
 
-public enum ModelError: Error, LocalizedError {
+public enum ModelError: Error, DetailedError {
     case notInstalled(String)
     /// The download finished but files are missing (usually a dropped connection). Trying again resumes it.
     case incomplete(String, missing: [String])
     /// That model is being downloaded right now.
     case busy(String)
+    /// Kikimi has no checked version of this model, so it will not download it.
+    case notAvailable(String)
+    /// Large files did not match the values built into the app. Kikimi deleted them and will not use them.
+    case verificationFailed(String, files: [String])
 
     public var errorDescription: String? {
         switch self {
-        case .notInstalled(let model): String(localized: "The speech model \(model) isn't downloaded yet.", bundle: .module)
+        case .notInstalled: String(localized: "The speech model isn't downloaded yet. Download it from Import, then try again.", bundle: .module)
         case .busy(let model): String(localized: "The \(ModelCatalog.name(for: model)) model is downloading right now. Wait for it to finish.", bundle: .module)
-        case .incomplete(let model, let missing):
-            String(localized: "The \(model) download didn't finish (missing \(missing.joined(separator: ", "))). Check your connection and download again.", bundle: .module)
+        case .incomplete: String(localized: "The speech model didn't finish downloading. Check your connection, then download it again.", bundle: .module)
+        case .notAvailable(let model): String(localized: "Kikimi can't download the speech model \(ModelCatalog.name(for: model)).", bundle: .module)
+        case .verificationFailed(let model, _):
+            String(localized: "The \(ModelCatalog.name(for: model)) download is damaged: a file does not match what it should be. Kikimi deleted it and will not use it. Check your connection and download again.", bundle: .module)
+        }
+    }
+
+    public var detail: String {
+        switch self {
+        case .notInstalled(let model): "notInstalled: \(model)"
+        case .busy(let model): "busy: \(model)"
+        case .incomplete(let model, let missing): "incomplete: \(model), missing \(missing.joined(separator: ", "))"
+        case .notAvailable(let model): "notAvailable: \(model)"
+        case .verificationFailed(let model, let files): "verificationFailed: \(model), files \(files.joined(separator: ", "))"
         }
     }
 }
@@ -40,23 +56,31 @@ public actor ModelManager {
     ]
 
     public let directory: URL
+    private let manifest: ModelManifest
     private let downloader: Downloader
     private var downloading = Set<String>()
     private var indexURL: URL { directory.appending(path: "installed.json") }
 
-    public init(
-        directory: URL,
-        downloader: @escaping Downloader = { variant, base, progress in
-            try await WhisperKit.download(variant: variant, downloadBase: base,
-                                          progressCallback: { progress($0.fractionCompleted) })
-        }
-    ) {
+    public init(directory: URL, manifest: ModelManifest = .bundled, downloader: Downloader? = nil) {
         self.directory = directory
-        self.downloader = downloader
+        self.manifest = manifest
+        self.downloader = downloader ?? Self.pinnedDownloader(manifest)
     }
 
-    static func missingFiles(in folder: URL) -> [String] {
-        requiredFiles.filter { !FileManager.default.fileExists(atPath: folder.appending(path: $0).path) }
+    /// Downloads one variant from the manifest's repository at the manifest's commit, never from a branch.
+    /// It uses the same call as `WhisperKit.download`, so the folder layout is the same and earlier installs keep working.
+    static func pinnedDownloader(_ manifest: ModelManifest) -> Downloader {
+        { variant, base, progress in
+            let hub = HubApiWrapper(downloadBase: base)
+            let root = try await hub.snapshot(from: HubApiWrapper.Repo(id: manifest.repo), revision: manifest.commit,
+                                              matching: ["\(variant)/*"]) { progress($0.fractionCompleted) }
+            return root.appending(path: variant)
+        }
+    }
+
+    static func missingFiles(in folder: URL, checking extra: [ModelManifest.File] = []) -> [String] {
+        let wanted = requiredFiles + extra.map(\.path).filter { !requiredFiles.contains($0) }
+        return wanted.filter { !FileManager.default.fileExists(atPath: folder.appending(path: $0).path) }
     }
 
     /// Folder of an installed model variant, or nil if it is missing or incomplete.
@@ -68,7 +92,8 @@ public actor ModelManager {
 
     public func isInstalled(_ variant: String) -> Bool { installedFolder(for: variant) != nil }
 
-    /// Downloads a model, retrying while files are missing (each retry resumes rather than starting over).
+    /// Downloads a model, retrying while files are missing or fail the check (each retry fetches only what is gone).
+    /// The model is recorded as installed only after every large file matches the manifest.
     @discardableResult
     public func download(
         variant: String, attempts: Int = 3, progress: @escaping @Sendable (Double) -> Void
@@ -76,11 +101,20 @@ public actor ModelManager {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         downloading.insert(variant)
         defer { downloading.remove(variant) }
+        guard let expected = manifest.files(for: variant) else { throw ModelError.notAvailable(variant) }
         var missing: [String] = []
+        var mismatched: [String] = []
         for _ in 0..<max(1, attempts) {
             let folder = try await downloader(variant, directory, progress)
-            missing = Self.missingFiles(in: folder)
+            missing = Self.missingFiles(in: folder, checking: expected)
+            mismatched = []
             if missing.isEmpty {
+                // Off the actor: reading a few GB takes seconds, and other calls must not wait for it.
+                mismatched = await Task.detached(priority: .utility) {
+                    ModelVerifier.deleteMismatches(of: expected, in: folder)
+                }.value
+            }
+            if missing.isEmpty && mismatched.isEmpty {
                 var index = loadIndex()
                 index[variant] = relativePath(of: folder)
                 try JSONEncoder().encode(index).write(to: indexURL, options: .atomic)
@@ -91,6 +125,7 @@ public actor ModelManager {
         var index = loadIndex()
         index[variant] = nil
         try? JSONEncoder().encode(index).write(to: indexURL, options: .atomic)
+        if !mismatched.isEmpty { throw ModelError.verificationFailed(variant, files: mismatched) }
         throw ModelError.incomplete(variant, missing: missing)
     }
 
