@@ -66,18 +66,58 @@ final class AppState {
     private(set) var toast: Toast?
     @ObservationIgnored private var toastTimer: Task<Void, Never>?
 
-    /// `undo` puts a button on the toast, and keeps it up longer so there is time to use it.
-    func showToast(_ text: String, isError: Bool = false, undo: (title: String, run: () -> Void)? = nil) {
+    /// The latest thing that Edit > Undo (⌘Z) takes back, when no text field is being edited. A toast with an Undo button
+    /// sets it for as long as the toast shows. A review answer sets it until the next answer or the end of the session.
+    struct QuickUndo {
+        let title: String
+        let run: () -> Void
+        let belongsToToast: Bool
+    }
+    private(set) var quickUndo: QuickUndo?
+
+    /// The menu item for `quickUndo`: "Undo Review Answer", or plain "Undo" when there is none or it has no name.
+    var undoMenuTitle: String {
+        guard let title = quickUndo?.title, !title.isEmpty else { return String(localized: "Undo") }
+        return String(localized: "Undo \(title)")
+    }
+
+    func setQuickUndo(title: String, run: @escaping () -> Void) {
+        quickUndo = QuickUndo(title: title, run: run, belongsToToast: false)
+    }
+
+    /// Ends a review's quick undo. One that belongs to a toast stays until its toast goes.
+    func clearReviewUndo() {
+        if quickUndo?.belongsToToast == false { quickUndo = nil }
+    }
+
+    /// Runs the quick undo once, as the menu does.
+    func performQuickUndo() {
+        guard let undo = quickUndo else { return }
+        quickUndo = nil
+        undo.run()
+        if undo.belongsToToast { dismissToast() }
+    }
+
+    /// `undo` puts a button on the toast, and keeps it up longer so there is time to use it. It is also the quick undo
+    /// while the toast shows; `undoTitle` names it in the Edit menu.
+    func showToast(_ text: String, isError: Bool = false, undo: (title: String, run: () -> Void)? = nil, undoTitle: String = "") {
         var shown = Toast(text: text, isError: isError)
         shown.action = undo
         toast = shown
+        if let undo { quickUndo = QuickUndo(title: undoTitle, run: undo.run, belongsToToast: true) }
+        else if quickUndo?.belongsToToast == true { quickUndo = nil }
         AccessibilityNotification.Announcement(undo == nil ? text : "\(text). \(undo!.title) is available.").post()   // VoiceOver can't see it appear
         dismissToast(after: isError || undo != nil ? 8 : 4)
     }
 
     func dismissToast() {
         toastTimer?.cancel()
+        clearToast()
+    }
+
+    private func clearToast() {
         toast = nil
+        if quickUndo?.belongsToToast == true { quickUndo = nil }
     }
 
     /// Pointing at a toast holds it; looking away gives it two more seconds.
@@ -90,7 +130,7 @@ final class AppState {
         toastTimer?.cancel()
         toastTimer = Task {
             try? await Task.sleep(for: .seconds(seconds))
-            if !Task.isCancelled { toast = nil }
+            if !Task.isCancelled { clearToast() }
         }
     }
 
