@@ -31,4 +31,10 @@ final class ReviewShortcutTests: XCTestCase {
         XCTAssertNil(ReviewShortcut.check.letter)
         XCTAssertNil(ReviewShortcut.playAgain.letter)
     }
+
+    func testATextFieldKeepsEveryBareLetterFromTheMenu() {
+        let all = ReviewShortcut.allCases
+        XCTAssertEqual(ReviewShortcut.menuKeys(offered: all, textFieldFocused: true), [.check, .playAgain])
+        XCTAssertEqual(ReviewShortcut.menuKeys(offered: all, textFieldFocused: false), all)
+    }
 }

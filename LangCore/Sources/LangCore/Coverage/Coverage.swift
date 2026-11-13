@@ -60,15 +60,19 @@ public struct VideoCoverage: Equatable, Sendable {
     public var totalWords: Int
     /// How many of those are words you know (see `SRSStage.isEstablished`).
     public var knownWords: Int
+    /// How many are words you are learning but do not yet count as known (stages 1 to 4). Never part of `knownWords`.
+    public var learningWords: Int
 
-    public init(videoID: Int64, totalWords: Int, knownWords: Int) {
-        self.videoID = videoID; self.totalWords = totalWords; self.knownWords = knownWords
+    public init(videoID: Int64, totalWords: Int, knownWords: Int, learningWords: Int = 0) {
+        self.videoID = videoID; self.totalWords = totalWords; self.knownWords = knownWords; self.learningWords = learningWords
     }
 
     public var unknownWords: Int { totalWords - knownWords }
     /// 0 to 1. A video with no words in it (silence, or nothing the tokenizer kept) reads as 0.
     public var fraction: Double { totalWords == 0 ? 0 : Double(knownWords) / Double(totalWords) }
     /// nil when there are no words to judge by.
+    /// 0 to 1. Shown beside `fraction`, never added to it: the fit rule counts known words only.
+    public var learningFraction: Double { totalWords == 0 ? 0 : Double(learningWords) / Double(totalWords) }
     public var fit: LevelFit? { totalWords == 0 ? nil : LevelFit(fraction: fraction) }
 
     /// The video most worth watching next, or nil when none is within reach (all of them hard, or with nothing to judge
@@ -118,6 +122,10 @@ private let knownCondition = """
     (words.status IN ('known', 'burned') OR (words.status = 'learning' AND words.stage >= \(SRSStage.stage5.rawValue)))
     """
 
+private let learningCondition = """
+    (words.status = 'learning' AND words.stage < \(SRSStage.stage5.rawValue))
+    """
+
 extension LangDatabase {
     /// Coverage for every video (of one language, or all), keyed by video id.
     public func videoCoverage(language: String? = nil) async throws -> [Int64: VideoCoverage] {
@@ -125,7 +133,8 @@ extension LangDatabase {
             let rows = try Row.fetchAll(db, sql: """
                 SELECT videos.id AS video_id,
                        COUNT(CASE WHEN occurrences.id IS NOT NULL AND words.status IS NOT 'ignored' THEN 1 END) AS total,
-                       COALESCE(SUM(CASE WHEN \(knownCondition) THEN 1 ELSE 0 END), 0) AS known
+                       COALESCE(SUM(CASE WHEN \(knownCondition) THEN 1 ELSE 0 END), 0) AS known,
+                       COALESCE(SUM(CASE WHEN \(learningCondition) THEN 1 ELSE 0 END), 0) AS learning
                 FROM videos
                 LEFT JOIN subtitles ON subtitles.video_id = videos.id
                 LEFT JOIN occurrences ON occurrences.subtitle_id = subtitles.id
@@ -136,7 +145,8 @@ extension LangDatabase {
             var result: [Int64: VideoCoverage] = [:]
             for row in rows {
                 let id: Int64 = row["video_id"]
-                result[id] = VideoCoverage(videoID: id, totalWords: row["total"], knownWords: row["known"])
+                result[id] = VideoCoverage(videoID: id, totalWords: row["total"], knownWords: row["known"],
+                                        learningWords: row["learning"])
             }
             return result
         }

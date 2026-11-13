@@ -1,8 +1,18 @@
 import Foundation
 import GRDB
 
-public enum DictionaryError: Error {
+public enum DictionaryError: Error, DetailedError {
     case missingResource(String)
+
+    public var errorDescription: String? {
+        String(localized: "A dictionary file is missing from Kikimi. Download Kikimi again to get it back.", bundle: .module)
+    }
+
+    public var detail: String {
+        switch self {
+        case .missingResource(let name): "missingResource: \(name)"
+        }
+    }
 }
 
 /// One entry of a built dictionary file.

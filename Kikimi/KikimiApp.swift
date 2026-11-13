@@ -16,7 +16,7 @@ struct KikimiApp: App {
                 .onOpenURL { app.handleOpen($0) }
         }
         .defaultSize(width: 1240, height: 800)
-        .commands { AppCommands(app: app) }
+        .commands { AppCommands(app: app); PlaybackReviewCommands() }
 
         // A standard Settings window. SwiftUI adds the Settings… item (⌘,) to the app menu for it.
         Settings {

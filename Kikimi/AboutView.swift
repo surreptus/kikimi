@@ -149,11 +149,12 @@ struct AboutView: View {
 
     private var level: some View {
         section("Finding videos at your level") {
-            paragraph("Each video shows how much of it you know, such as 91% known · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says.")
+            paragraph("Each video shows how much of it you know, such as 91% known, 6% learning · Mostly familiar. Only nouns, verbs, adjectives and adverbs are counted. Small words are nearly always known, so you understand more than the figure says.")
             VStack(alignment: .leading, spacing: 6) {
                 bullet("Hard is under 80%, A stretch is 80 to 88%, Mostly familiar is 88 to 98%, and Easy is 98% or more.")
                 bullet("Around 90% of the counted words is where following along gets comfortable.")
                 bullet("A word counts as known if you marked it known, it is finished, or it is at Stage 5 or above.")
+                bullet("A word you are learning at Stages 1 to 4 is the lighter part of the bar, and the text says how many are learning. It does not count as known, and the level word ignores it.")
                 bullet("Words you ignore, such as names and mistakes, are left out of the count, so ignoring words raises the figure.")
                 bullet("Sort by Closest to my level to see what to watch next.")
                 bullet("Open a video's Info to learn its commonest new words in lessons: you are taught them five at a time, and can ignore or skip any that don't belong.")

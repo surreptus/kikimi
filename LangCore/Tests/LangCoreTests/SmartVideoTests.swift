@@ -184,7 +184,7 @@ final class SmartTranscoderTests: XCTestCase {
             try await transcoder.compact(source: audio, destination: dir.appending(path: "out.mov"), progress: { _ in })
             XCTFail("expected noVideoTrack")
         } catch TranscodeError.noVideoTrack {
-            XCTAssertEqual(TranscodeError.noVideoTrack.errorDescription, "This file has no video track.")
+            XCTAssertEqual(TranscodeError.noVideoTrack.errorDescription, "This file has no video. Kikimi adds video files; audio-only files aren't supported yet.")
         }
     }
 
