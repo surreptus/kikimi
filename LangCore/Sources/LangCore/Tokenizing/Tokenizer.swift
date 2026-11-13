@@ -95,6 +95,10 @@ public struct NLTaggerTokenizer: WordTokenizer {
                     // tagger can call an adverb).
                     pos = .verb
                     chosen = forms.contains(chosen) ? chosen : best
+                } else if pos == .other, forms.contains(chosen) {
+                    // The tagger names a pronoun but gives a verb's lemma that the table lists for this spelling: sé is saber, and
+                    // the pronoun se is not (its lemma is no form of any verb).
+                    pos = .verb
                 }
             }
             if rules.marksNames, pos == .noun, surface.first?.isUppercase == true, !Self.startsSentence(range, in: text),
@@ -107,6 +111,7 @@ public struct NLTaggerTokenizer: WordTokenizer {
             return true
         }
         correctByNeighbours(&found, in: text)
+        correctPrepositions(&found)
         return found.map(\.token)
     }
 
@@ -126,6 +131,21 @@ public struct NLTaggerTokenizer: WordTokenizer {
             guard isParticiple || afterMarker || inList else { continue }
             let old = found[i].token
             found[i].token = Token(surface: old.surface, lemma: best, pos: .verb, isCutOff: old.isCutOff)
+        }
+    }
+
+    /// A preposition spelt like a verb form ("para") that the tagger gave the verb's lemma without calling it a verb, or a
+    /// cut-off one (the tagger reads "para-" as a verb or a number): the preposition, unless a subject or a verb marker stands right before it ("él para el coche").
+    private func correctPrepositions(_ found: inout [Found]) {
+        for i in found.indices where (found[i].token.pos == .other || found[i].token.isCutOff)
+                                    && rules.prepositionsSpelledAsVerbs.contains(found[i].spelling)
+                                    && found[i].token.lemma != found[i].spelling {
+            if i > 0 {
+                let before = found[i - 1].spelling
+                if rules.subjects.contains(before) || rules.verbMarkers.contains(before) { continue }
+            }
+            let old = found[i].token
+            found[i].token = Token(surface: old.surface, lemma: found[i].spelling, pos: .other, isCutOff: old.isCutOff)
         }
     }
 
