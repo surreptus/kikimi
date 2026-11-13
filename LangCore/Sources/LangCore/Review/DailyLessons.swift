@@ -35,6 +35,9 @@ public struct DailyLessons: Equatable, Sendable {
 
     public var isOff: Bool { perDay == 0 }
 
+    /// Whether there is a lesson to do now: lessons are on, reviews are not over the limit, and there are words to teach.
+    public var isWaiting: Bool { !isOff && !heldBack && !wordIDs.isEmpty }
+
     /// The day's words in the groups a lesson teaches and then quizzes.
     public var batches: [[Int64]] {
         stride(from: 0, to: wordIDs.count, by: Self.batchSize).map { Array(wordIDs[$0..<min($0 + Self.batchSize, wordIDs.count)]) }

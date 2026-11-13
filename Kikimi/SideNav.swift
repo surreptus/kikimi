@@ -31,6 +31,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
 struct SideNav: View {
     @Binding var selection: SidebarItem
     var dueCount: Int
+    var lessonsWaiting = false
     var languages: [(code: String, name: String)]
     @Binding var language: String
     var showAbout: () -> Void
@@ -85,6 +86,16 @@ struct SideNav: View {
         .ignoresSafeArea()
     }
 
+    private func navLabel(_ item: SidebarItem) -> String {
+        guard item == .review else { return item.title }
+        switch (dueCount > 0, lessonsWaiting) {
+        case (true, true): return String(localized: "Learn, \(dueCount) due, lessons waiting")
+        case (true, false): return String(localized: "Learn, \(dueCount) due")
+        case (false, true): return String(localized: "Learn, lessons waiting")
+        case (false, false): return item.title
+        }
+    }
+
     private func navRow(_ item: SidebarItem) -> some View {
         let selected = selection == item
         return Button {
@@ -103,6 +114,12 @@ struct SideNav: View {
                         .background(Capsule().fill(Theme.accent))
                         .help(inflected("^[\(dueCount) review](inflect: true) due now"))
                 }
+                if item == .review, lessonsWaiting {
+                    // A dot, not a number: lessons are offered, not owed. VoiceOver and the tooltip say what it is.
+                    Circle().fill(Theme.lessonDot).frame(width: 9, height: 9)
+                        .help("Lessons are waiting")
+                        .accessibilityHidden(true)
+                }
             }
             .foregroundStyle(Theme.ink)
             .padding(.horizontal, 12).padding(.vertical, 11)
@@ -116,7 +133,7 @@ struct SideNav: View {
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(item == .review && dueCount > 0 ? String(localized: "Learn, \(dueCount) due") : item.title)
+        .accessibilityLabel(navLabel(item))
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
