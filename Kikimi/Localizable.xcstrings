@@ -88,6 +88,45 @@
         }
       }
     },
+    "Brought “%@” back" : {
+
+    },
+    "Couldn't undo: the word has changed since." : {
+
+    },
+    "Mark as Known" : {
+
+    },
+    "Marked “%@” as known" : {
+
+    },
+    "Marked “%@” as known and took it out of your reviews" : {
+
+    },
+    "Redo" : {
+
+    },
+    "Restore Word" : {
+
+    },
+    "Review Answer" : {
+
+    },
+    "Set Aside" : {
+
+    },
+    "Set “%@” aside" : {
+
+    },
+    "Start Learning" : {
+
+    },
+    "Started learning “%@”" : {
+
+    },
+    "Undo %@" : {
+
+    },
     "%@ of words known, %@ learning · %@" : {
 
     },

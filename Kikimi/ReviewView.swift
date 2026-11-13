@@ -85,7 +85,7 @@ struct ReviewView: View {
             voiceAvailable = WordSpeaker.shared.isAvailable(languageCode: app.profile.whisperCode)
         }
         .task(id: app.pendingLesson) { takePendingLesson() }
-        .onDisappear { audio?.stop(); voice.discard() }
+        .onDisappear { audio?.stop(); voice.discard(); app.clearReviewUndo() }
         // Having said it, the answer is what you want next.
         .onChange(of: voice.state) { _, state in if state == .recorded, shadowing(for: card) { revealed = true } }
     }
@@ -768,8 +768,25 @@ struct ReviewView: View {
         do {
             try await session.answer(correct: correct)
             await app.refreshDue()
+            if await session.canUndo { offerUndo(session: session) } else { app.clearReviewUndo() }
             await advance(session)
         } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't save your answer.")) }
+    }
+
+    /// Edit > Undo takes back the latest answer only, so it is the quick undo until the next answer.
+    private func offerUndo(session: ReviewSession) {
+        app.setQuickUndo(title: String(localized: "Review Answer")) {
+            Task {
+                do {
+                    guard try await session.undoLast() else {
+                        app.showToast(String(localized: "Couldn't undo: the word has changed since."), isError: true)
+                        return
+                    }
+                    await app.refreshDue()
+                    if self.session === session { await advance(session) }
+                } catch { self.error = Problem(error, fallback: String(localized: "Kikimi couldn't undo that answer. Try again.")) }
+            }
+        }
     }
 
     private func advance(_ session: ReviewSession) async {
@@ -785,6 +802,7 @@ struct ReviewView: View {
                 if listening(for: next) || dictation(for: next) { playSentence() }   // the sentence is the question: it plays whatever the audio setting
                 else if mode == .onCardShown, cloze(for: next) == nil { playSentence() }
             }
+            if card == nil { app.clearReviewUndo() }
             if card == nil, await session.answered > 0 {
                 summary = (await session.answered, await session.correctFirstTry)
                 returned = await session.returnedToLearning

@@ -6,11 +6,28 @@ import SwiftUI
 struct AppCommands: Commands {
     let app: AppState
 
+    /// A text field is being edited and has something to undo: typing keeps ⌘Z.
+    private static var editingTextCanUndo: Bool {
+        (NSApp.keyWindow?.firstResponder as? NSText)?.undoManager?.canUndo == true
+    }
+
     var body: some Commands {
         // The standard About window, with a few lines under the version: what the app is, where to find it, and the credits.
         CommandGroup(replacing: .appInfo) {
             Button("About Kikimi") { Self.showAboutPanel() }
             Button("Check for Updates…") { Task { await UpdateChecker.run() } }
+        }
+
+        // ⌘Z takes back the latest quick action (a review answer, a word marked in the player). While a text field is being
+        // edited, or when there is no quick action, it goes to the responder chain as usual.
+        CommandGroup(replacing: .undoRedo) {
+            Button(app.undoMenuTitle) {
+                if app.quickUndo != nil, !Self.editingTextCanUndo { app.performQuickUndo() }
+                else { NSApp.sendAction(Selector(("undo:")), to: nil, from: nil) }
+            }
+            .keyboardShortcut("z")
+            Button("Redo") { NSApp.sendAction(Selector(("redo:")), to: nil, from: nil) }
+                .keyboardShortcut("z", modifiers: [.command, .shift])
         }
 
         // One window, so there is no "New Window". Adding a video is what "New" means here.
