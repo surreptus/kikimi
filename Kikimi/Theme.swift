@@ -74,6 +74,10 @@ enum Theme {
 
     /// Captions and explanatory text: the body size of the app. Furigana over subtitle words is the one thing smaller (see `SubtitleRow`).
     static var small: Font { sized(size: 14, design: .rounded) }
+    /// Reading copy: a modal's paragraphs and a page's subtitle. 16 pt, since 14 read as small.
+    static var copy: Font { sized(size: 16, design: .rounded) }
+    /// The pale yellow dot that says lessons are waiting. A new colour on purpose, so it stands apart from the due count.
+    static let lessonDot = Color(light: Color(hex: 0xF2B705), dark: Color(hex: 0xFFD54A))
 
     /// Large headings are light; small ones need a little weight to stay readable.
     static func title(_ size: CGFloat = 24) -> Font { sized(size: size, weight: size >= 30 ? .regular : .semibold, design: .rounded) }
@@ -297,7 +301,7 @@ struct ScreenTitle: View {
         VStack(alignment: .leading, spacing: 2) {
             Text(text).font(Theme.title(34)).foregroundStyle(Theme.ink)
             // Always one subtitle line, so the heading is the same height on every screen.
-            Text(subtitle ?? " ").font(.system(.callout, design: .rounded)).foregroundStyle(Theme.muted).lineLimit(1)
+            Text(subtitle ?? " ").font(Theme.copy).foregroundStyle(Theme.muted).lineLimit(1)
         }
     }
 }
@@ -483,7 +487,7 @@ struct EmptyState: View {
             VStack(spacing: 10) {
                 illustration.view
                 Text(title).font(Theme.title(22)).foregroundStyle(Theme.ink)
-                Text(message).font(.system(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                Text(message).font(Theme.styled(.body, design: .rounded)).foregroundStyle(Theme.muted)
                     .multilineTextAlignment(.center)
             }
             .accessibilityElement(children: .combine)

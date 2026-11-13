@@ -54,7 +54,7 @@ struct CalibrationSheet: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("I know these words").font(Theme.title(20))
                 Text("Tick the words you know. Only those are marked as known, which makes this video's figure and your lessons truer.")
-                    .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+                    .font(Theme.copy).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
             }
             ScrollView {
                 FlowLayout(spacing: 8, lineSpacing: 8) {
@@ -66,7 +66,7 @@ struct CalibrationSheet: View {
             Text(Calibration.endsAfter(batch, known: ticked) && !ticked.isEmpty
                  ? String(localized: "Fewer than half of these are known to you, so that is enough.")
                  : String(localized: "Words \(index * Calibration.batchSize + 1) to \(index * Calibration.batchSize + batch.count), the most common in this video."))
-                .font(Theme.small).foregroundStyle(Theme.muted)
+                .font(Theme.copy).foregroundStyle(Theme.muted)
             HStack(spacing: 12) {
                 Button("Cancel") { dismiss() }.buttonStyle(.pill(.quiet, compact: true))
                 Button(allTicked ? "Clear all" : "Select all") {
@@ -129,7 +129,7 @@ struct CalibrationSheet: View {
             Text(toMark.isEmpty
                  ? "You ticked no words, so none are marked known."
                  : "These are the words you ticked. They are marked as known, so they are left out of lessons and count toward how much of each video you know. You can undo it right after.")
-                .font(Theme.small).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+                .font(Theme.copy).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 12) {
                 Button("Back") { step = .asking }.buttonStyle(.pill(.quiet, compact: true))
                 Spacer()
@@ -166,7 +166,7 @@ struct CalibrationSheet: View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Nothing to ask").font(Theme.title(20))
             Text("Every word in this video has already been set, whether learning, known or ignored.")
-                .font(Theme.small).foregroundStyle(Theme.muted)
+                .font(Theme.copy).foregroundStyle(Theme.muted)
             HStack { Spacer(); Button("Done") { dismiss() }.buttonStyle(.pill(compact: true)).keyboardShortcut(.defaultAction) }
         }
     }

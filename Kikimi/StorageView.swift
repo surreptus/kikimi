@@ -32,7 +32,7 @@ struct StorageView: View {
                 ForEach(models) { model in modelRow(model) }
                 if importRunning {
                     Text("An import is running, so models can't be removed right now.")
-                        .font(Theme.small).foregroundStyle(Theme.muted)
+                        .font(Theme.copy).foregroundStyle(Theme.muted)
                 }
             }
 

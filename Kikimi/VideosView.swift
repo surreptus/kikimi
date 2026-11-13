@@ -74,6 +74,7 @@ struct VideosView: View {
                 if !items.isEmpty { sortMenu }
                 ForEach(orderedItems) { item in
                     row(item)
+                        .transition(reduceMotion ? .opacity : .asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.96, anchor: .top)), removal: .opacity))
                 }
             }
             .padding(Theme.screenPadding)
@@ -221,7 +222,10 @@ struct VideosView: View {
     }
 
     private func reload() async {
-        items = (try? await env.database.libraryVideos(language: app.languageCode)) ?? []
+        let loaded = (try? await env.database.libraryVideos(language: app.languageCode)) ?? []
+        // A video that has just been added settles into the list; the first load and a change of language do not animate.
+        let added = !items.isEmpty && loaded.contains { new in !items.contains { $0.id == new.id } }
+        if added { withAnimation(Theme.easeOut(0.4)) { items = loaded } } else { items = loaded }
         totalBytes = env.libraryBytes()
         coverages = (try? await env.database.videoCoverage(language: app.languageCode)) ?? [:]
         unwatched = (try? await env.database.unwatchedVideoIDs(language: app.languageCode)) ?? []

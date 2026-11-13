@@ -78,7 +78,7 @@ struct LessonView: View {
                     .font(Theme.styled(.title3, design: .rounded)).multilineTextAlignment(.center).textSelection(.enabled)
                 WordKanji(env: env, lemma: card.word.lemma, language: card.word.language)
                 if let example = card.example {
-                    Text(example.highlighted).font(Theme.styled(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                    Text(example.highlighted).font(Theme.sized(size: 20, design: .rounded)).foregroundStyle(Theme.muted)
                         .multilineTextAlignment(.center).padding(.top, 6)
                     Text(example.videoTitle).font(Theme.small).foregroundStyle(Theme.faint)
                     Button { play() } label: { KeyedLabel(title: "Play sentence", systemImage: "speaker.wave.2.fill", key: "R") }

@@ -238,7 +238,7 @@ struct ReviewView: View {
                     if revealed, app.profile.display.showsReadings {
                         RubySentence(example: example, profile: app.profile, pinned: furiganaPinned).padding(.top, 4)
                     } else {
-                        Text(example.highlighted).font(Theme.styled(.body, design: .rounded)).foregroundStyle(Theme.muted)
+                        Text(example.highlighted).font(Theme.sized(size: 20, design: .rounded)).foregroundStyle(Theme.muted)
                             .multilineTextAlignment(.center)
                             .padding(.top, 4)
                     }
