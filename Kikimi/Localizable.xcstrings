@@ -2768,9 +2768,6 @@
         }
       }
     },
-    "Back" : {
-
-    },
     "Back to %@" : {
       "localizations" : {
         "de" : {
@@ -4916,9 +4913,6 @@
         }
       }
     },
-    "Fewer than half of these are known to you, so that is enough." : {
-
-    },
     "Files are missing" : {
       "localizations" : {
         "de" : {
@@ -6431,6 +6425,9 @@
         }
       }
     },
+    "Know at least half of these to be shown more words." : {
+
+    },
     "Known" : {
       "localizations" : {
         "de" : {
@@ -7393,7 +7390,7 @@
         }
       }
     },
-    "Mark %@ as known?" : {
+    "Mark ^[%lld word](inflect: true) as known" : {
 
     },
     "Mark as known" : {
@@ -7423,9 +7420,6 @@
           }
         }
       }
-    },
-    "Mark known" : {
-
     },
     "Mark the words I know" : {
 
@@ -8301,9 +8295,6 @@
       }
     },
     "Nothing to ask" : {
-
-    },
-    "Nothing to mark" : {
 
     },
     "Nothing to review yet" : {
@@ -12290,7 +12281,7 @@
     "The words you were just taught, asked at once." : {
 
     },
-    "These are the words you ticked. They are marked as known, so they are left out of lessons and count toward how much of each video you know. You can undo it right after." : {
+    "They are left out of lessons and count toward how much of each video you know. You can undo it right after." : {
 
     },
     "This is the app's own copy. Your original file, wherever you imported it from, is not touched by the app." : {
@@ -13738,9 +13729,6 @@
           }
         }
       }
-    },
-    "You ticked no words, so none are marked known." : {
-
     },
     "You will be asked these words as soon as you have seen them all." : {
 
