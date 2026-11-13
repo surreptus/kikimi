@@ -3933,6 +3933,9 @@
     "Couldn't undo: %@" : {
 
     },
+    "Danger zone" : {
+
+    },
     "Dark" : {
       "localizations" : {
         "de" : {
@@ -7654,6 +7657,9 @@
         }
       }
     },
+    "Moves your words, progress and videos into a Set Aside folder and quits Kikimi, so it opens empty. Nothing is deleted: speech models stay, and you can move things back or delete the folder yourself. Save a backup first if you may want your progress back." : {
+
+    },
     "New" : {
       "localizations" : {
         "de" : {
@@ -10578,6 +10584,9 @@
     "Sentence from your videos" : {
 
     },
+    "Set Aside and Quit" : {
+
+    },
     "Set aside words that are not worth learning, such as names or mistakes. They stay, and Reset brings them back." : {
 
     },
@@ -10740,6 +10749,9 @@
 
     },
     "Show one line" : {
+
+    },
+    "Show Set Aside Folder in Finder" : {
 
     },
     "Show subtitle" : {
@@ -11619,6 +11631,12 @@
           }
         }
       }
+    },
+    "Start over with an empty library?" : {
+
+    },
+    "Start over…" : {
+
     },
     "Start with the 25 new words you hear most" : {
 
@@ -13806,6 +13824,9 @@
           }
         }
       }
+    },
+    "Your words, progress and videos are moved to a Set Aside folder in Kikimi's Application Support folder, and Kikimi quits. Open it again to start with an empty library. Nothing is deleted, and the speech models stay." : {
+
     },
     "日本語 · Una frase de ejemplo" : {
 
