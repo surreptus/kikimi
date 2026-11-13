@@ -88,6 +88,15 @@
         }
       }
     },
+    "%@ of words known, %@ learning · %@" : {
+
+    },
+    "Known-word coverage %@, learning %@: %@" : {
+
+    },
+    "You know %lld%% of its words and are learning %lld%%." : {
+
+    },
     "“%@” is no longer in that sentence, so this card was skipped." : {
 
     },
@@ -13212,12 +13221,12 @@
         }
       }
     },
-    "You know %lld of this video's %lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you ignore are left out of the count." : {
+    "You know %lld of this video's %lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you are learning at Stages 1 to 4 are shown beside it and do not count as known. Words you ignore are left out of the count." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You know %1$lld of this video's %2$lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you ignore are left out of the count."
+            "value" : "You know %1$lld of this video's %2$lld content words (counted once per line). In our samples, knowing 90%% of the content words was about 94%% to 96%% of everything said (counting the small words as known), around where listening becomes comfortable. This counts the words you know, not how much you understand: grammar, idioms, speed and the transcript's mistakes matter too. Words you are learning at Stages 1 to 4 are shown beside it and do not count as known. Words you ignore are left out of the count."
           }
         }
       }
