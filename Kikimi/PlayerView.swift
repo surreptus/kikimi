@@ -138,18 +138,41 @@ struct PlayerView: View {
         if announce, let wordID = hint?.wordID { try? await env.database.record(.lookup, subject: wordID) }
     }
 
-    /// Start learning or mark known without leaving the video.
+    /// Start learning or mark known without leaving the video. The toast says what happened and offers Undo.
     private func setStatus(_ status: WordStatus) {
         guard let id = hint?.wordID else { return }
+        let lemma = hint?.lemma ?? ""
         Task {
-            switch status {
-            case .learning: try? await env.database.startLearning(wordID: id)
-            case .ignored: try? await env.database.markIgnored(wordIDs: [id])
-            case .new: try? await env.database.markNew(wordIDs: [id])
-            default: try? await env.database.markKnown(wordID: id)
+            do {
+                let change = try await env.database.setStatus(status, ofWord: id)
+                app.dataChanged()
+                await refreshHint()
+                guard !change.isEmpty else { return }
+                let wasInReviews = change.before.first.map { $0.status == .learning || $0.status == .finished } ?? false
+                let text = switch status {
+                case .learning: String(localized: "Started learning “\(lemma)”")
+                case .ignored: String(localized: "Set “\(lemma)” aside")
+                case .new: String(localized: "Brought “\(lemma)” back")
+                default: wasInReviews ? String(localized: "Marked “\(lemma)” as known and took it out of your reviews")
+                                      : String(localized: "Marked “\(lemma)” as known")
+                }
+                app.showToast(text, undo: (String(localized: "Undo"), { undo(change) }))
+            } catch {
+                app.showToast(String(localized: "Failed: \(error.localizedDescription)"), isError: true)
             }
-            app.dataChanged()
-            await refreshHint()
+        }
+    }
+
+    private func undo(_ change: WordChange) {
+        Task {
+            do {
+                try await env.database.undo(change)
+                app.dataChanged()
+                await refreshHint()
+                app.showToast(String(localized: "Undone"))
+            } catch {
+                app.showToast(String(localized: "Couldn't undo: \(error.localizedDescription)"), isError: true)
+            }
         }
     }
 
