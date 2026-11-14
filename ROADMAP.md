@@ -333,6 +333,12 @@ The order follows how much each item helps comprehensible input for the effort.
       and a pinyin dictionary (CC-CEDICT, CC BY-SA). Korean is not planned.
 
 ### Housekeeping
+- [x] **Find words again** (13 Nov 2026). Settings > Data re-reads the saved lines of every video (edited lines too) with the current
+      tokenizer, so fixes reach videos imported earlier. It needs no video file, model or network. It only changes occurrences
+      and adds new words; status, stage, review dates and activity stay, and words you have worked with that are found in no video any more are kept. A `new` word with no activity and no occurrence is
+      removed, as editing a line does. Each video
+      is one transaction, and a second run changes nothing. No migration and no version stamp on videos. Not done: running it
+      automatically, and undo (nothing of yours changes, so there is a confirmation instead). Not seen in the running app.
 - [ ] Cache video thumbnails on disk if scrolling a large library feels slow.
 - [ ] **Translate the app's own interface.** The groundwork is done (strings are localisable, in two string catalogs). To add a
       language: add it to each catalog in Xcode, translate (Product > Export Localizations), add localised copies of `Privacy.md`

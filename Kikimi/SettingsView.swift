@@ -230,6 +230,8 @@ private struct DataTab: View {
     @State private var known: KnownListState = .idle
     @State private var libraryBytes: Int64 = 0
     @State private var confirmingStartOver = false
+    @State private var findAgain: FindAgainState = .idle
+    @State private var confirmingFindAgain = false
     @State private var setAsideFolder = StartOver.setAsideFolder()
 
     var body: some View {
@@ -275,6 +277,14 @@ private struct DataTab: View {
             }
 
             Section {
+                findAgainContent
+            } header: {
+                Text("Words in your videos")
+            } footer: {
+                Text("Reads the lines of your videos again with the latest word finder, so fixes made since you added a video reach it. Use it after an update, if your videos show mistakes in their words. It needs no video file or internet. Your progress is never changed. Words you have worked with are kept, even if they no longer appear in a video.")
+            }
+
+            Section {
                 Button("Manage storage…") {
                     openWindow(id: "main")
                     NSApp.activate(ignoringOtherApps: true)
@@ -298,6 +308,12 @@ private struct DataTab: View {
             }
         }
         .formStyle(.grouped)
+        .alert("Find the words in all your videos again?", isPresented: $confirmingFindAgain) {
+            Button("Find Words Again") { Task { await findWordsAgain() } }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Kikimi reads every saved line again, including lines you edited. New words are added. Your progress, and every word you have worked with, stays. Words you never touched that no longer appear in any video are removed.")
+        }
         .alert("Start over with an empty library?", isPresented: $confirmingStartOver) {
             Button("Set Aside and Quit", role: .destructive) { StartOver.request() }
             Button("Cancel", role: .cancel) {}
@@ -470,6 +486,71 @@ private struct DataTab: View {
             known = .done(report)
         } catch {
             known = .failed(Problem(error, fallback: String(localized: "Kikimi couldn't mark those words as known. Try again.")))
+        }
+    }
+
+    // MARK: Find words again
+
+    private enum FindAgainState {
+        case idle
+        case working(done: Int, total: Int)
+        case done(ReanalysisReport)
+        case failed(Problem)
+    }
+
+    @ViewBuilder
+    private var findAgainContent: some View {
+        switch findAgain {
+        case .idle:
+            Button("Find Words Again…") { confirmingFindAgain = true }
+        case .working(let done, let total):
+            HStack(spacing: 10) {
+                ProgressView(value: Double(done), total: Double(max(total, 1)))
+                    .frame(maxWidth: 240)
+                Text("Video \(min(done + 1, total)) of \(total)").foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .combine)
+        case .done(let report):
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Looked at ^[\(report.videosLooked) video](inflect: true).").font(Theme.styled(.headline))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(report.wordsAdded > 0
+                         ? inflected("• ^[\(report.wordsAdded) word](inflect: true) added.")
+                         : String(localized: "• No new words."))
+                    if report.wordsRemoved > 0 {
+                        Text("• ^[\(report.wordsRemoved) unused word](inflect: true) removed. You had not touched them.")
+                    }
+                    if report.wordsInNoVideo > 0 {
+                        Text("• ^[\(report.wordsInNoVideo) word](inflect: true) no longer appear in any video. They are kept.")
+                    }
+                    if report.videosSkipped > 0 {
+                        Text("• ^[\(report.videosSkipped) video](inflect: true) skipped, because Kikimi has no word finder for their language.")
+                    }
+                }
+                Button("Done") { findAgain = .idle }
+            }
+        case .failed(let problem):
+            VStack(alignment: .leading, spacing: 8) {
+                ProblemView(problem: problem)
+                Button("Try again") { findAgain = .idle }
+            }
+        }
+    }
+
+    private func findWordsAgain() async {
+        findAgain = .working(done: 0, total: 0)
+        do {
+            // Progress arrives from the database queue; hop to the main actor to show it.
+            let report = try await env.findWordsAgain { done, total in
+                Task { @MainActor in
+                    if case .working = findAgain { findAgain = .working(done: done, total: total) }
+                }
+            }
+            app.dataChanged()
+            findAgain = .done(report)
+        } catch {
+            app.dataChanged()
+            findAgain = .failed(Problem(error, fallback: String(localized: "Kikimi couldn't read your videos again. Nothing was lost. Try again.")))
         }
     }
 
